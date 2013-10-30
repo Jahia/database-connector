@@ -63,6 +63,7 @@
     <properties>
         <spring-data-neo4j.version>2.3.1.RELEASE</spring-data-neo4j.version>
         <spring-data-redis.version>1.1.0.RELEASE</spring-data-redis.version>
+        <spring-data-mongodb.version>1.3.1.RELEASE</spring-data-mongodb.version>
         <jedis.version>2.1.0</jedis.version>
     </properties>
 
@@ -136,6 +137,21 @@
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>${jedis.version}</version>
+        </dependency>
+
+        <!-- ******************* -->
+        <!-- Spring Data MongoDB -->
+        <!-- ******************* -->
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-mongodb</artifactId>
+            <version>${spring-data-mongodb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>2.11.3</version>
         </dependency>
 
         <!-- ***************** -->
@@ -258,6 +274,7 @@
                             com.mysema.query.annotations;resolution:=optional,
                             com.mysema.query.apt;resolution:=optional,
                             com.mysema.query.lucene;resolution:=optional,
+                            com.mysema.query.mongodb;resolution:=optional,
                             com.mysema.query.types;resolution:=optional,
                             com.mysema.query.types.path;resolution:=optional,
                             com.tinkerpop.blueprints.pgm;resolution:=optional,
@@ -295,6 +312,8 @@
                             org.apache.xml.resolver.helpers;resolution:=optional,
                             org.apache.xml.resolver.readers;resolution:=optional,
                             org.apache.xml.resolver.tools;resolution:=optional,
+                            org.bson;resolution:=optional,
+                            org.bson.types;resolution:=optional,
                             org.codehaus.jackson.xc;resolution:=optional,
                             org.codehaus.jettison.badgerfish;resolution:=optional,
                             org.codehaus.jettison.json;resolution:=optional,
@@ -333,21 +352,41 @@
                             {local-packages},
                             org.neo4j.graphdb,
                             org.neo4j.graphdb.traversal,
+                            org.springframework.data.annotation,
                             org.springframework.data.domain,
                             org.springframework.data.neo4j.annotation,
                             org.springframework.data.neo4j.conversion,
                             org.springframework.data.neo4j.config,
+                            org.springframework.data.neo4j.core,
+                            org.springframework.data.neo4j.fieldaccess,
+                            org.springframework.data.neo4j.mapping,
                             org.springframework.data.neo4j.repository,
+                            org.springframework.data.neo4j.repository.query,
                             org.springframework.data.neo4j.rest,
                             org.springframework.data.neo4j.support,
+                            org.springframework.data.mongodb,
+                            org.springframework.data.mongodb.core,
+                            org.springframework.data.mongodb.core.aggregation,
+                            org.springframework.data.mongodb.core.convert,
+                            org.springframework.data.mongodb.core.geo,
+                            org.springframework.data.mongodb.core.index,
+                            org.springframework.data.mongodb.core.mapping,
+                            org.springframework.data.mongodb.core.mapreduce,
+                            org.springframework.data.mongodb.core.query,
+                            org.springframework.data.mongodb.repository,
+                            org.springframework.data.mongodb.repository.config,
+                            org.springframework.data.mongodb.repository.query,
+                            org.springframework.data.mongodb.repository.support,
                             org.springframework.data.redis.core,
+                            org.springframework.data.redis.core.query,
                             org.springframework.data.repository,
+                            org.springframework.data.repository.config,
                             org.springframework.data.repository.core.support
                         </Export-Package>
                         <Embed-Dependency>
                             *;groupId=org.neo4j|javax.ws.rs|com.sun.jersey|com.googlecode.concurrentlinkedhashmap|
                             org.ow2.easybeans.osgi|com.sun.xml.bind|org.parboiled|org.scala-lang|commons-configuration|
-                            org.codehaus.jackson|redis.clients;scope=compile; type=!pom; inline=false,
+                            org.codehaus.jackson|redis.clients|org.mongodb;scope=compile; type=!pom; inline=false,
                             *;artifactId=spring-aspects;scope=compile; type=!pom; inline=false,
                             *;groupId=org.springframework.data;scope=compile; type=!pom; inline=!META-INF/**
                         </Embed-Dependency>

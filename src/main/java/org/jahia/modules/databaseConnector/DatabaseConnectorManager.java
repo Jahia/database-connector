@@ -7,6 +7,8 @@ import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -41,6 +43,12 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
     @Autowired
     private RedisTemplate<String, Integer> integerRedisTemplate;
 
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private MongoDbFactory mongoDbFactory;
+
     public DatabaseConnectorManager() {}
 
     @Override
@@ -61,14 +69,14 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
     @Override
     public boolean registerRedisConnectionFactory() throws InvalidSyntaxException {
         logger.info("Start registering OSGi service for Redis Connection Factory");
-        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(redisConnectionFactory.getClass().getName(), "(database=redis)");
+        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(RedisConnectionFactory.class.getName(), "(database=redis)");
         if(serviceReferences != null) {
             logger.info("OSGi service for Redis Connection Factory already registered");
             return true;
         }
         Properties properties = new Properties();
         properties.put("database", "redis");
-        bundleContext.registerService(redisConnectionFactory.getClass().getName(), redisConnectionFactory, properties);
+        bundleContext.registerService(getInterfacesNames(redisConnectionFactory), redisConnectionFactory, properties);
         logger.info("OSGi service for Redis Connection Factory successfully registered");
         return true;
     }
@@ -119,8 +127,47 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
     }
 
     @Override
+    public boolean registerMongoTemplate() throws InvalidSyntaxException {
+        logger.info("Start registering OSGi service for MongoDB Template");
+        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(mongoTemplate.getClass().getName(), "(database=mongo)");
+        if(serviceReferences != null) {
+            logger.info("OSGi service for MongoDB Template already registered");
+            return true;
+        }
+        Properties properties = new Properties();
+        properties.put("database", "mongo");
+        bundleContext.registerService(mongoTemplate.getClass().getName(), mongoTemplate, properties);
+        logger.info("OSGi service for MongoDB Template successfully registered");
+        return true;
+    }
+
+    @Override
+    public boolean registerMongoDbFactory() throws InvalidSyntaxException {
+        logger.info("Start registering OSGi service for MongoDB Factory");
+        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(MongoDbFactory.class.getName(), "(database=mongo)");
+        if(serviceReferences != null) {
+            logger.info("OSGi service for MongoDB Factory already registered");
+            return true;
+        }
+        Properties properties = new Properties();
+        properties.put("database", "mongo");
+        bundleContext.registerService(getInterfacesNames(mongoDbFactory), mongoDbFactory, properties);
+        logger.info("OSGi service for MongoDB Factory successfully registered");
+        return true;
+    }
+
+    @Override
     public void setBundleContext(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
+    }
+
+    private String[] getInterfacesNames(Object obj) {
+        Class[] interfaces = obj.getClass().getInterfaces();
+        String[] interfacesNames = new String[interfaces.length];
+        for (int i = 0; i < interfaces.length; i++) {
+            interfacesNames[i] = interfaces[i].getName();
+        }
+        return interfacesNames;
     }
 
 }

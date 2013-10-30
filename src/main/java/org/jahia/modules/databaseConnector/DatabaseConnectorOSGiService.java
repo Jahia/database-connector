@@ -19,4 +19,8 @@ public interface DatabaseConnectorOSGiService {
     boolean registerRedisLongTemplate() throws InvalidSyntaxException;
 
     boolean registerRedisIntegerTemplate() throws InvalidSyntaxException;
+
+    boolean registerMongoTemplate() throws InvalidSyntaxException;
+
+    boolean registerMongoDbFactory() throws InvalidSyntaxException;
 }
