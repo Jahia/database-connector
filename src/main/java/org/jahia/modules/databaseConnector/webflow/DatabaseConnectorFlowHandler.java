@@ -43,7 +43,7 @@ public class DatabaseConnectorFlowHandler implements Serializable {
         }
     }
 
-    public Connection getConnection(String databaseId, String databaseTypeName) {
+    public Connection getConnectionData(String databaseId, String databaseTypeName) {
         return new Connection(databaseConnectorManager.getConnectionData(databaseTypeName, databaseId));
     }
 
@@ -51,8 +51,7 @@ public class DatabaseConnectorFlowHandler implements Serializable {
         databaseConnectorManager.addConnection(connection);
     }
 
-//    public boolean addEditNeo4jConnection(Connection connection) {
-//        return databaseConnectorManager.addEditNeo4jConnection(connection);
-//    }
-
+    public void removeConnection(String databaseId, String databaseTypeName) {
+        databaseConnectorManager.removeConnection(databaseId, databaseTypeName);
+    }
 }

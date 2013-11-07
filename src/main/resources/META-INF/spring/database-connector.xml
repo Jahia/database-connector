@@ -14,22 +14,6 @@
     <context:spring-configured/>
     <context:annotation-config/>
 
-    <!--Neo4j-->
-    <!--<neo4j:config graphDatabaseService="graphDatabaseService" />-->
-    <!--<bean databaseId="graphDatabaseService" class="org.springframework.data.neo4j.rest.SpringRestGraphDatabase">-->
-        <!--<constructor-arg index="0" value="http://localhost:7474/db/data" />-->
-    <!--</bean>-->
-
-    <!--Redis-->
-    <!--<bean class="org.jahia.modules.databaseConnector.redis.SpringDataRedisConfig"/>-->
-
-    <!--MongoDB-->
-    <!--<mongo:db-factory id="mongoDbFactory" dbname="test" />-->
-    <!--<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">-->
-        <!--<constructor-arg ref="mongoDbFactory" />-->
-        <!--<property name="writeConcern" value="SAFE" />-->
-    <!--</bean>-->
-
     <!--OSGi Service-->
     <bean class="org.jahia.modules.databaseConnector.DatabaseConnectorManager" id="databaseConnectorManager"/>
     <osgi:service ref="databaseConnectorManager" interface="org.jahia.modules.databaseConnector.DatabaseConnectorOSGiService"/>

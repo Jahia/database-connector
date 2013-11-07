@@ -1,11 +1,16 @@
 package org.jahia.modules.databaseConnector;
 
+import org.jahia.modules.databaseConnector.neo4j.Neo4jDatabaseConnection;
 import org.jahia.modules.databaseConnector.webflow.model.Connection;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.JCRTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
@@ -23,6 +28,10 @@ import static org.jahia.modules.databaseConnector.DatabaseConnectorManager.*;
  * @version 1.0
  */
 public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractDatabaseConnection> implements DatabaseConnectionRegistry<T> {
+
+    private final static String NODE_TYPE = "dcmix:databaseConnection";
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractDatabaseConnectionRegistry.class);
 
     protected Map<String, T> registry;
 
@@ -73,6 +82,39 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractDatab
         } catch (RepositoryException e) {
             return false;
         }
+    }
+
+    @Override
+    public Boolean removeConnection(final String databaseConnectionId) {
+        if (!registry.containsKey(databaseConnectionId)) {
+            throw new IllegalArgumentException("No database connection with ID: " + databaseConnectionId);
+        }
+        JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
+
+            public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
+                StringBuffer statement = new StringBuffer("SELECT * FROM [").append(NODE_TYPE).append("] WHERE [").
+                        append(ID_KEY).append("] = '").append(databaseConnectionId).append("'");
+                NodeIterator nodes = query(statement.toString(), session).getNodes();
+                if (!nodes.hasNext()) {
+                    // TODO
+                    return false;
+                }
+                Node databaseConnectionNode = nodes.nextNode();
+                session.checkout(databaseConnectionNode);
+                session.removeItem(databaseConnectionNode.getPath());
+                session.save();
+                return true;
+            }
+        };
+        try {
+            if (jcrTemplate.doExecuteWithSystemSession(callback)) {
+                registry.remove(databaseConnectionId);
+                return true;
+            }
+        } catch (RepositoryException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return false;
     }
 
     protected QueryResult query(String statement, JCRSessionWrapper session) throws RepositoryException {

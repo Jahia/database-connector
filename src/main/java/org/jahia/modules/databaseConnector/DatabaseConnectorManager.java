@@ -277,6 +277,11 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
         databaseConnectionRegistries.get(connection.getDatabaseType()).addConnection(connection);
     }
 
+    public void removeConnection(String databaseId, String databaseTypeName) {
+        DatabaseTypes databaseType = valueOf(databaseTypeName);
+        databaseConnectionRegistries.get(databaseType).removeConnection(databaseId);
+    }
+
     public void setActivatedDatabaseTypes(Set<DatabaseTypes> activatedDatabaseTypes) {
         this.activatedDatabaseTypes = activatedDatabaseTypes;
     }

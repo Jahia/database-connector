@@ -19,6 +19,8 @@ public interface DatabaseConnectionRegistry<T extends AbstractDatabaseConnection
 
     public void addConnection(Connection connection);
 
+    public Boolean removeConnection(String databaseConnectionId);
+
 //    public void editConnection(Connection connection);
 
 //    public DatabaseTypes getDatabaseType();

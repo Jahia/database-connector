@@ -16,12 +16,12 @@
             <set name="flowScope.isEdition" value="false" type="boolean"/>
         </transition>
         <transition on="editConnection" to="enterConfig">
-            <evaluate expression="flowHandler.getConnectionData(requestParameters.databaseTypeId, requestParameters.databaseTypeName)" result="flowScope.connection"/>
+            <evaluate expression="flowHandler.getConnectionData(requestParameters.databaseId, requestParameters.databaseTypeName)" result="flowScope.connection"/>
             <set name="flowScope.isEdition" value="true" type="boolean"/>
         </transition>
-        <!--<transition on="removeConnection" to="registeredConnections">-->
-            <!--<evaluate expression="flowHandler.removeConnection(requestParameters.providerId, siteIdentifier)"/>-->
-        <!--</transition>-->
+        <transition on="removeConnection" to="registeredConnections">
+            <evaluate expression="flowHandler.removeConnection(requestParameters.databaseId, requestParameters.databaseTypeName)"/>
+        </transition>
     </view-state>
 
     <view-state id="selectDatabaseType">
