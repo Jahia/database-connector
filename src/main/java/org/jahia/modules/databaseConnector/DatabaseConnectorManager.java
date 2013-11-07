@@ -6,9 +6,6 @@ import org.jahia.modules.databaseConnector.neo4j.Neo4jDatabaseConnectionRegistry
 import org.jahia.modules.databaseConnector.redis.RedisDatabaseConnection;
 import org.jahia.modules.databaseConnector.redis.RedisDatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.webflow.model.Connection;
-import org.jahia.services.content.JCRCallback;
-import org.jahia.services.content.JCRNodeWrapper;
-import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.JCRTemplate;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -17,8 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.util.Assert;
 
-import javax.jcr.RepositoryException;
 import java.util.*;
 
 import static org.jahia.modules.databaseConnector.DatabaseTypes.*;
@@ -61,13 +58,9 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
     @Override
     public boolean registerNeo4jGraphDatabase(String databaseId) throws InvalidSyntaxException {
         logger.info("Start registering OSGi service for Neo4j Template");
-        if (!databaseConnectionRegistries.containsKey(NEO4J)) {
-            throw new IllegalArgumentException("No Neo4j connection registered");
-        }
+        Assert.isTrue(databaseConnectionRegistries.containsKey(NEO4J), "No Neo4j connection registered");
         final Map<String, Neo4jDatabaseConnection> registry = ((Neo4jDatabaseConnectionRegistry) databaseConnectionRegistries.get(NEO4J)).getRegistry();
-        if (!registry.containsKey(databaseId)) {
-            throw new IllegalArgumentException("No Neo4j connection registered with databaseId: " + databaseId);
-        }
+        Assert.isTrue(registry.containsKey(databaseId), "No Neo4j connection registered with databaseId: " + databaseId);
         SpringRestGraphDatabase graphDatabaseService = registry.get(databaseId).getGraphDatabaseService();
         ServiceReference[] serviceReferences =
                 bundleContext.getAllServiceReferences(graphDatabaseService.getClass().getName(), createFilter(NEO4J, databaseId));
@@ -83,13 +76,9 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
     @Override
     public boolean registerRedisConnectionFactory(String databaseId) throws InvalidSyntaxException {
         logger.info("Start registering OSGi service for Redis Connection Factory");
-        if (!databaseConnectionRegistries.containsKey(REDIS)) {
-            throw new IllegalArgumentException("No Redis connection registered");
-        }
+        Assert.isTrue(databaseConnectionRegistries.containsKey(REDIS), "No Redis connection registered");
         final Map<String, RedisDatabaseConnection> registry = ((RedisDatabaseConnectionRegistry) databaseConnectionRegistries.get(REDIS)).getRegistry();
-        if (!registry.containsKey(databaseId)) {
-            throw new IllegalArgumentException("No Redis Connection registered with databaseId: " + databaseId);
-        }
+        Assert.isTrue(registry.containsKey(databaseId), "No Redis connection registered with databaseId: " + databaseId);
         RedisConnectionFactory redisConnectionFactory = registry.get(databaseId).getConnectionFactory();
         ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(RedisConnectionFactory.class.getName(), createFilter(REDIS, databaseId));
         if(serviceReferences != null) {
@@ -273,8 +262,8 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
         return initialId+index;
     }
 
-    public void addConnection(Connection connection) {
-        databaseConnectionRegistries.get(connection.getDatabaseType()).addConnection(connection);
+    public void addEditConnection(Connection connection, boolean isEdition) {
+        databaseConnectionRegistries.get(connection.getDatabaseType()).addEditConnection(connection, isEdition);
     }
 
     public void removeConnection(String databaseId, String databaseTypeName) {

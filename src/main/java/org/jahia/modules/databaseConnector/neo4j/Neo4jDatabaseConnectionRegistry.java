@@ -58,12 +58,20 @@ public class Neo4jDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
     }
 
     @Override
-    public void addConnection(Connection connection) {
+    public void addEditConnection(Connection connection, boolean isEdition) {
         Assert.hasText(connection.getUri(), "URI must be defined");
         Neo4jDatabaseConnection neo4jDatabaseConnection =
                 new Neo4jDatabaseConnection(connection.getId(), connection.getUri(), connection.getUser(), connection.getPassword());
-        if (storeConnection(connection, NODE_TYPE)) {
-            registry.put(connection.getId(), neo4jDatabaseConnection);
+        if (storeConnection(connection, NODE_TYPE, isEdition)) {
+            if (isEdition) {
+                if (!connection.getId().equals(connection.getOldId())) {
+                    registry.remove(connection.getOldId());
+                }
+                registry.put(connection.getId(), neo4jDatabaseConnection);
+            }
+            else {
+                registry.put(connection.getId(), neo4jDatabaseConnection);
+            }
         }
         else {
             // TODO

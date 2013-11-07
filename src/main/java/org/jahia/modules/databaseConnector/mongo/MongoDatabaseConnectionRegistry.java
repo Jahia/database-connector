@@ -66,7 +66,7 @@ public class MongoDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
     }
 
     @Override
-    public void addConnection(Connection connection) {
+    public void addEditConnection(Connection connection, boolean isEdition) {
         Assert.hasText(connection.getHost(), "Host must be defined");
         Assert.notNull(connection.getPort(), "Port must be defined");
         MongoDatabaseConnection mongoDatabaseConnection =
@@ -77,8 +77,16 @@ public class MongoDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
         } catch (UnknownHostException e) {
             logger.error(e.getMessage(), e);
         }
-        if (storeConnection(connection, NODE_TYPE)) {
-            registry.put(connection.getId(), mongoDatabaseConnection);
+        if (storeConnection(connection, NODE_TYPE, isEdition)) {
+            if (isEdition) {
+                if (!connection.getId().equals(connection.getOldId())) {
+                    registry.remove(connection.getOldId());
+                }
+                registry.put(connection.getId(), mongoDatabaseConnection);
+            }
+            else {
+                registry.put(connection.getId(), mongoDatabaseConnection);
+            }
         }
         else {
             // TODO

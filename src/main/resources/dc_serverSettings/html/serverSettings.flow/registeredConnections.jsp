@@ -26,19 +26,19 @@
 
         var textToReplace = "databaseId";
 
-        function manageConnection(eventId, databaseId, databaseTypeName) {
+        function manageConnection(eventId, databaseId, databaseType) {
             var form = $("#manageConnection");
             form.find("input[name='_eventId']").attr('name', "_eventId_"+eventId);
             form.find("input[name='databaseId']").val(databaseId);
-            form.find("input[name='databaseTypeName']").val(databaseTypeName);
+            form.find("input[name='databaseType']").val(databaseType);
             form.submit();
         }
 
-        function confirmRemoveConnection(databaseId, databaseTypeName) {
+        function confirmRemoveConnection(databaseId, databaseType) {
             var modalTitle = $("#removeConnectionModalTitle");
             modalTitle.text(modalTitle.text().replace(textToReplace, databaseId));
             textToReplace = databaseId;
-            $("#removeConnectionModalConfirmButton").attr("onclick", "manageConnection('removeConnection', '"+databaseId+"', '"+databaseTypeName+"')");
+            $("#removeConnectionModalConfirmButton").attr("onclick", "manageConnection('removeConnection', '"+databaseId+"', '"+databaseType+"')");
             $("#removeConnectionModal").modal("show");
         }
     </script>
@@ -59,7 +59,7 @@
 
     <form id="manageConnection" action="${flowExecutionUrl}" method="POST">
         <input type="hidden" name="_eventId">
-        <input type="hidden" name="databaseTypeName"/>
+        <input type="hidden" name="databaseType"/>
         <input type="hidden" name="databaseId"/>
     </form>
     <ul id="registeredConnections" class="thumbnails">
@@ -76,8 +76,7 @@
                             <dt>Database ID</dt>
                             <dd>${connectionData.id}</dd>
                         </dl>
-                        <%--<button class="btn" onclick="manageConnection('editConnection', '${connectionData.id}')">--%>
-                        <button class="btn">
+                        <button class="btn" onclick="manageConnection('editConnection', '${connectionData.id}', '${databaseType}')">
                             <i class="icon-pencil"></i>
                             &nbsp;<fmt:message key="dc_databaseConnector.label.editConnection"/>
                         </button>

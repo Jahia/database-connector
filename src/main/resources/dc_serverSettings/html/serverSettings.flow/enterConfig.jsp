@@ -73,7 +73,7 @@
             <div class="control-group">
                 <label class="control-label" for="id"><fmt:message key="dc_databaseConnector.label.id"/></label>
                 <div class="controls">
-                    <form:input path="id" type="text" value="${id}"/>
+                    <form:input path="id" type="text" value="${id}" disabled="${isEdition}" autocomplete="false"/>
                     <form:errors path="id" cssClass="help-inline errorMessage"/>
                 </div>
             </div>
@@ -112,7 +112,7 @@
                 <div class="control-group">
                     <label class="control-label" for="uri"><fmt:message key="dc_databaseConnector.label.uri"/></label>
                     <div class="controls">
-                        <form:input path="uri" type="text" value="${uri}"/>
+                        <form:input path="uri" type="url" value="${uri}"/>
                         <form:errors path="uri" cssClass="help-inline errorMessage"/>
                     </div>
                 </div>
@@ -129,7 +129,7 @@
             <div class="control-group">
                 <label class="control-label" for="password"><fmt:message key="dc_databaseConnector.label.password"/></label>
                 <div class="controls">
-                    <form:input path="password" type="text" value="${password}"/>
+                    <form:input path="password" type="password" value="${password}" autocomplete="false"/>
                     <form:errors path="password" cssClass="help-inline errorMessage"/>
                 </div>
             </div>

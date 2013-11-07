@@ -14,9 +14,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.query.QueryResult;
 import java.util.Map;
 
-import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.HOST_KEY;
-import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.ID_KEY;
-import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.PORT_KEY;
+import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.*;
 import static org.jahia.modules.databaseConnector.redis.RedisDatabaseConnection.NODE_TYPE;
 
 /**
@@ -60,13 +58,21 @@ public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
     }
 
     @Override
-    public void addConnection(Connection connection) {
+    public void addEditConnection(Connection connection, boolean isEdition) {
         Assert.hasText(connection.getHost(), "Host must be defined");
         Assert.notNull(connection.getPort(), "Port must be defined");
         RedisDatabaseConnection redisDatabaseConnection =
                 new RedisDatabaseConnection(connection.getId(), connection.getHost(), connection.getPort());
-        if (storeConnection(connection, NODE_TYPE)) {
-            registry.put(connection.getId(), redisDatabaseConnection);
+        if (storeConnection(connection, NODE_TYPE, isEdition)) {
+            if (isEdition) {
+                if (!connection.getId().equals(connection.getOldId())) {
+                    registry.remove(connection.getOldId());
+                }
+                registry.put(connection.getId(), redisDatabaseConnection);
+            }
+            else {
+                registry.put(connection.getId(), redisDatabaseConnection);
+            }
         }
         else {
             // TODO

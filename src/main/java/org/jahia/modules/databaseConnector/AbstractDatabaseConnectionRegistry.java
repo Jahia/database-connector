@@ -1,13 +1,10 @@
 package org.jahia.modules.databaseConnector;
 
-import org.jahia.modules.databaseConnector.neo4j.Neo4jDatabaseConnection;
 import org.jahia.modules.databaseConnector.webflow.model.Connection;
-import org.jahia.services.content.JCRCallback;
-import org.jahia.services.content.JCRNodeWrapper;
-import org.jahia.services.content.JCRSessionWrapper;
-import org.jahia.services.content.JCRTemplate;
+import org.jahia.services.content.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -47,30 +44,42 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractDatab
         return registry;
     }
 
-    protected Boolean storeConnection(final Connection connection, final String nodeType) {
+    protected Boolean storeConnection(final Connection connection, final String nodeType, final boolean isEdition) {
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 JCRNodeWrapper databaseConnectorNode = getDatabaseConnectorNode(session);
                 session.checkout(databaseConnectorNode);
-                JCRNodeWrapper connectionNode = databaseConnectorNode.addNode(connection.getId(), nodeType);
+                JCRNodeWrapper connectionNode;
+                if (isEdition) {
+                    connectionNode = (JCRNodeWrapper) getDatabaseConnectionNode(connection.getOldId(), session);
+                    Assert.isTrue(connectionNode.getPrimaryNodeTypeName().equals(nodeType));
+                    session.checkout(connectionNode);
+                }
+                else {
+                    connectionNode = databaseConnectorNode.addNode(
+//                            JCRContentUtils.findAvailableNodeName(databaseConnectorNode, connection.getDatabaseType().name().toLowerCase()),
+                            connection.getId(),
+                            nodeType);
+                }
+                // TODO id editable or not? if yes, bind in flow and change name of node when created
                 connectionNode.setProperty(ID_KEY, connection.getId());
-                if (connection.getHost() != null && !connection.getHost().isEmpty()) {
+                if (connection.getHost() != null) {
                     connectionNode.setProperty(HOST_KEY, connection.getHost());
                 }
                 if (connection.getPort() != null) {
                     connectionNode.setProperty(PORT_KEY, connection.getPort());
                 }
-                if (connection.getUri() != null && !connection.getUri().isEmpty()) {
+                if (connection.getUri() != null) {
                     connectionNode.setProperty(URI_KEY, connection.getUri());
                 }
-                if (connection.getDbName() != null && !connection.getDbName().isEmpty()) {
+                if (connection.getDbName() != null) {
                     connectionNode.setProperty(DB_NAME_KEY, connection.getDbName());
                 }
-                if (connection.getUser() != null && !connection.getUser().isEmpty()) {
+                if (connection.getUser() != null) {
                     connectionNode.setProperty(USER_KEY, connection.getUser());
                 }
-                if (connection.getPassword() != null && !connection.getPassword().isEmpty()) {
+                if (connection.getPassword() != null) {
                     connectionNode.setProperty(PASSWORD_KEY, connection.getPassword());
                 }
                 session.save();
@@ -86,20 +95,11 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractDatab
 
     @Override
     public Boolean removeConnection(final String databaseConnectionId) {
-        if (!registry.containsKey(databaseConnectionId)) {
-            throw new IllegalArgumentException("No database connection with ID: " + databaseConnectionId);
-        }
+        Assert.isTrue(registry.containsKey(databaseConnectionId), "No database connection with ID: " + databaseConnectionId);
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
-                StringBuffer statement = new StringBuffer("SELECT * FROM [").append(NODE_TYPE).append("] WHERE [").
-                        append(ID_KEY).append("] = '").append(databaseConnectionId).append("'");
-                NodeIterator nodes = query(statement.toString(), session).getNodes();
-                if (!nodes.hasNext()) {
-                    // TODO
-                    return false;
-                }
-                Node databaseConnectionNode = nodes.nextNode();
+                Node databaseConnectionNode = getDatabaseConnectionNode(databaseConnectionId, session);
                 session.checkout(databaseConnectionNode);
                 session.removeItem(databaseConnectionNode.getPath());
                 session.save();
@@ -121,6 +121,17 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractDatab
         QueryManager queryManager = session.getWorkspace().getQueryManager();
         Query query = queryManager.createQuery(statement, Query.JCR_SQL2);
         return query.execute();
+    }
+
+    private Node getDatabaseConnectionNode(String databaseConnectionId, JCRSessionWrapper session) throws RepositoryException {
+        StringBuffer statement = new StringBuffer("SELECT * FROM [").append(NODE_TYPE).append("] WHERE [").
+                append(ID_KEY).append("] = '").append(databaseConnectionId).append("'");
+        NodeIterator nodes = query(statement.toString(), session).getNodes();
+        if (!nodes.hasNext()) {
+            // TODO
+            return null;
+        }
+        return nodes.nextNode();
     }
 
     protected JCRNodeWrapper getDatabaseConnectorNode(JCRSessionWrapper session) throws RepositoryException {

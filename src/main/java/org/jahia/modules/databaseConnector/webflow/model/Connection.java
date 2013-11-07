@@ -18,6 +18,8 @@ public class Connection implements DatabaseConnection, Serializable {
 
     private String id;
 
+    private String oldId;
+
     private String host;
 
     private Integer port;
@@ -38,6 +40,7 @@ public class Connection implements DatabaseConnection, Serializable {
 
     public Connection(ConnectionData connectionData) {
         this.id = connectionData.getId();
+        this.oldId = id;
         this.host = connectionData.getHost();
         this.port = connectionData.getPort();
         this.dbName = connectionData.getDbName();
@@ -49,6 +52,7 @@ public class Connection implements DatabaseConnection, Serializable {
 
     public void clear() {
         this.id = null;
+        this.oldId = null;
         this.host = null;
         this.port = null;
         this.dbName = null;
@@ -64,6 +68,10 @@ public class Connection implements DatabaseConnection, Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getOldId() {
+        return oldId;
     }
 
     public String getHost() {

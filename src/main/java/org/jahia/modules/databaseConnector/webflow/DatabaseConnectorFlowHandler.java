@@ -9,7 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Date: 11/1/2013
@@ -43,12 +44,12 @@ public class DatabaseConnectorFlowHandler implements Serializable {
         }
     }
 
-    public Connection getConnectionData(String databaseId, String databaseTypeName) {
-        return new Connection(databaseConnectorManager.getConnectionData(databaseTypeName, databaseId));
+    public Connection getConnection(String databaseId, String databaseTypeName) {
+        return new Connection(databaseConnectorManager.getConnectionData(databaseId, databaseTypeName));
     }
 
-    public void addConnection(Connection connection) {
-        databaseConnectorManager.addConnection(connection);
+    public void addEditConnection(Connection connection, boolean isEdition) {
+        databaseConnectorManager.addEditConnection(connection, isEdition);
     }
 
     public void removeConnection(String databaseId, String databaseTypeName) {

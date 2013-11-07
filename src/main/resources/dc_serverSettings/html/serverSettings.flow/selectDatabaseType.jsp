@@ -57,7 +57,7 @@
                     <img src="/modules/database-connector/images/${fn:toLowerCase(databaseType)}/logo_60.png">
                     <h3>${databaseTypeDetails.displayName}</h3>
                     <span>${labelConnectedDatabases}</span>
-                    <button class="btn" type="submit" name="databaseTypeName" value="${databaseType}">
+                    <button class="btn" type="submit" name="databaseType" value="${databaseType}">
                         <i class="icon-plus"></i>
                         &nbsp;<fmt:message key="dc_databaseConnector.label.addConnection"/>
                     </button>
