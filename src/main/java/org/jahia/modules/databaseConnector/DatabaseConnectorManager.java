@@ -39,149 +39,24 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
 
     public static final String DATABASE_CONNECTOR_PATH = "databaseConnector";
 
+    public static final String DATABASE_CONNECTOR_NODE_TYPE = "dc:databaseConnector";
+
     private JCRTemplate jcrTemplate;
-
-//    @Autowired
-//    private SpringRestGraphDatabase graphDatabaseService;
-//
-//    @Autowired
-//    private RedisConnectionFactory redisConnectionFactory;
-//
-//    @Autowired
-//    private StringRedisTemplate stringRedisTemplate;
-//
-//    @Autowired
-//    private RedisTemplate<String, Long> longRedisTemplate;
-//
-//    @Autowired
-//    private RedisTemplate<String, Integer> integerRedisTemplate;
-
-//    @Autowired
-//    private MongoTemplate mongoTemplate;
-//
-//    @Autowired
-//    private MongoDbFactory mongoDbFactory;
 
     private Map<DatabaseTypes, DatabaseConnectionRegistry> databaseConnectionRegistries;
 
     private Set<DatabaseTypes> activatedDatabaseTypes = getAllDatabaseTypes();
 
-//    private Map<String, Neo4jDatabaseConnection> neo4jDatabaseConnectionRegistry;
-//
-//    private Map<String, RedisDatabaseConnection> redisDatabaseConnectionRegistry;
-//
-//    private Map<String, MongoDatabaseConnection> mongoDatabaseConnectionRegistry;
-
     public DatabaseConnectorManager() {
         this.jcrTemplate = JCRTemplate.getInstance();
 
         databaseConnectionRegistries = new TreeMap<DatabaseTypes, DatabaseConnectionRegistry>();
-//        neo4jDatabaseConnectionRegistry = new HashMap<String, Neo4jDatabaseConnection>();
-//        redisDatabaseConnectionRegistry = new HashMap<String, RedisDatabaseConnection>();
-//        mongoDatabaseConnectionRegistry = new HashMap<String, MongoDatabaseConnection>();
         for (DatabaseTypes activatedDatabaseType : activatedDatabaseTypes) {
             DatabaseConnectionRegistry databaseConnectionRegistry
                     = DatabaseConnectionRegistryFactory.makeDatabaseConnectionRegistry(activatedDatabaseType);
             databaseConnectionRegistries.put(activatedDatabaseType, databaseConnectionRegistry);
         }
-
-
-//        databaseConnectionRegistries.put(NEO4J, neo4jDatabaseConnectionRegistry);
-//        databaseConnectionRegistries.put(MONGO, mongoDatabaseConnectionRegistry);
-//        databaseConnectionRegistries.put(REDIS, redisDatabaseConnectionRegistry);
-//
-//        neo4jDatabaseConnectionRegistry.put("neo4j", new Neo4jDatabaseConnection("neo4j", "http://localhost:7474/db/data"));
-//        redisDatabaseConnectionRegistry.put("redis", new RedisDatabaseConnection("redis", "localhost", 6379));
-//        try {
-//            mongoDatabaseConnectionRegistry.put("mongo", new MongoDatabaseConnection("mongo", "localhost", 27017, "test"));
-//        } catch (UnknownHostException e) {
-//            logger.error(e.getMessage(), e);
-//        }
     }
-
-//    private void populateDatabaseConnectionRegistries() {
-//        try {
-//            if (populateNeo4jDatabaseConnectionRegistry()) {
-//                databaseConnectionRegistries.put(NEO4J, neo4jDatabaseConnectionRegistry)
-//            }
-//        } catch (RepositoryException e) {
-//            logger.error(e.getMessage(), e);
-//        }
-//    }
-
-//    private Map<String, Neo4jDatabaseConnection> populateNeo4jDatabaseConnectionRegistry() {
-//        JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
-//
-//            public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
-//                QueryResult queryResult = query("SELECT * FROM [dc:neo4jConnection]", session);
-//                NodeIterator it = queryResult.getNodes();
-//                while (it.hasNext()) {
-//                    JCRNodeWrapper connection = (JCRNodeWrapper) it.next();
-//                    String id = connection.getProperty("dc:id").getString();
-//                    String uri = connection.getProperty("dc:uri").getString();
-//                    String user = connection.hasProperty("dc:user") ? connection.getProperty("dc:user").getString() : null;
-//                    String password = connection.hasProperty("dc:password") ? connection.getProperty("dc:password").getString() : null;
-//                    Neo4jDatabaseConnection storedConnection = new Neo4jDatabaseConnection(id, uri, user, password);
-//                    neo4jDatabaseConnectionRegistry.put(id, storedConnection);
-//                }
-//                return true;
-//            }
-//        };
-//        try {
-//            jcrTemplate.doExecuteWithSystemSession(callback);
-//        } catch (RepositoryException e) {
-//            logger.error(e.getMessage(), e);
-//            return MapUtils.EMPTY_MAP;
-//        }
-//        return neo4jDatabaseConnectionRegistry;
-//    }
-//
-//    private Boolean populateMongoDatabaseConnectionRegistry() throws RepositoryException {
-//        JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
-//
-//            public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
-//                QueryResult queryResult = query("SELECT * FROM [dc:mongoConnection]", session);
-//                NodeIterator it = queryResult.getNodes();
-//                while (it.hasNext()) {
-//                    JCRNodeWrapper connection = (JCRNodeWrapper) it.next();
-//                    String id = connection.getProperty("dc:id").getString();
-//                    String host = connection.getProperty("dc:host").getString();
-//                    Integer port = (int) connection.getProperty("dc:port").getLong();
-//                    String dbName = connection.hasProperty("dc:dbName") ? connection.getProperty("dc:dbName").getString() : null;
-//                    String user = connection.hasProperty("dc:user") ? connection.getProperty("dc:user").getString() : null;
-//                    String password = connection.hasProperty("dc:password") ? connection.getProperty("dc:password").getString() : null;
-//                    try {
-//                        MongoDatabaseConnection storedConnection = new MongoDatabaseConnection(id, host, port, dbName, user, password);
-//                        mongoDatabaseConnectionRegistry.put(id, storedConnection);
-//                    } catch (UnknownHostException e) {
-//                        logger.error(e.getMessage(), e);
-//                    }
-//                }
-//                return true;
-//            }
-//        };
-//        return jcrTemplate.doExecuteWithSystemSession(callback);
-//    }
-//
-//    private Boolean populateRedisDatabaseConnectionRegistry() throws RepositoryException {
-//        JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
-//
-//            public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
-//                QueryResult queryResult = query("SELECT * FROM [dc:redisConnection]", session);
-//                NodeIterator it = queryResult.getNodes();
-//                while (it.hasNext()) {
-//                    JCRNodeWrapper connection = (JCRNodeWrapper) it.next();
-//                    String id = connection.getProperty("dc:id").getString();
-//                    String host = connection.getProperty("dc:host").getString();
-//                    Integer port = (int) connection.getProperty("dc:port").getLong();
-//                    RedisDatabaseConnection storedConnection = new RedisDatabaseConnection(id, host, port);
-//                    redisDatabaseConnectionRegistry.put(id, storedConnection);
-//                }
-//                return true;
-//            }
-//        };
-//        return jcrTemplate.doExecuteWithSystemSession(callback);
-//    }
 
     @Override
     public boolean registerNeo4jGraphDatabase(String databaseId) throws InvalidSyntaxException {
@@ -336,21 +211,6 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
             }
             registeredConnections.put(databaseType, connectionDataSet);
         }
-//        List<ConnectionData> connectionDatas = new ArrayList<ConnectionData>();
-//        for (Neo4jDatabaseConnection neo4jDatabaseConnection : neo4jDatabaseConnectionRegistry.values()) {
-//            connectionDatas.add(neo4jDatabaseConnection.createData());
-//        }
-//        registeredConnections.put("neo4j", connectionDatas);
-//        connectionDatas = new ArrayList<ConnectionData>();
-//        for (RedisDatabaseConnection redisDatabaseConnection : redisDatabaseConnectionRegistry.values()) {
-//            connectionDatas.add(redisDatabaseConnection.createData());
-//        }
-//        registeredConnections.put("redis", connectionDatas);
-//        connectionDatas = new ArrayList<ConnectionData>();
-//        for (MongoDatabaseConnection mongoDatabaseConnection : mongoDatabaseConnectionRegistry.values()) {
-//            connectionDatas.add(mongoDatabaseConnection.createData());
-//        }
-//        registeredConnections.put("mongo", connectionDatas);
         return registeredConnections;
     }
 
@@ -375,37 +235,8 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
             submap.put("displayName", databaseType.getDisplayName());
             map.put(databaseType, submap);
         }
-//        // TODO
-//        Map<DatabaseTypes, Map<String, Object>> map = new HashMap<DatabaseTypes, Map<String, Object>>();
-//
-//        Map<String, Object> submap = new HashMap<String, Object>();
-//        submap.put("displayName", NEO4J.getDisplayName());
-//        submap.put("connectedDatabases", neo4jDatabaseConnectionRegistry.size());
-//        map.put(NEO4J, submap);
-//
-//        submap = new HashMap<String, Object>();
-//        submap.put("displayName", MONGO.getDisplayName());
-//        submap.put("connectedDatabases", mongoDatabaseConnectionRegistry.size());
-//        map.put(MONGO, submap);
-//
-//        submap = new HashMap<String, Object>();
-//        submap.put("displayName", REDIS.getDisplayName());
-//        submap.put("connectedDatabases", redisDatabaseConnectionRegistry.size());
-//        map.put(REDIS, submap);
-
         return map;
     }
-
-//    public ConnectionData getConnectionData(String databaseId) {
-//        for (Map<String, ? extends AbstractDatabaseConnection> map : databaseConnectionRegistries.values()) {
-//            for (AbstractDatabaseConnection databaseConnection : map.values()) {
-//                if (databaseConnection.getId().equals(databaseId)) {
-//                    return databaseConnection.createData();
-//                }
-//            }
-//        }
-//        return null;
-//    }
 
     public ConnectionData getConnectionData(String databaseId, String databaseTypeName) {
         try {
@@ -445,41 +276,6 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
     public void addConnection(Connection connection) {
         databaseConnectionRegistries.get(connection.getDatabaseType()).addConnection(connection);
     }
-
-//    public boolean addEditNeo4jConnection(Connection connection) {
-//        Neo4jDatabaseConnection neo4jDatabaseConnection =
-//                new Neo4jDatabaseConnection(connection.getId(), connection.getUri(), connection.getUser(), connection.getPassword());
-//        neo4jDatabaseConnectionRegistry.put(connection.getId(), neo4jDatabaseConnection);
-//        return true;
-//    }
-
-    private void storeNeo4jConnection(final Connection connection) throws RepositoryException {
-        JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
-
-            public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
-                getDatabaseConnectorNode(session);
-                session.save();
-                return true;
-            }
-        };
-        jcrTemplate.doExecuteWithSystemSession(callback);
-    }
-
-    private JCRNodeWrapper getDatabaseConnectorNode(JCRSessionWrapper session) throws RepositoryException {
-        JCRNodeWrapper settings = session.getNode(DATABASE_CONNECTOR_ROOT_PATH);
-        if (settings.hasNode(DATABASE_CONNECTOR_PATH)) {
-            return settings.getNode(DATABASE_CONNECTOR_PATH);
-        }
-        else {
-            return settings.addNode(DATABASE_CONNECTOR_PATH, "dc:databaseConnector");
-        }
-    }
-
-//    private QueryResult query(String statement, JCRSessionWrapper session) throws RepositoryException {
-//        QueryManager queryManager = session.getWorkspace().getQueryManager();
-//        Query query = queryManager.createQuery(statement, Query.JCR_SQL2);
-//        return query.execute();
-//    }
 
     public void setActivatedDatabaseTypes(Set<DatabaseTypes> activatedDatabaseTypes) {
         this.activatedDatabaseTypes = activatedDatabaseTypes;

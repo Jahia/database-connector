@@ -62,8 +62,12 @@
         <transition on="NEO4J" to="registeredConnections">
             <evaluate expression="flowHandler.addConnection(connection)"/>
         </transition>
-        <transition on="MONGO" to="registeredConnections"/>
-        <transition on="REDIS" to="registeredConnections"/>
+        <transition on="MONGO" to="registeredConnections">
+            <evaluate expression="flowHandler.addConnection(connection)"/>
+        </transition>
+        <transition on="REDIS" to="registeredConnections">
+            <evaluate expression="flowHandler.addConnection(connection)"/>
+        </transition>
     </action-state>
 
     <!--<view-state id="authorize" view="externalRedirect:#{authorizeUrl}" popup="true"/>-->

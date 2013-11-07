@@ -1,5 +1,7 @@
 package org.jahia.modules.databaseConnector;
 
+import org.jahia.modules.databaseConnector.webflow.model.Connection;
+import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.JCRTemplate;
@@ -11,6 +13,7 @@ import javax.jcr.query.QueryResult;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.*;
 import static org.jahia.modules.databaseConnector.DatabaseConnectorManager.*;
 
 /**
@@ -35,6 +38,43 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractDatab
         return registry;
     }
 
+    protected Boolean storeConnection(final Connection connection, final String nodeType) {
+        JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
+
+            public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
+                JCRNodeWrapper databaseConnectorNode = getDatabaseConnectorNode(session);
+                session.checkout(databaseConnectorNode);
+                JCRNodeWrapper connectionNode = databaseConnectorNode.addNode(connection.getId(), nodeType);
+                connectionNode.setProperty(ID_KEY, connection.getId());
+                if (connection.getHost() != null && !connection.getHost().isEmpty()) {
+                    connectionNode.setProperty(HOST_KEY, connection.getHost());
+                }
+                if (connection.getPort() != null) {
+                    connectionNode.setProperty(PORT_KEY, connection.getPort());
+                }
+                if (connection.getUri() != null && !connection.getUri().isEmpty()) {
+                    connectionNode.setProperty(URI_KEY, connection.getUri());
+                }
+                if (connection.getDbName() != null && !connection.getDbName().isEmpty()) {
+                    connectionNode.setProperty(DB_NAME_KEY, connection.getDbName());
+                }
+                if (connection.getUser() != null && !connection.getUser().isEmpty()) {
+                    connectionNode.setProperty(USER_KEY, connection.getUser());
+                }
+                if (connection.getPassword() != null && !connection.getPassword().isEmpty()) {
+                    connectionNode.setProperty(PASSWORD_KEY, connection.getPassword());
+                }
+                session.save();
+                return true;
+            }
+        };
+        try {
+            return jcrTemplate.doExecuteWithSystemSession(callback);
+        } catch (RepositoryException e) {
+            return false;
+        }
+    }
+
     protected QueryResult query(String statement, JCRSessionWrapper session) throws RepositoryException {
         QueryManager queryManager = session.getWorkspace().getQueryManager();
         Query query = queryManager.createQuery(statement, Query.JCR_SQL2);
@@ -47,7 +87,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractDatab
             return settings.getNode(DATABASE_CONNECTOR_PATH);
         }
         else {
-            return settings.addNode(DATABASE_CONNECTOR_PATH, "dc:databaseConnector");
+            return settings.addNode(DATABASE_CONNECTOR_PATH, DATABASE_CONNECTOR_NODE_TYPE);
         }
     }
 }

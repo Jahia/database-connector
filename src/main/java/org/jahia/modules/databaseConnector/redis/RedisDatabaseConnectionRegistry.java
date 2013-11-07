@@ -7,11 +7,17 @@ import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.query.QueryResult;
 import java.util.Map;
+
+import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.HOST_KEY;
+import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.ID_KEY;
+import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.PORT_KEY;
+import static org.jahia.modules.databaseConnector.redis.RedisDatabaseConnection.NODE_TYPE;
 
 /**
  * Date: 11/6/2013
@@ -32,13 +38,13 @@ public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
-                QueryResult queryResult = query("SELECT * FROM [dc:redisConnection]", session);
+                QueryResult queryResult = query("SELECT * FROM ["+ NODE_TYPE +"]", session);
                 NodeIterator it = queryResult.getNodes();
                 while (it.hasNext()) {
                     JCRNodeWrapper connection = (JCRNodeWrapper) it.next();
-                    String id = connection.getProperty("dc:id").getString();
-                    String host = connection.getProperty("dc:host").getString();
-                    Integer port = (int) connection.getProperty("dc:port").getLong();
+                    String id = connection.getProperty(ID_KEY).getString();
+                    String host = connection.getProperty(HOST_KEY).getString();
+                    Integer port = (int) connection.getProperty(PORT_KEY).getLong();
                     RedisDatabaseConnection storedConnection = new RedisDatabaseConnection(id, host, port);
                     registry.put(id, storedConnection);
                 }
@@ -55,6 +61,15 @@ public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
 
     @Override
     public void addConnection(Connection connection) {
-        // TODO
+        Assert.hasText(connection.getHost(), "Host must be defined");
+        Assert.notNull(connection.getPort(), "Port must be defined");
+        RedisDatabaseConnection redisDatabaseConnection =
+                new RedisDatabaseConnection(connection.getId(), connection.getHost(), connection.getPort());
+        if (storeConnection(connection, NODE_TYPE)) {
+            registry.put(connection.getId(), redisDatabaseConnection);
+        }
+        else {
+            // TODO
+        }
     }
 }

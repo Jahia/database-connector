@@ -10,17 +10,31 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection, 
 
     private String id;
 
+    public final static String ID_KEY = "dc:id";
+
     private String host;
+
+    public final static String HOST_KEY = "dc:host";
 
     private Integer port;
 
+    public final static String PORT_KEY = "dc:port";
+
     private String dbName;
+
+    public final static String DB_NAME_KEY = "dc:dbName";
 
     private String uri;
 
+    public final static String URI_KEY = "dc:uri";
+
     private String user;
 
+    public final static String USER_KEY = "dc:user";
+
     private String password;
+
+    public final static String PASSWORD_KEY = "dc:password";
 
     public AbstractDatabaseConnection(String id, String uri) {
         this(id, null, null, null, uri, null, null);

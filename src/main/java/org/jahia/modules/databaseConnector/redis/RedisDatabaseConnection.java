@@ -19,7 +19,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 public class RedisDatabaseConnection extends AbstractDatabaseConnection {
 
-    private static final DatabaseTypes databaseType = DatabaseTypes.REDIS;
+    public static final String NODE_TYPE = "dc:redisConnection";
+
+    private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.REDIS;
 
     private RedisConnectionFactory connectionFactory;
 
@@ -87,6 +89,6 @@ public class RedisDatabaseConnection extends AbstractDatabaseConnection {
 
     @Override
     public DatabaseTypes getDatabaseType() {
-        return databaseType;
+        return DATABASE_TYPE;
     }
 }

@@ -12,7 +12,9 @@ import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
  */
 public class Neo4jDatabaseConnection extends AbstractDatabaseConnection {
 
-    private static final DatabaseTypes databaseType = DatabaseTypes.NEO4J;
+    public static final String NODE_TYPE = "dc:neo4jConnection";
+
+    private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.NEO4J;
 
     private SpringRestGraphDatabase graphDatabaseService;
 
@@ -31,6 +33,6 @@ public class Neo4jDatabaseConnection extends AbstractDatabaseConnection {
 
     @Override
     public DatabaseTypes getDatabaseType() {
-        return databaseType;
+        return DATABASE_TYPE;
     }
 }

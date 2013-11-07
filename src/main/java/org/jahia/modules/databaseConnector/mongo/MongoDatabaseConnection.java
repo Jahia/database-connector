@@ -17,7 +17,9 @@ import java.net.UnknownHostException;
  */
 public class MongoDatabaseConnection extends AbstractDatabaseConnection {
 
-    private static final DatabaseTypes databaseType = DatabaseTypes.MONGO;
+    public static final String NODE_TYPE = "dc:mongoConnection";
+
+    private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.MONGO;
 
     private MongoDbFactory dbFactory;
 
@@ -56,6 +58,6 @@ public class MongoDatabaseConnection extends AbstractDatabaseConnection {
 
     @Override
     public DatabaseTypes getDatabaseType() {
-        return databaseType;
+        return DATABASE_TYPE;
     }
 }
