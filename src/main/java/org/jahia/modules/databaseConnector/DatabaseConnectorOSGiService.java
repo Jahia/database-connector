@@ -10,17 +10,17 @@ import org.osgi.framework.InvalidSyntaxException;
  */
 public interface DatabaseConnectorOSGiService {
 
-    boolean registerNeo4jGraphDatabase() throws InvalidSyntaxException;
+    boolean registerNeo4jGraphDatabase(String databaseId) throws InvalidSyntaxException;
 
-    boolean registerRedisConnectionFactory() throws InvalidSyntaxException;
+    boolean registerRedisConnectionFactory(String databaseId) throws InvalidSyntaxException;
 
-    boolean registerRedisStringTemplate() throws InvalidSyntaxException;
+    boolean registerRedisStringTemplate(String databaseId) throws InvalidSyntaxException;
 
-    boolean registerRedisLongTemplate() throws InvalidSyntaxException;
+    boolean registerRedisLongTemplate(String databaseId) throws InvalidSyntaxException;
 
-    boolean registerRedisIntegerTemplate() throws InvalidSyntaxException;
+    boolean registerRedisIntegerTemplate(String databaseId) throws InvalidSyntaxException;
 
-    boolean registerMongoTemplate() throws InvalidSyntaxException;
+    boolean registerMongoTemplate(String databaseId) throws InvalidSyntaxException;
 
-    boolean registerMongoDbFactory() throws InvalidSyntaxException;
+    boolean registerMongoDbFactory(String databaseId) throws InvalidSyntaxException;
 }

@@ -1,20 +1,27 @@
 package org.jahia.modules.databaseConnector;
 
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
+import org.jahia.modules.databaseConnector.neo4j.Neo4jDatabaseConnection;
+import org.jahia.modules.databaseConnector.neo4j.Neo4jDatabaseConnectionRegistry;
+import org.jahia.modules.databaseConnector.redis.RedisDatabaseConnection;
+import org.jahia.modules.databaseConnector.redis.RedisDatabaseConnectionRegistry;
+import org.jahia.modules.databaseConnector.webflow.model.Connection;
+import org.jahia.services.content.JCRCallback;
+import org.jahia.services.content.JCRNodeWrapper;
+import org.jahia.services.content.JCRSessionWrapper;
+import org.jahia.services.content.JCRTemplate;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 
-import java.util.Properties;
+import javax.jcr.RepositoryException;
+import java.util.*;
+
+import static org.jahia.modules.databaseConnector.DatabaseTypes.*;
 
 /**
  * Date: 2013-10-17
@@ -28,131 +35,279 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectorManager.class);
 
-    @Autowired
-    private SpringRestGraphDatabase graphDatabaseService;
+    public static final String DATABASE_CONNECTOR_ROOT_PATH = "/settings/";
 
-    @Autowired
-    private RedisConnectionFactory redisConnectionFactory;
+    public static final String DATABASE_CONNECTOR_PATH = "databaseConnector";
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private JCRTemplate jcrTemplate;
 
-    @Autowired
-    private RedisTemplate<String, Long> longRedisTemplate;
+//    @Autowired
+//    private SpringRestGraphDatabase graphDatabaseService;
+//
+//    @Autowired
+//    private RedisConnectionFactory redisConnectionFactory;
+//
+//    @Autowired
+//    private StringRedisTemplate stringRedisTemplate;
+//
+//    @Autowired
+//    private RedisTemplate<String, Long> longRedisTemplate;
+//
+//    @Autowired
+//    private RedisTemplate<String, Integer> integerRedisTemplate;
 
-    @Autowired
-    private RedisTemplate<String, Integer> integerRedisTemplate;
+//    @Autowired
+//    private MongoTemplate mongoTemplate;
+//
+//    @Autowired
+//    private MongoDbFactory mongoDbFactory;
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    private Map<DatabaseTypes, DatabaseConnectionRegistry> databaseConnectionRegistries;
 
-    @Autowired
-    private MongoDbFactory mongoDbFactory;
+    private Set<DatabaseTypes> activatedDatabaseTypes = getAllDatabaseTypes();
 
-    public DatabaseConnectorManager() {}
+//    private Map<String, Neo4jDatabaseConnection> neo4jDatabaseConnectionRegistry;
+//
+//    private Map<String, RedisDatabaseConnection> redisDatabaseConnectionRegistry;
+//
+//    private Map<String, MongoDatabaseConnection> mongoDatabaseConnectionRegistry;
+
+    public DatabaseConnectorManager() {
+        this.jcrTemplate = JCRTemplate.getInstance();
+
+        databaseConnectionRegistries = new TreeMap<DatabaseTypes, DatabaseConnectionRegistry>();
+//        neo4jDatabaseConnectionRegistry = new HashMap<String, Neo4jDatabaseConnection>();
+//        redisDatabaseConnectionRegistry = new HashMap<String, RedisDatabaseConnection>();
+//        mongoDatabaseConnectionRegistry = new HashMap<String, MongoDatabaseConnection>();
+        for (DatabaseTypes activatedDatabaseType : activatedDatabaseTypes) {
+            DatabaseConnectionRegistry databaseConnectionRegistry
+                    = DatabaseConnectionRegistryFactory.makeDatabaseConnectionRegistry(activatedDatabaseType);
+            databaseConnectionRegistries.put(activatedDatabaseType, databaseConnectionRegistry);
+        }
+
+
+//        databaseConnectionRegistries.put(NEO4J, neo4jDatabaseConnectionRegistry);
+//        databaseConnectionRegistries.put(MONGO, mongoDatabaseConnectionRegistry);
+//        databaseConnectionRegistries.put(REDIS, redisDatabaseConnectionRegistry);
+//
+//        neo4jDatabaseConnectionRegistry.put("neo4j", new Neo4jDatabaseConnection("neo4j", "http://localhost:7474/db/data"));
+//        redisDatabaseConnectionRegistry.put("redis", new RedisDatabaseConnection("redis", "localhost", 6379));
+//        try {
+//            mongoDatabaseConnectionRegistry.put("mongo", new MongoDatabaseConnection("mongo", "localhost", 27017, "test"));
+//        } catch (UnknownHostException e) {
+//            logger.error(e.getMessage(), e);
+//        }
+    }
+
+//    private void populateDatabaseConnectionRegistries() {
+//        try {
+//            if (populateNeo4jDatabaseConnectionRegistry()) {
+//                databaseConnectionRegistries.put(NEO4J, neo4jDatabaseConnectionRegistry)
+//            }
+//        } catch (RepositoryException e) {
+//            logger.error(e.getMessage(), e);
+//        }
+//    }
+
+//    private Map<String, Neo4jDatabaseConnection> populateNeo4jDatabaseConnectionRegistry() {
+//        JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
+//
+//            public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
+//                QueryResult queryResult = query("SELECT * FROM [dc:neo4jConnection]", session);
+//                NodeIterator it = queryResult.getNodes();
+//                while (it.hasNext()) {
+//                    JCRNodeWrapper connection = (JCRNodeWrapper) it.next();
+//                    String id = connection.getProperty("dc:id").getString();
+//                    String uri = connection.getProperty("dc:uri").getString();
+//                    String user = connection.hasProperty("dc:user") ? connection.getProperty("dc:user").getString() : null;
+//                    String password = connection.hasProperty("dc:password") ? connection.getProperty("dc:password").getString() : null;
+//                    Neo4jDatabaseConnection storedConnection = new Neo4jDatabaseConnection(id, uri, user, password);
+//                    neo4jDatabaseConnectionRegistry.put(id, storedConnection);
+//                }
+//                return true;
+//            }
+//        };
+//        try {
+//            jcrTemplate.doExecuteWithSystemSession(callback);
+//        } catch (RepositoryException e) {
+//            logger.error(e.getMessage(), e);
+//            return MapUtils.EMPTY_MAP;
+//        }
+//        return neo4jDatabaseConnectionRegistry;
+//    }
+//
+//    private Boolean populateMongoDatabaseConnectionRegistry() throws RepositoryException {
+//        JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
+//
+//            public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
+//                QueryResult queryResult = query("SELECT * FROM [dc:mongoConnection]", session);
+//                NodeIterator it = queryResult.getNodes();
+//                while (it.hasNext()) {
+//                    JCRNodeWrapper connection = (JCRNodeWrapper) it.next();
+//                    String id = connection.getProperty("dc:id").getString();
+//                    String host = connection.getProperty("dc:host").getString();
+//                    Integer port = (int) connection.getProperty("dc:port").getLong();
+//                    String dbName = connection.hasProperty("dc:dbName") ? connection.getProperty("dc:dbName").getString() : null;
+//                    String user = connection.hasProperty("dc:user") ? connection.getProperty("dc:user").getString() : null;
+//                    String password = connection.hasProperty("dc:password") ? connection.getProperty("dc:password").getString() : null;
+//                    try {
+//                        MongoDatabaseConnection storedConnection = new MongoDatabaseConnection(id, host, port, dbName, user, password);
+//                        mongoDatabaseConnectionRegistry.put(id, storedConnection);
+//                    } catch (UnknownHostException e) {
+//                        logger.error(e.getMessage(), e);
+//                    }
+//                }
+//                return true;
+//            }
+//        };
+//        return jcrTemplate.doExecuteWithSystemSession(callback);
+//    }
+//
+//    private Boolean populateRedisDatabaseConnectionRegistry() throws RepositoryException {
+//        JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
+//
+//            public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
+//                QueryResult queryResult = query("SELECT * FROM [dc:redisConnection]", session);
+//                NodeIterator it = queryResult.getNodes();
+//                while (it.hasNext()) {
+//                    JCRNodeWrapper connection = (JCRNodeWrapper) it.next();
+//                    String id = connection.getProperty("dc:id").getString();
+//                    String host = connection.getProperty("dc:host").getString();
+//                    Integer port = (int) connection.getProperty("dc:port").getLong();
+//                    RedisDatabaseConnection storedConnection = new RedisDatabaseConnection(id, host, port);
+//                    redisDatabaseConnectionRegistry.put(id, storedConnection);
+//                }
+//                return true;
+//            }
+//        };
+//        return jcrTemplate.doExecuteWithSystemSession(callback);
+//    }
 
     @Override
-    public boolean registerNeo4jGraphDatabase() throws InvalidSyntaxException {
+    public boolean registerNeo4jGraphDatabase(String databaseId) throws InvalidSyntaxException {
         logger.info("Start registering OSGi service for Neo4j Template");
-        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(graphDatabaseService.getClass().getName(), "(database=neo4j)");
+        if (!databaseConnectionRegistries.containsKey(NEO4J)) {
+            throw new IllegalArgumentException("No Neo4j connection registered");
+        }
+        final Map<String, Neo4jDatabaseConnection> registry = ((Neo4jDatabaseConnectionRegistry) databaseConnectionRegistries.get(NEO4J)).getRegistry();
+        if (!registry.containsKey(databaseId)) {
+            throw new IllegalArgumentException("No Neo4j connection registered with databaseId: " + databaseId);
+        }
+        SpringRestGraphDatabase graphDatabaseService = registry.get(databaseId).getGraphDatabaseService();
+        ServiceReference[] serviceReferences =
+                bundleContext.getAllServiceReferences(graphDatabaseService.getClass().getName(), createFilter(NEO4J, databaseId));
         if(serviceReferences != null) {
             logger.info("OSGi service for Neo4j Template already registered");
             return true;
         }
-        Properties properties = new Properties();
-        properties.put("database", "neo4j");
-        bundleContext.registerService(graphDatabaseService.getClass().getName(), graphDatabaseService, properties);
+        bundleContext.registerService(graphDatabaseService.getClass().getName(), graphDatabaseService, createProperties(NEO4J, databaseId));
         logger.info("OSGi service for Neo4j Template successfully registered");
         return true;
     }
 
     @Override
-    public boolean registerRedisConnectionFactory() throws InvalidSyntaxException {
+    public boolean registerRedisConnectionFactory(String databaseId) throws InvalidSyntaxException {
         logger.info("Start registering OSGi service for Redis Connection Factory");
-        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(RedisConnectionFactory.class.getName(), "(database=redis)");
+        if (!databaseConnectionRegistries.containsKey(REDIS)) {
+            throw new IllegalArgumentException("No Redis connection registered");
+        }
+        final Map<String, RedisDatabaseConnection> registry = ((RedisDatabaseConnectionRegistry) databaseConnectionRegistries.get(REDIS)).getRegistry();
+        if (!registry.containsKey(databaseId)) {
+            throw new IllegalArgumentException("No Redis Connection registered with databaseId: " + databaseId);
+        }
+        RedisConnectionFactory redisConnectionFactory = registry.get(databaseId).getConnectionFactory();
+        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(RedisConnectionFactory.class.getName(), createFilter(REDIS, databaseId));
         if(serviceReferences != null) {
             logger.info("OSGi service for Redis Connection Factory already registered");
             return true;
         }
-        Properties properties = new Properties();
-        properties.put("database", "redis");
-        bundleContext.registerService(getInterfacesNames(redisConnectionFactory), redisConnectionFactory, properties);
+        bundleContext.registerService(getInterfacesNames(redisConnectionFactory), redisConnectionFactory, createProperties(REDIS, databaseId));
         logger.info("OSGi service for Redis Connection Factory successfully registered");
         return true;
     }
 
     @Override
-    public boolean registerRedisStringTemplate() throws InvalidSyntaxException {
-        logger.info("Start registering OSGi service for Redis String Template");
-        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(stringRedisTemplate.getClass().getName(), "(database=redis)");
-        if(serviceReferences != null) {
-            logger.info("OSGi service for Redis String Template already registered");
-            return true;
-        }
-        Properties properties = new Properties();
-        properties.put("database", "redis");
-        bundleContext.registerService(stringRedisTemplate.getClass().getName(), stringRedisTemplate, properties);
-        logger.info("OSGi service for Redis String Template successfully registered");
+    public boolean registerRedisStringTemplate(String databaseId) throws InvalidSyntaxException {
+//        logger.info("Start registering OSGi service for Redis String Templat");
+//        if (!redisDatabaseConnectionRegistry.containsKey(databaseId)) {
+//            throw new IllegalArgumentException("No Redis Connection registered with databaseId: " + databaseId);
+//        }
+//        StringRedisTemplate stringRedisTemplate = redisDatabaseConnectionRegistry.get(databaseId).getStringRedisTemplate();
+//        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(stringRedisTemplate.getClass().getName(), createFilter(REDIS, databaseId));
+//        if(serviceReferences != null) {
+//            logger.info("OSGi service for Redis String Template already registered");
+//            return true;
+//        }
+//        bundleContext.registerService(stringRedisTemplate.getClass().getName(), stringRedisTemplate, createProperties(REDIS, databaseId));
+//        logger.info("OSGi service for Redis String Template successfully registered");
         return true;
     }
 
     @Override
-    public boolean registerRedisLongTemplate() throws InvalidSyntaxException {
-        logger.info("Start registering OSGi service for Redis Long Template");
-        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(longRedisTemplate.getClass().getName(), "(database=redis)");
-        if(serviceReferences != null) {
-            logger.info("OSGi service for Redis Long Template already registered");
-            return true;
-        }
-        Properties properties = new Properties();
-        properties.put("database", "redis");
-        bundleContext.registerService(longRedisTemplate.getClass().getName(), longRedisTemplate, properties);
-        logger.info("OSGi service for Redis Long Template successfully registered");
+    public boolean registerRedisLongTemplate(String databaseId) throws InvalidSyntaxException {
+//        logger.info("Start registering OSGi service for Redis Long Template");
+//        if (!redisDatabaseConnectionRegistry.containsKey(databaseId)) {
+//            throw new IllegalArgumentException("No Redis Connection registered with databaseId: " + databaseId);
+//        }
+//        RedisTemplate<String, Long> longRedisTemplate = redisDatabaseConnectionRegistry.get(databaseId).getLongRedisTemplate();
+//        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(longRedisTemplate.getClass().getName(), createFilter(REDIS, databaseId));
+//        if(serviceReferences != null) {
+//            logger.info("OSGi service for Redis Long Template already registered");
+//            return true;
+//        }
+//        bundleContext.registerService(longRedisTemplate.getClass().getName(), longRedisTemplate, createProperties(REDIS, databaseId));
+//        logger.info("OSGi service for Redis Long Template successfully registered");
         return true;
     }
 
     @Override
-    public boolean registerRedisIntegerTemplate() throws InvalidSyntaxException {
-        logger.info("Start registering OSGi service for Redis Integer Template");
-        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(integerRedisTemplate.getClass().getName(), "(database=redis)");
-        if(serviceReferences != null) {
-            logger.info("OSGi service for Redis Integer Template already registered");
-            return true;
-        }
-        Properties properties = new Properties();
-        properties.put("database", "redis");
-        bundleContext.registerService(integerRedisTemplate.getClass().getName(), integerRedisTemplate, properties);
-        logger.info("OSGi service for Redis Integer Template successfully registered");
+    public boolean registerRedisIntegerTemplate(String databaseId) throws InvalidSyntaxException {
+//        logger.info("Start registering OSGi service for Redis Integer Template");
+//        if (!redisDatabaseConnectionRegistry.containsKey(databaseId)) {
+//            throw new IllegalArgumentException("No Redis Connection registered with databaseId: " + databaseId);
+//        }
+//        RedisTemplate<String, Integer> integerRedisTemplate = redisDatabaseConnectionRegistry.get(databaseId).getIntegerRedisTemplate();
+//        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(integerRedisTemplate.getClass().getName(), createFilter(REDIS, databaseId));
+//        if(serviceReferences != null) {
+//            logger.info("OSGi service for Redis Integer Template already registered");
+//            return true;
+//        }
+//        bundleContext.registerService(integerRedisTemplate.getClass().getName(), integerRedisTemplate, createProperties(REDIS, databaseId));
+//        logger.info("OSGi service for Redis Integer Template successfully registered");
         return true;
     }
 
     @Override
-    public boolean registerMongoTemplate() throws InvalidSyntaxException {
-        logger.info("Start registering OSGi service for MongoDB Template");
-        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(mongoTemplate.getClass().getName(), "(database=mongo)");
-        if(serviceReferences != null) {
-            logger.info("OSGi service for MongoDB Template already registered");
-            return true;
-        }
-        Properties properties = new Properties();
-        properties.put("database", "mongo");
-        bundleContext.registerService(mongoTemplate.getClass().getName(), mongoTemplate, properties);
-        logger.info("OSGi service for MongoDB Template successfully registered");
+    public boolean registerMongoTemplate(String databaseId) throws InvalidSyntaxException {
+//        logger.info("Start registering OSGi service for MongoDB Template");
+//        if (!mongoDatabaseConnectionRegistry.containsKey(databaseId)) {
+//            throw new IllegalArgumentException("No Mongo Connection registered with databaseId: " + databaseId);
+//        }
+//        MongoTemplate mongoTemplate = mongoDatabaseConnectionRegistry.get(databaseId).getTemplate();
+//        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(mongoTemplate.getClass().getName(), createFilter(MONGO, databaseId));
+//        if(serviceReferences != null) {
+//            logger.info("OSGi service for MongoDB Template already registered");
+//            return true;
+//        }
+//        bundleContext.registerService(mongoTemplate.getClass().getName(), mongoTemplate, createProperties(MONGO, databaseId));
+//        logger.info("OSGi service for MongoDB Template successfully registered");
         return true;
     }
 
     @Override
-    public boolean registerMongoDbFactory() throws InvalidSyntaxException {
-        logger.info("Start registering OSGi service for MongoDB Factory");
-        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(MongoDbFactory.class.getName(), "(database=mongo)");
-        if(serviceReferences != null) {
-            logger.info("OSGi service for MongoDB Factory already registered");
-            return true;
-        }
-        Properties properties = new Properties();
-        properties.put("database", "mongo");
-        bundleContext.registerService(getInterfacesNames(mongoDbFactory), mongoDbFactory, properties);
-        logger.info("OSGi service for MongoDB Factory successfully registered");
+    public boolean registerMongoDbFactory(String databaseId) throws InvalidSyntaxException {
+//        logger.info("Start registering OSGi service for MongoDB Factory");
+//        if (!mongoDatabaseConnectionRegistry.containsKey(databaseId)) {
+//            throw new IllegalArgumentException("No Mongo Connection registered with databaseId: " + databaseId);
+//        }
+//        MongoDbFactory mongoDbFactory = mongoDatabaseConnectionRegistry.get(databaseId).getDbFactory();
+//        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(MongoDbFactory.class.getName(), createFilter(MONGO, databaseId));
+//        if(serviceReferences != null) {
+//            logger.info("OSGi service for MongoDB Factory already registered");
+//            return true;
+//        }
+//        bundleContext.registerService(getInterfacesNames(mongoDbFactory), mongoDbFactory, createProperties(MONGO, databaseId));
+//        logger.info("OSGi service for MongoDB Factory successfully registered");
         return true;
     }
 
@@ -170,4 +325,163 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
         return interfacesNames;
     }
 
+    public Map<DatabaseTypes, Set<ConnectionData>> findRegisteredConnections() {
+        Map<DatabaseTypes, Set<ConnectionData>> registeredConnections = new LinkedHashMap<DatabaseTypes, Set<ConnectionData>>();
+        for (DatabaseTypes databaseType : databaseConnectionRegistries.keySet()) {
+            Map<String, AbstractDatabaseConnection> registry =
+                    (Map<String, AbstractDatabaseConnection>) databaseConnectionRegistries.get(databaseType).getRegistry();
+            Set<ConnectionData> connectionDataSet = new LinkedHashSet<ConnectionData>();
+            for (AbstractDatabaseConnection abstractDatabaseConnection : registry.values()) {
+                connectionDataSet.add(abstractDatabaseConnection.createData());
+            }
+            registeredConnections.put(databaseType, connectionDataSet);
+        }
+//        List<ConnectionData> connectionDatas = new ArrayList<ConnectionData>();
+//        for (Neo4jDatabaseConnection neo4jDatabaseConnection : neo4jDatabaseConnectionRegistry.values()) {
+//            connectionDatas.add(neo4jDatabaseConnection.createData());
+//        }
+//        registeredConnections.put("neo4j", connectionDatas);
+//        connectionDatas = new ArrayList<ConnectionData>();
+//        for (RedisDatabaseConnection redisDatabaseConnection : redisDatabaseConnectionRegistry.values()) {
+//            connectionDatas.add(redisDatabaseConnection.createData());
+//        }
+//        registeredConnections.put("redis", connectionDatas);
+//        connectionDatas = new ArrayList<ConnectionData>();
+//        for (MongoDatabaseConnection mongoDatabaseConnection : mongoDatabaseConnectionRegistry.values()) {
+//            connectionDatas.add(mongoDatabaseConnection.createData());
+//        }
+//        registeredConnections.put("mongo", connectionDatas);
+        return registeredConnections;
+    }
+
+    public static String createFilter(DatabaseTypes databaseType, String id) {
+        StringBuffer sb = new StringBuffer("(&(").append(getKey()).append("=").append(databaseType.name())
+                .append(")(").append(DatabaseTypes.getKey()).append("=").append(id).append("))");
+        return sb.toString();
+    }
+
+    private Properties createProperties(DatabaseTypes databaseType, String id) {
+        Properties properties = new Properties();
+        properties.put(getKey(), databaseType.name());
+        properties.put(DatabaseTypes.getKey(), id);
+        return properties;
+    }
+
+    public Map<DatabaseTypes, Map<String, Object>> findAllDatabaseTypes() {
+        Map<DatabaseTypes, Map<String, Object>> map = new LinkedHashMap<DatabaseTypes, Map<String, Object>>();
+        for (DatabaseTypes databaseType : databaseConnectionRegistries.keySet()) {
+            Map<String, Object> submap = new HashMap<String, Object>();
+            submap.put("connectedDatabases", databaseConnectionRegistries.get(databaseType).getRegistry().size());
+            submap.put("displayName", databaseType.getDisplayName());
+            map.put(databaseType, submap);
+        }
+//        // TODO
+//        Map<DatabaseTypes, Map<String, Object>> map = new HashMap<DatabaseTypes, Map<String, Object>>();
+//
+//        Map<String, Object> submap = new HashMap<String, Object>();
+//        submap.put("displayName", NEO4J.getDisplayName());
+//        submap.put("connectedDatabases", neo4jDatabaseConnectionRegistry.size());
+//        map.put(NEO4J, submap);
+//
+//        submap = new HashMap<String, Object>();
+//        submap.put("displayName", MONGO.getDisplayName());
+//        submap.put("connectedDatabases", mongoDatabaseConnectionRegistry.size());
+//        map.put(MONGO, submap);
+//
+//        submap = new HashMap<String, Object>();
+//        submap.put("displayName", REDIS.getDisplayName());
+//        submap.put("connectedDatabases", redisDatabaseConnectionRegistry.size());
+//        map.put(REDIS, submap);
+
+        return map;
+    }
+
+//    public ConnectionData getConnectionData(String databaseId) {
+//        for (Map<String, ? extends AbstractDatabaseConnection> map : databaseConnectionRegistries.values()) {
+//            for (AbstractDatabaseConnection databaseConnection : map.values()) {
+//                if (databaseConnection.getId().equals(databaseId)) {
+//                    return databaseConnection.createData();
+//                }
+//            }
+//        }
+//        return null;
+//    }
+
+    public ConnectionData getConnectionData(String databaseId, String databaseTypeName) {
+        try {
+            DatabaseTypes databaseType = valueOf(databaseTypeName);
+            AbstractDatabaseConnection databaseConnection =
+                    ((Map<String, AbstractDatabaseConnection>) databaseConnectionRegistries.get(databaseType).getRegistry()).get(databaseId);
+            return databaseConnection.createData();
+        } catch (NullPointerException e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    private Set<String> getUsedIds() {
+        HashSet<String> usedIds = new HashSet<String>();
+        for (DatabaseConnectionRegistry databaseConnectionRegistry : databaseConnectionRegistries.values()) {
+            for (AbstractDatabaseConnection databaseConnection : ((Map<String, AbstractDatabaseConnection>) databaseConnectionRegistry.getRegistry()).values()) {
+                usedIds.add(databaseConnection.getId());
+            }
+        }
+        return usedIds;
+    }
+
+    public String getNextAvailableId(DatabaseTypes databaseType) {
+        String initialId = databaseType.name().toLowerCase();
+        Set<String> usedIds = getUsedIds();
+        if (!usedIds.contains(initialId)) {
+            return initialId;
+        }
+        int index = 1;
+        while (usedIds.contains(initialId+index)) {
+            index++;
+        }
+        return initialId+index;
+    }
+
+    public void addConnection(Connection connection) {
+        databaseConnectionRegistries.get(connection.getDatabaseType()).addConnection(connection);
+    }
+
+//    public boolean addEditNeo4jConnection(Connection connection) {
+//        Neo4jDatabaseConnection neo4jDatabaseConnection =
+//                new Neo4jDatabaseConnection(connection.getId(), connection.getUri(), connection.getUser(), connection.getPassword());
+//        neo4jDatabaseConnectionRegistry.put(connection.getId(), neo4jDatabaseConnection);
+//        return true;
+//    }
+
+    private void storeNeo4jConnection(final Connection connection) throws RepositoryException {
+        JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
+
+            public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
+                getDatabaseConnectorNode(session);
+                session.save();
+                return true;
+            }
+        };
+        jcrTemplate.doExecuteWithSystemSession(callback);
+    }
+
+    private JCRNodeWrapper getDatabaseConnectorNode(JCRSessionWrapper session) throws RepositoryException {
+        JCRNodeWrapper settings = session.getNode(DATABASE_CONNECTOR_ROOT_PATH);
+        if (settings.hasNode(DATABASE_CONNECTOR_PATH)) {
+            return settings.getNode(DATABASE_CONNECTOR_PATH);
+        }
+        else {
+            return settings.addNode(DATABASE_CONNECTOR_PATH, "dc:databaseConnector");
+        }
+    }
+
+//    private QueryResult query(String statement, JCRSessionWrapper session) throws RepositoryException {
+//        QueryManager queryManager = session.getWorkspace().getQueryManager();
+//        Query query = queryManager.createQuery(statement, Query.JCR_SQL2);
+//        return query.execute();
+//    }
+
+    public void setActivatedDatabaseTypes(Set<DatabaseTypes> activatedDatabaseTypes) {
+        this.activatedDatabaseTypes = activatedDatabaseTypes;
+    }
 }

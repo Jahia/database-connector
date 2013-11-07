@@ -1,0 +1,1 @@
+<h2><c:if test="${not empty title}">${title} <span class="muted">| </c:if><fmt:message key="dc_databaseConnector"/><c:if test="${not empty title}"></span></c:if></h2>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<content xmlns:j="http://www.jahia.org/jahia/1.0"
+         xmlns:jcr="http://www.jcp.org/jcr/1.0"
+         xmlns:jnt="http://www.jahia.org/jahia/nt/1.0">
+    <modules jcr:primaryType="jnt:modules">
+        <database-connector j:dependencies="default siteSettings serverSettings"
+                                  j:installedModules="database-connector"
+                                  j:moduleType="system"
+                                  j:title="Jahia Database Connector"
+                                  jcr:primaryType="jnt:module">
+            <portlets jcr:primaryType="jnt:portletFolder"/>
+            <files jcr:primaryType="jnt:folder"/>
+            <contents jcr:primaryType="jnt:contentFolder"/>
+            <templates j:rootTemplatePath="/" jcr:primaryType="jnt:templatesFolder">
+                <files jcr:primaryType="jnt:folder">
+                    <admin jcr:primaryType="jnt:folder">
+                        <database_connector.png j:height="16"
+                                                      j:width="16"
+                                                      jcr:mixinTypes="jmix:image"
+                                                      jcr:primaryType="jnt:file">
+                            <jcr:content jcr:mimeType="image/png" jcr:primaryType="jnt:resource"/>
+                            <thumbnail jcr:mimeType="image/png" jcr:primaryType="jnt:resource"/>
+                            <thumbnail2 jcr:mimeType="image/png" jcr:primaryType="jnt:resource"/>
+                        </database_connector.png>
+                    </admin>
+                </files>
+                <contents jcr:primaryType="jnt:contentFolder"/>
+                <!--<siteSettingsBase j:view="siteSettings"-->
+                                  <!--jcr:mixinTypes="jmix:useUILocale"-->
+                                  <!--jcr:primaryType="jnt:template">-->
+                    <!--<social-network-connector j:applyOn="jnt:virtualsite"-->
+                                              <!--j:defaultTemplate="false"-->
+                                              <!--j:hiddenTemplate="true"-->
+                                              <!--j:icon="/modules/social-network-connector/templates/files/admin/social_network_connector.png"-->
+                                              <!--j:priority="100"-->
+                                              <!--j:requiredPermissions="#/permissions/admin/siteAdminSocialNetworkConnector"-->
+                                              <!--j:titleKey="jnt_socialNetworkConnector"-->
+                                              <!--jcr:mixinTypes="jmix:rbTitle"-->
+                                              <!--jcr:primaryType="jnt:contentTemplate">-->
+                        <!--<pagecontent jcr:primaryType="jnt:contentList">-->
+                            <!--<socialNetworkConnector jcr:primaryType="jnt:socialNetworkConnector"/>-->
+                        <!--</pagecontent>-->
+                    <!--</social-network-connector>-->
+                <!--</siteSettingsBase>-->
+                <serverSettingsBase j:view="serverSettings"
+                                    jcr:mixinTypes="jmix:useUILocale"
+                                    jcr:primaryType="jnt:template">
+                    <configurations j:hiddenTemplate="false"
+                                    j:icon="/modules/serverSettings/templates/files/serveradmin/configurations/configurations.png"
+                                    j:titleKey="serverSettings.configurations"
+                                    jcr:mixinTypes="jmix:rbTitle"
+                                    jcr:primaryType="jnt:template">
+                        <database-connector j:applyOn="jnt:globalSettings"
+                                                  j:defaultTemplate="false"
+                                                  j:hiddenTemplate="false"
+                                                  j:icon="/modules/database-connector/templates/files/admin/database_connector.png"
+                                                  j:requiredPermissions="#/permissions/admin/serverAdminDatabaseConnector"
+                                                  j:titleKey="dc_databaseConnector"
+                                                  jcr:mixinTypes="jmix:rbTitle"
+                                                  jcr:primaryType="jnt:contentTemplate">
+                            <pagecontent jcr:primaryType="jnt:contentList">
+                                <databaseConnectorSettings jcr:primaryType="dc:serverSettings"/>
+                            </pagecontent>
+                        </database-connector>
+                    </configurations>
+                </serverSettingsBase>
+            </templates>
+        </database-connector>
+    </modules>
+    <!--<settings jcr:primaryType="jnt:globalSettings">-->
+        <!--<SNCEncryptorSettings jcr:primaryType="jnt:SNCEncryptorSettings" password="cm9vdDEyMzQ=" salt="9dbf3b5459cda17f"/>-->
+    <!--</settings>-->
+</content>

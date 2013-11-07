@@ -1,2 +1,28 @@
 <jnt = 'http://www.jahia.org/jahia/nt/1.0'>
 <jmix = 'http://www.jahia.org/jahia/mix/1.0'>
+<dc = 'http://www.jahia.org/jahia/database-connector/1.0'>
+<dcmix = 'http://www.jahia.org/jahia/database-connector-mix/1.0'>
+<mix = 'http://www.jcp.org/jcr/mix/1.0'>
+
+[dc:serverSettings] > jnt:content, jmix:studioOnly, mix:title, jmix:siteComponent
+
+[dc:neo4jConnection] > jnt:content, dcmix:databaseConnection
+
+[dc:mongoConnection] > jnt:content, dcmix:databaseConnection
+ - dc:writeConcern (String, choicelist[resourceBundle]) = SAFE < SAFE, REPLICAS_SAFE, NORMAL, NONE, FSYNC_SAFE
+
+[dc:redisConnection] > jnt:content, dcmix:databaseConnection
+
+[dcmix:databaseConnection] mixin
+ - dc:id (String) mandatory
+ - dc:host (String)
+ - dc:port (long)
+ - dc:uri (String)
+ - dc:dbName (String)
+ - dc:user (String)
+ - dc:password (String)
+
+[dc:databaseConnector] > jnt:content
+ + * (dc:neo4jConnection)
+ + * (dc:redisConnection)
+ + * (dc:mongoConnection)

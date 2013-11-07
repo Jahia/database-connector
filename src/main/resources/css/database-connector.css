@@ -1,0 +1,17 @@
+#registeredConnections .registeredConnection .thumbnail, #allDatabaseTypes .databaseType .thumbnail {
+  background-color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+#registeredConnections .registeredConnection .thumbnail > img, #allDatabaseTypes .databaseType .thumbnail > img {
+  margin-bottom: 12px;
+}
+
+#registeredConnections .registeredConnection .thumbnail dl dd, #allDatabaseTypes .databaseType .thumbnail dl dd {
+  margin-left: 0;
+}
+
+img.muted {
+  opacity: 0.6;
+}

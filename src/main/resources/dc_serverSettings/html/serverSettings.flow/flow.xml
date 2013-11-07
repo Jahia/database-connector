@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+		http://www.springframework.org/schema/webflow
+		http://www.springframework.org/schema/webflow/spring-webflow.xsd">
+
+    <var name="flowHandler" class="org.jahia.modules.databaseConnector.webflow.DatabaseConnectorFlowHandler"/>
+
+    <view-state id="registeredConnections">
+        <on-render>
+            <evaluate expression="flowHandler.findRegisteredConnections()" result="flowScope.registeredConnections"/>
+            <!--<evaluate expression="flowHandler.hasTextEncryptor()" result="flowScope.hasTextEncryptor"/>-->
+        </on-render>
+        <transition on="addConnection" to="selectDatabaseType">
+            <set name="flowScope.isEdition" value="false" type="boolean"/>
+        </transition>
+        <transition on="editConnection" to="enterConfig">
+            <evaluate expression="flowHandler.getConnectionData(requestParameters.databaseTypeId, requestParameters.databaseTypeName)" result="flowScope.connection"/>
+            <set name="flowScope.isEdition" value="true" type="boolean"/>
+        </transition>
+        <!--<transition on="removeConnection" to="registeredConnections">-->
+            <!--<evaluate expression="flowHandler.removeConnection(requestParameters.providerId, siteIdentifier)"/>-->
+        <!--</transition>-->
+    </view-state>
+
+    <view-state id="selectDatabaseType">
+        <on-render>
+            <evaluate expression="flowHandler.findAllDatabaseTypes()" result="flowScope.allDatabaseTypes"/>
+        </on-render>
+        <transition on="setDatabaseType" to="enterConfig">
+            <evaluate expression="flowHandler.initConnection(requestParameters.databaseTypeName)" result="flowScope.connection"/>
+            <set name="flowScope.isEdition" value="false" type="boolean"/>
+        </transition>
+        <transition on="cancel" to="registeredConnections"/>
+        <transition on="back" to="registeredConnections"/>
+    </view-state>
+
+    <view-state id="enterConfig" model="connection">
+        <binder>
+            <binding property="host"/>
+            <binding property="port"/>
+            <binding property="dbName"/>
+            <binding property="uri"/>
+            <binding property="user"/>
+            <binding property="password"/>
+        </binder>
+        <on-entry>
+            <evaluate expression="flowHandler.initDatabaseId(connection)"/>
+        </on-entry>
+        <transition on="submit" to="switch"/>
+            <!--<evaluate expression="flowHandler.addEditConnection(credentials, flowRequestContext)"/>-->
+        <!--</transition>-->
+        <transition on="back" to="selectDatabaseType" validate="false" bind="false">
+            <evaluate expression="connection.clear()"/>
+        </transition>
+        <transition on="cancel" to="registeredConnections" validate="false" bind="false"/>
+    </view-state>
+
+    <action-state id="switch">
+        <evaluate expression="flowScope.connection.getDatabaseType().name()"/>
+        <transition on="NEO4J" to="registeredConnections">
+            <evaluate expression="flowHandler.addConnection(connection)"/>
+        </transition>
+        <transition on="MONGO" to="registeredConnections"/>
+        <transition on="REDIS" to="registeredConnections"/>
+    </action-state>
+
+    <!--<view-state id="authorize" view="externalRedirect:#{authorizeUrl}" popup="true"/>-->
+
+    <!--<end-state id="connectionAddedEdited"/>-->
+
+</flow>
