@@ -23,6 +23,4 @@
  - dc:password (String)
 
 [dc:databaseConnector] > jnt:content
- + * (dc:neo4jConnection)
- + * (dc:redisConnection)
- + * (dc:mongoConnection)
+ + * (dcmix:databaseConnection)
