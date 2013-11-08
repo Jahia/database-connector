@@ -25,23 +25,6 @@
                     </admin>
                 </files>
                 <contents jcr:primaryType="jnt:contentFolder"/>
-                <!--<siteSettingsBase j:view="siteSettings"-->
-                                  <!--jcr:mixinTypes="jmix:useUILocale"-->
-                                  <!--jcr:primaryType="jnt:template">-->
-                    <!--<social-network-connector j:applyOn="jnt:virtualsite"-->
-                                              <!--j:defaultTemplate="false"-->
-                                              <!--j:hiddenTemplate="true"-->
-                                              <!--j:icon="/modules/social-network-connector/templates/files/admin/social_network_connector.png"-->
-                                              <!--j:priority="100"-->
-                                              <!--j:requiredPermissions="#/permissions/admin/siteAdminSocialNetworkConnector"-->
-                                              <!--j:titleKey="jnt_socialNetworkConnector"-->
-                                              <!--jcr:mixinTypes="jmix:rbTitle"-->
-                                              <!--jcr:primaryType="jnt:contentTemplate">-->
-                        <!--<pagecontent jcr:primaryType="jnt:contentList">-->
-                            <!--<socialNetworkConnector jcr:primaryType="jnt:socialNetworkConnector"/>-->
-                        <!--</pagecontent>-->
-                    <!--</social-network-connector>-->
-                <!--</siteSettingsBase>-->
                 <serverSettingsBase j:view="serverSettings"
                                     jcr:mixinTypes="jmix:useUILocale"
                                     jcr:primaryType="jnt:template">
@@ -67,7 +50,4 @@
             </templates>
         </database-connector>
     </modules>
-    <!--<settings jcr:primaryType="jnt:globalSettings">-->
-        <!--<SNCEncryptorSettings jcr:primaryType="jnt:SNCEncryptorSettings" password="cm9vdDEyMzQ=" salt="9dbf3b5459cda17f"/>-->
-    <!--</settings>-->
 </content>
