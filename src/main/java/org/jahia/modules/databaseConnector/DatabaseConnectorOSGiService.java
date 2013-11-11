@@ -1,7 +1,5 @@
 package org.jahia.modules.databaseConnector;
 
-import org.osgi.framework.InvalidSyntaxException;
-
 /**
  * Date: 2013-10-17
  *
@@ -10,17 +8,13 @@ import org.osgi.framework.InvalidSyntaxException;
  */
 public interface DatabaseConnectorOSGiService {
 
-    boolean registerNeo4jGraphDatabase(String databaseId) throws InvalidSyntaxException;
+    public static final String DATABASE_CONNECTOR_ROOT_PATH = "/settings/";
 
-    boolean registerRedisConnectionFactory(String databaseId) throws InvalidSyntaxException;
+    public static final String DATABASE_CONNECTOR_PATH = "databaseConnector";
 
-    boolean registerRedisStringTemplate(String databaseId) throws InvalidSyntaxException;
+    public static final String DATABASE_CONNECTOR_NODE_TYPE = "dc:databaseConnector";
 
-    boolean registerRedisLongTemplate(String databaseId) throws InvalidSyntaxException;
+    boolean registerSingleDatabase(DatabaseTypes databaseType);
 
-    boolean registerRedisIntegerTemplate(String databaseId) throws InvalidSyntaxException;
-
-    boolean registerMongoTemplate(String databaseId) throws InvalidSyntaxException;
-
-    boolean registerMongoDbFactory(String databaseId) throws InvalidSyntaxException;
+    boolean registerDatabase(String databaseId, DatabaseTypes databaseType);
 }

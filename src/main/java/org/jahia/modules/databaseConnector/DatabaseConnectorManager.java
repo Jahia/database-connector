@@ -1,24 +1,17 @@
 package org.jahia.modules.databaseConnector;
 
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
-import org.jahia.modules.databaseConnector.neo4j.Neo4jDatabaseConnection;
-import org.jahia.modules.databaseConnector.neo4j.Neo4jDatabaseConnectionRegistry;
-import org.jahia.modules.databaseConnector.redis.RedisDatabaseConnection;
-import org.jahia.modules.databaseConnector.redis.RedisDatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.webflow.model.Connection;
-import org.jahia.services.content.JCRTemplate;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 import java.util.*;
 
-import static org.jahia.modules.databaseConnector.DatabaseTypes.*;
+import static org.jahia.modules.databaseConnector.DatabaseTypes.getAllDatabaseTypes;
+import static org.jahia.modules.databaseConnector.DatabaseTypes.valueOf;
 
 /**
  * Date: 2013-10-17
@@ -26,28 +19,35 @@ import static org.jahia.modules.databaseConnector.DatabaseTypes.*;
  * @author Frédéric Pierre
  * @version 1.0
  */
-public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, BundleContextAware {
+public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, BundleContextAware, InitializingBean {
+
+    private static DatabaseConnectorManager instance;
 
     private BundleContext bundleContext;
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectorManager.class);
-
-    public static final String DATABASE_CONNECTOR_ROOT_PATH = "/settings/";
-
-    public static final String DATABASE_CONNECTOR_PATH = "databaseConnector";
-
-    public static final String DATABASE_CONNECTOR_NODE_TYPE = "dc:databaseConnector";
-
-    private JCRTemplate jcrTemplate;
 
     private Map<DatabaseTypes, DatabaseConnectionRegistry> databaseConnectionRegistries;
 
     private Set<DatabaseTypes> activatedDatabaseTypes = getAllDatabaseTypes();
 
     public DatabaseConnectorManager() {
-        this.jcrTemplate = JCRTemplate.getInstance();
-
         databaseConnectionRegistries = new TreeMap<DatabaseTypes, DatabaseConnectionRegistry>();
+    }
+
+    public static DatabaseConnectorManager getInstance() {
+        if (instance == null) {
+            synchronized (DatabaseConnectorManager.class) {
+                if (instance == null) {
+                    instance = new DatabaseConnectorManager();
+                }
+            }
+        }
+        return instance;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
         for (DatabaseTypes activatedDatabaseType : activatedDatabaseTypes) {
             DatabaseConnectionRegistry databaseConnectionRegistry
                     = DatabaseConnectionRegistryFactory.makeDatabaseConnectionRegistry(activatedDatabaseType);
@@ -56,123 +56,36 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
     }
 
     @Override
-    public boolean registerNeo4jGraphDatabase(String databaseId) throws InvalidSyntaxException {
-        logger.info("Start registering OSGi service for Neo4j Template");
-        Assert.isTrue(databaseConnectionRegistries.containsKey(NEO4J), "No Neo4j connection registered");
-        final Map<String, Neo4jDatabaseConnection> registry = ((Neo4jDatabaseConnectionRegistry) databaseConnectionRegistries.get(NEO4J)).getRegistry();
-        Assert.isTrue(registry.containsKey(databaseId), "No Neo4j connection registered with databaseId: " + databaseId);
-        SpringRestGraphDatabase graphDatabaseService = registry.get(databaseId).getGraphDatabaseService();
-        ServiceReference[] serviceReferences =
-                bundleContext.getAllServiceReferences(graphDatabaseService.getClass().getName(), createFilter(NEO4J, databaseId));
-        if(serviceReferences != null) {
-            logger.info("OSGi service for Neo4j Template already registered");
-            return true;
-        }
-        bundleContext.registerService(graphDatabaseService.getClass().getName(), graphDatabaseService, createProperties(NEO4J, databaseId));
-        logger.info("OSGi service for Neo4j Template successfully registered");
-        return true;
+    public boolean registerSingleDatabase(DatabaseTypes databaseType) {
+        return false;
+        // TODO
+        //return getOneDatabaseConnection(databaseType).registerAsService();
     }
 
     @Override
-    public boolean registerRedisConnectionFactory(String databaseId) throws InvalidSyntaxException {
-        logger.info("Start registering OSGi service for Redis Connection Factory");
-        Assert.isTrue(databaseConnectionRegistries.containsKey(REDIS), "No Redis connection registered");
-        final Map<String, RedisDatabaseConnection> registry = ((RedisDatabaseConnectionRegistry) databaseConnectionRegistries.get(REDIS)).getRegistry();
-        Assert.isTrue(registry.containsKey(databaseId), "No Redis connection registered with databaseId: " + databaseId);
-        RedisConnectionFactory redisConnectionFactory = registry.get(databaseId).getConnectionFactory();
-        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(RedisConnectionFactory.class.getName(), createFilter(REDIS, databaseId));
-        if(serviceReferences != null) {
-            logger.info("OSGi service for Redis Connection Factory already registered");
-            return true;
-        }
-        bundleContext.registerService(getInterfacesNames(redisConnectionFactory), redisConnectionFactory, createProperties(REDIS, databaseId));
-        logger.info("OSGi service for Redis Connection Factory successfully registered");
-        return true;
+    public boolean registerDatabase(String databaseId, DatabaseTypes databaseType) {
+        return getDatabaseConnection(databaseId, databaseType).registerAsService();
     }
 
-    @Override
-    public boolean registerRedisStringTemplate(String databaseId) throws InvalidSyntaxException {
-//        logger.info("Start registering OSGi service for Redis String Templat");
-//        if (!redisDatabaseConnectionRegistry.containsKey(databaseId)) {
-//            throw new IllegalArgumentException("No Redis Connection registered with databaseId: " + databaseId);
-//        }
-//        StringRedisTemplate stringRedisTemplate = redisDatabaseConnectionRegistry.get(databaseId).getStringRedisTemplate();
-//        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(stringRedisTemplate.getClass().getName(), createFilter(REDIS, databaseId));
-//        if(serviceReferences != null) {
-//            logger.info("OSGi service for Redis String Template already registered");
-//            return true;
-//        }
-//        bundleContext.registerService(stringRedisTemplate.getClass().getName(), stringRedisTemplate, createProperties(REDIS, databaseId));
-//        logger.info("OSGi service for Redis String Template successfully registered");
-        return true;
+    @SuppressWarnings("unchecked")
+    private <T extends AbstractDatabaseConnection> Map<String, T> getDatabaseRegistry(DatabaseTypes databaseType) {
+        Assert.isTrue(databaseConnectionRegistries.containsKey(databaseType),
+                "No " + databaseType.getDisplayName() + " connection registered");
+        return databaseConnectionRegistries.get(databaseType).getRegistry();
     }
 
-    @Override
-    public boolean registerRedisLongTemplate(String databaseId) throws InvalidSyntaxException {
-//        logger.info("Start registering OSGi service for Redis Long Template");
-//        if (!redisDatabaseConnectionRegistry.containsKey(databaseId)) {
-//            throw new IllegalArgumentException("No Redis Connection registered with databaseId: " + databaseId);
-//        }
-//        RedisTemplate<String, Long> longRedisTemplate = redisDatabaseConnectionRegistry.get(databaseId).getLongRedisTemplate();
-//        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(longRedisTemplate.getClass().getName(), createFilter(REDIS, databaseId));
-//        if(serviceReferences != null) {
-//            logger.info("OSGi service for Redis Long Template already registered");
-//            return true;
-//        }
-//        bundleContext.registerService(longRedisTemplate.getClass().getName(), longRedisTemplate, createProperties(REDIS, databaseId));
-//        logger.info("OSGi service for Redis Long Template successfully registered");
-        return true;
+    private <T extends AbstractDatabaseConnection> T getOneDatabaseConnection(DatabaseTypes databaseType) {
+        Map<String, T> databaseRegistry = getDatabaseRegistry(databaseType);
+        Assert.isTrue(databaseRegistry.size() == 1,
+                "None or more than one DatabaseConnection of type " + databaseType.getDisplayName() + " registered");
+        return databaseRegistry.values().iterator().next();
     }
 
-    @Override
-    public boolean registerRedisIntegerTemplate(String databaseId) throws InvalidSyntaxException {
-//        logger.info("Start registering OSGi service for Redis Integer Template");
-//        if (!redisDatabaseConnectionRegistry.containsKey(databaseId)) {
-//            throw new IllegalArgumentException("No Redis Connection registered with databaseId: " + databaseId);
-//        }
-//        RedisTemplate<String, Integer> integerRedisTemplate = redisDatabaseConnectionRegistry.get(databaseId).getIntegerRedisTemplate();
-//        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(integerRedisTemplate.getClass().getName(), createFilter(REDIS, databaseId));
-//        if(serviceReferences != null) {
-//            logger.info("OSGi service for Redis Integer Template already registered");
-//            return true;
-//        }
-//        bundleContext.registerService(integerRedisTemplate.getClass().getName(), integerRedisTemplate, createProperties(REDIS, databaseId));
-//        logger.info("OSGi service for Redis Integer Template successfully registered");
-        return true;
-    }
-
-    @Override
-    public boolean registerMongoTemplate(String databaseId) throws InvalidSyntaxException {
-//        logger.info("Start registering OSGi service for MongoDB Template");
-//        if (!mongoDatabaseConnectionRegistry.containsKey(databaseId)) {
-//            throw new IllegalArgumentException("No Mongo Connection registered with databaseId: " + databaseId);
-//        }
-//        MongoTemplate mongoTemplate = mongoDatabaseConnectionRegistry.get(databaseId).getTemplate();
-//        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(mongoTemplate.getClass().getName(), createFilter(MONGO, databaseId));
-//        if(serviceReferences != null) {
-//            logger.info("OSGi service for MongoDB Template already registered");
-//            return true;
-//        }
-//        bundleContext.registerService(mongoTemplate.getClass().getName(), mongoTemplate, createProperties(MONGO, databaseId));
-//        logger.info("OSGi service for MongoDB Template successfully registered");
-        return true;
-    }
-
-    @Override
-    public boolean registerMongoDbFactory(String databaseId) throws InvalidSyntaxException {
-//        logger.info("Start registering OSGi service for MongoDB Factory");
-//        if (!mongoDatabaseConnectionRegistry.containsKey(databaseId)) {
-//            throw new IllegalArgumentException("No Mongo Connection registered with databaseId: " + databaseId);
-//        }
-//        MongoDbFactory mongoDbFactory = mongoDatabaseConnectionRegistry.get(databaseId).getDbFactory();
-//        ServiceReference[] serviceReferences = bundleContext.getAllServiceReferences(MongoDbFactory.class.getName(), createFilter(MONGO, databaseId));
-//        if(serviceReferences != null) {
-//            logger.info("OSGi service for MongoDB Factory already registered");
-//            return true;
-//        }
-//        bundleContext.registerService(getInterfacesNames(mongoDbFactory), mongoDbFactory, createProperties(MONGO, databaseId));
-//        logger.info("OSGi service for MongoDB Factory successfully registered");
-        return true;
+    private <T extends AbstractDatabaseConnection> T getDatabaseConnection(String databaseId, DatabaseTypes databaseType) {
+        Map<String, T> databaseRegistry = getDatabaseRegistry(databaseType);
+        Assert.isTrue(databaseRegistry.containsKey(databaseId),
+                "No " + databaseType.getDisplayName() + " connection with id '" + databaseId + "'registered");
+        return databaseRegistry.get(databaseId);
     }
 
     @Override
@@ -180,20 +93,10 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
         this.bundleContext = bundleContext;
     }
 
-    private String[] getInterfacesNames(Object obj) {
-        Class[] interfaces = obj.getClass().getInterfaces();
-        String[] interfacesNames = new String[interfaces.length];
-        for (int i = 0; i < interfaces.length; i++) {
-            interfacesNames[i] = interfaces[i].getName();
-        }
-        return interfacesNames;
-    }
-
     public Map<DatabaseTypes, Set<ConnectionData>> findRegisteredConnections() {
         Map<DatabaseTypes, Set<ConnectionData>> registeredConnections = new LinkedHashMap<DatabaseTypes, Set<ConnectionData>>();
         for (DatabaseTypes databaseType : databaseConnectionRegistries.keySet()) {
-            Map<String, AbstractDatabaseConnection> registry =
-                    (Map<String, AbstractDatabaseConnection>) databaseConnectionRegistries.get(databaseType).getRegistry();
+            Map<String, AbstractDatabaseConnection> registry = getDatabaseRegistry(databaseType);
             Set<ConnectionData> connectionDataSet = new LinkedHashSet<ConnectionData>();
             for (AbstractDatabaseConnection abstractDatabaseConnection : registry.values()) {
                 connectionDataSet.add(abstractDatabaseConnection.createData());
@@ -201,19 +104,6 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
             registeredConnections.put(databaseType, connectionDataSet);
         }
         return registeredConnections;
-    }
-
-    public static String createFilter(DatabaseTypes databaseType, String id) {
-        StringBuffer sb = new StringBuffer("(&(").append(getKey()).append("=").append(databaseType.name())
-                .append(")(").append(DatabaseTypes.getKey()).append("=").append(id).append("))");
-        return sb.toString();
-    }
-
-    private Properties createProperties(DatabaseTypes databaseType, String id) {
-        Properties properties = new Properties();
-        properties.put(getKey(), databaseType.name());
-        properties.put(DatabaseTypes.getKey(), id);
-        return properties;
     }
 
     public Map<DatabaseTypes, Map<String, Object>> findAllDatabaseTypes() {
@@ -230,8 +120,7 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
     public ConnectionData getConnectionData(String databaseId, String databaseTypeName) {
         try {
             DatabaseTypes databaseType = valueOf(databaseTypeName);
-            AbstractDatabaseConnection databaseConnection =
-                    ((Map<String, AbstractDatabaseConnection>) databaseConnectionRegistries.get(databaseType).getRegistry()).get(databaseId);
+            AbstractDatabaseConnection databaseConnection = getDatabaseRegistry(databaseType).get(databaseId);
             return databaseConnection.createData();
         } catch (NullPointerException e) {
             logger.error(e.getMessage(), e);
@@ -239,6 +128,7 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
         }
     }
 
+    @SuppressWarnings("unchecked")
     private Set<String> getUsedIds() {
         HashSet<String> usedIds = new HashSet<String>();
         for (DatabaseConnectionRegistry databaseConnectionRegistry : databaseConnectionRegistries.values()) {
@@ -273,5 +163,9 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
 
     public void setActivatedDatabaseTypes(Set<DatabaseTypes> activatedDatabaseTypes) {
         this.activatedDatabaseTypes = activatedDatabaseTypes;
+    }
+
+    protected BundleContext getBundleContext() {
+        return bundleContext;
     }
 }

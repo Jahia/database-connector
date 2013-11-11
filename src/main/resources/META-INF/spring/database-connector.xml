@@ -13,7 +13,7 @@
     <context:annotation-config/>
 
     <!--OSGi Service-->
-    <bean class="org.jahia.modules.databaseConnector.DatabaseConnectorManager" id="databaseConnectorManager"/>
+    <bean class="org.jahia.modules.databaseConnector.DatabaseConnectorManager" id="databaseConnectorManager" factory-method="getInstance"/>
     <osgi:service ref="databaseConnectorManager" interface="org.jahia.modules.databaseConnector.DatabaseConnectorOSGiService"/>
 
 </beans>

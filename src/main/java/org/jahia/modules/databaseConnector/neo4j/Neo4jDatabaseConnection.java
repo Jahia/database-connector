@@ -27,6 +27,11 @@ public class Neo4jDatabaseConnection extends AbstractDatabaseConnection {
         this.graphDatabaseService = new SpringRestGraphDatabase(uri, user, password);
     }
 
+    @Override
+    public boolean registerAsService() {
+        return registerAsService(graphDatabaseService);
+    }
+
     public SpringRestGraphDatabase getGraphDatabaseService() {
         return graphDatabaseService;
     }

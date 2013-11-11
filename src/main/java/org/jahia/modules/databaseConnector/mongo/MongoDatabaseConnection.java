@@ -48,6 +48,13 @@ public class MongoDatabaseConnection extends AbstractDatabaseConnection {
         template = new MongoTemplate(dbFactory);
     }
 
+    @Override
+    protected boolean registerAsService() {
+        boolean b = registerAsService(template);
+        boolean b1 = registerAsService(dbFactory, true);
+        return b && b1;
+    }
+
     public MongoDbFactory getDbFactory() {
         return dbFactory;
     }

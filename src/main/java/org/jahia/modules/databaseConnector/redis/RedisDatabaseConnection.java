@@ -63,6 +63,15 @@ public class RedisDatabaseConnection extends AbstractDatabaseConnection {
         integerRedisTemplate = template;
     }
 
+    @Override
+    protected boolean registerAsService() {
+        boolean b = registerAsService(connectionFactory);
+        boolean b1 = registerAsService(stringRedisTemplate);
+        boolean b2 = registerAsService(longRedisTemplate);
+        boolean b3 = registerAsService(integerRedisTemplate);
+        return b && b1 && b2 && b3;
+    }
+
     public RedisConnectionFactory getConnectionFactory() {
         return connectionFactory;
     }
@@ -91,4 +100,5 @@ public class RedisDatabaseConnection extends AbstractDatabaseConnection {
     public DatabaseTypes getDatabaseType() {
         return DATABASE_TYPE;
     }
+
 }
