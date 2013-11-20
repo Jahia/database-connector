@@ -10,7 +10,7 @@ import java.util.Map;
  * @author Frédéric Pierre
  * @version 1.0
  */
-public interface DatabaseConnectionRegistry<T extends AbstractDatabaseConnection> {
+public interface DatabaseConnectionRegistry<T extends DatabaseConnection> {
 
     public Map<String, T> getRegistry();
 

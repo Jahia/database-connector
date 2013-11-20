@@ -16,4 +16,7 @@
     <bean class="org.jahia.modules.databaseConnector.DatabaseConnectorManager" id="databaseConnectorManager" factory-method="getInstance"/>
     <osgi:service ref="databaseConnectorManager" interface="org.jahia.modules.databaseConnector.DatabaseConnectorOSGiService"/>
 
+    <!--Choice List Initializers-->
+    <bean id="mongoWriteConcernChoiceListInitializer" class="org.jahia.modules.databaseConnector.mongo.initializer.WriteConcernChoiceListInitializer"/>
+
 </beans>

@@ -1,0 +1,138 @@
+package org.jahia.modules.databaseConnector.redis;
+
+import org.jahia.modules.databaseConnector.AbstractDatabaseConnection;
+import org.jahia.modules.databaseConnector.ConnectionData;
+import org.jahia.modules.databaseConnector.DatabaseTypes;
+import org.jahia.modules.databaseConnector.redis.serializer.IntSerializer;
+import org.jahia.modules.databaseConnector.redis.serializer.LongSerializer;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+import redis.clients.jedis.JedisShardInfo;
+
+/**
+ * Date: 11/1/2013
+ *
+ * @author Frédéric Pierre
+ * @version 1.0
+ */
+public class RedisDatabaseConnectionImpl extends AbstractDatabaseConnection implements RedisDatabaseConnection {
+
+    public static final String NODE_TYPE = "dc:redisConnection";
+
+    private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.REDIS;
+
+    private Integer timeout;
+
+    private Integer weight;
+
+    private RedisConnectionFactory connectionFactory;
+
+    private StringRedisTemplate stringRedisTemplate;
+
+    private RedisTemplate<String, Long> longRedisTemplate;
+
+    private RedisTemplate<String, Integer> integerRedisTemplate;
+
+    public RedisDatabaseConnectionImpl(String id, String host, Integer port) {
+        super(id, host, port, null);
+        this.timeout = null;
+        this.weight = null;
+        JedisConnectionFactory cf = new JedisConnectionFactory();
+        cf.setHostName(host);
+        cf.setPort(port);
+        cf.afterPropertiesSet();
+        connectionFactory = cf;
+        initStringRedisTemplate();
+        initLongRedisTemplate();
+        initIntegerRedisTemplate();
+    }
+
+    public RedisDatabaseConnectionImpl(String id, JedisShardInfo shardInfo) {
+        super(id, shardInfo.getHost(), shardInfo.getPort(), null, null, shardInfo.getPassword());
+        this.timeout = shardInfo.getTimeout();
+        this.weight = shardInfo.getWeight();
+        JedisConnectionFactory cf = new JedisConnectionFactory(shardInfo);
+        cf.afterPropertiesSet();
+        connectionFactory = cf;
+        initStringRedisTemplate();
+        initLongRedisTemplate();
+        initIntegerRedisTemplate();
+    }
+
+    private void initStringRedisTemplate() {
+        stringRedisTemplate = new StringRedisTemplate(connectionFactory);
+    }
+
+    private void initLongRedisTemplate() {
+        RedisTemplate<String, Long> template = new RedisTemplate<String, Long>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(LongSerializer.INSTANCE);
+        longRedisTemplate = template;
+    }
+
+    private void initIntegerRedisTemplate() {
+        RedisTemplate<String, Integer> template = new RedisTemplate<String, Integer>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(IntSerializer.INSTANCE);
+        integerRedisTemplate = template;
+    }
+
+    @Override
+    protected boolean registerAsService() {
+        boolean b = registerAsService(connectionFactory);
+        boolean b1 = registerAsService(stringRedisTemplate);
+        boolean b2 = registerAsService(longRedisTemplate);
+        boolean b3 = registerAsService(integerRedisTemplate);
+        return b && b1 && b2 && b3;
+    }
+
+    @Override
+    public ConnectionData makeConnectionData() {
+        return new RedisConnectionDataImpl(id, host, port, dbName, uri, user, password, getDatabaseType(), timeout, weight);
+    }
+
+    public RedisConnectionFactory getConnectionFactory() {
+        return connectionFactory;
+    }
+
+    public StringRedisTemplate getStringRedisTemplate() {
+        return stringRedisTemplate;
+    }
+
+    public RedisTemplate<String, Long> getLongRedisTemplate() {
+        return longRedisTemplate;
+    }
+
+    public RedisTemplate<String, Integer> getIntegerRedisTemplate() {
+        return integerRedisTemplate;
+    }
+
+    public <K,V> RedisTemplate<K,V> getRedisTemplate(RedisSerializer<K> keySerializer, RedisSerializer<V> valueSerializer) {
+        RedisTemplate<K,V> template = new RedisTemplate<K, V>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(keySerializer);
+        template.setValueSerializer(valueSerializer);
+        return template;
+    }
+
+    @Override
+    public DatabaseTypes getDatabaseType() {
+        return DATABASE_TYPE;
+    }
+
+    @Override
+    public Integer getTimeout() {
+        return timeout;
+    }
+
+    @Override
+    public Integer getWeight() {
+        return weight;
+    }
+}

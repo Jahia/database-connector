@@ -27,7 +27,7 @@ import static org.jahia.modules.databaseConnector.DatabaseConnectorManager.*;
  * @author Frédéric Pierre
  * @version 1.0
  */
-public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractDatabaseConnection> implements DatabaseConnectionRegistry<T> {
+public abstract class AbstractDatabaseConnectionRegistry<T extends DatabaseConnection> implements DatabaseConnectionRegistry<T> {
 
     private final static String NODE_TYPE = "dcmix:databaseConnection";
 
@@ -85,6 +85,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractDatab
                 if (connection.getPassword() != null) {
                     connectionNode.setProperty(PASSWORD_KEY, connection.getPassword());
                 }
+                storeAdvancedConfig(connection, connectionNode);
                 session.save();
                 return true;
             }
@@ -95,6 +96,8 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractDatab
             return false;
         }
     }
+
+    protected void storeAdvancedConfig(Connection connection, JCRNodeWrapper node) throws RepositoryException {}
 
     @Override
     public Boolean removeConnection(final String databaseConnectionId) {

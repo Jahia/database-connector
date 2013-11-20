@@ -4,6 +4,7 @@ import org.jahia.modules.databaseConnector.ConnectionData;
 import org.jahia.modules.databaseConnector.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.DatabaseTypes;
 import org.jahia.modules.databaseConnector.webflow.model.Connection;
+import org.jahia.modules.databaseConnector.webflow.model.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,18 +35,14 @@ public class DatabaseConnectorFlowHandler implements Serializable {
     }
 
     public Connection initConnection(String databaseTypeName) {
-        return new Connection(databaseTypeName);
-    }
-
-    public void initDatabaseId(Connection connection) {
-        if (connection.getId() == null) {
-            String id = databaseConnectorManager.getNextAvailableId(connection.getDatabaseType());
-            connection.setId(id);
-        }
+        Connection connection = ConnectionFactory.makeConnection(databaseTypeName);
+        String id = databaseConnectorManager.getNextAvailableId(connection.getDatabaseType());
+        connection.setId(id);
+        return connection;
     }
 
     public Connection getConnection(String databaseId, String databaseTypeName) {
-        return new Connection(databaseConnectorManager.getConnectionData(databaseId, databaseTypeName));
+        return ConnectionFactory.makeConnection(databaseConnectorManager.getConnectionData(databaseId, databaseTypeName));
     }
 
     public void addEditConnection(Connection connection, boolean isEdition) {

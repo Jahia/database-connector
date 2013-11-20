@@ -15,3 +15,35 @@
 img.muted {
   opacity: 0.6;
 }
+
+#advancedConfig {
+    display: none;
+}
+
+#advancedConfig.form-actions {
+    padding-left: 0;
+}
+
+#advancedConfigToggle {
+    cursor: pointer;
+}
+
+div.box-1 {
+    padding: 0;
+}
+
+div.box-1 form {
+    margin-bottom: 0;
+}
+
+form legend {
+    padding-left: 20px;
+}
+
+.form-actions {
+    margin-bottom: 0;
+}
+
+#connectionForm .form-actions {
+    margin-top: 0;
+}

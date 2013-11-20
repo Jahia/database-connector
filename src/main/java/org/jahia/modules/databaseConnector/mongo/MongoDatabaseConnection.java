@@ -1,70 +1,19 @@
 package org.jahia.modules.databaseConnector.mongo;
 
-import com.mongodb.*;
-import org.jahia.modules.databaseConnector.AbstractDatabaseConnection;
-import org.jahia.modules.databaseConnector.DatabaseTypes;
-import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
-
-import java.net.UnknownHostException;
+import org.jahia.modules.databaseConnector.DatabaseConnection;
 
 /**
- * Date: 11/1/2013
+ * Date: 11/20/2013
  *
  * @author Frédéric Pierre
  * @version 1.0
  */
-public class MongoDatabaseConnection extends AbstractDatabaseConnection {
+public interface MongoDatabaseConnection extends DatabaseConnection {
 
-    public static final String NODE_TYPE = "dc:mongoConnection";
+    public static final String WRITE_CONCERN_KEY = "dc:writeConcern";
 
-    private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.MONGO;
+    public static final String WRITE_CONCERN_DEFAULT_VALUE = "SAFE";
 
-    private MongoDbFactory dbFactory;
+    public String getWriteConcern();
 
-    private MongoTemplate template;
-
-    public MongoDatabaseConnection(String id, String host, Integer port) throws UnknownHostException {
-        this(id, host, port, null, null, null);
-    }
-
-    public MongoDatabaseConnection(String id, String host, Integer port, String dbName) throws UnknownHostException {
-        this(id, host, port, dbName, null, null);
-    }
-
-    public MongoDatabaseConnection(String id, String host, Integer port, String user, String password) throws UnknownHostException {
-        this(id, host, port, null, user, password);
-    }
-
-    public MongoDatabaseConnection(String id, String host, Integer port, String dbName, String user, String password) throws UnknownHostException {
-        super(id, host, port, dbName, user, password);
-        ServerAddress serverAddress = new ServerAddress(host,(int) port);
-        // TODO
-        //MongoCredential credential = new MongoCredential()
-        MongoClientOptions options = new MongoClientOptions.Builder().writeConcern(WriteConcern.SAFE).build();
-        Mongo mongo = new MongoClient(serverAddress, options);
-        dbFactory = new SimpleMongoDbFactory(mongo, dbName);
-        template = new MongoTemplate(dbFactory);
-    }
-
-    @Override
-    protected boolean registerAsService() {
-        boolean b = registerAsService(template);
-        boolean b1 = registerAsService(dbFactory, true);
-        return b && b1;
-    }
-
-    public MongoDbFactory getDbFactory() {
-        return dbFactory;
-    }
-
-    public MongoTemplate getTemplate() {
-        return template;
-    }
-
-    @Override
-    public DatabaseTypes getDatabaseType() {
-        return DATABASE_TYPE;
-    }
 }

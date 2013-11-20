@@ -20,17 +20,25 @@
 <%--@elvariable id="flowExecutionUrl" type="java.lang.String"--%>
 
 <%--@elvariable id="connection" type="org.jahia.modules.databaseConnector.webflow.model.Connection"--%>
+<%--@elvariable id="option" type="org.jahia.services.content.nodetypes.initializers.ChoiceListValue"--%>
 
 <template:addResources type="javascript" resources="jquery.min.js,admin-bootstrap.js"/>
-<template:addResources type="css" resources="admin-bootstrap.css"/>
+<template:addResources type="css" resources="admin-bootstrap.css, database-connector.css"/>
 
 <c:set var="databaseType" value="${connection.databaseType}"/>
+<c:set var="hasAdvancedOptions" value="${databaseType eq 'REDIS' || databaseType eq 'MONGO'}"/>
 
 <template:addResources type="inlinejavascript">
     <script type="text/javascript">
         $(document).ready(function () {
             var connectionForm = $("#connectionForm");
             connectionForm.find(".errorMessage").parentsUntil(connectionForm, ".control-group").addClass("error");
+
+            <c:if test="${hasAdvancedOptions}">
+                $('#advancedConfigToggle').click(function() {
+                    $('#advancedConfig').slideToggle();
+                });
+            </c:if>
         });
     </script>
 </template:addResources>
@@ -68,7 +76,11 @@
     <form:form modelAttribute="connection" id="connectionForm" class="form form-horizontal">
         <fieldset>
 
-            <legend><fmt:message key="dc_databaseConnector.label.${isEdition ? 'edit' : 'enter'}Config"/></legend>
+            <legend>
+                <fmt:message key="dc_databaseConnector.label.${isEdition ? 'edit' : 'enter'}Config">
+                    <fmt:param value="${connection.displayName}"/>
+                </fmt:message>
+            </legend>
 
             <div class="control-group">
                 <label class="control-label" for="id"><fmt:message key="dc_databaseConnector.label.id"/></label>
@@ -129,31 +141,57 @@
             <div class="control-group">
                 <label class="control-label" for="password"><fmt:message key="dc_databaseConnector.label.password"/></label>
                 <div class="controls">
-                    <form:input path="password" type="password" value="${password}" autocomplete="false"/>
+                    <form:password path="password" value="${password}" autocomplete="false"/>
                     <form:errors path="password" cssClass="help-inline errorMessage"/>
                 </div>
             </div>
 
-            <div class="control-group">
-                <div class="controls">
-                    <button class="btn btn-primary" type="submit" name="_eventId_submit">
-                        <fmt:message key="dc_databaseConnector.label.submit"/>
-                    </button>
-                    <c:if test="${isEdition}">
-                        <button class="btn" type="submit" name="_eventId_cancel">
-                            <fmt:message key="dc_databaseConnector.label.cancel"/>
-                        </button>
+            <c:if test="${hasAdvancedOptions}">
+                <div class="control-group">
+                    <p class="control-label" id="advancedConfigToggle"><i class="icon-plus"></i> <fmt:message key="dc_databaseConnector.label.advancedConfig"/></p>
+                </div>
+                <div id="advancedConfig">
+                    <c:if test="${databaseType eq 'REDIS'}">
+                        <div class="control-group">
+                            <label class="control-label" for="timeout"><fmt:message key="dc_databaseConnector.label.redis.timeout"/></label>
+                            <div class="controls">
+                                <form:input path="timeout" value="${timeout}"/>
+                                <form:errors path="timeout" cssClass="help-inline errorMessage"/>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="weight"><fmt:message key="dc_databaseConnector.label.redis.weight"/></label>
+                            <div class="controls">
+                                <form:input path="weight" value="${weight}"/>
+                                <form:errors path="weight" cssClass="help-inline errorMessage"/>
+                            </div>
+                        </div>
+                    </c:if>
+                    <c:if test="${databaseType eq 'MONGO'}">
+                        <div class="control-group">
+                            <label class="control-label" for="writeConcern"><fmt:message key="dc_databaseConnector.label.mongo.writeConcern"/></label>
+                            <div class="controls">
+                                <jcr:propertyInitializers var="options" node="${currentNode}" name="dc:writeConcern" nodeType="dc:mongoConnection"/>
+                                <form:select path="writeConcern" value="${writeConcern}">
+                                    <form:options items="${options}" itemValue="value.string" itemLabel="displayName" />
+                                </form:select>
+                                <form:errors path="writeConcern" cssClass="help-inline errorMessage"/>
+                            </div>
+                        </div>
                     </c:if>
                 </div>
-            </div>
+            </c:if>
 
-            <%--<c:url var="authorizeUrl" value="${url.server}"/>--%>
-            <%--<fmt:message key="jnt_socialNetworkConnector.label.${providerId}.help" var="help">--%>
-                <%--<fmt:param value="${authorizeUrl}"/>--%>
-            <%--</fmt:message>--%>
-            <%--<c:if test="${not empty help && not fn:startsWith(help, '???')}">--%>
-                <%--<i class="icon-info-sign"></i>&nbsp;${help}--%>
-            <%--</c:if>--%>
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit" name="_eventId_submit">
+                    <fmt:message key="dc_databaseConnector.label.submit"/>
+                </button>
+                <c:if test="${isEdition}">
+                    <button class="btn" type="submit" name="_eventId_cancel">
+                        <fmt:message key="dc_databaseConnector.label.cancel"/>
+                    </button>
+                </c:if>
+            </div>
 
         </fieldset>
     </form:form>

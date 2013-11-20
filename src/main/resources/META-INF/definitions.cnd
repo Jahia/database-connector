@@ -9,9 +9,11 @@
 [dc:neo4jConnection] > jnt:content, dcmix:databaseConnection
 
 [dc:mongoConnection] > jnt:content, dcmix:databaseConnection
- - dc:writeConcern (String, choicelist[resourceBundle]) = SAFE < SAFE, REPLICAS_SAFE, NORMAL, NONE, FSYNC_SAFE
+ - dc:writeConcern (String, choicelist[mongoWriteConcern])
 
 [dc:redisConnection] > jnt:content, dcmix:databaseConnection
+ - dc:timeout (long)
+ - dc:weight (long)
 
 [dcmix:databaseConnection] mixin
  - dc:id (String) mandatory

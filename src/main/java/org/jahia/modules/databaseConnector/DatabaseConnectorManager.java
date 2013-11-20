@@ -99,7 +99,7 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
             Map<String, AbstractDatabaseConnection> registry = getDatabaseRegistry(databaseType);
             Set<ConnectionData> connectionDataSet = new LinkedHashSet<ConnectionData>();
             for (AbstractDatabaseConnection abstractDatabaseConnection : registry.values()) {
-                connectionDataSet.add(abstractDatabaseConnection.createData());
+                connectionDataSet.add(abstractDatabaseConnection.makeConnectionData());
             }
             registeredConnections.put(databaseType, connectionDataSet);
         }
@@ -121,7 +121,7 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
         try {
             DatabaseTypes databaseType = valueOf(databaseTypeName);
             AbstractDatabaseConnection databaseConnection = getDatabaseRegistry(databaseType).get(databaseId);
-            return databaseConnection.createData();
+            return databaseConnection.makeConnectionData();
         } catch (NullPointerException e) {
             logger.error(e.getMessage(), e);
             return null;

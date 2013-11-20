@@ -1,12 +1,13 @@
 package org.jahia.modules.databaseConnector;
 
-import java.io.Serializable;
-
 /**
  * Date: 11/19/2013
  *
  * @author Frédéric Pierre
  * @version 1.0
  */
-public interface ConnectionData extends DatabaseConnection, Serializable {
+public interface ConnectionDataFactory {
+
+    public ConnectionData makeConnectionData();
+
 }

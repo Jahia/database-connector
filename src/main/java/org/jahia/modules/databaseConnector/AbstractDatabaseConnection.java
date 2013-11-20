@@ -14,7 +14,7 @@ import java.util.Properties;
  * @author Frédéric Pierre
  * @version 1.0
  */
-public abstract class AbstractDatabaseConnection implements DatabaseConnection, Comparable<AbstractDatabaseConnection> {
+public abstract class AbstractDatabaseConnection implements DatabaseConnection, ConnectionDataFactory, Comparable<AbstractDatabaseConnection> {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractDatabaseConnection.class);
 
@@ -22,27 +22,27 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection, 
 
     public final static String ID_KEY = "dc:id";
 
-    private String host;
+    protected String host;
 
     public final static String HOST_KEY = "dc:host";
 
-    private Integer port;
+    protected Integer port;
 
     public final static String PORT_KEY = "dc:port";
 
-    private String dbName;
+    protected String dbName;
 
     public final static String DB_NAME_KEY = "dc:dbName";
 
-    private String uri;
+    protected String uri;
 
     public final static String URI_KEY = "dc:uri";
 
-    private String user;
+    protected String user;
 
     public final static String USER_KEY = "dc:user";
 
-    private String password;
+    protected String password;
 
     public final static String PASSWORD_KEY = "dc:password";
 
@@ -72,6 +72,11 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection, 
         this.uri = uri;
         this.user = user;
         this.password = password;
+    }
+
+    @Override
+    public ConnectionData makeConnectionData() {
+        return new ConnectionDataImpl(id, host, port, dbName, uri, user, password, getDatabaseType());
     }
 
     protected abstract boolean registerAsService();
@@ -124,10 +129,6 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection, 
             interfacesNames[i] = interfaces[i].getName();
         }
         return interfacesNames;
-    }
-
-    public ConnectionData createData(){
-        return new ConnectionData(id, host, port, dbName, uri, user, password, getDatabaseType());
     }
 
     @Override
