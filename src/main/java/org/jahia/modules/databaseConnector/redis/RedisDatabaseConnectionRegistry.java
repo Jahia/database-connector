@@ -47,7 +47,7 @@ public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
                     String host = connection.getProperty(HOST_KEY).getString();
                     Integer port = (int) connection.getProperty(PORT_KEY).getLong();
                     String password = connection.hasProperty(PASSWORD_KEY) ?
-                            connection.getProperty(PASSWORD_KEY).getString() : null;
+                            decodePassword(connection.getProperty(PASSWORD_KEY).getString()) : null;
                     Integer timeout = connection.hasProperty(TIMEOUT_KEY) ?
                             (int) connection.getProperty(TIMEOUT_KEY).getLong() : null;
                     Integer weight = connection.hasProperty(WEIGHT_KEY) ?

@@ -48,7 +48,7 @@ public class MongoDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
                     Integer port = (int) connection.getProperty(PORT_KEY).getLong();
                     String dbName = connection.hasProperty(DB_NAME_KEY) ? connection.getProperty(DB_NAME_KEY).getString() : null;
                     String user = connection.hasProperty(USER_KEY) ? connection.getProperty(USER_KEY).getString() : null;
-                    String password = connection.hasProperty(PASSWORD_KEY) ? connection.getProperty(PASSWORD_KEY).getString() : null;
+                    String password = connection.hasProperty(PASSWORD_KEY) ? decodePassword(connection.getProperty(PASSWORD_KEY).getString()) : null;
                     String writeConcern = connection.hasProperty(WRITE_CONCERN_KEY) ? connection.getProperty(WRITE_CONCERN_KEY).getString() : null;
                     try {
                         MongoDatabaseConnection storedConnection = new MongoDatabaseConnectionImpl(id, host, port, dbName, user, password, writeConcern);

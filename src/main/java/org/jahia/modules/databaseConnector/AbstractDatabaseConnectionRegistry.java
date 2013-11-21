@@ -5,6 +5,7 @@ import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.JCRTemplate;
+import org.jahia.utils.EncryptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -83,7 +84,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends DatabaseConne
                     connectionNode.setProperty(USER_KEY, connection.getUser());
                 }
                 if (connection.getPassword() != null) {
-                    connectionNode.setProperty(PASSWORD_KEY, connection.getPassword());
+                    connectionNode.setProperty(PASSWORD_KEY, encodePassword(connection.getPassword()));
                 }
                 storeAdvancedConfig(connection, connectionNode);
                 session.save();
@@ -148,5 +149,13 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends DatabaseConne
         else {
             return settings.addNode(DATABASE_CONNECTOR_PATH, DATABASE_CONNECTOR_NODE_TYPE);
         }
+    }
+
+    private String encodePassword(String password) {
+        return EncryptionUtils.passwordBaseEncrypt(password);
+    }
+
+    protected String decodePassword(String encryptedPassword) {
+        return EncryptionUtils.passwordBaseDecrypt(encryptedPassword);
     }
 }

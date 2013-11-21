@@ -42,7 +42,7 @@ public class Neo4jDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
                     String id = connection.getProperty(ID_KEY).getString();
                     String uri = connection.getProperty(URI_KEY).getString();
                     String user = connection.hasProperty(USER_KEY) ? connection.getProperty(USER_KEY).getString() : null;
-                    String password = connection.hasProperty(PASSWORD_KEY) ? connection.getProperty(PASSWORD_KEY).getString() : null;
+                    String password = connection.hasProperty(PASSWORD_KEY) ? decodePassword(connection.getProperty(PASSWORD_KEY).getString()) : null;
                     Neo4jDatabaseConnection storedConnection = new Neo4jDatabaseConnection(id, uri, user, password);
                     registry.put(id, storedConnection);
                 }
