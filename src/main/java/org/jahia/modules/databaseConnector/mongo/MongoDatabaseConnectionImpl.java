@@ -4,6 +4,7 @@ import com.mongodb.*;
 import org.jahia.modules.databaseConnector.AbstractDatabaseConnection;
 import org.jahia.modules.databaseConnector.ConnectionData;
 import org.jahia.modules.databaseConnector.DatabaseTypes;
+import org.springframework.data.authentication.UserCredentials;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
@@ -65,12 +66,15 @@ public class MongoDatabaseConnectionImpl extends AbstractDatabaseConnection impl
             ArrayList<MongoCredential> mongoCredentials = new ArrayList<MongoCredential>(1);
             mongoCredentials.add(credential);
             mongo = new MongoClient(serverAddress, mongoCredentials , options);
+            UserCredentials userCredentials = new UserCredentials(user, password);
+            dbFactory = new SimpleMongoDbFactory(mongo, dbName, userCredentials);
+            template = new MongoTemplate(dbFactory);
         }
         else {
             mongo = new MongoClient(serverAddress, options);
+            dbFactory = new SimpleMongoDbFactory(mongo, dbName);
+            template = new MongoTemplate(dbFactory);
         }
-        dbFactory = new SimpleMongoDbFactory(mongo, dbName);
-        template = new MongoTemplate(dbFactory);
     }
 
     @Override
