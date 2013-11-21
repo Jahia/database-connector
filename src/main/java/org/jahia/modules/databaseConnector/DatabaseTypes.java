@@ -16,12 +16,10 @@ public enum DatabaseTypes {
 
     private final String displayName;
 
+    public final static String DATABASE_TYPE_KEY = "databaseType";
+
     DatabaseTypes(String displayName) {
         this.displayName = displayName;
-    }
-
-    public static String getKey() {
-        return "databaseType";
     }
 
     public String getDisplayName() {

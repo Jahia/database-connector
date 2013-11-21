@@ -16,7 +16,7 @@ public class Neo4jDatabaseConnection extends AbstractDatabaseConnection {
 
     private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.NEO4J;
 
-    private SpringRestGraphDatabase graphDatabaseService;
+    private final SpringRestGraphDatabase graphDatabaseService;
 
     public Neo4jDatabaseConnection(String id, String uri) {
         this(id, uri, null, null);

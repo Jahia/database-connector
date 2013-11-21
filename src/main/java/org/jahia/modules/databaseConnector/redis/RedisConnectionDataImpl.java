@@ -11,9 +11,9 @@ import org.jahia.modules.databaseConnector.DatabaseTypes;
  */
 public class RedisConnectionDataImpl extends ConnectionDataImpl implements RedisDatabaseConnection {
 
-    private Integer timeout;
+    private final Integer timeout;
 
-    private Integer weight;
+    private final Integer weight;
 
     public RedisConnectionDataImpl(String id, String host, Integer port, String dbName, String uri,
                                    String user, String password, DatabaseTypes databaseType, Integer timeout, Integer weight) {

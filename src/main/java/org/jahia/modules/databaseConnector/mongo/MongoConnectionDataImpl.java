@@ -11,7 +11,7 @@ import org.jahia.modules.databaseConnector.DatabaseTypes;
  */
 public class MongoConnectionDataImpl extends ConnectionDataImpl implements MongoDatabaseConnection {
 
-    private String writeConcern;
+    private final String writeConcern;
 
     public MongoConnectionDataImpl(String id, String host, Integer port, String dbName, String uri,
                                    String user, String password, DatabaseTypes databaseType, String writeConcern) {

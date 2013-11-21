@@ -8,8 +8,6 @@ import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
-import redis.clients.jedis.JedisShardInfo;
 
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
@@ -54,21 +52,8 @@ public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
                             (int) connection.getProperty(TIMEOUT_KEY).getLong() : null;
                     Integer weight = connection.hasProperty(WEIGHT_KEY) ?
                             (int) connection.getProperty(WEIGHT_KEY).getLong() : null;
-                    JedisShardInfo shardInfo;
-                    if (timeout == null) {
-                        shardInfo = new JedisShardInfo(host, port);
-                    }
-                    else {
-                        if (weight != null) {
-                            shardInfo = new JedisShardInfo(host, port, timeout, weight);
-                        }
-                        else {
-                            shardInfo = new JedisShardInfo(host, port);
-                            shardInfo.setTimeout(timeout);
-                        }
-                    }
-                    shardInfo.setPassword(password);
-                    RedisDatabaseConnectionImpl storedConnection = new RedisDatabaseConnectionImpl(id, shardInfo);
+                    RedisDatabaseConnectionImpl storedConnection =
+                            new RedisDatabaseConnectionImpl(id, host, port, password, timeout, weight);
                     registry.put(id, storedConnection);
                 }
                 return true;
@@ -84,26 +69,13 @@ public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
 
     @Override
     public void addEditConnection(Connection connection, boolean isEdition) {
-        Assert.hasText(connection.getHost(), "Host must be defined");
-        Assert.notNull(connection.getPort(), "Port must be defined");
-        final RedisConnectionImpl redisConnection = (RedisConnectionImpl) connection;
-        RedisDatabaseConnection redisDatabaseConnection = null;
-        if (redisConnection.getTimeout() != null) {
-            JedisShardInfo shardInfo = null;
-            if (redisConnection.getWeight() != null) {
-                shardInfo = new JedisShardInfo(redisConnection.getHost(), redisConnection.getPort(),
-                        redisConnection.getTimeout(), redisConnection.getWeight());
-            }
-            else {
-                shardInfo = new JedisShardInfo(redisConnection.getHost(), redisConnection.getPort(),
-                        redisConnection.getTimeout());
-            }
-            redisDatabaseConnection = new RedisDatabaseConnectionImpl(redisConnection.getId(), shardInfo);
+        if (isEdition) {
+            ((RedisDatabaseConnectionImpl) registry.get(connection.getOldId())).unregisterAsService();
         }
-        else {
-            redisDatabaseConnection =
-                    new RedisDatabaseConnectionImpl(connection.getId(), connection.getHost(), connection.getPort());
-        }
+        RedisConnectionImpl redisConnection = (RedisConnectionImpl) connection;
+        RedisDatabaseConnection redisDatabaseConnection = new RedisDatabaseConnectionImpl(redisConnection.getId(),
+                redisConnection.getHost(), redisConnection.getPort(), redisConnection.getPassword(),
+                redisConnection.getTimeout(), redisConnection.getWeight());
         if (storeConnection(connection, NODE_TYPE, isEdition)) {
             if (isEdition) {
                 if (!connection.getId().equals(connection.getOldId())) {

@@ -102,6 +102,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends DatabaseConne
     @Override
     public Boolean removeConnection(final String databaseConnectionId) {
         Assert.isTrue(registry.containsKey(databaseConnectionId), "No database connection with ID: " + databaseConnectionId);
+        ((AbstractDatabaseConnection) registry.get(databaseConnectionId)).unregisterAsService();
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
@@ -130,9 +131,8 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends DatabaseConne
     }
 
     private Node getDatabaseConnectionNode(String databaseConnectionId, JCRSessionWrapper session) throws RepositoryException {
-        StringBuffer statement = new StringBuffer("SELECT * FROM [").append(NODE_TYPE).append("] WHERE [").
-                append(ID_KEY).append("] = '").append(databaseConnectionId).append("'");
-        NodeIterator nodes = query(statement.toString(), session).getNodes();
+        String statement = "SELECT * FROM [" + NODE_TYPE + "] WHERE [" + ID_KEY + "] = '" + databaseConnectionId + "'";
+        NodeIterator nodes = query(statement, session).getNodes();
         if (!nodes.hasNext()) {
             // TODO
             return null;

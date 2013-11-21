@@ -130,18 +130,20 @@
                 </div>
             </c:if>
 
-            <div class="control-group">
-                <label class="control-label" for="user"><fmt:message key="dc_databaseConnector.label.user"/></label>
-                <div class="controls">
-                    <form:input path="user" type="text" value="${user}"/>
-                    <form:errors path="user" cssClass="help-inline errorMessage"/>
+            <c:if test="${databaseType ne 'REDIS'}">
+                <div class="control-group">
+                    <label class="control-label" for="user"><fmt:message key="dc_databaseConnector.label.user"/></label>
+                    <div class="controls">
+                        <form:input path="user" type="text" value="${user}"/>
+                        <form:errors path="user" cssClass="help-inline errorMessage"/>
+                    </div>
                 </div>
-            </div>
+            </c:if>
 
             <div class="control-group">
                 <label class="control-label" for="password"><fmt:message key="dc_databaseConnector.label.password"/></label>
                 <div class="controls">
-                    <form:password path="password" value="${password}" autocomplete="false"/>
+                    <form:password path="password" value="${password}" autocomplete="false" showPassword="true"/>
                     <form:errors path="password" cssClass="help-inline errorMessage"/>
                 </div>
             </div>
@@ -184,7 +186,14 @@
 
             <div class="form-actions">
                 <button class="btn btn-primary" type="submit" name="_eventId_submit">
-                    <fmt:message key="dc_databaseConnector.label.submit"/>
+                    <c:choose>
+                        <c:when test="${isEdition}">
+                            <fmt:message key="dc_databaseConnector.label.save"/>
+                        </c:when>
+                        <c:otherwise>
+                            <fmt:message key="dc_databaseConnector.label.submit"/>
+                        </c:otherwise>
+                    </c:choose>
                 </button>
                 <c:if test="${isEdition}">
                     <button class="btn" type="submit" name="_eventId_cancel">

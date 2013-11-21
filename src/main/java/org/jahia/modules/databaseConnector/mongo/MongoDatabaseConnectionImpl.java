@@ -27,7 +27,7 @@ public class MongoDatabaseConnectionImpl extends AbstractDatabaseConnection impl
 
     private MongoTemplate template;
 
-    private String writeConcern;
+    private final String writeConcern;
 
     public MongoDatabaseConnectionImpl(String id, String host, Integer port) throws UnknownHostException {
         this(id, host, port, null, null, null, null);

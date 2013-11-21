@@ -57,9 +57,7 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
 
     @Override
     public boolean registerSingleDatabase(DatabaseTypes databaseType) {
-        return false;
-        // TODO
-        //return getOneDatabaseConnection(databaseType).registerAsService();
+        return getOneDatabaseConnection(databaseType).registerAsService();
     }
 
     @Override

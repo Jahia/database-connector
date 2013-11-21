@@ -11,7 +11,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.util.Assert;
 import redis.clients.jedis.JedisShardInfo;
+import redis.clients.jedis.Protocol;
 
 /**
  * Date: 11/1/2013
@@ -25,11 +27,11 @@ public class RedisDatabaseConnectionImpl extends AbstractDatabaseConnection impl
 
     private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.REDIS;
 
-    private Integer timeout;
+    private final Integer timeout;
 
-    private Integer weight;
+    private final Integer weight;
 
-    private RedisConnectionFactory connectionFactory;
+    private final RedisConnectionFactory connectionFactory;
 
     private StringRedisTemplate stringRedisTemplate;
 
@@ -38,12 +40,18 @@ public class RedisDatabaseConnectionImpl extends AbstractDatabaseConnection impl
     private RedisTemplate<String, Integer> integerRedisTemplate;
 
     public RedisDatabaseConnectionImpl(String id, String host, Integer port) {
-        super(id, host, port, null);
-        this.timeout = null;
-        this.weight = null;
-        JedisConnectionFactory cf = new JedisConnectionFactory();
-        cf.setHostName(host);
-        cf.setPort(port);
+        this(id, host, port, null, null, null);
+    }
+
+    public RedisDatabaseConnectionImpl(String id, String host, Integer port, String password) {
+        this(id, host, port, password, null, null);
+    }
+
+    public RedisDatabaseConnectionImpl(String id, String host, Integer port, String password, Integer timeout, Integer weight) {
+        super(id, host, port, null, null, password);
+        this.timeout = timeout;
+        this.weight = weight;
+        JedisConnectionFactory cf = new JedisConnectionFactory(makeJedisShardInfo());
         cf.afterPropertiesSet();
         connectionFactory = cf;
         initStringRedisTemplate();
@@ -51,16 +59,28 @@ public class RedisDatabaseConnectionImpl extends AbstractDatabaseConnection impl
         initIntegerRedisTemplate();
     }
 
-    public RedisDatabaseConnectionImpl(String id, JedisShardInfo shardInfo) {
-        super(id, shardInfo.getHost(), shardInfo.getPort(), null, null, shardInfo.getPassword());
-        this.timeout = shardInfo.getTimeout();
-        this.weight = shardInfo.getWeight();
-        JedisConnectionFactory cf = new JedisConnectionFactory(shardInfo);
-        cf.afterPropertiesSet();
-        connectionFactory = cf;
-        initStringRedisTemplate();
-        initLongRedisTemplate();
-        initIntegerRedisTemplate();
+    private JedisShardInfo makeJedisShardInfo() {
+        Assert.hasText(host, "Host must be defined");
+        Assert.notNull(port, "Port must be defined");
+        JedisShardInfo shardInfo;
+        if (timeout != null || weight != null) {
+            if (timeout == null) {
+                shardInfo = new JedisShardInfo(host, port, Protocol.DEFAULT_TIMEOUT, weight);
+            }
+            else if (weight != null) {
+                shardInfo = new JedisShardInfo(host, port, timeout, weight);
+            }
+            else {
+                shardInfo = new JedisShardInfo(host, port, timeout);
+            }
+        }
+        else {
+            shardInfo = new JedisShardInfo(host, port);
+        }
+        if (password != null && !password.isEmpty()) {
+            shardInfo.setPassword(password);
+        }
+        return shardInfo;
     }
 
     private void initStringRedisTemplate() {
@@ -85,7 +105,7 @@ public class RedisDatabaseConnectionImpl extends AbstractDatabaseConnection impl
 
     @Override
     protected boolean registerAsService() {
-        boolean b = registerAsService(connectionFactory);
+        boolean b = registerAsService(connectionFactory, true);
         boolean b1 = registerAsService(stringRedisTemplate);
         boolean b2 = registerAsService(longRedisTemplate);
         boolean b3 = registerAsService(integerRedisTemplate);
