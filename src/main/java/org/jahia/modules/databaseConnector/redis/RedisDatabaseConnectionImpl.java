@@ -11,7 +11,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.util.Assert;
 import redis.clients.jedis.JedisShardInfo;
 import redis.clients.jedis.Protocol;
 
@@ -60,8 +59,6 @@ public class RedisDatabaseConnectionImpl extends AbstractDatabaseConnection impl
     }
 
     private JedisShardInfo makeJedisShardInfo() {
-        Assert.hasText(host, "Host must be defined");
-        Assert.notNull(port, "Port must be defined");
         JedisShardInfo shardInfo;
         if (timeout != null || weight != null) {
             if (timeout == null) {

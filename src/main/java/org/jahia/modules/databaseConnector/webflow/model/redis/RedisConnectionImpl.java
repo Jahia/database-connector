@@ -3,7 +3,7 @@ package org.jahia.modules.databaseConnector.webflow.model.redis;
 import org.jahia.modules.databaseConnector.ConnectionData;
 import org.jahia.modules.databaseConnector.DatabaseTypes;
 import org.jahia.modules.databaseConnector.redis.RedisConnectionDataImpl;
-import org.jahia.modules.databaseConnector.webflow.model.ConnectionImpl;
+import org.jahia.modules.databaseConnector.webflow.model.AbstractConnection;
 import redis.clients.jedis.Protocol;
 import redis.clients.util.Sharded;
 
@@ -13,7 +13,7 @@ import redis.clients.util.Sharded;
  * @author Frédéric Pierre
  * @version 1.0
  */
-public class RedisConnectionImpl extends ConnectionImpl implements RedisConnection {
+public class RedisConnectionImpl extends AbstractConnection implements RedisConnection {
 
     private Integer timeout = Protocol.DEFAULT_TIMEOUT;
 
@@ -48,5 +48,17 @@ public class RedisConnectionImpl extends ConnectionImpl implements RedisConnecti
     @Override
     public Integer getWeight() {
         return weight;
+    }
+
+    @Override
+    public void validateEnterConfig() {
+        if (host == null || host.isEmpty()) {
+            addRequiredErrorMessage("host");
+        }
+        if (port == null) {
+            addRequiredErrorMessage("port");
+        } else if (port <= 0) {
+            addErrorMessage("port", "dc_databaseConnector.label.port.message.askPositiveInteger");
+        }
     }
 }

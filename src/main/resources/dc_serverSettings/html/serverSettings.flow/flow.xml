@@ -13,11 +13,11 @@
             <!--<evaluate expression="flowHandler.hasTextEncryptor()" result="flowScope.hasTextEncryptor"/>-->
         </on-render>
         <transition on="addConnection" to="selectDatabaseType">
-            <set name="flowScope.isEdition" value="false" type="boolean"/>
+            <set name="flowScope.isEdition" value="false" type="java.lang.Boolean"/>
         </transition>
         <transition on="editConnection" to="enterConfig">
             <evaluate expression="flowHandler.getConnection(requestParameters.databaseId, requestParameters.databaseType)" result="flowScope.connection"/>
-            <set name="flowScope.isEdition" value="true" type="boolean"/>
+            <set name="flowScope.isEdition" value="true" type="java.lang.Boolean"/>
         </transition>
         <transition on="removeConnection" to="registeredConnections">
             <evaluate expression="flowHandler.removeConnection(requestParameters.databaseId, requestParameters.databaseType)"/>
@@ -30,7 +30,7 @@
         </on-render>
         <transition on="setDatabaseType" to="enterConfig">
             <evaluate expression="flowHandler.initConnection(requestParameters.databaseType)" result="flowScope.connection"/>
-            <set name="flowScope.isEdition" value="false" type="boolean"/>
+            <set name="flowScope.isEdition" value="false" type="java.lang.Boolean"/>
         </transition>
         <transition on="cancel" to="registeredConnections"/>
         <transition on="back" to="registeredConnections"/>

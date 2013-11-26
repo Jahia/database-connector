@@ -150,7 +150,11 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
         return initialId+index;
     }
 
-    public void addEditConnection(Connection connection, boolean isEdition) {
+    public boolean isAvailableId(String id, DatabaseTypes databaseType) {
+        return !databaseConnectionRegistries.get(databaseType).getRegistry().containsKey(id);
+    }
+
+    public void addEditConnection(final Connection connection, final Boolean isEdition) {
         databaseConnectionRegistries.get(connection.getDatabaseType()).addEditConnection(connection, isEdition);
     }
 

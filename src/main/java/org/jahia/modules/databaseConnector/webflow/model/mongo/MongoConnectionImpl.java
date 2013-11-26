@@ -3,7 +3,7 @@ package org.jahia.modules.databaseConnector.webflow.model.mongo;
 import com.mongodb.ServerAddress;
 import org.jahia.modules.databaseConnector.ConnectionData;
 import org.jahia.modules.databaseConnector.mongo.MongoConnectionDataImpl;
-import org.jahia.modules.databaseConnector.webflow.model.ConnectionImpl;
+import org.jahia.modules.databaseConnector.webflow.model.AbstractConnection;
 
 import static org.jahia.modules.databaseConnector.DatabaseTypes.MONGO;
 
@@ -13,7 +13,7 @@ import static org.jahia.modules.databaseConnector.DatabaseTypes.MONGO;
  * @author Frédéric Pierre
  * @version 1.0
  */
-public class MongoConnectionImpl extends ConnectionImpl implements MongoConnection {
+public class MongoConnectionImpl extends AbstractConnection implements MongoConnection {
 
     private String writeConcern;
 
@@ -36,5 +36,20 @@ public class MongoConnectionImpl extends ConnectionImpl implements MongoConnecti
     @Override
     public void setWriteConcern(String writeConcern) {
         this.writeConcern = writeConcern;
+    }
+
+    @Override
+    public void validateEnterConfig() {
+        if (host == null || host.isEmpty()) {
+            addRequiredErrorMessage("host");
+        }
+        if (port == null) {
+            addRequiredErrorMessage("port");
+        } else if (port <= 0) {
+            addErrorMessage("port", "dc_databaseConnector.label.port.message.askPositiveInteger");
+        }
+        if (dbName == null || dbName.isEmpty()) {
+            addRequiredErrorMessage("dbName");
+        }
     }
 }

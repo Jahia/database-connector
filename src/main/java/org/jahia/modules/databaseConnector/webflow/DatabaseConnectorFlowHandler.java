@@ -45,7 +45,7 @@ public class DatabaseConnectorFlowHandler implements Serializable {
         return ConnectionFactory.makeConnection(databaseConnectorManager.getConnectionData(databaseId, databaseTypeName));
     }
 
-    public void addEditConnection(Connection connection, boolean isEdition) {
+    public void addEditConnection(Connection connection, Boolean isEdition) {
         databaseConnectorManager.addEditConnection(connection, isEdition);
     }
 

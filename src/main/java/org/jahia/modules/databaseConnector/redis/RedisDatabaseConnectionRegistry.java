@@ -2,12 +2,13 @@ package org.jahia.modules.databaseConnector.redis;
 
 import org.jahia.modules.databaseConnector.AbstractDatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.webflow.model.Connection;
-import org.jahia.modules.databaseConnector.webflow.model.redis.RedisConnectionImpl;
+import org.jahia.modules.databaseConnector.webflow.model.redis.RedisConnection;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
@@ -68,11 +69,13 @@ public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
     }
 
     @Override
-    public void addEditConnection(Connection connection, boolean isEdition) {
+    public void addEditConnection(final Connection connection, final Boolean isEdition) {
+        Assert.hasText(connection.getHost(), "Host must be defined");
+        Assert.notNull(connection.getPort(), "Port must be defined");
         if (isEdition) {
             ((RedisDatabaseConnectionImpl) registry.get(connection.getOldId())).unregisterAsService();
         }
-        RedisConnectionImpl redisConnection = (RedisConnectionImpl) connection;
+        RedisConnection redisConnection = (RedisConnection) connection;
         RedisDatabaseConnection redisDatabaseConnection = new RedisDatabaseConnectionImpl(redisConnection.getId(),
                 redisConnection.getHost(), redisConnection.getPort(), redisConnection.getPassword(),
                 redisConnection.getTimeout(), redisConnection.getWeight());
@@ -94,7 +97,7 @@ public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
 
     @Override
     protected void storeAdvancedConfig(Connection connection, JCRNodeWrapper node) throws RepositoryException {
-        RedisConnectionImpl redisConnection = (RedisConnectionImpl) connection;
+        RedisConnection redisConnection = (RedisConnection) connection;
         if (redisConnection.getTimeout() != null) {
             node.setProperty(TIMEOUT_KEY, redisConnection.getTimeout());
         }

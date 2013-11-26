@@ -69,12 +69,11 @@ public class MongoDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
     }
 
     @Override
-    public void addEditConnection(Connection connection, boolean isEdition) {
+    public void addEditConnection(final Connection connection, final Boolean isEdition) {
         Assert.hasText(connection.getHost(), "Host must be defined");
         Assert.notNull(connection.getPort(), "Port must be defined");
         Assert.hasText(connection.getDbName(), "DB name must be defined");
-        MongoDatabaseConnection mongoDatabaseConnection =
-                null;
+        MongoDatabaseConnection mongoDatabaseConnection = null;
         try {
             mongoDatabaseConnection = new MongoDatabaseConnectionImpl(connection.getId(), connection.getHost(), connection.getPort(),
                     connection.getDbName(), connection.getUser(), connection.getPassword(), ((MongoConnection) connection).getWriteConcern());

@@ -3,9 +3,9 @@ package org.jahia.modules.databaseConnector.webflow.model;
 import org.jahia.modules.databaseConnector.ConnectionData;
 import org.jahia.modules.databaseConnector.DatabaseTypes;
 import org.jahia.modules.databaseConnector.webflow.model.mongo.MongoConnectionImpl;
+import org.jahia.modules.databaseConnector.webflow.model.neo4j.Neo4jConnection;
 import org.jahia.modules.databaseConnector.webflow.model.redis.RedisConnectionImpl;
 
-import static org.jahia.modules.databaseConnector.DatabaseTypes.NEO4J;
 import static org.jahia.modules.databaseConnector.DatabaseTypes.valueOf;
 
 /**
@@ -24,7 +24,7 @@ public class ConnectionFactory {
         Connection connection = null;
         switch (databaseType) {
             case NEO4J:
-                connection = new ConnectionImpl(NEO4J);
+                connection = new Neo4jConnection();
                 break;
             case REDIS:
                 connection = new RedisConnectionImpl();
@@ -40,7 +40,7 @@ public class ConnectionFactory {
         Connection connection = null;
         switch (connectionData.getDatabaseType()) {
             case NEO4J:
-                connection = new ConnectionImpl(connectionData);
+                connection = new Neo4jConnection(connectionData);
                 break;
             case REDIS:
                 connection = new RedisConnectionImpl(connectionData);
