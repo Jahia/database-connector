@@ -47,11 +47,14 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         for (DatabaseTypes activatedDatabaseType : activatedDatabaseTypes) {
-            DatabaseConnectionRegistry databaseConnectionRegistry
-                    = DatabaseConnectionRegistryFactory.makeDatabaseConnectionRegistry(activatedDatabaseType);
-            databaseConnectionRegistries.put(activatedDatabaseType, databaseConnectionRegistry);
+            try {
+                DatabaseConnectionRegistry databaseConnectionRegistry = DatabaseConnectionRegistryFactory.makeDatabaseConnectionRegistry(activatedDatabaseType);
+                databaseConnectionRegistries.put(activatedDatabaseType, databaseConnectionRegistry);
+            } catch(Exception e) {
+                logger.error(e.getMessage(), e);
+            }
         }
     }
 
