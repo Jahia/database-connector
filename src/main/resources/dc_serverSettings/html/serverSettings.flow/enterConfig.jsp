@@ -94,7 +94,7 @@
                 <div class="control-group">
                     <label class="control-label" for="host"><fmt:message key="dc_databaseConnector.label.host"/></label>
                     <div class="controls">
-                        <form:input path="host" type="text" value="${host}"/>
+                        <form:input path="host" type="text" value="${empty host ? 'localhost' : host}"/>
                         <form:errors path="host" cssClass="help-inline errorMessage"/>
                     </div>
                 </div>
@@ -124,7 +124,7 @@
                 <div class="control-group">
                     <label class="control-label" for="uri"><fmt:message key="dc_databaseConnector.label.uri"/></label>
                     <div class="controls">
-                        <form:input path="uri" type="url" value="${uri}"/>
+                        <form:input path="uri" type="url" value="${empty uri ? 'http://localhost:7474/db/data' : uri}"/>
                         <form:errors path="uri" cssClass="help-inline errorMessage"/>
                     </div>
                 </div>

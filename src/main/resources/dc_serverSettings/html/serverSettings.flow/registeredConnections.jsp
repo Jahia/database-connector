@@ -69,7 +69,7 @@
             <c:forEach var="connectionData" items="${entry.value}">
                 <li class="span3 registeredConnection">
                     <div class="thumbnail">
-                        <img src="/modules/database-connector/images/${databaseType}/logo_60.png">
+                        <img src="/modules/database-connector/images/${fn:toLowerCase(databaseType)}/logo_60.png">
                         <dl>
                             <dt>Database type</dt>
                             <dd>${connectionData.displayName}</dd>
