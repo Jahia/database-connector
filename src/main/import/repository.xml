@@ -3,7 +3,7 @@
          xmlns:jcr="http://www.jcp.org/jcr/1.0"
          xmlns:jnt="http://www.jahia.org/jahia/nt/1.0">
     <modules jcr:primaryType="jnt:modules">
-        <database-connector j:dependencies="default siteSettings serverSettings"
+        <database-connector j:dependencies="default serverSettings"
                                   j:installedModules="database-connector"
                                   j:moduleType="system"
                                   j:title="Jahia Database Connector"
@@ -25,7 +25,7 @@
                     </admin>
                 </files>
                 <contents jcr:primaryType="jnt:contentFolder"/>
-                <serverSettingsBase j:view="serverSettings"
+                <server-settings-base j:view="serverSettings"
                                     jcr:mixinTypes="jmix:useUILocale"
                                     jcr:primaryType="jnt:template">
                     <configurations j:hiddenTemplate="false"
@@ -46,7 +46,7 @@
                             </pagecontent>
                         </database-connector>
                     </configurations>
-                </serverSettingsBase>
+                </server-settings-base>
             </templates>
         </database-connector>
     </modules>
