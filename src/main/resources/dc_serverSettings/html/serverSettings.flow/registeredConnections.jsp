@@ -54,6 +54,12 @@
     </button>
 </form>
 
+<c:if test="${not empty errorMessage}">
+    <div class="alert alert-danger">
+        <p><fmt:message key="dc_databaseConnector.alert.errorMessage"/>&nbsp;${errorMessage}</p>
+    </div>
+</c:if>
+
 <%--@elvariable id="registeredConnections" type="java.util.Map<java.lang.String, java.util.List<org.jahia.modules.databaseConnector.ConnectionData>>"--%>
 <c:if test="${not empty registeredConnections}">
 

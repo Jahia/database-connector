@@ -39,6 +39,18 @@
                     $('#advancedConfig').slideToggle();
                 });
             </c:if>
+
+            <c:if test="${isEdition}">
+                $('#databaseIdInput').change(function() {
+                    $("#changeDatabaseIdModal").modal("show");
+                    $(this).off("change");
+                });
+
+                $('#changeDatabaseIdModalCancelButton').click(function() {
+                    $('#databaseIdInput').val("${connection.id}");
+                    $("#changeDatabaseIdModal").modal("hide");
+                });
+            </c:if>
         });
     </script>
 </template:addResources>
@@ -85,7 +97,7 @@
             <div class="control-group">
                 <label class="control-label" for="id"><fmt:message key="dc_databaseConnector.label.id"/></label>
                 <div class="controls">
-                    <form:input path="id" type="text" value="${id}" disabled="${isEdition}" autocomplete="false"/>
+                    <form:input id="databaseIdInput" path="id" type="text" value="${id}" autocomplete="false"/>
                     <form:errors path="id" cssClass="help-inline errorMessage"/>
                 </div>
             </div>
@@ -205,3 +217,19 @@
         </fieldset>
     </form:form>
 </div>
+
+<c:if test="${isEdition}">
+    <div id="changeDatabaseIdModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="changeDatabaseIdModalTitle" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="changeDatabaseIdModalTitle"><fmt:message key="dc_databaseConnector.label.changeDatabaseId.modal.title"/></h3>
+        </div>
+        <div class="modal-body">
+            <fmt:message key="dc_databaseConnector.label.changeDatabaseId.modal.body"/>
+        </div>
+        <div class="modal-footer">
+            <button id="changeDatabaseIdModalCancelButton" class="btn"><fmt:message key="dc_databaseConnector.label.changeDatabaseId.modal.cancel"/></button>
+            <button class="btn btn-warning" data-dismiss="modal" aria-hidden="true"><fmt:message key="dc_databaseConnector.label.changeDatabaseId.modal.continue"/></button>
+        </div>
+    </div>
+</c:if>

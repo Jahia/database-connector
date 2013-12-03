@@ -19,6 +19,7 @@ import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.HOS
 import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.ID_KEY;
 import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.PASSWORD_KEY;
 import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.PORT_KEY;
+import static org.jahia.modules.databaseConnector.Utils.query;
 import static org.jahia.modules.databaseConnector.redis.RedisDatabaseConnectionImpl.*;
 
 /**
@@ -69,7 +70,7 @@ public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
     }
 
     @Override
-    public void addEditConnection(final Connection connection, final Boolean isEdition) {
+    public boolean addEditConnection(final Connection connection, final Boolean isEdition) {
         Assert.hasText(connection.getHost(), "Host must be defined");
         Assert.notNull(connection.getPort(), "Port must be defined");
         if (isEdition) {
@@ -89,9 +90,10 @@ public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
             else {
                 registry.put(connection.getId(), redisDatabaseConnection);
             }
+            return true;
         }
         else {
-            // TODO
+            return false;
         }
     }
 

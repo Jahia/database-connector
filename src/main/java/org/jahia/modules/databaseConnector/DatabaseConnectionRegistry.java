@@ -16,7 +16,7 @@ public interface DatabaseConnectionRegistry<T extends DatabaseConnection> {
 
     public Map<String, T> populateRegistry();
 
-    public void addEditConnection(final Connection connection, final Boolean isEdition);
+    public boolean addEditConnection(final Connection connection, final Boolean isEdition);
 
-    public Boolean removeConnection(String databaseConnectionId);
+    public boolean removeConnection(String databaseConnectionId);
 }

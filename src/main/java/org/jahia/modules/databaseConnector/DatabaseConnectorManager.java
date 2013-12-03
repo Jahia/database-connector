@@ -153,17 +153,22 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
         return initialId+index;
     }
 
-    public boolean isAvailableId(String id, DatabaseTypes databaseType) {
-        return !databaseConnectionRegistries.get(databaseType).getRegistry().containsKey(id);
+    public boolean isAvailableId(String id) {
+        for (DatabaseConnectionRegistry databaseConnectionRegistry : databaseConnectionRegistries.values()) {
+            if (databaseConnectionRegistry.getRegistry().containsKey(id)) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    public void addEditConnection(final Connection connection, final Boolean isEdition) {
-        databaseConnectionRegistries.get(connection.getDatabaseType()).addEditConnection(connection, isEdition);
+    public boolean addEditConnection(final Connection connection, final Boolean isEdition) {
+        return databaseConnectionRegistries.get(connection.getDatabaseType()).addEditConnection(connection, isEdition);
     }
 
-    public void removeConnection(String databaseId, String databaseTypeName) {
+    public boolean removeConnection(String databaseId, String databaseTypeName) {
         DatabaseTypes databaseType = valueOf(databaseTypeName);
-        databaseConnectionRegistries.get(databaseType).removeConnection(databaseId);
+        return databaseConnectionRegistries.get(databaseType).removeConnection(databaseId);
     }
 
     public void setActivatedDatabaseTypes(Set<DatabaseTypes> activatedDatabaseTypes) {

@@ -17,6 +17,7 @@ import java.net.UnknownHostException;
 import java.util.Map;
 
 import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.*;
+import static org.jahia.modules.databaseConnector.Utils.query;
 import static org.jahia.modules.databaseConnector.mongo.MongoDatabaseConnection.WRITE_CONCERN_KEY;
 import static org.jahia.modules.databaseConnector.mongo.MongoDatabaseConnectionImpl.NODE_TYPE;
 
@@ -69,16 +70,17 @@ public class MongoDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
     }
 
     @Override
-    public void addEditConnection(final Connection connection, final Boolean isEdition) {
+    public boolean addEditConnection(final Connection connection, final Boolean isEdition) {
         Assert.hasText(connection.getHost(), "Host must be defined");
         Assert.notNull(connection.getPort(), "Port must be defined");
         Assert.hasText(connection.getDbName(), "DB name must be defined");
-        MongoDatabaseConnection mongoDatabaseConnection = null;
+        MongoDatabaseConnection mongoDatabaseConnection;
         try {
             mongoDatabaseConnection = new MongoDatabaseConnectionImpl(connection.getId(), connection.getHost(), connection.getPort(),
                     connection.getDbName(), connection.getUser(), connection.getPassword(), ((MongoConnection) connection).getWriteConcern());
         } catch (UnknownHostException e) {
             logger.error(e.getMessage(), e);
+            return false;
         }
         if (storeConnection(connection, NODE_TYPE, isEdition)) {
             if (isEdition) {
@@ -90,9 +92,10 @@ public class MongoDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
             else {
                 registry.put(connection.getId(), mongoDatabaseConnection);
             }
+            return true;
         }
         else {
-            // TODO
+            return false;
         }
     }
 

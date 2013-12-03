@@ -14,6 +14,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.query.QueryResult;
 import java.util.Map;
 
+import static org.jahia.modules.databaseConnector.Utils.query;
 import static org.jahia.modules.databaseConnector.neo4j.Neo4jDatabaseConnection.*;
 
 /**
@@ -58,7 +59,7 @@ public class Neo4jDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
     }
 
     @Override
-    public void addEditConnection(final Connection connection, final Boolean isEdition) {
+    public boolean addEditConnection(final Connection connection, final Boolean isEdition) {
         Assert.hasText(connection.getUri(), "URI must be defined");
         Neo4jDatabaseConnection neo4jDatabaseConnection =
                 new Neo4jDatabaseConnection(connection.getId(), connection.getUri(), connection.getUser(), connection.getPassword());
@@ -72,9 +73,10 @@ public class Neo4jDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
             else {
                 registry.put(connection.getId(), neo4jDatabaseConnection);
             }
+            return true;
         }
         else {
-            // TODO
+            return false;
         }
     }
 }

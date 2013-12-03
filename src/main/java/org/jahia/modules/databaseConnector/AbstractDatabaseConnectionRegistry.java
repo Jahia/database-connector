@@ -1,10 +1,7 @@
 package org.jahia.modules.databaseConnector;
 
 import org.jahia.modules.databaseConnector.webflow.model.Connection;
-import org.jahia.services.content.JCRCallback;
-import org.jahia.services.content.JCRNodeWrapper;
-import org.jahia.services.content.JCRSessionWrapper;
-import org.jahia.services.content.JCRTemplate;
+import org.jahia.services.content.*;
 import org.jahia.utils.EncryptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,14 +10,12 @@ import org.springframework.util.Assert;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
-import javax.jcr.query.Query;
-import javax.jcr.query.QueryManager;
-import javax.jcr.query.QueryResult;
 import java.util.Map;
 import java.util.TreeMap;
 
 import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.*;
 import static org.jahia.modules.databaseConnector.DatabaseConnectorManager.*;
+import static org.jahia.modules.databaseConnector.Utils.query;
 
 /**
  * Date: 11/6/2013
@@ -57,16 +52,20 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends DatabaseConne
                 JCRNodeWrapper connectionNode;
                 if (isEdition) {
                     connectionNode = (JCRNodeWrapper) getDatabaseConnectionNode(connection.getOldId(), session);
-                    Assert.isTrue(connectionNode.getPrimaryNodeTypeName().equals(nodeType));
+                    Assert.isTrue(connectionNode.getPrimaryNodeTypeName().equals(nodeType), "Stored node's primary type not equal "+nodeType);
                     session.checkout(connectionNode);
                 }
                 else {
+                    // As is the id of a database connection is editable, if you need it to be final uncomment
+                    // the next line and put the setProperty(ID_KEY, connection.getId()) inside the else statement.
+                    // You will also need to add the attribute 'disabled="${isEdition}"' in the form input field
+                    // for id in the file dc_serverSettings.html.serverSettings.flow.enterConfig.jsp and get rid of
+                    // the javascript code corresponding to the warning modal
+//                    connectionNode = databaseConnectorNode.addNode(connection.getId(), nodeType);
                     connectionNode = databaseConnectorNode.addNode(
-//                            JCRContentUtils.findAvailableNodeName(databaseConnectorNode, connection.getDatabaseType().name().toLowerCase()),
-                            connection.getId(),
+                            JCRContentUtils.findAvailableNodeName(databaseConnectorNode, connection.getDatabaseType().name().toLowerCase()),
                             nodeType);
                 }
-                // TODO id editable or not? if yes, bind in flow and change name of node when created
                 connectionNode.setProperty(ID_KEY, connection.getId());
                 if (connection.getHost() != null) {
                     connectionNode.setProperty(HOST_KEY, connection.getHost());
@@ -101,7 +100,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends DatabaseConne
     protected void storeAdvancedConfig(Connection connection, JCRNodeWrapper node) throws RepositoryException {}
 
     @Override
-    public Boolean removeConnection(final String databaseConnectionId) {
+    public boolean removeConnection(final String databaseConnectionId) {
         Assert.isTrue(registry.containsKey(databaseConnectionId), "No database connection with ID: " + databaseConnectionId);
         ((AbstractDatabaseConnection) registry.get(databaseConnectionId)).unregisterAsService();
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
@@ -109,7 +108,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends DatabaseConne
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 Node databaseConnectionNode = getDatabaseConnectionNode(databaseConnectionId, session);
                 session.checkout(databaseConnectionNode);
-                session.removeItem(databaseConnectionNode.getPath());
+                databaseConnectionNode.remove();
                 session.save();
                 return true;
             }
@@ -125,18 +124,12 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends DatabaseConne
         return false;
     }
 
-    protected QueryResult query(String statement, JCRSessionWrapper session) throws RepositoryException {
-        QueryManager queryManager = session.getWorkspace().getQueryManager();
-        Query query = queryManager.createQuery(statement, Query.JCR_SQL2);
-        return query.execute();
-    }
-
-    private Node getDatabaseConnectionNode(String databaseConnectionId, JCRSessionWrapper session) throws RepositoryException {
+    private Node getDatabaseConnectionNode(String databaseConnectionId, JCRSessionWrapper session)
+            throws RepositoryException, IllegalArgumentException {
         String statement = "SELECT * FROM [" + NODE_TYPE + "] WHERE [" + ID_KEY + "] = '" + databaseConnectionId + "'";
         NodeIterator nodes = query(statement, session).getNodes();
         if (!nodes.hasNext()) {
-            // TODO
-            return null;
+            throw new IllegalArgumentException("No database connection with ID '"+databaseConnectionId+"' stored in the JCR");
         }
         return nodes.nextNode();
     }

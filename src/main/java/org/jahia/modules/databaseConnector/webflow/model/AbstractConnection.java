@@ -3,11 +3,11 @@ package org.jahia.modules.databaseConnector.webflow.model;
 import org.jahia.modules.databaseConnector.ConnectionData;
 import org.jahia.modules.databaseConnector.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.DatabaseTypes;
-import org.jahia.utils.i18n.Messages;
 import org.springframework.binding.message.MessageBuilder;
 import org.springframework.binding.message.MessageContext;
 import org.springframework.binding.validation.ValidationContext;
-import org.springframework.context.i18n.LocaleContextHolder;
+
+import static org.jahia.modules.databaseConnector.Utils.getMessage;
 
 /**
  * Date: 11/5/2013
@@ -151,7 +151,7 @@ public abstract class AbstractConnection implements Connection {
             addRequiredErrorMessage("id");
         }
         else if (oldId == null || !oldId.equals(id)) {
-            if (!DatabaseConnectorManager.getInstance().isAvailableId(id, databaseType)) {
+            if (!DatabaseConnectorManager.getInstance().isAvailableId(id)) {
                 addErrorMessage("id", "dc_databaseConnector.label.port.message.idAlreadyInUse");
             }
         }
@@ -159,14 +159,6 @@ public abstract class AbstractConnection implements Connection {
     }
 
     protected abstract void validateEnterConfig();
-
-    private String getMessage(String key) {
-        return Messages.get("resources.database-connector", key, LocaleContextHolder.getLocale());
-    }
-
-    private String getMessage(String key, Object... args) {
-        return Messages.getWithArgs("resources.database-connector", key, LocaleContextHolder.getLocale(), args);
-    }
 
     private String getRequiredMessage(String propertyName) {
         String arg = getMessage("dc_databaseConnector.label."+propertyName);
