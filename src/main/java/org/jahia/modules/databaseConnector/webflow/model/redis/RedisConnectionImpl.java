@@ -20,7 +20,9 @@ public class RedisConnectionImpl extends AbstractConnection implements RedisConn
     private Integer weight = Sharded.DEFAULT_WEIGHT;
 
     public RedisConnectionImpl() {
-        super(DatabaseTypes.REDIS, Protocol.DEFAULT_PORT);
+        super(DatabaseTypes.REDIS);
+        this.host = "localhost";
+        this.port = Protocol.DEFAULT_PORT;
     }
 
     public RedisConnectionImpl(ConnectionData connectionData) {

@@ -39,17 +39,8 @@ public abstract class AbstractConnection implements Connection {
 
     private transient MessageContext messages;
 
-    public AbstractConnection(String databaseTypeName) {
-        this.databaseType = DatabaseTypes.valueOf(databaseTypeName);
-    }
-
     public AbstractConnection(DatabaseTypes databaseType) {
         this.databaseType = databaseType;
-    }
-
-    protected AbstractConnection(DatabaseTypes databaseType, Integer defaultPort) {
-        this.databaseType = databaseType;
-        this.port = defaultPort;
     }
 
     public AbstractConnection(ConnectionData connectionData) {

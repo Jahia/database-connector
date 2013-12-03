@@ -14,7 +14,8 @@ import static org.jahia.modules.databaseConnector.DatabaseTypes.NEO4J;
 public class Neo4jConnection extends AbstractConnection {
     
     public Neo4jConnection() {
-        super(NEO4J);    
+        super(NEO4J);
+        this.uri = "http://localhost:7474/db/data/";
     }
     
     public Neo4jConnection(ConnectionData connectionData) {

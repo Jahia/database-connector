@@ -18,7 +18,10 @@ public class MongoConnectionImpl extends AbstractConnection implements MongoConn
     private String writeConcern;
 
     public MongoConnectionImpl() {
-        super(MONGO, ServerAddress.defaultPort());
+        super(MONGO);
+        this.host = ServerAddress.defaultHost();
+        this.port = ServerAddress.defaultPort();
+        this.dbName = "test";
         this.writeConcern = WRITE_CONCERN_DEFAULT_VALUE;
     }
 

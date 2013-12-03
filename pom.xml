@@ -291,6 +291,8 @@
                         <Export-Package>{local-packages},
                             org.neo4j.graphdb,
                             org.neo4j.graphdb.traversal,
+                            org.neo4j.rest.graphdb.converter,
+                            org.neo4j.rest.graphdb.entity,
                             org.springframework.data.annotation,
                             org.springframework.data.domain,
                             org.springframework.data.neo4j.annotation,
