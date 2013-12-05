@@ -60,6 +60,12 @@
     </div>
 </c:if>
 
+<c:if test="${empty registeredConnections}">
+    <div class="alert alert-info">
+        <p><fmt:message key="dc_databaseConnector.alert.noConnectionsRegistered"/></p>
+    </div>
+</c:if>
+
 <%--@elvariable id="registeredConnections" type="java.util.Map<java.lang.String, java.util.List<org.jahia.modules.databaseConnector.ConnectionData>>"--%>
 <c:if test="${not empty registeredConnections}">
 

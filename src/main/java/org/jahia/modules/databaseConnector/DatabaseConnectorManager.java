@@ -98,11 +98,13 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
         Map<DatabaseTypes, Set<ConnectionData>> registeredConnections = new LinkedHashMap<DatabaseTypes, Set<ConnectionData>>();
         for (DatabaseTypes databaseType : databaseConnectionRegistries.keySet()) {
             Map<String, AbstractDatabaseConnection> registry = getDatabaseRegistry(databaseType);
-            Set<ConnectionData> connectionDataSet = new LinkedHashSet<ConnectionData>();
-            for (AbstractDatabaseConnection abstractDatabaseConnection : registry.values()) {
-                connectionDataSet.add(abstractDatabaseConnection.makeConnectionData());
+            if (!registry.isEmpty()) {
+                Set<ConnectionData> connectionDataSet = new LinkedHashSet<ConnectionData>();
+                for (AbstractDatabaseConnection abstractDatabaseConnection : registry.values()) {
+                    connectionDataSet.add(abstractDatabaseConnection.makeConnectionData());
+                }
+                registeredConnections.put(databaseType, connectionDataSet);
             }
-            registeredConnections.put(databaseType, connectionDataSet);
         }
         return registeredConnections;
     }
