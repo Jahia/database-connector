@@ -1,5 +1,7 @@
 package org.jahia.modules.databaseConnector;
 
+import java.util.Set;
+
 /**
  * Date: 2013-10-17
  *
@@ -17,4 +19,8 @@ public interface DatabaseConnectorOSGiService {
     boolean registerSingleDatabase(DatabaseTypes databaseType);
 
     boolean registerDatabase(String databaseId, DatabaseTypes databaseType);
+
+    Set<ConnectionData> getRegisteredConnections(DatabaseTypes databaseType);
+
+    ConnectionData getConnectionData(String databaseId, String databaseTypeName);
 }

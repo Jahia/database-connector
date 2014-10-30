@@ -68,6 +68,13 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
         return getDatabaseConnection(databaseId, databaseType).registerAsService();
     }
 
+    @Override
+    public Set<ConnectionData> getRegisteredConnections(DatabaseTypes databaseType) {
+        return findRegisteredConnections().get(databaseType);
+    }
+
+
+
     @SuppressWarnings("unchecked")
     private <T extends AbstractDatabaseConnection> Map<String, T> getDatabaseRegistry(DatabaseTypes databaseType) {
         Assert.isTrue(databaseConnectionRegistries.containsKey(databaseType),
@@ -109,17 +116,7 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
         return registeredConnections;
     }
 
-    public Map<DatabaseTypes, Map<String, Object>> findAllDatabaseTypes() {
-        Map<DatabaseTypes, Map<String, Object>> map = new LinkedHashMap<DatabaseTypes, Map<String, Object>>();
-        for (DatabaseTypes databaseType : databaseConnectionRegistries.keySet()) {
-            Map<String, Object> submap = new HashMap<String, Object>();
-            submap.put("connectedDatabases", databaseConnectionRegistries.get(databaseType).getRegistry().size());
-            submap.put("displayName", databaseType.getDisplayName());
-            map.put(databaseType, submap);
-        }
-        return map;
-    }
-
+    @Override
     public ConnectionData getConnectionData(String databaseId, String databaseTypeName) {
         try {
             DatabaseTypes databaseType = valueOf(databaseTypeName);
@@ -129,6 +126,17 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
             logger.error(e.getMessage(), e);
             return null;
         }
+    }
+
+    public Map<DatabaseTypes, Map<String, Object>> findAllDatabaseTypes() {
+        Map<DatabaseTypes, Map<String, Object>> map = new LinkedHashMap<DatabaseTypes, Map<String, Object>>();
+        for (DatabaseTypes databaseType : databaseConnectionRegistries.keySet()) {
+            Map<String, Object> submap = new HashMap<String, Object>();
+            submap.put("connectedDatabases", databaseConnectionRegistries.get(databaseType).getRegistry().size());
+            submap.put("displayName", databaseType.getDisplayName());
+            map.put(databaseType, submap);
+        }
+        return map;
     }
 
     @SuppressWarnings("unchecked")
