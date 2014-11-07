@@ -18,16 +18,25 @@
         <url>scm:git@github.com:Jahia/database-connector.git</url>
     </scm>
     <properties>
-        <jedis.version>2.1.0</jedis.version>
-        <spring-data-redis.version>1.1.0.RELEASE</spring-data-redis.version>
+        <!--<jedis.version>2.1.0</jedis.version>-->
+        <!--<spring-data-redis.version>1.1.0.RELEASE</spring-data-redis.version>
         <spring-data-mongodb.version>1.3.2.RELEASE</spring-data-mongodb.version>
-        <spring-data-neo4j.version>2.3.2.RELEASE</spring-data-neo4j.version>
+        <spring-data-neo4j.version>2.3.2.RELEASE</spring-data-neo4j.version>-->
+        <jedis.version>2.6.0</jedis.version>
+        <spring-data-redis.version>1.4.1.RELEASE</spring-data-redis.version>
+        <spring-data-mongodb.version>1.5.4.RELEASE</spring-data-mongodb.version>
+        <spring-data-neo4j.version>2.3.5.RELEASE</spring-data-neo4j.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-neo4j</artifactId>
             <version>${spring-data-neo4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+            <version>1.9.1.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
@@ -38,6 +47,11 @@
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
             <version>1.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.objenesis</groupId>
+            <artifactId>objenesis</artifactId>
+            <version>1.3</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
@@ -88,6 +102,11 @@
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>2.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
@@ -277,7 +296,13 @@
                             org.springframework.beans.factory.aspectj;resolution:=optional,
                             org.springframework.hateoas;resolution:=optional,
                             org.springframework.hateoas.mvc;resolution:=optional,
+                            org.springframework.hateoas.core;resolution:=optional,
                             org.springframework.oxm;resolution:=optional,
+                            org.objenesis.instantiator.jrockit;resolution:=optional,
+                            org.objenesis.instantiator.perc;resolution:=optional,
+                            COM.jrockit.reflect;resolution:=optional,
+                            jrockit.vm;resolution:=optional,
+                            COM.newmonics.PercClassLoader;resolution:=optional,
                             sun.misc;resolution:=optional,
                             sun.reflect;resolution:=optional,
 
@@ -342,7 +367,7 @@
                         <Embed-Dependency>*;groupId=org.neo4j|javax.ws.rs|com.sun.jersey|com.googlecode.concurrentlinkedhashmap|
                             org.ow2.easybeans.osgi|com.sun.xml.bind|org.parboiled|org.scala-lang|commons-configuration|
                             commons-pool|org.codehaus.jackson|redis.clients|org.mongodb;scope=compile; type=!pom; inline=false,
-                            *;artifactId=spring-aspects;scope=compile; type=!pom; inline=false,
+                            *;artifactId=spring-aspects|commons-pool2|objenesis;scope=compile; type=!pom; inline=false,
                             *;groupId=org.springframework.data;scope=compile; type=!pom; inline=!META-INF/**</Embed-Dependency>
                     </instructions>
                 </configuration>

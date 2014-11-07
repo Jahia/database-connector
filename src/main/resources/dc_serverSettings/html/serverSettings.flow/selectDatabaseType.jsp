@@ -54,7 +54,7 @@
 
             <li class="span3 databaseType">
                 <div class="thumbnail">
-                    <img src="/modules/database-connector/images/${fn:toLowerCase(databaseType)}/logo_60.png">
+                    <img src="${url.context}/modules/database-connector/images/${fn:toLowerCase(databaseType)}/logo_60.png">
                     <h3>${databaseTypeDetails.displayName}</h3>
                     <p>${labelConnectedDatabases}</p>
                     <button class="btn" type="submit" name="databaseType" value="${databaseType}">
