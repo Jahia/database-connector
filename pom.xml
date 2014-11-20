@@ -18,13 +18,9 @@
         <url>scm:git@github.com:Jahia/database-connector.git</url>
     </scm>
     <properties>
-        <!--<jedis.version>2.1.0</jedis.version>-->
-        <!--<spring-data-redis.version>1.1.0.RELEASE</spring-data-redis.version>
-        <spring-data-mongodb.version>1.3.2.RELEASE</spring-data-mongodb.version>
-        <spring-data-neo4j.version>2.3.2.RELEASE</spring-data-neo4j.version>-->
         <jedis.version>2.6.0</jedis.version>
         <spring-data-redis.version>1.4.1.RELEASE</spring-data-redis.version>
-        <spring-data-mongodb.version>1.5.4.RELEASE</spring-data-mongodb.version>
+        <spring-data-mongodb.version>1.4.2.RELEASE</spring-data-mongodb.version>
         <spring-data-neo4j.version>2.3.5.RELEASE</spring-data-neo4j.version>
     </properties>
     <dependencies>
@@ -36,7 +32,7 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
-            <version>1.9.1.RELEASE</version>
+            <version>1.7.2.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
@@ -335,6 +331,7 @@
                             org.springframework.data.mongodb.core,
                             org.springframework.data.mongodb.core.aggregation,
                             org.springframework.data.mongodb.core.convert,
+                            org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper,
                             org.springframework.data.mongodb.core.geo,
                             org.springframework.data.mongodb.core.index,
                             org.springframework.data.mongodb.core.mapping,
