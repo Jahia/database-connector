@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.jahia.modules</groupId>
         <artifactId>jahia-modules</artifactId>
-        <version>7.0.0.2</version>
+        <version>7.1.0.0</version>
     </parent>
     <artifactId>database-connector</artifactId>
     <version>2.0-SNAPSHOT</version>
@@ -18,76 +19,41 @@
         <url>scm:git@github.com:Jahia/database-connector.git</url>
     </scm>
     <properties>
-        <jedis.version>2.6.0</jedis.version>
-        <spring-data-redis.version>1.4.1.RELEASE</spring-data-redis.version>
-        <spring-data-mongodb.version>1.4.2.RELEASE</spring-data-mongodb.version>
-        <spring-data-neo4j.version>2.3.5.RELEASE</spring-data-neo4j.version>
+        <spring-data.version>Hopper-SR1</spring-data.version>
+        <jedis.version>2.8.1</jedis.version>
+        <spring.version>4.2.1.RELEASE</spring.version>
+        <jahia-module-type>system</jahia-module-type>
+        <jahia-depends>default,siteSettings,serverSettings</jahia-depends>
+        <embed-dependency>*;groupId=org.springframework.data|org.springframework|redis.clients|org.apache.commons|org.mongodb;scope=compile;
+            type=!pom; inline=false
+        </embed-dependency>
     </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${spring.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-releasetrain</artifactId>
+                <version>${spring-data.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-neo4j</artifactId>
-            <version>${spring-data-neo4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-commons</artifactId>
-            <version>1.7.2.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-neo4j-rest</artifactId>
-            <version>${spring-data-neo4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
-            <version>1.9</version>
-        </dependency>
-        <dependency>
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-            <version>1.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.13</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-bundle</artifactId>
-            <version>1.17.1</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
-            <artifactId>concurrentlinkedhashmap-lru</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.parboiled</groupId>
-            <artifactId>parboiled-java</artifactId>
-            <version>1.1.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>2.10.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aspects</artifactId>
-            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
-            <version>${spring-data-redis.version}</version>
         </dependency>
         <dependency>
             <groupId>redis.clients</groupId>
@@ -95,94 +61,28 @@
             <version>${jedis.version}</version>
         </dependency>
         <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-            <version>1.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
-            <version>2.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-mongodb</artifactId>
-            <version>${spring-data-mongodb.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>2.11.3</version>
+            <artifactId>mongodb-driver</artifactId>
+            <version>3.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-expression</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-orm</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.webflow</groupId>
-            <artifactId>spring-webflow</artifactId>
-            <version>${springwebflow-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.gemini.blueprint</groupId>
-            <artifactId>gemini-blueprint-core</artifactId>
-            <version>${gemini.blueprint.version}</version>
+            <artifactId>spring-aspects</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.gemini.blueprint</groupId>
+            <artifactId>gemini-blueprint-core</artifactId>
+            <version>${gemini.blueprint.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -208,113 +108,14 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Jahia-Module-Type>system</Jahia-Module-Type>
                         <Jahia-Deploy-On-Site>all</Jahia-Deploy-On-Site>
-                        <Jahia-Depends>default,siteSettings,serverSettings</Jahia-Depends>
-                        <Import-Package>ch.qos.logback.classic;resolution:=optional,
-                            ch.qos.logback.classic.joran;resolution:=optional,
-                            ch.qos.logback.classic.pattern;resolution:=optional,
-                            ch.qos.logback.classic.spi;resolution:=optional,
-                            ch.qos.logback.core;resolution:=optional,
-                            ch.qos.logback.core.filter;resolution:=optional,
-                            ch.qos.logback.core.joran.spi;resolution:=optional,
-                            ch.qos.logback.core.spi;resolution:=optional,
-                            com.lambdaworks.redis;resolution:=optional,
-                            com.lambdaworks.redis.codec;resolution:=optional,
-                            com.lambdaworks.redis.output;resolution:=optional,
-                            com.lambdaworks.redis.protocol;resolution:=optional,
-                            com.lambdaworks.redis.pubsub;resolution:=optional,
-                            com.mysema.query;resolution:=optional,
-                            com.mysema.query.annotations;resolution:=optional,
-                            com.mysema.query.apt;resolution:=optional,
-                            com.mysema.query.lucene;resolution:=optional,
-                            com.mysema.query.mongodb;resolution:=optional,
-                            com.mysema.query.types;resolution:=optional,
-                            com.mysema.query.types.path;resolution:=optional,
-                            com.tinkerpop.blueprints.pgm;resolution:=optional,
-                            com.tinkerpop.blueprints.pgm.impls.neo4j;resolution:=optional,
-                            com.tinkerpop.pipes.util.structures;resolution:=optional,
-                            com.sun.jersey.api.client;resolution:=optional,
-                            com.sun.jersey.api.client.filter;resolution:=optional,
-                            com.sun.grizzly.http;resolution:=optional,
-                            com.sun.grizzly.http.servlet;resolution:=optional,
-                            com.sun.grizzly.standalone;resolution:=optional,
-                            com.sun.grizzly.tcp.http11;resolution:=optional,
-                            com.sun.grizzly.util.buf;resolution:=optional,
-                            com.sun.codemodel;resolution:=optional,
-                            com.sun.source.tree;resolution:=optional,
-                            com.sun.source.util;resolution:=optional,
-                            com.sun.tools.javac.model;resolution:=optional,
-                            com.sun.tools.javac.processing;resolution:=optional,
-                            com.sun.tools.javac.tree;resolution:=optional,
-                            com.sun.tools.javac.util;resolution:=optional,
-                            com.sun.tools.xjc;resolution:=optional,
-                            com.sun.xml.bind.v2.model.core;resolution:=optional,
-                            com.sun.xml.bind.v2.model.runtime;resolution:=optional,
-                            com.sun.xml.bind.v2.runtime;resolution:=optional,
-                            com.sun.xml.bind.v2.runtime.property;resolution:=optional,
-                            com.sun.xml.bind.v2.runtime.unmarshaller;resolution:=optional,
-                            com.sun.xml.fastinfoset.stax;resolution:=optional,
-                            com.sun.xml.fastinfoset.sax;resolution:=optional,
-                            com.sun.org.apache.xml.internal.resolver;resolution:=optional,
-                            com.sun.org.apache.xml.internal.resolver.tools;resolution:=optional,
-                            redis;resolution:=optional,
-                            redis.client;resolution:=optional,
-                            redis.reply;resolution:=optional,
-                            org.apache.commons.jexl2;resolution:=optional,
-                            org.apache.xml.resolver;resolution:=optional,
-                            org.apache.xml.resolver.helpers;resolution:=optional,
-                            org.apache.xml.resolver.readers;resolution:=optional,
-                            org.apache.xml.resolver.tools;resolution:=optional,
-                            org.bson;resolution:=optional,
-                            org.bson.types;resolution:=optional,
-                            org.codehaus.jackson.xc;resolution:=optional,
-                            org.codehaus.jettison.badgerfish;resolution:=optional,
-                            org.codehaus.jettison.json;resolution:=optional,
-                            org.codehaus.jettison.mapped;resolution:=optional,
-                            org.eclipse.persistence.descriptors;resolution:=optional,
-                            org.eclipse.persistence.internal.descriptors;resolution:=optional,
-                            org.eclipse.persistence.internal.oxm;resolution:=optional,
-                            org.eclipse.persistence.internal.queries;resolution:=optional,
-                            org.eclipse.persistence.jaxb;resolution:=optional,
-                            org.eclipse.persistence.mappings;resolution:=optional,
-                            org.eclipse.persistence.mappings.converters;resolution:=optional,
-                            org.eclipse.persistence.mappings.foundation;resolution:=optional,
-                            org.eclipse.persistence.oxm;resolution:=optional,
-                            org.eclipse.persistence.oxm.mappings;resolution:=optional,
-                            org.eclipse.persistence.sessions;resolution:=optional,
-                            org.jboss.netty.channel;resolution:=optional,
-                            org.jredis;resolution:=optional,
-                            org.jredis.connector;resolution:=optional,
-                            org.jredis.protocol;resolution:=optional,
-                            org.jredis.ri.alphazero;resolution:=optional,
-                            org.jredis.ri.alphazero.connection;resolution:=optional,
-                            org.springframework.beans.factory.aspectj;resolution:=optional,
-                            org.springframework.hateoas;resolution:=optional,
-                            org.springframework.hateoas.mvc;resolution:=optional,
-                            org.springframework.hateoas.core;resolution:=optional,
-                            org.springframework.oxm;resolution:=optional,
-                            org.objenesis.instantiator.jrockit;resolution:=optional,
-                            org.objenesis.instantiator.perc;resolution:=optional,
-                            COM.jrockit.reflect;resolution:=optional,
-                            jrockit.vm;resolution:=optional,
-                            COM.newmonics.PercClassLoader;resolution:=optional,
-                            sun.misc;resolution:=optional,
-                            sun.reflect;resolution:=optional,
-
-                            org.springframework.cglib.core,
+                        <Import-Package>org.springframework.cglib.core,
                             org.springframework.cglib.proxy,
-                            org.springframework.web.servlet.tags,
-                            org.springframework.web.servlet.tags.form,
-
                             ${jahia.plugin.projectPackageImport},
-                            *</Import-Package>
-                        <Export-Package>{local-packages},
+                            *
+                        </Import-Package>
+                        <Export-Package>org.jahia.modules.databaseConnector,
                             com.mongodb,
-                            org.neo4j.graphdb,
-                            org.neo4j.graphdb.traversal,
-                            org.neo4j.rest.graphdb.converter,
-                            org.neo4j.rest.graphdb.entity,
                             org.springframework.data.annotation,
                             org.springframework.data.domain,
                             org.springframework.data.neo4j.annotation,
@@ -360,62 +161,11 @@
                             org.springframework.data.redis.support.collections,
                             org.springframework.data.repository,
                             org.springframework.data.repository.config,
-                            org.springframework.data.repository.core.support</Export-Package>
-                        <Embed-Dependency>*;groupId=org.neo4j|javax.ws.rs|com.sun.jersey|com.googlecode.concurrentlinkedhashmap|
-                            org.ow2.easybeans.osgi|com.sun.xml.bind|org.parboiled|org.scala-lang|commons-configuration|
-                            commons-pool|org.codehaus.jackson|redis.clients|org.mongodb;scope=compile; type=!pom; inline=false,
-                            *;artifactId=spring-aspects|commons-pool2|objenesis;scope=compile; type=!pom; inline=false,
-                            *;groupId=org.springframework.data;scope=compile; type=!pom; inline=!META-INF/**</Embed-Dependency>
+                            org.springframework.data.repository.core.support
+                        </Export-Package>
+                        <Jahia-Depends>default,serverSettings</Jahia-Depends>
                     </instructions>
                 </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.1</version>
-                <executions>
-                    <execution>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <artifactSet>
-                                <includes>
-                                    <include>org.springframework:*</include>
-                                    <include>org.jahia.modules:*</include>
-                                    <include>org.springframework.webflow:*</include>
-                                    <include>org.springframework.data:*</include>
-                                </includes>
-                            </artifactSet>
-                            <filters>
-                                <filter>
-                                    <artifact>org.springframework:*</artifact>
-                                    <includes>
-                                        <include>META-INF/spring.handlers</include>
-                                        <include>META-INF/spring.schemas</include>
-                                    </includes>
-                                </filter>
-                                <filter>
-                                    <artifact>org.springframework.webflow:*</artifact>
-                                    <includes>
-                                        <include>META-INF/spring.handlers</include>
-                                        <include>META-INF/spring.schemas</include>
-                                    </includes>
-                                </filter>
-                            </filters>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                                    <resource>META-INF/spring.handlers</resource>
-                                </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                                    <resource>META-INF/spring.schemas</resource>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

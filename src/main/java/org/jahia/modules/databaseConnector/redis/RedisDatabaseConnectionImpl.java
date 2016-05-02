@@ -62,10 +62,10 @@ public class RedisDatabaseConnectionImpl extends AbstractDatabaseConnection impl
         JedisShardInfo shardInfo;
         if (timeout != null || weight != null) {
             if (timeout == null) {
-                shardInfo = new JedisShardInfo(host, port, Protocol.DEFAULT_TIMEOUT, weight);
+                shardInfo = new JedisShardInfo(host, port, Protocol.DEFAULT_TIMEOUT, Protocol.DEFAULT_TIMEOUT, weight);
             }
             else if (weight != null) {
-                shardInfo = new JedisShardInfo(host, port, timeout, weight);
+                shardInfo = new JedisShardInfo(host, port, timeout, timeout, weight);
             }
             else {
                 shardInfo = new JedisShardInfo(host, port, timeout);

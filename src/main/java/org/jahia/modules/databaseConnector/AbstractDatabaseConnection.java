@@ -7,9 +7,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static org.jahia.modules.databaseConnector.DatabaseTypes.DATABASE_TYPE_KEY;
 
@@ -136,8 +134,8 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection, 
         return "(" + DATABASE_TYPE_KEY + "=" + databaseType.name() + ")";
     }
 
-    private Properties createProperties(DatabaseTypes databaseType, String databaseId) {
-        Properties properties = new Properties();
+    private Hashtable<String, String> createProperties(DatabaseTypes databaseType, String databaseId) {
+        Hashtable<String, String> properties = new Hashtable<String, String>();
         properties.put(DATABASE_TYPE_KEY, databaseType.name());
         properties.put(DATABASE_ID_KEY, databaseId);
         return properties;
