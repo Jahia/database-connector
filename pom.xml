@@ -24,9 +24,14 @@
         <spring.version>4.2.1.RELEASE</spring.version>
         <jahia-module-type>system</jahia-module-type>
         <jahia-depends>default,siteSettings,serverSettings</jahia-depends>
-        <embed-dependency>*;groupId=org.springframework.data|org.springframework|redis.clients|org.apache.commons|org.mongodb;scope=compile;
+        <embed-dependency>*;groupId=org.springframework.data|org.springframework|redis.clients|org.apache.commons|org.mongodb|com.fasterxml.jackson.core|com.fasterxml.jackson.jaxrs|com.fasterxml.jackson.module;scope=compile;
             type=!pom; inline=false
         </embed-dependency>
+        <!--JAX-RS Properties -->
+        <jackson.version>2.3.2</jackson.version>
+        <jackson-annotations.version>2.3.0</jackson-annotations.version>
+        <javaxws-annotations.version>1.1.1</javaxws-annotations.version>
+        <jersey.version>2.6</jersey.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -83,6 +88,54 @@
             <groupId>org.eclipse.gemini.blueprint</groupId>
             <artifactId>gemini-blueprint-core</artifactId>
             <version>${gemini.blueprint.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.bundles</groupId>
+            <artifactId>jaxrs-ri</artifactId>
+            <version>${jersey.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+            <version>${jersey.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson-annotations.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-base</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jahia.modules</groupId>
+            <artifactId>jcrestapi</artifactId>
+            <version>2.1.1</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -162,8 +215,12 @@
                             org.springframework.data.repository,
                             org.springframework.data.repository.config,
                             org.springframework.data.repository.core.support
+                            org.jahia.modules.databaseConnector.api,
+                            org.jahia.modules.databaseConnector.api.*,
                         </Export-Package>
                         <Jahia-Depends>default,serverSettings</Jahia-Depends>
+                        <JAX-RS-Alias>/databaseconnector</JAX-RS-Alias>
+                        <JAX-RS-Application>org.jahia.modules.databaseConnector.api.DCApiApplication</JAX-RS-Application>
                     </instructions>
                 </configuration>
             </plugin>
