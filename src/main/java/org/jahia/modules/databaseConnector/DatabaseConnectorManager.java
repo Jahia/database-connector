@@ -52,9 +52,10 @@ public class DatabaseConnectorManager implements DatabaseConnectorOSGiService, B
             try {
                 DatabaseConnectionRegistry databaseConnectionRegistry = DatabaseConnectionRegistryFactory.makeDatabaseConnectionRegistry(activatedDatabaseType);
                 databaseConnectionRegistries.put(activatedDatabaseType, databaseConnectionRegistry);
-                Set set = databaseConnectionRegistry.getRegistry().keySet();
-                for (Object databaseConnection : set) {
-                    ((AbstractDatabaseConnection) databaseConnection).registerAsService();
+                Map registry = databaseConnectionRegistry.getRegistry();
+                Set set = registry.keySet();
+                for (Object databaseId : set) {
+                    ((AbstractDatabaseConnection) registry.get(databaseId)).registerAsService();
                 }
             } catch(Exception e) {
                 logger.error(e.getMessage(), e);
