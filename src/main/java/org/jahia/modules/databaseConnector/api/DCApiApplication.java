@@ -28,6 +28,8 @@ import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.jahia.modules.databaseConnector.DatabaseConnectorManager;
+import org.jahia.modules.databaseConnector.api.factories.DatabaseConnectorManagerFactory;
 import org.jahia.modules.databaseConnector.api.factories.JCRTemplateFactory;
 import org.jahia.services.content.JCRTemplate;
 
@@ -36,12 +38,15 @@ import org.jahia.services.content.JCRTemplate;
  */
 public class DCApiApplication extends ResourceConfig{
     public DCApiApplication() {
-        this(JCRTemplateFactory.class);
+        this(JCRTemplateFactory.class,
+                DatabaseConnectorManagerFactory.class);
     }
 
-    DCApiApplication(final Class<? extends Factory<JCRTemplate>> jcrTemplateFactoryClass) {
+    DCApiApplication(final Class<? extends Factory<JCRTemplate>> jcrTemplateFactoryClass,
+                     final Class<? extends Factory<DatabaseConnectorManager>> databaseConnectorManagerClass) {
         super(DCAPI.class,
                 jcrTemplateFactoryClass,
+                databaseConnectorManagerClass,
                 JacksonJaxbJsonProvider.class,
                 HeadersResponseFilter.class,
                 MultiPartFeature.class);
@@ -49,6 +54,7 @@ public class DCApiApplication extends ResourceConfig{
             @Override
             protected void configure() {
                 bindFactory(jcrTemplateFactoryClass).to(JCRTemplate.class);
+                bindFactory(databaseConnectorManagerClass).to(DatabaseConnectorManager.class);
             }
         });
     }

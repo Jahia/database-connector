@@ -16,8 +16,9 @@ public class DatabaseConnector extends AbstractResource {
 
     private transient DatabaseConnectorManager databaseConnectorManager;
 
-    public DatabaseConnector(JCRTemplate jcrTemplate, Logger logger) {
+    public DatabaseConnector(JCRTemplate jcrTemplate, DatabaseConnectorManager databaseConnectorManager, Logger logger) {
         super(jcrTemplate, logger);
+        this.databaseConnectorManager = databaseConnectorManager;
     }
 
     public Connection initConnection(String databaseTypeName) {

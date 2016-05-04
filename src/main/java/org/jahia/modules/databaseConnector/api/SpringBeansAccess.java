@@ -24,6 +24,7 @@
 
 package org.jahia.modules.databaseConnector.api;
 
+import org.jahia.modules.databaseConnector.DatabaseConnectorManager;
 import org.jahia.services.content.JCRTemplate;
 
 /**
@@ -32,6 +33,7 @@ import org.jahia.services.content.JCRTemplate;
 public final class SpringBeansAccess {
     private final static SpringBeansAccess INSTANCE = new SpringBeansAccess();
     private JCRTemplate jcrTemplate;
+    private DatabaseConnectorManager databaseConnectorManager;
 
     private SpringBeansAccess() {
     }
@@ -48,5 +50,13 @@ public final class SpringBeansAccess {
 
     public void setJcrTemplate(JCRTemplate jcrTemplate) {
         this.jcrTemplate = jcrTemplate;
+    }
+
+    public DatabaseConnectorManager getDatabaseConnectorManager() {
+        return databaseConnectorManager;
+    }
+
+    public void setDatabaseConnectorManager(DatabaseConnectorManager databaseConnectorManager) {
+        this.databaseConnectorManager = databaseConnectorManager;
     }
 }

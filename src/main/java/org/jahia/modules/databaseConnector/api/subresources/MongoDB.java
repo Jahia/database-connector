@@ -23,6 +23,7 @@
  */
 package org.jahia.modules.databaseConnector.api.subresources;
 
+import org.jahia.modules.databaseConnector.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.services.content.JCRTemplate;
 import org.slf4j.Logger;
@@ -47,8 +48,8 @@ public class MongoDB {
 
     private DatabaseConnector databaseConnector;
     @Inject
-    public MongoDB(JCRTemplate jcrTemplate) {
-        databaseConnector = new DatabaseConnector(jcrTemplate, logger);
+    public MongoDB(JCRTemplate jcrTemplate, DatabaseConnectorManager databaseConnectorManager) {
+        databaseConnector = new DatabaseConnector(jcrTemplate, databaseConnectorManager, logger);
     }
 
     //@TODO Remove when production ready
