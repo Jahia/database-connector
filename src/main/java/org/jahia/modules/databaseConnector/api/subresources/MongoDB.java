@@ -23,6 +23,8 @@
  */
 package org.jahia.modules.databaseConnector.api.subresources;
 
+import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
+import org.jahia.services.content.JCRTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,9 +45,10 @@ public class MongoDB {
     private static final Logger logger = LoggerFactory.getLogger(MongoDB.class);
     public static final String MAPPING = "mongodb";
 
+    private DatabaseConnector databaseConnector;
     @Inject
-    public MongoDB() {
-
+    public MongoDB(JCRTemplate jcrTemplate) {
+        databaseConnector = new DatabaseConnector(jcrTemplate, logger);
     }
 
     //@TODO Remove when production ready
@@ -54,5 +57,13 @@ public class MongoDB {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getJcrFormForPreview(@PathParam("testParam") String testParam) {
         return Response.status(Response.Status.OK).entity("{\"success\": \"We received your parameter: ' " + testParam.toString() + "'\"}").build();
+    }
+
+    @GET
+    @Path("/initconnection/{databaseTypeName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response initConnection(@PathParam("databaseTypeName") String databaseTypeName) {
+        databaseConnector.initConnection(databaseTypeName);
+        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully initialized database connection\"}").build();
     }
 }
