@@ -25,16 +25,14 @@ package org.jahia.modules.databaseConnector.api.subresources;
 
 import org.jahia.modules.databaseConnector.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
+import org.jahia.modules.databaseConnector.webflow.model.Connection;
 import org.jahia.services.content.JCRTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -47,6 +45,7 @@ public class MongoDB {
     public static final String MAPPING = "mongodb";
 
     private DatabaseConnector databaseConnector;
+
     @Inject
     public MongoDB(JCRTemplate jcrTemplate, DatabaseConnectorManager databaseConnectorManager) {
         databaseConnector = new DatabaseConnector(jcrTemplate, databaseConnectorManager, logger);
@@ -67,4 +66,34 @@ public class MongoDB {
         databaseConnector.initConnection(databaseTypeName);
         return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully initialized database connection\"}").build();
     }
+
+
+    @GET
+    @Path("/getConnection/{databaseId}{databaseTypeName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getConnection(@PathParam("databaseId") String databaseId, @PathParam("databaseTypeName") String databaseTypeName) {
+        databaseConnector.getConnection(databaseId, databaseTypeName);
+        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully created database connection\"}").build();
+    }
+
+
+    @POST
+    @Path("/addEditConnection/{isEdition}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addEditConnection(@PathParam("isEdition") Boolean isEdition, String data) {
+        //databaseConnector.addEditConnection(connection, isEdition);
+        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully addeed database connection\"}").build();
+    }
+
+    @DELETE
+    @Path("/removeConnection/{databaseId}{databaseTypeName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeConnection(@PathParam("databaseId") String databaseId, @PathParam("databaseTypeName") String databaseTypeName) {
+        databaseConnector.removeConnection(databaseId, databaseTypeName);
+        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully created database connection\"}").build();
+    }
+
+
+
 }
