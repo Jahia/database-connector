@@ -3,14 +3,6 @@ package org.jahia.modules.databaseConnector.redis;
 import org.jahia.modules.databaseConnector.AbstractDatabaseConnection;
 import org.jahia.modules.databaseConnector.ConnectionData;
 import org.jahia.modules.databaseConnector.DatabaseTypes;
-import org.jahia.modules.databaseConnector.redis.serializer.IntSerializer;
-import org.jahia.modules.databaseConnector.redis.serializer.LongSerializer;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisShardInfo;
 import redis.clients.jedis.Protocol;
 
@@ -30,14 +22,14 @@ public class RedisDatabaseConnectionImpl extends AbstractDatabaseConnection impl
 
     private final Integer weight;
 
-    private final RedisConnectionFactory connectionFactory;
+    /*private final RedisConnectionFactory connectionFactory;
 
     private StringRedisTemplate stringRedisTemplate;
 
     private RedisTemplate<String, Long> longRedisTemplate;
 
     private RedisTemplate<String, Integer> integerRedisTemplate;
-
+*/
     public RedisDatabaseConnectionImpl(String id, String host, Integer port) {
         this(id, host, port, null, null, null);
     }
@@ -50,9 +42,9 @@ public class RedisDatabaseConnectionImpl extends AbstractDatabaseConnection impl
         super(id, host, port, null, null, password);
         this.timeout = timeout;
         this.weight = weight;
-        JedisConnectionFactory cf = new JedisConnectionFactory(makeJedisShardInfo());
+        /*JedisConnectionFactory cf = new JedisConnectionFactory(makeJedisShardInfo());
         cf.afterPropertiesSet();
-        connectionFactory = cf;
+        connectionFactory = cf;*/
         initStringRedisTemplate();
         initLongRedisTemplate();
         initIntegerRedisTemplate();
@@ -81,32 +73,33 @@ public class RedisDatabaseConnectionImpl extends AbstractDatabaseConnection impl
     }
 
     private void initStringRedisTemplate() {
-        stringRedisTemplate = new StringRedisTemplate(connectionFactory);
+       /* stringRedisTemplate = new StringRedisTemplate(connectionFactory);*/
     }
 
     private void initLongRedisTemplate() {
-        RedisTemplate<String, Long> template = new RedisTemplate<String, Long>();
+       /* RedisTemplate<String, Long> template = new RedisTemplate<String, Long>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(LongSerializer.INSTANCE);
-        longRedisTemplate = template;
+        longRedisTemplate = template;*/
     }
 
     private void initIntegerRedisTemplate() {
-        RedisTemplate<String, Integer> template = new RedisTemplate<String, Integer>();
+       /* RedisTemplate<String, Integer> template = new RedisTemplate<String, Integer>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(IntSerializer.INSTANCE);
-        integerRedisTemplate = template;
+        integerRedisTemplate = template;*/
     }
 
     @Override
     protected boolean registerAsService() {
-        boolean b = registerAsService(connectionFactory, true);
+       /* boolean b = registerAsService(connectionFactory, true);
         boolean b1 = registerAsService(stringRedisTemplate);
         boolean b2 = registerAsService(longRedisTemplate);
         boolean b3 = registerAsService(integerRedisTemplate);
-        return b && b1 && b2 && b3;
+        return b && b1 && b2 && b3;*/
+        return false;
     }
 
     @Override
@@ -114,7 +107,7 @@ public class RedisDatabaseConnectionImpl extends AbstractDatabaseConnection impl
         return new RedisConnectionDataImpl(id, host, port, dbName, uri, user, password, getDatabaseType(), timeout, weight);
     }
 
-    public RedisConnectionFactory getConnectionFactory() {
+    /*public RedisConnectionFactory getConnectionFactory() {
         return connectionFactory;
     }
 
@@ -128,15 +121,15 @@ public class RedisDatabaseConnectionImpl extends AbstractDatabaseConnection impl
 
     public RedisTemplate<String, Integer> getIntegerRedisTemplate() {
         return integerRedisTemplate;
-    }
+    }*/
 
-    public <K,V> RedisTemplate<K,V> getRedisTemplate(RedisSerializer<K> keySerializer, RedisSerializer<V> valueSerializer) {
+    /*public <K,V> RedisTemplate<K,V> getRedisTemplate(RedisSerializer<K> keySerializer, RedisSerializer<V> valueSerializer) {
         RedisTemplate<K,V> template = new RedisTemplate<K, V>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(keySerializer);
         template.setValueSerializer(valueSerializer);
         return template;
-    }
+    }*/
 
     @Override
     public DatabaseTypes getDatabaseType() {

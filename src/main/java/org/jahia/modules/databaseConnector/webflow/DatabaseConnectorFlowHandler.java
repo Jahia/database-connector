@@ -7,8 +7,6 @@ import org.jahia.modules.databaseConnector.webflow.model.Connection;
 import org.jahia.modules.databaseConnector.webflow.model.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.webflow.execution.RequestContext;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -26,7 +24,6 @@ public class DatabaseConnectorFlowHandler implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectorFlowHandler.class);
 
-    @Autowired
     private transient DatabaseConnectorManager databaseConnectorManager;
 
     public Map<DatabaseTypes, Set<ConnectionData>> findRegisteredConnections() {
@@ -56,7 +53,7 @@ public class DatabaseConnectorFlowHandler implements Serializable {
         return databaseConnectorManager.removeConnection(databaseId, databaseTypeName);
     }
 
-    public String checkRemoveOperationResult(RequestContext context) {
+    /*public String checkRemoveOperationResult(RequestContext context) {
         if (context.getFlashScope().contains("removeOperationResult")
                 && (Boolean) context.getFlashScope().get("removeOperationResult")) {
             return "success";
@@ -80,5 +77,5 @@ public class DatabaseConnectorFlowHandler implements Serializable {
             context.getFlashScope().put("errorMessage", message);
             return "failed";
         }
-    }
+    }*/
 }

@@ -1,13 +1,10 @@
 package org.jahia.modules.databaseConnector.mongo;
 
 import com.mongodb.*;
+import com.mongodb.client.MongoDatabase;
 import org.jahia.modules.databaseConnector.AbstractDatabaseConnection;
 import org.jahia.modules.databaseConnector.ConnectionData;
 import org.jahia.modules.databaseConnector.DatabaseTypes;
-import org.springframework.data.authentication.UserCredentials;
-import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -24,9 +21,7 @@ public class MongoDatabaseConnectionImpl extends AbstractDatabaseConnection impl
 
     private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.MONGO;
 
-    private MongoDbFactory dbFactory;
-
-    private MongoTemplate template;
+    private MongoDatabase databaseConnection;
 
     private final String writeConcern;
 
@@ -61,19 +56,13 @@ public class MongoDatabaseConnectionImpl extends AbstractDatabaseConnection impl
             }
         }
         MongoClientOptions options = new MongoClientOptions.Builder().writeConcern(WriteConcern.valueOf(writeConcern)).build();
-        Mongo mongo;
         if (credential != null) {
             ArrayList<MongoCredential> mongoCredentials = new ArrayList<MongoCredential>(1);
             mongoCredentials.add(credential);
-            mongo = new MongoClient(serverAddress, mongoCredentials , options);
-            UserCredentials userCredentials = new UserCredentials(user, password);
-            dbFactory = new SimpleMongoDbFactory(mongo, dbName, userCredentials);
-            template = new MongoTemplate(dbFactory);
+            databaseConnection = (new MongoClient(serverAddress, options)).getDatabase(dbName);
         }
         else {
-            mongo = new MongoClient(serverAddress, options);
-            dbFactory = new SimpleMongoDbFactory(mongo, dbName);
-            template = new MongoTemplate(dbFactory);
+            databaseConnection = (new MongoClient(serverAddress, options)).getDatabase(dbName);
         }
     }
 
@@ -84,17 +73,7 @@ public class MongoDatabaseConnectionImpl extends AbstractDatabaseConnection impl
 
     @Override
     protected boolean registerAsService() {
-        boolean b = registerAsService(template);
-        boolean b1 = registerAsService(dbFactory, true);
-        return b && b1;
-    }
-
-    public MongoDbFactory getDbFactory() {
-        return dbFactory;
-    }
-
-    public MongoTemplate getTemplate() {
-        return template;
+        return registerAsService(databaseConnection);
     }
 
     @Override
