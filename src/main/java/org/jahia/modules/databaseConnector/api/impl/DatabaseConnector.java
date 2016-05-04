@@ -27,4 +27,20 @@ public class DatabaseConnector extends AbstractResource {
         connection.setId(id);
         return connection;
     }
+
+
+    public Connection getConnection(String databaseId, String databaseTypeName) {
+
+        return ConnectionFactory.makeConnection(databaseConnectorManager.getConnectionData(databaseId, databaseTypeName));
+    }
+
+
+    public boolean addEditConnection(Connection connection, Boolean isEdition) {
+        return databaseConnectorManager.addEditConnection(connection, isEdition);
+    }
+
+
+    public boolean removeConnection(String databaseId, String databaseTypeName) {
+        return databaseConnectorManager.removeConnection(databaseId, databaseTypeName);
+    }
 }
