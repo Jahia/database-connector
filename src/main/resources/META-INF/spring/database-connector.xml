@@ -13,5 +13,9 @@
 
     <!--Choice List Initializers-->
     <bean id="mongoWriteConcernChoiceListInitializer" class="org.jahia.modules.databaseConnector.mongo.initializer.WriteConcernChoiceListInitializer"/>
-
+    <bean id="springBeansAccess" class="org.jahia.modules.databaseConnector.api.SpringBeansAccess"
+          factory-method="getInstance">
+        <property name="databaseConnectorManager" ref="databaseConnectorManager"/>
+        <property name="jcrTemplate" ref="jcrTemplate"/>
+    </bean>
 </beans>

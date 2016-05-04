@@ -25,8 +25,8 @@ package org.jahia.modules.databaseConnector.api.subresources;
 
 import org.jahia.modules.databaseConnector.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
-import org.jahia.modules.databaseConnector.webflow.model.Connection;
 import org.jahia.services.content.JCRTemplate;
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +35,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.UnknownHostException;
 
 /**
  * @author stefan on 2016-05-02.
@@ -69,7 +70,7 @@ public class MongoDB {
 
 
     @GET
-    @Path("/getConnection/{databaseId}{databaseTypeName}")
+    @Path("/getconnection/{databaseId}/{databaseTypeName}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnection(@PathParam("databaseId") String databaseId, @PathParam("databaseTypeName") String databaseTypeName) {
         databaseConnector.getConnection(databaseId, databaseTypeName);
@@ -78,16 +79,24 @@ public class MongoDB {
 
 
     @POST
-    @Path("/addEditConnection/{isEdition}")
+    @Path("/addeditconnection/{isEdition}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addEditConnection(@PathParam("isEdition") Boolean isEdition, String data) {
-        //databaseConnector.addEditConnection(connection, isEdition);
-        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully addeed database connection\"}").build();
+        try {
+            databaseConnector.addEditConnection(data, isEdition);
+            return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully addeed database connection\"}").build();
+        } catch(JSONException e) {
+            logger.error("Cannot parse json data : {}", data);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
+        } catch (UnknownHostException ex) {
+            logger.error("Cannot add connection: {}", data);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Invalid connection parameters\"}").build();
+        }
     }
 
     @DELETE
-    @Path("/removeConnection/{databaseId}{databaseTypeName}")
+    @Path("/removeconnection/{databaseId}/{databaseTypeName}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response removeConnection(@PathParam("databaseId") String databaseId, @PathParam("databaseTypeName") String databaseTypeName) {
         databaseConnector.removeConnection(databaseId, databaseTypeName);

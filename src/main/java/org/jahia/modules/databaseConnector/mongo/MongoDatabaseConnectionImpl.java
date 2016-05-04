@@ -55,7 +55,7 @@ public class MongoDatabaseConnectionImpl extends AbstractDatabaseConnection impl
                 credential = MongoCredential.createGSSAPICredential(user);
             }
         }
-        MongoClientOptions options = new MongoClientOptions.Builder().writeConcern(WriteConcern.valueOf(writeConcern)).build();
+        MongoClientOptions options = new MongoClientOptions.Builder().writeConcern(WriteConcern.valueOf(this.writeConcern)).build();
         if (credential != null) {
             ArrayList<MongoCredential> mongoCredentials = new ArrayList<MongoCredential>(1);
             mongoCredentials.add(credential);
