@@ -42,7 +42,10 @@
                                                   jcr:mixinTypes="jmix:rbTitle"
                                                   jcr:primaryType="jnt:contentTemplate">
                             <pagecontent jcr:primaryType="jnt:contentList">
-                                <databaseConnectorSettings jcr:primaryType="dc:serverSettings"/>
+                                <databaseConnectorSettings
+                                        j:view="angular"
+                                        jcr:mixinTypes="jmix:renderable"
+                                        jcr:primaryType="dc:serverSettings"/>
                             </pagecontent>
                         </database-connector>
                     </configurations>

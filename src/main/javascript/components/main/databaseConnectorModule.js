@@ -1,6 +1,6 @@
 (function(){
     'use strict';
-    console.log('here');
+
     angular.module('databaseConnector', [
         'ui.router', 'datatables', 'datatables.bootstrap', 'i18n',
         'ui.bootstrap', 'ui.bootstrap.tooltip', 'ngResource', 'databaseConnector.downloadZipFactory',
