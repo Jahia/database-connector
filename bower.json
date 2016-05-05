@@ -1,0 +1,56 @@
+{
+  "name": "database-connector",
+  "version": "1.0.0",
+  "homepage": "https://github.com/Jahia/database-connector",
+  "authors": [
+    "cedmail <cmailleux@jahia.com>"
+  ],
+  "description": "Jahia Database Connector Module",
+  "main": "",
+  "moduleType": [],
+  "keywords": [
+    "database",
+    "connector",
+    "mongodb",
+    "redis"
+  ],
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "angular": "1.5.*",
+    "angular-route": "1.5.*",
+    "angular-sanitize": "1.5.*",
+    "angular-resource": "1.5.*",
+    "angular-ui-router": "0.2.*",
+    "angular-bootstrap": "angular-ui-bootstrap-bower#1.1",
+    "angular-datatables": "0.5.*",
+    "file-saver.js": "1.20150507.2",
+    "moment": "2.11.*",
+    "bootstrap": "3.3.*",
+    "underscore": "1.8.*",
+    "ng-file-upload": "10.0.*",
+    "angular-ui-switch": "0.*",
+    "underscore.string": "3.2.*",
+    "angular-animate": "1.5.*",
+    "AngularJS-Toaster": "0.4.*",
+    "moment-range": "2.1.*",
+    "bootstrap-datepicker": "1.5.*",
+    "Chart.js": "chartjs#~1.*",
+    "angular-recaptcha": "~2.4.*",
+    "datatables.net-buttons": "~1.1.2",
+    "jszip": "~2.6.0",
+    "flag-icon-css": "~1.4.0",
+    "datatables.net-scroller": "~1.4.1",
+    "datatables.net": "~1.10.11",
+    "datatables.net-bs": "~1.10.11",
+    "datatables.net-scroller-bs": "~1.4.1",
+    "datatables-plugins": "datatables.net-plugins#~1.10.11",
+    "datatables.net-buttons-bs": "~1.1.2",
+    "checklist-model": "~0.9.*"
+  }
+}

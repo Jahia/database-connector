@@ -43,3 +43,9 @@ form legend {
 #connectionForm .form-actions {
     margin-top: 0;
 }
+
+.scrollable-menu {
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+}
