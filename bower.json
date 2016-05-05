@@ -51,6 +51,7 @@
     "datatables.net-scroller-bs": "~1.4.1",
     "datatables-plugins": "datatables.net-plugins#~1.10.11",
     "datatables.net-buttons-bs": "~1.1.2",
-    "checklist-model": "~0.9.*"
+    "checklist-model": "~0.9.*",
+    "pdfmake": "~0.1.20"
   }
 }
