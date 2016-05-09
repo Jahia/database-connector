@@ -1,1 +1,1 @@
-Connections List
+<dc-connections-overview></dc-connections-overview>
