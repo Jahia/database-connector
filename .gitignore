@@ -12,7 +12,7 @@ etc/
 bower_components/
 src/main/resources/javascript/lib/packages
 src/main/resources/javascript/angular
-src/main/resources/css/lib/packages
+src/main/resources/css/lib
 src/main/resources/javascript/lib
 # OS generated files #
 ######################

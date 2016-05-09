@@ -1,19 +1,25 @@
 package org.jahia.modules.databaseConnector.api.impl;
 
 import org.jahia.modules.databaseConnector.ConnectionData;
+import org.jahia.modules.databaseConnector.DatabaseConnection;
 import org.jahia.modules.databaseConnector.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.DatabaseTypes;
 import org.jahia.modules.databaseConnector.mongo.MongoConnectionDataImpl;
+import org.jahia.modules.databaseConnector.serialization.models.MongoDbConnections;
 import org.jahia.modules.databaseConnector.webflow.model.Connection;
 import org.jahia.modules.databaseConnector.webflow.model.ConnectionFactory;
 import org.jahia.modules.databaseConnector.webflow.model.mongo.MongoConnectionImpl;
 import org.jahia.services.content.JCRTemplate;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by donnylam on 2016-05-04.
@@ -40,6 +46,14 @@ public class DatabaseConnector extends AbstractResource {
         return ConnectionFactory.makeConnection(databaseConnectorManager.getConnectionData(databaseId, databaseTypeName));
     }
 
+    public String getConnections() throws JSONException{
+        Set<ConnectionData> connections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.MONGO);
+        List<MongoConnectionDataImpl> connectionArray = new ArrayList<>();
+        for(DatabaseConnection connection : connections) {
+            connectionArray.add((MongoConnectionDataImpl) connection);
+        }
+        return new MongoDbConnections(connectionArray).getJson();
+    }
 
     public boolean addEditConnection(String data, Boolean isEdition) throws JSONException, UnknownHostException{
         JSONObject connectionParameters = new JSONObject(data);

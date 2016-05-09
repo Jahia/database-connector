@@ -74,9 +74,19 @@ public class MongoDB {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnection(@PathParam("databaseId") String databaseId, @PathParam("databaseTypeName") String databaseTypeName) {
         databaseConnector.getConnection(databaseId, databaseTypeName);
-        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully created database connection\"}").build();
+        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully retrieved database connection\"}").build();
     }
 
+    @GET
+    @Path("/getconnections")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getConnections() {
+        try {
+            return Response.status(Response.Status.OK).entity(databaseConnector.getConnections()).build();
+        } catch(JSONException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
+        }
+    }
 
     @POST
     @Path("/addeditconnection/{isEdition}")
