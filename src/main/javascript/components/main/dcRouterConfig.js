@@ -13,9 +13,9 @@ angular.module('databaseConnector').config(function(contextualData, $stateProvid
             url: '/connections',
             templateUrl:contextualData.urlBaseSiteSettingsTemplates + 'main.html.ajax'
         })
-        .state('connectionsManagement', {
-            url: '/connectionsManagement',
-            template: '<dc-controller>',
+        .state('connectionsStatus', {
+            url: '/connectionsStatus',
+            template: '<dc-connection-status>',
             params: {
                 connectionId: null,
                 options: {}

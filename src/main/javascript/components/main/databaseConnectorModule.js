@@ -4,7 +4,8 @@
     angular.module('databaseConnector', [
         'ui.router', 'datatables', 'datatables.bootstrap', 'i18n',
         'ui.bootstrap', 'ui.bootstrap.tooltip', 'ngResource', 'databaseConnector.downloadZipFactory',
-        'checklist-model', 'uiSwitch','toaster', 'ngAnimate', 'ngSanitize', 'ngMaterial', 'ngMessages'
+        'checklist-model', 'uiSwitch','toaster', 'ngAnimate', 'ngSanitize', 'ngMaterial', 'ngMessages',
+        'databaseConnector.dataFactory'
     ]).config(function ($mdThemingProvider, $uibTooltipProvider) {
         $mdThemingProvider.theme('blue-theme', 'default')
             .primaryPalette('light-blue',

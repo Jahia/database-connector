@@ -1,5 +1,8 @@
 package org.jahia.modules.databaseConnector.mongo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jahia.modules.databaseConnector.ConnectionDataImpl;
 import org.jahia.modules.databaseConnector.DatabaseTypes;
 
@@ -22,5 +25,12 @@ public class MongoConnectionDataImpl extends ConnectionDataImpl implements Mongo
     @Override
     public String getWriteConcern() {
         return writeConcern;
+    }
+
+    @JsonIgnore
+    public String getJson() {
+        ObjectMapper mapper = new ObjectMapper();
+        final JsonNode jsonForm = mapper.valueToTree(this);
+        return jsonForm != null ? jsonForm.toString() : null;
     }
 }
