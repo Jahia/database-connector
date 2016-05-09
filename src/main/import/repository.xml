@@ -25,7 +25,7 @@
                     </admin>
                 </files>
                 <contents jcr:primaryType="jnt:contentFolder"/>
-                <server-settings-base j:view="serverSettings"
+                <server-settings-base j:view="dc-serverSettings"
                                     jcr:mixinTypes="jmix:useUILocale"
                                     jcr:primaryType="jnt:template">
                     <configurations j:hiddenTemplate="false"
