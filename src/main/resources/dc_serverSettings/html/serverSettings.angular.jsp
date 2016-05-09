@@ -22,6 +22,7 @@
 <template:addResources type="css" resources="database-connector.css"/>
 <template:addResources type="css" resources="spinner.css"/>
 <template:addResources type="css" resources="lib/_dc.css"/>
+<template:addResources type="css" resources="admin-bootstrap.css"/>
 
 <template:addResources type="javascript" resources="jquery.min.js"/>
 <template:addResources type="javascript" resources="lib/_dc.min.js"/>
