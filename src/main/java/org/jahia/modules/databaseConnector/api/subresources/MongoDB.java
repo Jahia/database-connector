@@ -74,7 +74,7 @@ public class MongoDB {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnections() {
         try {
-            return Response.status(Response.Status.OK).entity(databaseConnector.getConnections()).build();
+            return Response.status(Response.Status.OK).entity(databaseConnector.getConnections(DatabaseTypes.MONGO)).build();
         } catch(JSONException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
         }
@@ -103,12 +103,5 @@ public class MongoDB {
     public Response removeConnection(@PathParam("databaseId") String databaseId, @PathParam("databaseTypeName") String databaseTypeName) {
         databaseConnector.removeConnection(databaseId, databaseTypeName);
         return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully removed database connection\"}").build();
-    }
-
-    @GET
-    @Path("/databasetypes")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getDatabaseTypes() {
-        return Response.status(Response.Status.OK).entity(databaseConnector.getDatabaseTypes()).build();
     }
 }

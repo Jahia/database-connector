@@ -3,6 +3,7 @@ package org.jahia.modules.databaseConnector.serialization.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jahia.modules.databaseConnector.connection.ConnectionData;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnectionData;
 
 import java.util.List;
@@ -10,15 +11,15 @@ import java.util.List;
 /**
  * Created by stefan on 2016-05-09.
  */
-public class MongoDbConnections {
-    List<MongoConnectionData> connections;
+public class DbConnections<T extends ConnectionData> {
+    List<T> connections;
 
     //Default constructor used by JSON deserializer
-    public MongoDbConnections() {
+    public DbConnections() {
 
     }
 
-    public MongoDbConnections(List <MongoConnectionData> connections) {
+    public DbConnections(List <T> connections) {
         this.connections = connections;
     }
 
@@ -29,11 +30,11 @@ public class MongoDbConnections {
         return jsonMongoDbConnections != null ? jsonMongoDbConnections.toString() : null;
     }
 
-    public List<MongoConnectionData> getConnections() {
+    public List<T> getConnections() {
         return connections;
     }
 
-    public void setConnections(List<MongoConnectionData> connections) {
+    public void setConnections(List<T> connections) {
         this.connections = connections;
     }
 

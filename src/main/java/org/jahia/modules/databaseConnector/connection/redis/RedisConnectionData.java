@@ -1,5 +1,8 @@
 package org.jahia.modules.databaseConnector.connection.redis;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.modules.databaseConnector.connection.ConnectionData;
 
@@ -28,5 +31,12 @@ public class RedisConnectionData extends ConnectionData{
 
     public Integer getWeight() {
         return weight;
+    }
+
+    @JsonIgnore
+    public String getJson() {
+        ObjectMapper mapper = new ObjectMapper();
+        final JsonNode jsonRedisConnectionData = mapper.valueToTree(this);
+        return jsonRedisConnectionData != null ? jsonRedisConnectionData.toString() : null;
     }
 }

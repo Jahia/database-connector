@@ -1,10 +1,13 @@
 package org.jahia.modules.databaseConnector.api.impl;
 
+import org.jahia.modules.databaseConnector.connection.ConnectionData;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnectionData;
-import org.jahia.modules.databaseConnector.serialization.models.MongoDbConnections;
+import org.jahia.modules.databaseConnector.connection.redis.RedisConnection;
+import org.jahia.modules.databaseConnector.connection.redis.RedisConnectionData;
+import org.jahia.modules.databaseConnector.serialization.models.DbConnections;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.services.content.JCRTemplate;
 import org.json.JSONArray;
@@ -17,7 +20,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author donnylam on 2016-05-04.
@@ -33,17 +35,41 @@ public class DatabaseConnector extends AbstractResource {
     }
 
     public String getConnection(String databaseId, DatabaseTypes databaseType) {
-        MongoConnection mongoConnection = databaseConnectorManager.getConnection(databaseId, databaseType);
-        return mongoConnection.makeConnectionData().getJson();
+        String connection = null;
+        switch (databaseType) {
+            case MONGO:
+                MongoConnection mongoConnection = databaseConnectorManager.getConnection(databaseId, databaseType);
+                connection = mongoConnection.makeConnectionData().getJson();
+                break;
+            case REDIS:
+                RedisConnection redisConnection = databaseConnectorManager.getConnection(databaseId, databaseType);
+                connection = redisConnection.makeConnectionData().getJson();
+                break;
+        }
+        return connection;
     }
 
-    public String getConnections() throws JSONException{
-        Map<String, MongoConnection> connections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.MONGO);
-        List<MongoConnectionData> connectionArray = new ArrayList<>();
-        for(Map.Entry<String, MongoConnection> entry : connections.entrySet()) {
-            connectionArray.add(entry.getValue().makeConnectionData());
+    public <T extends ConnectionData> String getConnections(DatabaseTypes databaseType) throws JSONException{
+        String connections = null;
+        switch (databaseType) {
+            case MONGO:
+                Map<String, MongoConnection> mongoConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.MONGO);
+                List<MongoConnectionData> mongoConnectionArray = new ArrayList<>();
+                for(Map.Entry<String, MongoConnection> entry : mongoConnections.entrySet()) {
+                    mongoConnectionArray.add(entry.getValue().makeConnectionData());
+                }
+                connections = new DbConnections(mongoConnectionArray).getJson();
+                break;
+            case REDIS:
+                Map<String, RedisConnection> redisConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.REDIS);
+                List<RedisConnectionData> redisConnectionArray = new ArrayList<>();
+                for(Map.Entry<String, RedisConnection> entry : redisConnections.entrySet()) {
+                    redisConnectionArray.add(entry.getValue().makeConnectionData());
+                }
+                connections = new DbConnections(redisConnectionArray).getJson();
+                break;
         }
-        return new MongoDbConnections(connectionArray).getJson();
+        return connections;
     }
 
     public boolean addEditConnection(String data, Boolean isEdition) throws JSONException, UnknownHostException{
