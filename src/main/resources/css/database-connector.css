@@ -50,7 +50,7 @@ form legend {
     overflow-x: hidden;
 }
 
-#rcorners {
+#grcorners {
     background: lightgrey;
     border-radius: 25px;
     padding: 20px;
@@ -58,9 +58,9 @@ form legend {
     height: auto;
 }
 
-#bgrcorners {
+#rcorners {
     border-radius: 30px;
-    padding: 50px;
+    padding: 40px;
     width: auto;
     height: auto;
 }

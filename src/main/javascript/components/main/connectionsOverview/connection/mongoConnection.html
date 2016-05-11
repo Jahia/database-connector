@@ -4,84 +4,51 @@
 
 <html>
 
-<span class="md-headline" layout-align="centre centre" >Connections:</span>
-
-<md-button> <br> <i class="fa fa-plus" aria-label="create a new connection"> click me to add a newconnection </i> </md-button>
+    <div class="container">&nbsp;
 
 
-<div class="container">&nbsp;
-
-
-    <div  id="bgrcorners" class="md-whiteframe-8dp" flex="50" layout-fill="auto">&nbsp;
+    <!--<md-content  id="bgrcorners" class="md-whiteframe-8dp" flex="50" layout-fill="auto">&nbsp;-->
 
        <md-list>
            <md-list-item layout="row" >
+               <md-content id="grcorners" layout-padding="" layout="row" >
 
-               <section layout="row" id="rcorners">
-
-                   <div flex="80">
+                   <md-content flex="80" layout="column">
                        <img ng-src="{{mcc.imageUrl}}">
-                       <md-divider></md-divider>
 
-                       <fieldset enabled>
+                       <fieldset disabled>
 
                            <legend>Status:</legend>
 
-                           <div class="md-list-item-text">
+                           <div class="md-list-item-text" layout-fill="auto" >
 
-                           <p>Connection Name: {{mcc.connection.displayName}}</p>
-                           <p>Database Name: {{mcc.connection.dbName}}</p>
-                           <p>Host: {{mcc.connection.host}}</p>
-                           <p>Port: {{mcc.connection.port}}</p>
+                               <p>Connection Name: {{mcc.connection.displayName}}</p>
+                               <p>Database Name: {{mcc.connection.dbName}}</p>
+                               <p>Host: {{mcc.connection.host}}</p>
+                               <p>Port: {{mcc.connection.port}}</p>
 
                            </div>
 
                        </fieldset>
 
-                   </div>
+                   </md-content>
 
 
-                    <div flex="20" layout="column" layout-align="start end">
+                    <md-content flex="20" layout="column" layout-align="start end">
                         <md-button><i class="fa fa-plug" aria-label="Connect to database"></i></md-button>
                         <md-button><i class="fa fa-chain-broken" aria-label="disconnect from database"></i></md-button>
                         <md-button><i class="fa fa-pencil-square-o" aria-hidden="edit connections details"></i></md-button>
                         <md-button><i class="fa fa-trash-o" aria-hidden="delete connection"></i></md-button>
 
-                    </div>
-
-               </section>
-
+                    </md-content>
+                </md-content>
 
            </md-list-item>
        </md-list>
-        <md-content id="content" > </md-content>
+
     </div>
 
-    <md-divider></md-divider>
+
 
 </div>
-
-
-<!--<li class="span3 registeredConnection">-->
-    <!--<div class="thumbnail">-->
-        <!--<img src="${contextualData.context + '/modules/database-connector/images/‘ + connection.dataType + '/logo_60.png’;-->
-<!--">-->
-        <!--<dl>-->
-            <!--<dt>Database type</dt>-->
-            <!--<dd>${connectionData.displayName}</dd>-->
-            <!--<dt>Database ID</dt>-->
-            <!--<dd>${connectionData.id}</dd>-->
-        <!--</dl>-->
-        <!--<button class="btn" onclick="manageConnection('editConnection', '${connectionData.id}', '${databaseType}')">-->
-            <!--<i class="icon-pencil"></i>-->
-            <!--&nbsp;<fmt:message key="dc_databaseConnector.label.editConnection"/>-->
-        <!--</button>-->
-        <!--<button class="btn" onclick="confirmRemoveConnection('${connectionData.id}', '${databaseType}')">-->
-            <!--<i class="icon-trash"></i>-->
-            <!--&nbsp;<fmt:message key="dc_databaseConnector.label.removeConnection"/>-->
-        <!--</button>-->
-    <!--</div>-->
-<!--</li>-->
-
-
 </html>
