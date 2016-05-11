@@ -49,3 +49,37 @@ form legend {
     max-height: 200px;
     overflow-x: hidden;
 }
+
+#rcorners {
+    background: lightgrey;
+    border-radius: 25px;
+    padding: 20px;
+    width: auto;
+    height: auto;
+}
+
+#bgrcorners {
+    border-radius: 30px;
+    padding: 50px;
+    width: auto;
+    height: auto;
+}
+
+
+#off{
+    border:1px solid red;
+    background: #ff8d96;
+    width:100%;
+    height:auto;
+
+}
+#on{
+    border:1px solid green;
+    background: #42ff7e;
+    width:100%;
+    height:auto;
+    margin:auto;
+}
+
+
+

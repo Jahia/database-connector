@@ -37,7 +37,15 @@
                 url: url,
                 method: 'GET'
             }).then(function(response) {
-               coc.connections = response.connections;
+                coc.connections = [];
+                for (var i in response.connections) {
+                    if (i % 2 == 0) {
+                        coc.connections.push([response.connections[i]]);
+                    } else {
+                        coc.connections[coc.connections.length - 1].push(response.connections[i]);
+                    }
+                }
+                console.log(coc.connections);
             }, function(response) {});
         }
     };
