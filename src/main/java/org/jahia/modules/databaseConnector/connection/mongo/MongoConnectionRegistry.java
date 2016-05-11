@@ -1,8 +1,7 @@
-package org.jahia.modules.databaseConnector.mongo;
+package org.jahia.modules.databaseConnector.connection.mongo;
 
-import org.jahia.modules.databaseConnector.AbstractDatabaseConnectionRegistry;
-import org.jahia.modules.databaseConnector.webflow.model.Connection;
-import org.jahia.modules.databaseConnector.webflow.model.mongo.MongoConnection;
+import org.jahia.modules.databaseConnector.connection.AbstractConnection;
+import org.jahia.modules.databaseConnector.connection.AbstractDatabaseConnectionRegistry;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
@@ -16,10 +15,10 @@ import javax.jcr.query.QueryResult;
 import java.net.UnknownHostException;
 import java.util.Map;
 
-import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.*;
 import static org.jahia.modules.databaseConnector.Utils.query;
-import static org.jahia.modules.databaseConnector.mongo.MongoDatabaseConnection.WRITE_CONCERN_KEY;
-import static org.jahia.modules.databaseConnector.mongo.MongoDatabaseConnectionImpl.NODE_TYPE;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.*;
+import static org.jahia.modules.databaseConnector.connection.mongo.MongoConnection.WRITE_CONCERN_KEY;
+import static org.jahia.modules.databaseConnector.connection.mongo.MongoConnection.NODE_TYPE;
 
 /**
  * Date: 11/6/2013
@@ -27,16 +26,16 @@ import static org.jahia.modules.databaseConnector.mongo.MongoDatabaseConnectionI
  * @author Frédéric Pierre
  * @version 1.0
  */
-public class MongoDatabaseConnectionRegistry extends AbstractDatabaseConnectionRegistry<MongoDatabaseConnection> {
+public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<MongoConnection> {
 
-    private static final Logger logger = LoggerFactory.getLogger(MongoDatabaseConnectionRegistry.class);
+    private static final Logger logger = LoggerFactory.getLogger(MongoConnectionRegistry.class);
 
-    public MongoDatabaseConnectionRegistry() {
+    public MongoConnectionRegistry() {
         super();
     }
 
     @Override
-    public Map<String, MongoDatabaseConnection> populateRegistry() {
+    public Map<String, MongoConnection> populateRegistry() {
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
@@ -52,7 +51,7 @@ public class MongoDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
                     String password = connection.hasProperty(PASSWORD_KEY) ? decodePassword(connection.getProperty(PASSWORD_KEY).getString()) : null;
                     String writeConcern = connection.hasProperty(WRITE_CONCERN_KEY) ? connection.getProperty(WRITE_CONCERN_KEY).getString() : null;
                     try {
-                        MongoDatabaseConnection storedConnection = new MongoDatabaseConnectionImpl(id, host, port, dbName, user, password, writeConcern);
+                        MongoConnection storedConnection = new MongoConnection(id, host, port, dbName, user, password, writeConcern);
                         registry.put(id, storedConnection);
                     } catch (UnknownHostException e) {
                         logger.error(e.getMessage(), e);
@@ -69,14 +68,13 @@ public class MongoDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
         return registry;
     }
 
-    @Override
-    public boolean addEditConnection(final Connection connection, final Boolean isEdition) {
+    public boolean addEditConnection(final AbstractConnection connection, final Boolean isEdition) {
         Assert.hasText(connection.getHost(), "Host must be defined");
         Assert.notNull(connection.getPort(), "Port must be defined");
         Assert.hasText(connection.getDbName(), "DB name must be defined");
-        MongoDatabaseConnection mongoDatabaseConnection;
+        MongoConnection mongoConnection;
         try {
-            mongoDatabaseConnection = new MongoDatabaseConnectionImpl(connection.getId(), connection.getHost(), connection.getPort(),
+            mongoConnection = new MongoConnection(connection.getId(), connection.getHost(), connection.getPort(),
                     connection.getDbName(), connection.getUser(), connection.getPassword(), ((MongoConnection) connection).getWriteConcern());
         } catch (UnknownHostException e) {
             logger.error(e.getMessage(), e);
@@ -87,10 +85,10 @@ public class MongoDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
                 if (!connection.getId().equals(connection.getOldId())) {
                     registry.remove(connection.getOldId());
                 }
-                registry.put(connection.getId(), mongoDatabaseConnection);
+                registry.put(connection.getId(), mongoConnection);
             }
             else {
-                registry.put(connection.getId(), mongoDatabaseConnection);
+                registry.put(connection.getId(), mongoConnection);
             }
             return true;
         }
@@ -100,7 +98,7 @@ public class MongoDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
     }
 
     @Override
-    protected void storeAdvancedConfig(Connection connection, JCRNodeWrapper node) throws RepositoryException {
+    protected void storeAdvancedConfig(AbstractConnection connection, JCRNodeWrapper node) throws RepositoryException {
         MongoConnection mongoConnection = (MongoConnection) connection;
         node.setProperty(WRITE_CONCERN_KEY, mongoConnection.getWriteConcern());
     }

@@ -3,7 +3,7 @@ import org.jahia.services.content.JCRTemplate;
 import org.slf4j.Logger;
 
 /**
- * Created by donnylam on 2016-05-03.
+ * @author donnylam on 2016-05-03.
  */
 public abstract class AbstractResource {
     private Logger logger;

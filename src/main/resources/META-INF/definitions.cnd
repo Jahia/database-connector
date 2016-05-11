@@ -6,8 +6,6 @@
 
 [dc:serverSettings] > jnt:content, jmix:studioOnly, mix:title, jmix:siteComponent
 
-[dc:neo4jConnection] > jnt:content, dcmix:databaseConnection
-
 [dc:mongoConnection] > jnt:content, dcmix:databaseConnection
  - dc:writeConcern (String, choicelist[mongoWriteConcern])
 

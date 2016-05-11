@@ -1,10 +1,9 @@
-package org.jahia.modules.databaseConnector.mongo;
+package org.jahia.modules.databaseConnector.connection.mongo;
 
 import com.mongodb.*;
 import com.mongodb.client.MongoDatabase;
-import org.jahia.modules.databaseConnector.AbstractDatabaseConnection;
-import org.jahia.modules.databaseConnector.ConnectionData;
-import org.jahia.modules.databaseConnector.DatabaseTypes;
+import org.jahia.modules.databaseConnector.connection.AbstractConnection;
+import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -15,9 +14,13 @@ import java.util.ArrayList;
  * @author Frédéric Pierre
  * @version 1.0
  */
-public class MongoDatabaseConnectionImpl extends AbstractDatabaseConnection implements MongoDatabaseConnection {
+public class MongoConnection extends AbstractConnection {
 
     public static final String NODE_TYPE = "dc:mongoConnection";
+
+    public static final String WRITE_CONCERN_KEY = "dc:writeConcern";
+
+    public static final String WRITE_CONCERN_DEFAULT_VALUE = "SAFE";
 
     private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.MONGO;
 
@@ -25,20 +28,24 @@ public class MongoDatabaseConnectionImpl extends AbstractDatabaseConnection impl
 
     private final String writeConcern;
 
-    public MongoDatabaseConnectionImpl(String id, String host, Integer port) throws UnknownHostException {
+    public MongoConnection(String id, String host, Integer port) throws UnknownHostException {
         this(id, host, port, null, null, null, null);
     }
 
-    public MongoDatabaseConnectionImpl(String id, String host, Integer port, String dbName) throws UnknownHostException {
+    public MongoConnection(String id, String host, Integer port, String dbName) throws UnknownHostException {
         this(id, host, port, dbName, null, null, null);
     }
 
-    public MongoDatabaseConnectionImpl(String id, String host, Integer port, String dbName, String user, String password) throws UnknownHostException {
+    public MongoConnection(String id, String host, Integer port, String dbName, String user, String password) throws UnknownHostException {
         this(id, host, port, dbName, user, password, null);
     }
 
-    public MongoDatabaseConnectionImpl(String id, String host, Integer port, String dbName, String user, String password, String writeConcern) throws UnknownHostException {
-        super(id, host, port, dbName, user, password);
+    public MongoConnection(String id, String host, Integer port, String dbName, String user, String password, String uri) throws UnknownHostException {
+        this(id, host, port, dbName, user, password, uri, null);
+    }
+
+    public MongoConnection(String id, String host, Integer port, String dbName, String user, String password, String uri, String writeConcern) throws UnknownHostException {
+        super(id, host, port, dbName, user, password, uri, DATABASE_TYPE);
         if (writeConcern == null) {
             this.writeConcern = WRITE_CONCERN_DEFAULT_VALUE;
         }
@@ -66,9 +73,9 @@ public class MongoDatabaseConnectionImpl extends AbstractDatabaseConnection impl
         }
     }
 
-    @Override
-    public ConnectionData makeConnectionData() {
-        return new MongoConnectionDataImpl(id, host, port, dbName, uri, user, password, getDatabaseType(), writeConcern);
+
+    public MongoConnectionData makeConnectionData() {
+        return new MongoConnectionData(id, host, port, dbName, uri, user, password, writeConcern);
     }
 
     @Override
@@ -76,12 +83,10 @@ public class MongoDatabaseConnectionImpl extends AbstractDatabaseConnection impl
         return registerAsService(databaseConnection);
     }
 
-    @Override
     public DatabaseTypes getDatabaseType() {
         return DATABASE_TYPE;
     }
 
-    @Override
     public String getWriteConcern() {
         return writeConcern;
     }

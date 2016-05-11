@@ -1,5 +1,4 @@
-package org.jahia.modules.databaseConnector;
-
+package org.jahia.modules.databaseConnector.connection;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -7,45 +6,52 @@ import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 
-import static org.jahia.modules.databaseConnector.DatabaseTypes.DATABASE_TYPE_KEY;
+import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.DATABASE_TYPE_KEY;
 
 /**
- * Date: 11/1/2013
- *
- * @author Frédéric Pierre
- * @version 1.0
+ * @author stefan on 2016-05-10.
  */
-public abstract class AbstractDatabaseConnection implements DatabaseConnection, ConnectionDataFactory, Comparable<AbstractDatabaseConnection> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractDatabaseConnection.class);
+public abstract class AbstractConnection <T extends ConnectionData> implements Serializable {
 
-    protected final String id;
+    private static final Logger logger = LoggerFactory.getLogger(AbstractConnection.class);
+
+    private static final long serialVersionUID = 1L;
+
+    protected String id;
+
+    protected String oldId;
+
+    protected String host;
+
+    protected Integer port;
+
+    protected String dbName;
+
+    protected String uri;
+
+    protected String user;
+
+    protected String password;
+
+    protected DatabaseTypes databaseType;
 
     public final static String ID_KEY = "dc:id";
 
-    protected final String host;
-
     public final static String HOST_KEY = "dc:host";
-
-    protected final Integer port;
 
     public final static String PORT_KEY = "dc:port";
 
-    protected final String dbName;
-
     public final static String DB_NAME_KEY = "dc:dbName";
-
-    protected final String uri;
 
     public final static String URI_KEY = "dc:uri";
 
-    protected final String user;
-
     public final static String USER_KEY = "dc:user";
-
-    protected final String password;
 
     public final static String PASSWORD_KEY = "dc:password";
 
@@ -53,36 +59,18 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection, 
 
     private final List<ServiceRegistration> serviceRegistrations;
 
-    public AbstractDatabaseConnection(String id, String uri) {
-        this(id, null, null, null, uri, null, null);
-    }
-
-    public AbstractDatabaseConnection(String id, String uri, String user, String password) {
-        this(id, null, null, null, uri, user, password);
-    }
-
-    public AbstractDatabaseConnection(String id, String host, Integer port, String dbName) {
-        this(id, host, port, dbName, null, null, null);
-    }
-
-    public AbstractDatabaseConnection(String id, String host, Integer port, String dbName, String user, String password) {
-        this(id, host, port, dbName, null, user, password);
-    }
-
-    public AbstractDatabaseConnection(String id, String host, Integer port, String dbName, String uri, String user, String password) {
+    public AbstractConnection(String id, String host, Integer port, String dbName, String uri,
+                              String user, String password, DatabaseTypes databaseType) {
         this.id = id;
+        this.oldId = id;
         this.host = host;
         this.port = port;
         this.dbName = dbName;
         this.uri = uri;
         this.user = user;
         this.password = password;
-        this.serviceRegistrations = new ArrayList<ServiceRegistration>();
-    }
-
-    @Override
-    public ConnectionData makeConnectionData() {
-        return new ConnectionDataImpl(id, host, port, dbName, uri, user, password, getDatabaseType());
+        this.databaseType = databaseType;
+        this.serviceRegistrations = new ArrayList<>();
     }
 
     protected abstract boolean registerAsService();
@@ -149,48 +137,79 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection, 
         }
         return interfacesNames;
     }
-
-    @Override
     public String getId() {
         return id;
     }
 
-    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getOldId() {
+        return oldId;
+    }
+
     public String getHost() {
         return host;
     }
 
-    @Override
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     public Integer getPort() {
         return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
+    public String getDbName() {
+        return dbName;
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
     }
 
     public String getUri() {
         return uri;
     }
 
-    @Override
-    public String getDbName() {
-        return dbName;
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
-    @Override
     public String getUser() {
         return user;
     }
 
-    @Override
+    public void setUser(String user) {
+        this.user = user;
+    }
+
     public String getPassword() {
         return password;
     }
 
-    @Override
-    public String getDisplayName() {
-        return getDatabaseType().getDisplayName();
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    @Override
-    public int compareTo(AbstractDatabaseConnection anotherDatabaseConnection) {
-        return this.getId().compareTo(anotherDatabaseConnection.getId());
+    public DatabaseTypes getDatabaseType() {
+        return databaseType;
     }
+
+    public void setDatabaseType(DatabaseTypes databaseType) {
+        this.databaseType = databaseType;
+    }
+
+    public String getDisplayName() {
+        return databaseType.getDisplayName();
+    }
+
+    public abstract T makeConnectionData();
+
 }
+

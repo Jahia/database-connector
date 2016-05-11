@@ -1,14 +1,11 @@
 package org.jahia.modules.databaseConnector.api.impl;
 
-import org.jahia.modules.databaseConnector.ConnectionData;
-import org.jahia.modules.databaseConnector.DatabaseConnection;
-import org.jahia.modules.databaseConnector.DatabaseConnectorManager;
-import org.jahia.modules.databaseConnector.DatabaseTypes;
-import org.jahia.modules.databaseConnector.mongo.MongoConnectionDataImpl;
+import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
+import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
+import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
+import org.jahia.modules.databaseConnector.connection.mongo.MongoConnectionData;
 import org.jahia.modules.databaseConnector.serialization.models.MongoDbConnections;
-import org.jahia.modules.databaseConnector.webflow.model.Connection;
-import org.jahia.modules.databaseConnector.webflow.model.ConnectionFactory;
-import org.jahia.modules.databaseConnector.webflow.model.mongo.MongoConnectionImpl;
+import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.services.content.JCRTemplate;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,10 +16,11 @@ import org.slf4j.LoggerFactory;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by donnylam on 2016-05-04.
+ * @author donnylam on 2016-05-04.
  */
 public class DatabaseConnector extends AbstractResource {
     private final static Logger logger = LoggerFactory.getLogger(DatabaseConnector.class);
@@ -34,23 +32,16 @@ public class DatabaseConnector extends AbstractResource {
         this.databaseConnectorManager = databaseConnectorManager;
     }
 
-    public Connection initConnection(String databaseTypeName) {
-        Connection connection = ConnectionFactory.makeConnection(databaseTypeName);
-        String id = databaseConnectorManager.getNextAvailableId(connection.getDatabaseType());
-        connection.setId(id);
-        return connection;
-    }
-
-
-    public Connection getConnection(String databaseId, String databaseTypeName) {
-        return ConnectionFactory.makeConnection(databaseConnectorManager.getConnectionData(databaseId, databaseTypeName));
+    public String getConnection(String databaseId, DatabaseTypes databaseType) {
+        MongoConnection mongoConnection = databaseConnectorManager.getConnection(databaseId, databaseType);
+        return mongoConnection.makeConnectionData().getJson();
     }
 
     public String getConnections() throws JSONException{
-        Set<ConnectionData> connections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.MONGO);
-        List<MongoConnectionDataImpl> connectionArray = new ArrayList<>();
-        for(DatabaseConnection connection : connections) {
-            connectionArray.add((MongoConnectionDataImpl) connection);
+        Map<String, MongoConnection> connections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.MONGO);
+        List<MongoConnectionData> connectionArray = new ArrayList<>();
+        for(Map.Entry<String, MongoConnection> entry : connections.entrySet()) {
+            connectionArray.add(entry.getValue().makeConnectionData());
         }
         return new MongoDbConnections(connectionArray).getJson();
     }
@@ -65,22 +56,21 @@ public class DatabaseConnector extends AbstractResource {
         String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
         String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
         String writeConcern = connectionParameters.has("writeConcern") ? connectionParameters.getString("writeConcern") : null;
-        ConnectionData connectionData = new MongoConnectionDataImpl(
-                id,
-                host,
-                port,
-                dbName,
-                uri,
-                user,
-                password,
-                DatabaseTypes.MONGO,
-                writeConcern);
-        Connection connection = new MongoConnectionImpl(connectionData);
+        AbstractConnection connection = new MongoConnection(id, host, port, dbName, user,
+        password, writeConcern);
         return databaseConnectorManager.addEditConnection(connection, isEdition);
     }
 
 
     public boolean removeConnection(String databaseId, String databaseTypeName) {
         return databaseConnectorManager.removeConnection(databaseId, databaseTypeName);
+    }
+
+    public String getDatabaseTypes() {
+        JSONArray databaseTypes = new JSONArray();
+        for (DatabaseTypes databaseType: DatabaseTypes.getAllDatabaseTypes()) {
+            databaseTypes.put(databaseType.name());
+        }
+        return databaseTypes.toString();
     }
 }

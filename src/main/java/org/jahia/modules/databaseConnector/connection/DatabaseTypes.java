@@ -1,4 +1,4 @@
-package org.jahia.modules.databaseConnector;
+package org.jahia.modules.databaseConnector.connection;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -27,6 +27,6 @@ public enum DatabaseTypes {
     }
 
     public static Set<DatabaseTypes> getAllDatabaseTypes() {
-        return new TreeSet<DatabaseTypes>(Arrays.asList(values()));
+        return new TreeSet<>(Arrays.asList(values()));
     }
 }

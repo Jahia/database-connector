@@ -28,7 +28,7 @@ import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.jahia.modules.databaseConnector.DatabaseConnectorManager;
+import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.api.factories.DatabaseConnectorManagerFactory;
 import org.jahia.modules.databaseConnector.api.factories.JCRTemplateFactory;
 import org.jahia.services.content.JCRTemplate;

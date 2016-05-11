@@ -4,10 +4,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <!--OSGi Service-->
-    <bean class="org.jahia.modules.databaseConnector.DatabaseConnectorManager" id="databaseConnectorManager" factory-method="getInstance"/>
+    <bean class="org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager" id="databaseConnectorManager" factory-method="getInstance"/>
 
     <!--Choice List Initializers-->
-    <bean id="mongoWriteConcernChoiceListInitializer" class="org.jahia.modules.databaseConnector.mongo.initializer.WriteConcernChoiceListInitializer"/>
     <bean id="springBeansAccess" class="org.jahia.modules.databaseConnector.api.SpringBeansAccess"
           factory-method="getInstance">
         <property name="databaseConnectorManager" ref="databaseConnectorManager"/>

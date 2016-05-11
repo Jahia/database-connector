@@ -1,8 +1,7 @@
-package org.jahia.modules.databaseConnector.redis;
+package org.jahia.modules.databaseConnector.connection.redis;
 
-import org.jahia.modules.databaseConnector.AbstractDatabaseConnectionRegistry;
-import org.jahia.modules.databaseConnector.webflow.model.Connection;
-import org.jahia.modules.databaseConnector.webflow.model.redis.RedisConnection;
+import org.jahia.modules.databaseConnector.connection.AbstractConnection;
+import org.jahia.modules.databaseConnector.connection.AbstractDatabaseConnectionRegistry;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
@@ -15,12 +14,9 @@ import javax.jcr.RepositoryException;
 import javax.jcr.query.QueryResult;
 import java.util.Map;
 
-import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.HOST_KEY;
-import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.ID_KEY;
-import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.PASSWORD_KEY;
-import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.PORT_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.*;
 import static org.jahia.modules.databaseConnector.Utils.query;
-import static org.jahia.modules.databaseConnector.redis.RedisDatabaseConnectionImpl.*;
+import static org.jahia.modules.databaseConnector.connection.redis.RedisConnection.*;
 
 /**
  * Date: 11/6/2013
@@ -28,16 +24,16 @@ import static org.jahia.modules.databaseConnector.redis.RedisDatabaseConnectionI
  * @author Frédéric Pierre
  * @version 1.0
  */
-public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionRegistry<RedisDatabaseConnection> {
+public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<RedisConnection> {
 
-    private static final Logger logger = LoggerFactory.getLogger(RedisDatabaseConnectionRegistry.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedisConnectionRegistry.class);
 
-    public RedisDatabaseConnectionRegistry() {
+    public RedisConnectionRegistry() {
         super();
     }
 
     @Override
-    public Map<String, RedisDatabaseConnection> populateRegistry() {
+    public Map<String, RedisConnection> populateRegistry() {
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
@@ -49,13 +45,15 @@ public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
                     String host = connection.getProperty(HOST_KEY).getString();
                     Integer port = (int) connection.getProperty(PORT_KEY).getLong();
                     String password = connection.hasProperty(PASSWORD_KEY) ?
+                            connection.getProperty(PASSWORD_KEY).getString() : null;
+                    String user = connection.hasProperty(USER_KEY) ?
                             decodePassword(connection.getProperty(PASSWORD_KEY).getString()) : null;
                     Integer timeout = connection.hasProperty(TIMEOUT_KEY) ?
                             (int) connection.getProperty(TIMEOUT_KEY).getLong() : null;
                     Integer weight = connection.hasProperty(WEIGHT_KEY) ?
                             (int) connection.getProperty(WEIGHT_KEY).getLong() : null;
-                    RedisDatabaseConnectionImpl storedConnection =
-                            new RedisDatabaseConnectionImpl(id, host, port, password, timeout, weight);
+                    RedisConnection storedConnection =
+                            new RedisConnection(id, host, port, password, user, null, timeout, weight);
                     registry.put(id, storedConnection);
                 }
                 return true;
@@ -70,25 +68,22 @@ public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
     }
 
     @Override
-    public boolean addEditConnection(final Connection connection, final Boolean isEdition) {
+    public boolean addEditConnection(final AbstractConnection connection, final Boolean isEdition) {
         Assert.hasText(connection.getHost(), "Host must be defined");
         Assert.notNull(connection.getPort(), "Port must be defined");
         if (isEdition) {
-            ((RedisDatabaseConnectionImpl) registry.get(connection.getOldId())).unregisterAsService();
+            ((RedisConnection) registry.get(connection.getOldId())).unregisterAsService();
         }
         RedisConnection redisConnection = (RedisConnection) connection;
-        RedisDatabaseConnection redisDatabaseConnection = new RedisDatabaseConnectionImpl(redisConnection.getId(),
-                redisConnection.getHost(), redisConnection.getPort(), redisConnection.getPassword(),
-                redisConnection.getTimeout(), redisConnection.getWeight());
         if (storeConnection(connection, NODE_TYPE, isEdition)) {
             if (isEdition) {
                 if (!connection.getId().equals(connection.getOldId())) {
                     registry.remove(connection.getOldId());
                 }
-                registry.put(connection.getId(), redisDatabaseConnection);
+                registry.put(connection.getId(), redisConnection);
             }
             else {
-                registry.put(connection.getId(), redisDatabaseConnection);
+                registry.put(connection.getId(), redisConnection);
             }
             return true;
         }
@@ -98,7 +93,7 @@ public class RedisDatabaseConnectionRegistry extends AbstractDatabaseConnectionR
     }
 
     @Override
-    protected void storeAdvancedConfig(Connection connection, JCRNodeWrapper node) throws RepositoryException {
+    protected void storeAdvancedConfig(AbstractConnection connection, JCRNodeWrapper node) throws RepositoryException {
         RedisConnection redisConnection = (RedisConnection) connection;
         if (redisConnection.getTimeout() != null) {
             node.setProperty(TIMEOUT_KEY, redisConnection.getTimeout());

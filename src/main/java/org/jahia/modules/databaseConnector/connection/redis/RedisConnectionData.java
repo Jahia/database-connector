@@ -1,7 +1,7 @@
-package org.jahia.modules.databaseConnector.redis;
+package org.jahia.modules.databaseConnector.connection.redis;
 
-import org.jahia.modules.databaseConnector.ConnectionDataImpl;
-import org.jahia.modules.databaseConnector.DatabaseTypes;
+import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
+import org.jahia.modules.databaseConnector.connection.ConnectionData;
 
 /**
  * Date: 11/19/2013
@@ -9,25 +9,23 @@ import org.jahia.modules.databaseConnector.DatabaseTypes;
  * @author Frédéric Pierre
  * @version 1.0
  */
-public class RedisConnectionDataImpl extends ConnectionDataImpl implements RedisDatabaseConnection {
+public class RedisConnectionData extends ConnectionData{
 
     private final Integer timeout;
 
     private final Integer weight;
 
-    public RedisConnectionDataImpl(String id, String host, Integer port, String dbName, String uri,
+    public RedisConnectionData(String id, String host, Integer port, String dbName, String uri,
                                    String user, String password, DatabaseTypes databaseType, Integer timeout, Integer weight) {
         super(id, host, port, dbName, uri, user, password, databaseType);
         this.timeout = timeout;
         this.weight = weight;
     }
 
-    @Override
     public Integer getTimeout() {
         return timeout;
     }
 
-    @Override
     public Integer getWeight() {
         return weight;
     }

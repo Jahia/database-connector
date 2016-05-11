@@ -23,8 +23,9 @@
  */
 package org.jahia.modules.databaseConnector.api.subresources;
 
-import org.jahia.modules.databaseConnector.DatabaseConnectorManager;
+import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
+import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.services.content.JCRTemplate;
 import org.json.JSONException;
 import org.slf4j.Logger;
@@ -61,20 +62,11 @@ public class MongoDB {
     }
 
     @GET
-    @Path("/initconnection/{databaseTypeName}")
+    @Path("/getconnection/{databaseId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response initConnection(@PathParam("databaseTypeName") String databaseTypeName) {
-        databaseConnector.initConnection(databaseTypeName);
-        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully initialized database connection\"}").build();
-    }
+    public Response getConnection(@PathParam("databaseId") String databaseId) {
 
-
-    @GET
-    @Path("/getconnection/{databaseId}/{databaseTypeName}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getConnection(@PathParam("databaseId") String databaseId, @PathParam("databaseTypeName") String databaseTypeName) {
-        databaseConnector.getConnection(databaseId, databaseTypeName);
-        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully retrieved database connection\"}").build();
+        return Response.status(Response.Status.OK).entity(databaseConnector.getConnection(databaseId, DatabaseTypes.MONGO)).build();
     }
 
     @GET
@@ -110,9 +102,13 @@ public class MongoDB {
     @Produces(MediaType.APPLICATION_JSON)
     public Response removeConnection(@PathParam("databaseId") String databaseId, @PathParam("databaseTypeName") String databaseTypeName) {
         databaseConnector.removeConnection(databaseId, databaseTypeName);
-        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully created database connection\"}").build();
+        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully removed database connection\"}").build();
     }
 
-
-
+    @GET
+    @Path("/databasetypes")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDatabaseTypes() {
+        return Response.status(Response.Status.OK).entity(databaseConnector.getDatabaseTypes()).build();
+    }
 }

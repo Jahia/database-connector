@@ -24,7 +24,7 @@
 
 package org.jahia.modules.databaseConnector.api;
 
-import org.jahia.modules.databaseConnector.DatabaseConnectorManager;
+import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.services.content.JCRTemplate;
 
 /**

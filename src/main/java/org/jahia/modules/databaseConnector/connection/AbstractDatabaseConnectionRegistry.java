@@ -1,6 +1,5 @@
-package org.jahia.modules.databaseConnector;
+package org.jahia.modules.databaseConnector.connection;
 
-import org.jahia.modules.databaseConnector.webflow.model.Connection;
 import org.jahia.services.content.*;
 import org.jahia.utils.EncryptionUtils;
 import org.slf4j.Logger;
@@ -13,8 +12,8 @@ import javax.jcr.RepositoryException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.jahia.modules.databaseConnector.AbstractDatabaseConnection.*;
-import static org.jahia.modules.databaseConnector.DatabaseConnectorManager.*;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.*;
+import static org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager.*;
 import static org.jahia.modules.databaseConnector.Utils.query;
 
 /**
@@ -23,7 +22,7 @@ import static org.jahia.modules.databaseConnector.Utils.query;
  * @author Frédéric Pierre
  * @version 1.0
  */
-public abstract class AbstractDatabaseConnectionRegistry<T extends DatabaseConnection> implements DatabaseConnectionRegistry<T> {
+public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseConnectionRegistry<T>{
 
     private final static String NODE_TYPE = "dcmix:databaseConnection";
 
@@ -38,12 +37,13 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends DatabaseConne
         this.registry = new TreeMap<String, T>();
     }
 
-    @Override
+
     public Map<String, T> getRegistry() {
         return registry;
     }
 
-    protected Boolean storeConnection(final Connection connection, final String nodeType, final boolean isEdition) {
+    protected Boolean storeConnection(final AbstractConnection connection, final String nodeType, final boolean isEdition) {
+
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
@@ -97,12 +97,11 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends DatabaseConne
         }
     }
 
-    protected void storeAdvancedConfig(Connection connection, JCRNodeWrapper node) throws RepositoryException {}
+    protected void storeAdvancedConfig(AbstractConnection connection, JCRNodeWrapper node) throws RepositoryException {}
 
-    @Override
     public boolean removeConnection(final String databaseConnectionId) {
         Assert.isTrue(registry.containsKey(databaseConnectionId), "No database connection with ID: " + databaseConnectionId);
-        ((AbstractDatabaseConnection) registry.get(databaseConnectionId)).unregisterAsService();
+        ((AbstractConnection) registry.get(databaseConnectionId)).unregisterAsService();
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
