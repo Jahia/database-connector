@@ -8,6 +8,7 @@
 
 [dc:mongoConnection] > jnt:content, dcmix:databaseConnection
  - dc:writeConcern (String, choicelist[mongoWriteConcern])
+ - dc:authDb (String)
 
 [dc:redisConnection] > jnt:content, dcmix:databaseConnection
  - dc:timeout (long)
@@ -21,6 +22,7 @@
  - dc:dbName (String)
  - dc:user (String)
  - dc:password (String)
+ - dc:isConnected (boolean)
 
 [dc:databaseConnector] > jnt:content
  + * (dcmix:databaseConnection)

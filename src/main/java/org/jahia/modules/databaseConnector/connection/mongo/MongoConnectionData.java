@@ -10,18 +10,21 @@ public class MongoConnectionData extends ConnectionData {
 
     private String writeConcern;
 
-    public static final String WRITE_CONCERN_KEY = "dc:writeConcern";
+    private String authDb;
 
-    public static final String WRITE_CONCERN_DEFAULT_VALUE = "SAFE";
-
-    public MongoConnectionData(String id, String host, Integer port, String dbName,
-                               String uri, String user, String password, String writeConcern) {
-        super(id, host, port, dbName, uri, user, password, MONGO);
+    public MongoConnectionData(String id, String host, Integer port, Boolean isConnected, String dbName,
+                               String uri, String user, String password, String authDb, String writeConcern) {
+        super(id, host, port, isConnected, dbName, uri, user, password, MONGO);
         this.writeConcern = writeConcern;
+        this.authDb = authDb;
     }
 
     public String getWriteConcern() {
         return this.writeConcern;
+    }
+
+    public String getAuthDb() {
+        return this.authDb;
     }
 
     @JsonIgnore

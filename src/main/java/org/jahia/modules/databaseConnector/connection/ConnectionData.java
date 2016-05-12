@@ -18,6 +18,8 @@ public class ConnectionData implements Serializable {
 
     private final Integer port;
 
+    private final Boolean isConnected;
+
     private final String dbName;
 
     private final String uri;
@@ -28,11 +30,12 @@ public class ConnectionData implements Serializable {
 
     private final DatabaseTypes databaseType;
 
-    public ConnectionData(String id, String host, Integer port, String dbName, String uri,
-                          String user, String password, DatabaseTypes databaseType) {
+    public ConnectionData(String id, String host, Integer port,  Boolean isConnected, String dbName,
+                          String uri, String user, String password, DatabaseTypes databaseType) {
         this.id = id;
         this.host = host;
         this.port = port;
+        this.isConnected = isConnected;
         this.dbName = dbName;
         this.uri = uri;
         this.user = user;
@@ -50,6 +53,10 @@ public class ConnectionData implements Serializable {
 
     public Integer getPort() {
         return port;
+    }
+
+    public Boolean getIsConnected() {
+        return isConnected;
     }
 
     public String getDbName() {

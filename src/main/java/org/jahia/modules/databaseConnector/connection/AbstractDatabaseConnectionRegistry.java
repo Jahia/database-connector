@@ -73,6 +73,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
                 if (connection.getPort() != null) {
                     connectionNode.setProperty(PORT_KEY, connection.getPort());
                 }
+                connectionNode.setProperty(IS_CONNECTED_KEY, connection.isConnected());
                 if (connection.getUri() != null) {
                     connectionNode.setProperty(URI_KEY, connection.getUri());
                 }
@@ -101,7 +102,9 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
 
     public boolean removeConnection(final String databaseConnectionId) {
         Assert.isTrue(registry.containsKey(databaseConnectionId), "No database connection with ID: " + databaseConnectionId);
-        ((AbstractConnection) registry.get(databaseConnectionId)).unregisterAsService();
+        if (((AbstractConnection) registry.get(databaseConnectionId)).isConnected()) {
+            ((AbstractConnection) registry.get(databaseConnectionId)).unregisterAsService();
+        }
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
@@ -121,6 +124,48 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
             logger.error(e.getMessage(), e);
         }
         return false;
+    }
+
+    public boolean connect(final String databaseConnectionId) {
+        ((AbstractConnection) registry.get(databaseConnectionId)).registerAsService();
+        JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
+            public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
+                Node databaseConnectionNode = getDatabaseConnectionNode(databaseConnectionId, session);
+                session.checkout(databaseConnectionNode);
+                databaseConnectionNode.setProperty(IS_CONNECTED_KEY, true);
+                session.save();
+                return true;
+            }
+        };
+        try {
+            if (jcrTemplate.doExecuteWithSystemSession(callback)) {
+                return true;
+            }
+        } catch (RepositoryException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return true;
+    }
+
+    public boolean disconnect(final String databaseConnectionId) {
+        ((AbstractConnection) registry.get(databaseConnectionId)).unregisterAsService();
+        JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
+            public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
+                Node databaseConnectionNode = getDatabaseConnectionNode(databaseConnectionId, session);
+                session.checkout(databaseConnectionNode);
+                databaseConnectionNode.setProperty(IS_CONNECTED_KEY, false);
+                session.save();
+                return true;
+            }
+        };
+        try {
+            if (jcrTemplate.doExecuteWithSystemSession(callback)) {
+                return true;
+            }
+        } catch (RepositoryException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return true;
     }
 
     private Node getDatabaseConnectionNode(String databaseConnectionId, JCRSessionWrapper session)

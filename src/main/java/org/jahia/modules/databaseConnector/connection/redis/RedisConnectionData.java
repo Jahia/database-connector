@@ -18,9 +18,9 @@ public class RedisConnectionData extends ConnectionData{
 
     private final Integer weight;
 
-    public RedisConnectionData(String id, String host, Integer port, String dbName, String uri,
+    public RedisConnectionData(String id, String host, Integer port, Boolean isConnected, String dbName, String uri,
                                    String user, String password, DatabaseTypes databaseType, Integer timeout, Integer weight) {
-        super(id, host, port, dbName, uri, user, password, databaseType);
+        super(id, host, port, isConnected, dbName, uri, user, password, databaseType);
         this.timeout = timeout;
         this.weight = weight;
     }

@@ -87,7 +87,7 @@ public class MongoDB {
     public Response addEditConnection(@PathParam("isEdition") Boolean isEdition, String data) {
         try {
             databaseConnector.addEditConnection(data, isEdition);
-            return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully addeed database connection\"}").build();
+            return Response.status(Response.Status.OK).entity("{\"success\": \"" + (isEdition ? "Connection successfully edited" : "Successfully connected to database") + "\"}").build();
         } catch(JSONException e) {
             logger.error("Cannot parse json data : {}", data);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
@@ -98,10 +98,28 @@ public class MongoDB {
     }
 
     @DELETE
-    @Path("/removeconnection/{databaseId}/{databaseTypeName}")
+    @Path("/removeconnection/{connectionId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response removeConnection(@PathParam("databaseId") String databaseId, @PathParam("databaseTypeName") String databaseTypeName) {
-        databaseConnector.removeConnection(databaseId, databaseTypeName);
+    public Response removeConnection(@PathParam("connectionId") String connectionId) {
+        databaseConnector.removeConnection(connectionId, DatabaseTypes.MONGO);
         return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully removed database connection\"}").build();
+    }
+
+    @PUT
+    @Path("/connect/{connectionId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response connect(@PathParam("connectionId") String connectionId) {
+        databaseConnector.updateConnection(connectionId, DatabaseTypes.MONGO, true);
+        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully connected to database\"}").build();
+    }
+
+    @PUT
+    @Path("/disconnect/{connectionId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response disconnect(@PathParam("connectionId") String connectionId) {
+        databaseConnector.updateConnection(connectionId, DatabaseTypes.MONGO, false);
+        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully disconnected from database\"}").build();
     }
 }

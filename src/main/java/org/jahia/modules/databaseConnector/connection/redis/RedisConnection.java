@@ -22,14 +22,14 @@ public class RedisConnection extends AbstractConnection {
 
     private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.REDIS;
 
-    public RedisConnection(String id, String host, Integer port, String dbName,
+    public RedisConnection(String id, String host, Integer port, Boolean isConnected, String dbName,
                            String user, String password, Integer timeout, Integer weight) {
-        this(id, host, port, dbName, null, user, password, timeout, weight);
+        this(id, host, port, isConnected, dbName, null, user, password, timeout, weight);
     }
 
-    public RedisConnection(String id, String host, Integer port, String dbName, String uri,
+    public RedisConnection(String id, String host, Integer port, Boolean isConnected, String dbName, String uri,
                            String user, String password, Integer timeout, Integer weight) {
-        super(id, host, port, dbName, user, password, uri, DATABASE_TYPE);
+        super(id, host, port, isConnected, dbName, user, password, uri, DATABASE_TYPE);
         this.timeout = timeout;
         this.weight = weight;
     }
@@ -50,12 +50,18 @@ public class RedisConnection extends AbstractConnection {
         return weight;
     }
 
-    protected boolean registerAsService() {
-        return false;
+    @Override
+    public RedisConnectionData makeConnectionData() {
+        return new RedisConnectionData(id, host, port, isConnected, dbName, uri, user, password, databaseType, timeout, weight);
     }
 
     @Override
-    public RedisConnectionData makeConnectionData() {
-        return new RedisConnectionData(id, host, port, dbName, uri, user, password, databaseType, timeout, weight);
+    protected Object beforeRegisterAsService() {
+        return null;
+    }
+
+    @Override
+    public void beforeUnregisterAsService() {
+
     }
 }

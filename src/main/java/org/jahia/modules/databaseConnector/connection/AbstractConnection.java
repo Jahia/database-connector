@@ -39,6 +39,8 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
 
     protected String password;
 
+    protected Boolean isConnected;
+
     protected DatabaseTypes databaseType;
 
     public final static String ID_KEY = "dc:id";
@@ -55,11 +57,13 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
 
     public final static String PASSWORD_KEY = "dc:password";
 
+    public final static String IS_CONNECTED_KEY = "dc:isConnected";
+
     private final static String DATABASE_ID_KEY = "databaseId";
 
     private final List<ServiceRegistration> serviceRegistrations;
 
-    public AbstractConnection(String id, String host, Integer port, String dbName, String uri,
+    public AbstractConnection(String id, String host, Integer port, Boolean isConnected, String dbName, String uri,
                               String user, String password, DatabaseTypes databaseType) {
         this.id = id;
         this.oldId = id;
@@ -69,17 +73,22 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
         this.uri = uri;
         this.user = user;
         this.password = password;
+        this.isConnected = isConnected;
         this.databaseType = databaseType;
         this.serviceRegistrations = new ArrayList<>();
     }
 
-    protected abstract boolean registerAsService();
+    protected abstract Object beforeRegisterAsService();
 
-    protected boolean registerAsService(Object object) {
-        return registerAsService(object, false);
+    public abstract void beforeUnregisterAsService();
+
+    protected void registerAsService() {
+        Object service = beforeRegisterAsService();
+        registerAsService(service, false);
     }
 
     public void unregisterAsService() {
+        beforeUnregisterAsService();
         logger.info("Start unregistering OSGi services for DatabaseConnection of type {} with id '{}'", getDatabaseType().getDisplayName(), id);
         for (ServiceRegistration serviceRegistration : serviceRegistrations) {
             serviceRegistration.unregister();
@@ -195,6 +204,14 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Boolean isConnected() {
+        return isConnected;
+    }
+
+    public void isConnected(Boolean connected) {
+        isConnected = connected;
     }
 
     public DatabaseTypes getDatabaseType() {

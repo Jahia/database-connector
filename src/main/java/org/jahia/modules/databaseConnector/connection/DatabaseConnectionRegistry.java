@@ -17,4 +17,8 @@ public interface DatabaseConnectionRegistry<T>{
     public boolean addEditConnection(final AbstractConnection connection, final Boolean isEdition);
 
     public boolean removeConnection(String databaseConnectionId);
+
+    public boolean connect(final String databaseConnectionId);
+
+    public boolean disconnect(final String databaseConnectionId);
 }

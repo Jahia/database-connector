@@ -10,7 +10,6 @@ import org.springframework.beans.factory.InitializingBean;
 import java.util.*;
 
 import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.getAllDatabaseTypes;
-import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.valueOf;
 
 /**
  * Date: 2013-10-17
@@ -59,8 +58,11 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                 databaseConnectionRegistries.put(activatedDatabaseType, databaseConnectionRegistry);
                 Map registry = databaseConnectionRegistry.getRegistry();
                 Set set = registry.keySet();
-                for (Object databaseId : set) {
-                    ((AbstractConnection) registry.get(databaseId)).registerAsService();
+                for (Object connectionId : set) {
+                    //Only register the service if it was previously connected and registered.
+                    if (((AbstractConnection) registry.get(connectionId)).isConnected()) {
+                        ((AbstractConnection) registry.get(connectionId)).registerAsService();
+                    }
                 }
             } catch(Exception e) {
                 logger.error(e.getMessage(), e);
@@ -99,10 +101,10 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         return registeredConnections;
     }
 
-    public  <T extends AbstractConnection> T getConnection(String databaseId, DatabaseTypes databaseType) {
+    public  <T extends AbstractConnection> T getConnection(String connectionId, DatabaseTypes databaseType) {
         try {
             Map<String, T> databaseConnection = getRegisteredConnections(databaseType);
-            return databaseConnection.get(databaseId);
+            return databaseConnection.get(connectionId);
         } catch (NullPointerException e) {
             logger.error(e.getMessage(), e);
             return null;
@@ -133,11 +135,18 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         return databaseConnectionRegistries.get(connection.getDatabaseType()).addEditConnection(connection, isEdition);
     }
 
-    public boolean removeConnection(String databaseId, String databaseTypeName) {
-        DatabaseTypes databaseType = valueOf(databaseTypeName);
-        return databaseConnectionRegistries.get(databaseType).removeConnection(databaseId);
+    public boolean removeConnection(String connectionId, DatabaseTypes databaseType) {
+        return databaseConnectionRegistries.get(databaseType).removeConnection(connectionId);
     }
 
+    public boolean updateConnection(String connectionId, DatabaseTypes databaseType, boolean connect) {
+        if (connect) {
+            databaseConnectionRegistries.get(databaseType).connect(connectionId);
+        } else {
+            databaseConnectionRegistries.get(databaseType).disconnect(connectionId);
+        }
+        return true;
+    }
 
     protected BundleContext getBundleContext() {
         return bundleContext;

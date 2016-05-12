@@ -44,6 +44,7 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                     String id = connection.getProperty(ID_KEY).getString();
                     String host = connection.getProperty(HOST_KEY).getString();
                     Integer port = (int) connection.getProperty(PORT_KEY).getLong();
+                    Boolean isConnected = connection.getProperty(IS_CONNECTED_KEY).getBoolean();
                     String password = connection.hasProperty(PASSWORD_KEY) ?
                             connection.getProperty(PASSWORD_KEY).getString() : null;
                     String user = connection.hasProperty(USER_KEY) ?
@@ -53,7 +54,7 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                     Integer weight = connection.hasProperty(WEIGHT_KEY) ?
                             (int) connection.getProperty(WEIGHT_KEY).getLong() : null;
                     RedisConnection storedConnection =
-                            new RedisConnection(id, host, port, password, user, null, timeout, weight);
+                            new RedisConnection(id, host, port, isConnected, password, user, null, timeout, weight);
                     registry.put(id, storedConnection);
                 }
                 return true;

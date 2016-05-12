@@ -34,15 +34,15 @@ public class DatabaseConnector extends AbstractResource {
         this.databaseConnectorManager = databaseConnectorManager;
     }
 
-    public String getConnection(String databaseId, DatabaseTypes databaseType) {
+    public String getConnection(String connectionId, DatabaseTypes databaseType) {
         String connection = null;
         switch (databaseType) {
             case MONGO:
-                MongoConnection mongoConnection = databaseConnectorManager.getConnection(databaseId, databaseType);
+                MongoConnection mongoConnection = databaseConnectorManager.getConnection(connectionId, databaseType);
                 connection = mongoConnection.makeConnectionData().getJson();
                 break;
             case REDIS:
-                RedisConnection redisConnection = databaseConnectorManager.getConnection(databaseId, databaseType);
+                RedisConnection redisConnection = databaseConnectorManager.getConnection(connectionId, databaseType);
                 connection = redisConnection.makeConnectionData().getJson();
                 break;
         }
@@ -54,22 +54,26 @@ public class DatabaseConnector extends AbstractResource {
         switch (databaseType) {
             case MONGO:
                 Map<String, MongoConnection> mongoConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.MONGO);
-                List<MongoConnectionData> mongoConnectionArray = new ArrayList<>();
-                for(Map.Entry<String, MongoConnection> entry : mongoConnections.entrySet()) {
-                    mongoConnectionArray.add(entry.getValue().makeConnectionData());
+                if (mongoConnections != null) {
+                    List<MongoConnectionData> mongoConnectionArray = new ArrayList<>();
+                    for(Map.Entry<String, MongoConnection> entry : mongoConnections.entrySet()) {
+                        mongoConnectionArray.add(entry.getValue().makeConnectionData());
+                    }
+                    connections = new DbConnections(mongoConnectionArray).getJson();
                 }
-                connections = new DbConnections(mongoConnectionArray).getJson();
                 break;
             case REDIS:
                 Map<String, RedisConnection> redisConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.REDIS);
-                List<RedisConnectionData> redisConnectionArray = new ArrayList<>();
-                for(Map.Entry<String, RedisConnection> entry : redisConnections.entrySet()) {
-                    redisConnectionArray.add(entry.getValue().makeConnectionData());
+                if (redisConnections != null) {
+                    List<RedisConnectionData> redisConnectionArray = new ArrayList<>();
+                    for (Map.Entry<String, RedisConnection> entry : redisConnections.entrySet()) {
+                        redisConnectionArray.add(entry.getValue().makeConnectionData());
+                    }
+                    connections = new DbConnections(redisConnectionArray).getJson();
                 }
-                connections = new DbConnections(redisConnectionArray).getJson();
                 break;
         }
-        return connections;
+        return connections == null ? new JSONArray().toString() : connections;
     }
 
     public boolean addEditConnection(String data, Boolean isEdition) throws JSONException, UnknownHostException{
@@ -77,19 +81,24 @@ public class DatabaseConnector extends AbstractResource {
         String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
         String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
         Integer port = connectionParameters.has("port") ? connectionParameters.getInt("port") : null;
+        Boolean isConnected = connectionParameters.has("isConnected") ? connectionParameters.getBoolean("isConnected") : false;
         String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
-        String uri = connectionParameters.has("uri") ? connectionParameters.getString("uri") : null;
         String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
         String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
         String writeConcern = connectionParameters.has("writeConcern") ? connectionParameters.getString("writeConcern") : null;
-        AbstractConnection connection = new MongoConnection(id, host, port, dbName, user,
-        password, writeConcern);
+        String authDb = connectionParameters.has("authDb") ? connectionParameters.getString("authDb") : null;
+        AbstractConnection connection = new MongoConnection(id, host, port, isConnected, dbName, user,
+        password, authDb, writeConcern);
         return databaseConnectorManager.addEditConnection(connection, isEdition);
     }
 
 
-    public boolean removeConnection(String databaseId, String databaseTypeName) {
-        return databaseConnectorManager.removeConnection(databaseId, databaseTypeName);
+    public boolean removeConnection(String connectionId, DatabaseTypes databaseType) {
+        return databaseConnectorManager.removeConnection(connectionId, databaseType);
+    }
+
+    public boolean updateConnection(String connectionId, DatabaseTypes databaseType, boolean connect) {
+        return databaseConnectorManager.updateConnection(connectionId, databaseType, connect);
     }
 
     public String getDatabaseTypes() {
