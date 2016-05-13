@@ -1,53 +1,42 @@
+<div class="container">&nbsp;
+   <md-list>
+       <md-list-item>
+           <md-content class="rcorners" layout-padding layout="row" ng-class="[{'on': mcc.connection.isConnected, 'off': !mcc.connection.isConnected}]">
 
+               <div class="round-corners-16" layout="row">
+                   <div flex="100">
+                       <div layout="row">
+                           <div flex="100" class="center-align">
+                               <img ng-src="{{mcc.imageUrl}}" width="211" height="60">
+                           </div>
+                       </div>
+                       <span class="heading-placer">
+                                   Status
+                        </span>
+                       <div layout="row" layout-margin layout-padding class="status-wrap">
+                           <div layout layout-wrap >
+                               <div flex="90">
+                                   <div class="md-list-item-text" layout-fill="auto" >
 
-<!--<!DOCTYPE html>-->
+                                       <p>Connection Name: {{mcc.connection.id}}</p>
+                                       <p>Database Name: {{mcc.connection.dbName}}</p>
+                                       <p>Host: {{mcc.connection.host}}</p>
+                                       <p>Port: {{mcc.connection.port}}</p>
 
-
-    <div class="container">&nbsp;
-
-
-    <!--<md-content  class="" class="md-whiteframe-8dp" flex="50" layout-fill="auto">&nbsp;-->
-
-       <md-list>
-           <md-list-item layout="row" >
-               <md-content class="rcorners" layout-padding="" layout="row" ng-class="[{'on': mcc.connection.isConnected, 'off': !mcc.connection.isConnected}]">
-
-                   <md-content flex="75" layout="column" >
-                       <img ng-src="{{mcc.imageUrl}}">
-
-                       <fieldset disabled>
-
-                           <legend>Status:</legend>
-
-                           <div class="md-list-item-text" layout-fill="auto" >
-
-                               <p>Connection Name: {{mcc.connection.displayName}}</p>
-                               <p>Database Name: {{mcc.connection.dbName}}</p>
-                               <p>Host: {{mcc.connection.host}}</p>
-                               <p>Port: {{mcc.connection.port}}</p>
-
+                                   </div>
+                               </div>
+                               <div flex="10">
+                                   <md-button class="md-icon-button" ng-if="!mcc.connection.isConnected" ng-click="mcc.updateConnection(true)"><i class="fa fa-plug" aria-label="Connect to database"></i></md-button>
+                                   <md-button class="md-icon-button" ng-if="mcc.connection.isConnected" ng-click="mcc.updateConnection(false)"><i class="fa fa-chain-broken" aria-label="disconnect from database"></i></md-button>
+                                   <md-button class="md-icon-button"><i class="fa fa-pencil-square-o" aria-label="edit connections details"></i></md-button>
+                                   <md-button class="md-icon-button"><i class="fa fa-trash-o" aria-label="delete connection"></i></md-button>
+                               </div>
                            </div>
 
-                       </fieldset>
-                    </md-content>
-
-
-
-                    <md-content flex="25" layout="column" layout-align="end center">
-                        <md-button class="md-icon-button" ng-if="!mcc.connection.isConnected" ng-click="mcc.updateConnection(true)"><i class="fa fa-plug" aria-label="Connect to database"></i></md-button>
-                        <md-button class="md-icon-button" ng-if="mcc.connection.isConnected" ng-click="mcc.updateConnection(false)"><i class="fa fa-chain-broken" aria-label="disconnect from database"></i></md-button>
-                        <md-button class="md-icon-button"><i class="fa fa-pencil-square-o" aria-label="edit connections details"></i></md-button>
-                        <md-button class="md-icon-button"><i class="fa fa-trash-o" aria-label="delete connection"></i></md-button>
-
-                    </md-content>
-
-               </md-content>
-
-           </md-list-item>
-       </md-list>
-    <!--</md-content>-->
-    </div>
-
-
-
+                       </div>
+                   </div>
+               </div>
+           </md-content>
+       </md-list-item>
+   </md-list>
 </div>

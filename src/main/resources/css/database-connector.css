@@ -67,32 +67,20 @@ form legend {
     height: auto;
 }
 
-.box { display:inline-block;
-    line-height: 0; }
-
-.box, .box:before {
-    border: 8px solid #fff;
+.round-corners-16 {
+    border:#E1E2E7 solid 2px;
     border-radius: 16px;
-    position: relative;
-    z-index: 1; }
-
-.box:before {
-    display: block;
-    content: '';
-    position: absolute;
-    top: -8px; left: -8px;
-    right: -8px;
-    bottom: -8px;
-    z-index: 2; }
+    background: #ffffff;
+}
 
 .off{
-    border:1px solid red;
+    border:2px solid red;
     background: #ff8d96;
 
 
 }
 .on {
-    border: 1px solid green;
+    border: 2px solid green;
     background: #42ff7e;
 }
 
@@ -100,4 +88,18 @@ form legend {
     text-align: center;
 }
 
+.status-wrap {
+    border: solid 1px #bbbbbb;
+    background: #fff;
+    border-radius: 2px;
+    margin-bottom: 10px;
+    box-shadow: -2px 2px 3px -3px rgba(0,0,0,1);
+}
+
+.heading-placer {
+    position: relative;
+    top:25px;
+    left: 15px;
+    background-color: #ffffff;
+}
 
