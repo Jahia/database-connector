@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.DATABASE_TYPE_KEY;
@@ -61,22 +62,7 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
 
     private final static String DATABASE_ID_KEY = "databaseId";
 
-    private final List<ServiceRegistration> serviceRegistrations;
-
-    public AbstractConnection(String id, String host, Integer port, Boolean isConnected, String dbName, String uri,
-                              String user, String password, DatabaseTypes databaseType) {
-        this.id = id;
-        this.oldId = id;
-        this.host = host;
-        this.port = port;
-        this.dbName = dbName;
-        this.uri = uri;
-        this.user = user;
-        this.password = password;
-        this.isConnected = isConnected;
-        this.databaseType = databaseType;
-        this.serviceRegistrations = new ArrayList<>();
-    }
+    private final List<ServiceRegistration> serviceRegistrations = new LinkedList<>();
 
     protected abstract Object beforeRegisterAsService();
 

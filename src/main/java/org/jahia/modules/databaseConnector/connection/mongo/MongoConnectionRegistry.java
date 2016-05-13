@@ -43,16 +43,16 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                 QueryResult queryResult = query("SELECT * FROM ["+ NODE_TYPE +"]", session);
                 NodeIterator it = queryResult.getNodes();
                 while (it.hasNext()) {
-                    JCRNodeWrapper connection = (JCRNodeWrapper) it.next();
-                    String id = connection.getProperty(ID_KEY).getString();
-                    String host = connection.getProperty(HOST_KEY).getString();
-                    Integer port = (int) connection.getProperty(PORT_KEY).getLong();
-                    Boolean isConnected = connection.getProperty(IS_CONNECTED_KEY).getBoolean();
-                    String dbName = connection.hasProperty(DB_NAME_KEY) ? connection.getProperty(DB_NAME_KEY).getString() : null;
-                    String user = connection.hasProperty(USER_KEY) ? connection.getProperty(USER_KEY).getString() : null;
-                    String password = connection.hasProperty(PASSWORD_KEY) ? decodePassword(connection.getProperty(PASSWORD_KEY).getString()) : null;
-                    String writeConcern = connection.hasProperty(WRITE_CONCERN_KEY) ? connection.getProperty(WRITE_CONCERN_KEY).getString() : null;
-                    String dbAuth = connection.hasProperty(AUTH_DB_KEY) ? connection.getProperty(AUTH_DB_KEY).getString() : null;
+                    JCRNodeWrapper connectionNode = (JCRNodeWrapper) it.next();
+                    String id = connectionNode.getProperty(ID_KEY).getString();
+                    String host = connectionNode.getProperty(HOST_KEY).getString();
+                    Integer port = (int) connectionNode.getProperty(PORT_KEY).getLong();
+                    Boolean isConnected = connectionNode.getProperty(IS_CONNECTED_KEY).getBoolean();
+                    String dbName = connectionNode.hasProperty(DB_NAME_KEY) ? connectionNode.getProperty(DB_NAME_KEY).getString() : null;
+                    String user = connectionNode.hasProperty(USER_KEY) ? connectionNode.getProperty(USER_KEY).getString() : null;
+                    String password = connectionNode.hasProperty(PASSWORD_KEY) ? decodePassword(connectionNode.getProperty(PASSWORD_KEY).getString()) : null;
+                    String writeConcern = connectionNode.hasProperty(WRITE_CONCERN_KEY) ? connectionNode.getProperty(WRITE_CONCERN_KEY).getString() : null;
+                    String dbAuth = connectionNode.hasProperty(AUTH_DB_KEY) ? connectionNode.getProperty(AUTH_DB_KEY).getString() : null;
                     try {
                         MongoConnection storedConnection = new MongoConnection(id, host, port, isConnected, dbName, user, password, dbAuth, writeConcern);
                         registry.put(id, storedConnection);

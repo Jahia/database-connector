@@ -51,7 +51,6 @@ public class MongoConnection extends AbstractConnection {
     }
 
     public MongoConnection(String id, String host, Integer port, Boolean isConnected, String dbName, String user, String password, String authDb, String writeConcern) throws UnknownHostException {
-        super(id, host, port, isConnected, dbName, null, user, password , DATABASE_TYPE);
         if (writeConcern == null) {
             this.writeConcern = WRITE_CONCERN_DEFAULT_VALUE;
         }

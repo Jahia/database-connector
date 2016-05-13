@@ -29,7 +29,6 @@ public class RedisConnection extends AbstractConnection {
 
     public RedisConnection(String id, String host, Integer port, Boolean isConnected, String dbName, String uri,
                            String user, String password, Integer timeout, Integer weight) {
-        super(id, host, port, isConnected, dbName, user, password, uri, DATABASE_TYPE);
         this.timeout = timeout;
         this.weight = weight;
     }
