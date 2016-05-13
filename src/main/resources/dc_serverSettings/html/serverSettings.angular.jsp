@@ -46,7 +46,11 @@
         contextualData.urlBaseSiteSettingsTemplates = '${url.context}${url.basePreview}${url.currentModule}/${script.view.moduleVersion}/templates/server-settings-base/configurations/database-connector/pagecontent/databaseConnectorSettings.';
         contextualData.sitePath = '${renderContext.site.path}';
         contextualData.pageQuery = '<c:url value="/modules/api/jcr/v1/default/${currentResource.locale}/query?noLinks"/>';
-
+        contextualData.entryPoints = {
+            MONGO    : 'mongodb',
+            REDIS    : 'redis',
+            ORIENT   : 'orientdb'
+        };
         angular.module('databaseConnector').constant('contextualData', contextualData);
         angular.element(document).ready(function () {
             moment.locale('${renderContext.UILocale.language}');
