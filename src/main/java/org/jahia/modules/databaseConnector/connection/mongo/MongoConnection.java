@@ -109,6 +109,12 @@ public class MongoConnection extends AbstractConnection {
             uri += authDb;
         }
 
+        //If there are options or user, add query parameter start
+        //@TODO add options array check when it is implemented
+        if (user != null) {
+            uri += "?";
+        }
+
         //Options to be added:
         if (user != null) {
             uri += (password != null ? "authMechanism=SCRAM-SHA-1" : "authMechanism=GSSAPI");

@@ -75,24 +75,22 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
         Assert.hasText(connection.getHost(), "Host must be defined");
         Assert.notNull(connection.getPort(), "Port must be defined");
         Assert.hasText(connection.getDbName(), "DB name must be defined");
-        MongoConnection mongoConnection;
-        try {
-            mongoConnection = new MongoConnection(connection.getId(), connection.getHost(), connection.getPort(),
-                    connection.isConnected(), connection.getDbName(), connection.getUser(), connection.getPassword(),
-                    ((MongoConnection)connection).getAuthDb(), ((MongoConnection) connection).getWriteConcern());
-        } catch (UnknownHostException e) {
-            logger.error(e.getMessage(), e);
-            return false;
-        }
+        MongoConnection mongoConnection = (MongoConnection) connection;
         if (storeConnection(connection, NODE_TYPE, isEdition)) {
             if (isEdition) {
                 if (!connection.getId().equals(connection.getOldId())) {
+                    if (registry.get(connection.getOldId()).isConnected()) {
+                        registry.get(connection.getOldId()).unregisterAsService();
+                    }
                     registry.remove(connection.getOldId());
                 }
                 registry.put(connection.getId(), mongoConnection);
             }
             else {
                 registry.put(connection.getId(), mongoConnection);
+            }
+            if (connection.isConnected()) {
+                ((MongoConnection) connection).beforeRegisterAsService();
             }
             return true;
         }
