@@ -24,12 +24,23 @@
         .module('databaseConnector')
         .directive('dcMongoConnection', ['$log', 'contextualData', mongoConnection]);
 
-    var mongoConnectionController = function($scope, contextualData) {
+    var mongoConnectionController = function($scope, contextualData,dcDataFactory) {
         var mcc = this;
         mcc.imageUrl = contextualData.context + '/modules/database-connector/images/' + mcc.connection.databaseType + '/logo_60.png';
 
-         // console.log(mcc.connection);
+        mcc.updateConnection = updateConnection;
+
+        function updateConnection(connect) {
+            var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[mcc.connection.databaseType] + '/' + (connect ? 'connect' : 'disconnect') + '/' + mcc.connection.id;
+            dcDataFactory.customRequest({
+                url: url,
+                method: 'PUT'
+            }).then(function(response) {
+                mcc.connection.isConnected = connect;
+            }, function(response) {});
+        }
     };
 
-    mongoConnectionController.$inject = ['$scope', 'contextualData'];
+    mongoConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory'];
+    
 })();

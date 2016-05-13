@@ -50,36 +50,54 @@ form legend {
     overflow-x: hidden;
 }
 
-#grcorners {
+.grcorners {
     background: lightgrey;
     border-radius: 25px;
+    padding: 30px;
+    width: auto;
+    height: auto;
+}
+
+.rcorners {
+    background: lightgrey;
+    border-radius: 25px;
+    /*border:black solid 8px;*/
     padding: 20px;
     width: auto;
     height: auto;
 }
 
-#rcorners {
-    border-radius: 30px;
-    padding: 40px;
-    width: auto;
-    height: auto;
-}
+.box { display:inline-block;
+    line-height: 0; }
 
+.box, .box:before {
+    border: 8px solid #fff;
+    border-radius: 16px;
+    position: relative;
+    z-index: 1; }
 
-#off{
+.box:before {
+    display: block;
+    content: '';
+    position: absolute;
+    top: -8px; left: -8px;
+    right: -8px;
+    bottom: -8px;
+    z-index: 2; }
+
+.off{
     border:1px solid red;
     background: #ff8d96;
-    width:100%;
-    height:auto;
+
 
 }
-#on{
-    border:1px solid green;
+.on {
+    border: 1px solid green;
     background: #42ff7e;
-    width:100%;
-    height:auto;
-    margin:auto;
 }
 
+.center-align {
+    text-align: center;
+}
 
 
