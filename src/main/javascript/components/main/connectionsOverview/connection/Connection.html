@@ -1,13 +1,13 @@
 <div class="container">&nbsp;
    <md-list>
        <md-list-item>
-           <md-content class="rcorners" layout-padding layout="row" ng-class="[{'on': mcc.connection.isConnected, 'off': !mcc.connection.isConnected}]">
+           <md-content class="rcorners" layout-padding layout="row" ng-class="[{'on': cc.connection.isConnected, 'off': !cc.connection.isConnected}]">
 
                <div class="round-corners-16" layout="row">
                    <div flex="100">
                        <div layout="row">
                            <div flex="100" class="center-align">
-                               <img ng-src="{{mcc.imageUrl}}" width="211" height="60">
+                               <img ng-src="{{cc.imageUrl}}" width="211" height="60">
                            </div>
                        </div>
                        <span class="heading-placer">
@@ -18,16 +18,16 @@
                                <div flex="90">
                                    <div class="md-list-item-text" layout-fill="auto" >
 
-                                       <p>Connection Name: {{mcc.connection.id}}</p>
-                                       <p>Database Name: {{mcc.connection.dbName}}</p>
-                                       <p>Host: {{mcc.connection.host}}</p>
-                                       <p>Port: {{mcc.connection.port}}</p>
+                                       <p>Connection Name: {{cc.connection.id}}</p>
+                                       <p>Database Name: {{cc.connection.dbName}}</p>
+                                       <p>Host: {{cc.connection.host}}</p>
+                                       <p>Port: {{cc.connection.port}}</p>
 
                                    </div>
                                </div>
                                <div flex="10">
-                                   <md-button class="md-icon-button" ng-if="!mcc.connection.isConnected" ng-click="mcc.updateConnection(true)"><i class="fa fa-plug" aria-label="Connect to database"></i></md-button>
-                                   <md-button class="md-icon-button" ng-if="mcc.connection.isConnected" ng-click="mcc.updateConnection(false)"><i class="fa fa-chain-broken" aria-label="disconnect from database"></i></md-button>
+                                   <md-button class="md-icon-button" ng-if="!cc.connection.isConnected" ng-click="cc.updateConnection(true)"><i class="fa fa-plug" aria-label="Connect to database"></i></md-button>
+                                   <md-button class="md-icon-button" ng-if="cc.connection.isConnected" ng-click="cc.updateConnection(false)"><i class="fa fa-chain-broken" aria-label="disconnect from database"></i></md-button>
                                    <md-button class="md-icon-button"><i class="fa fa-pencil-square-o" aria-label="edit connections details"></i></md-button>
                                    <md-button class="md-icon-button"><i class="fa fa-trash-o" aria-label="delete connection"></i></md-button>
                                </div>
