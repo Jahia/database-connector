@@ -1,0 +1,86 @@
+<md-content layout-padding>
+    <form name="mongoForm">
+
+        <md-checkbox ng-model="cmcc.connection.isConnected" aria-label="Automatic startup after Creation"
+                     ng-true-value="'true'" ng-false-value="'false'"
+                     class="md-warn md-align-top-left" flex>
+            <span class="ipsum">
+              Enables the automatic startup of the newly created database
+            </span>
+        </md-checkbox>
+
+
+        <md-input-container class="md-block">
+            <label>Host</label>
+            <input required md-no-asterisk name="host" ng-model="cmcc.connection.host">
+            <div ng-messages="mongoForm.host.$error">
+                <div ng-message="required">This is required.</div>
+                <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
+            </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+            <label>Port</label>
+            <input required ng-pattern="/[0-9]+/" name="port" ng-model="cmcc.connection.port">
+                   <!--minlength="8" maxlength="100" ng-pattern="/^.+@.+\..+$/" />-->
+            <div ng-messages="mongoForm.port.$error" role="alert">
+                <div ng-message="required">This is required.</div>
+                <!--<div ng-message-exp="['required', 'minlength', 'maxlength', 'pattern']">-->
+                    <!--Your email must be between 10 and 100 characters long and look like an e-mail address.-->
+                <!--</div>-->
+            </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+            <label>Connection Name</label>
+            <input required name="id" ng-model="cmcc.connection.id" >
+            <div ng-messages="mongoForm.id.$error">
+                <div ng-message="required">This is required.</div>
+            </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+            <label>Database Name</label>
+            <input required name="dbName" ng-model="cmcc.connection.dbName" >
+            <div ng-messages="mongoForm.dbName.$error">
+                <div ng-message="required">This is required.</div>
+            </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+            <label>User</label>
+            <input required name="user"  ng-model="cmcc.connection.user">
+            <div ng-messages="mongoForm.user.$error">
+                <div ng-message="required">This is required.</div>
+            </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+            <label>Password</label>
+            <input type="password" required name="password" ng-model="cmcc.connection.password" ng-change="cmcc.updatePassword()">
+            <div ng-messages="mongoForm.password.$error" role="alert">
+                <div ng-message-exp="['required', 'minlength', 'maxlength', 'pattern']">
+                </div>
+            </div>
+        </md-input-container>
+
+
+        <md-input-container class="md-block" ng-if="cmcc.connection.password !== undefined">
+            <label>Authentication Database</label>
+            <input required name="authDb" ng-model="cmcc.connection.authDb" >
+            <div ng-messages="mongoForm.authDb.$error">
+                <div ng-message="required">This is required.</div>
+            </div>
+        </md-input-container>
+
+        <md-button class="md-raised md-primary pull-right" ng-click="cmcc.createMongoConnection()">
+            Create connection </md-button>
+        <md-button class="md-raised md-primary pull-right" ng-click="cmcc.cancelCreation()">
+            Back </md-button>
+
+
+
+
+
+    </form>
+</md-content>

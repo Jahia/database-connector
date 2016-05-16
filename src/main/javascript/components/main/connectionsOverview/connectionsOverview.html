@@ -1,6 +1,9 @@
-
-<span class="md-headline" layout-align="centre centre" >Connections:
-<md-button> <br> <i class="fa fa-plus" aria-label="create a new connection"> click me to add a newconnection </i> </md-button>
+<div layout="row"  >
+    <span class="md-headline center-align" flex="100">Connections: </span>
+</div>
+<div layout="row">
+    <md-button class="md-raised md-primary" ng-click="coc.createConnection($event)"> <i class="fa fa-plus" aria-label="create a new connection"> Add new connection </i> </md-button>
+</div>
 
 <div ng-repeat="row in coc.connections" layout="row">
 
@@ -9,4 +12,3 @@
     </div>
 
 </div>
-</span>

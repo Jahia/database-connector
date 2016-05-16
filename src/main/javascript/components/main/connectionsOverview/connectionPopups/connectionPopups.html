@@ -1,0 +1,24 @@
+
+<md-dialog>
+    <form >
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                Create  Connection
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content databaseSelection">
+                <div layout layout-wrap ng-if="!cpc.databaseTypeSelected">
+                    <div ng-repeat="databaseType in cpc.databaseTypes" flex="50">
+                        <md-button class="md-button" ng-click="cpc.setSelectedDatabaseType(databaseType)">
+                            <img ng-src="{{cpc.images[databaseType]}}">
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+            <div ng-switch="cpc.selectedDatabaseType">
+                <create-mongo-connection ng-switch-when="MONGO"></create-mongo-connection>
+            </div>
+        </md-dialog-content>
+    </form>
+</md-dialog>

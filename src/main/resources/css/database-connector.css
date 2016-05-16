@@ -103,3 +103,13 @@ form legend {
     background-color: #ffffff;
 }
 
+.databaseSelection {
+    min-width: 600px;
+}
+
+.inputdemoErrors .inputErrorsApp {
+    min-height: 48px; }
+.inputdemoErrors md-input-container > p {
+    font-size: 0.8em;
+    text-align: left;
+    width: 100%; }
