@@ -75,21 +75,21 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
 
     public boolean addEditConnection(final AbstractConnection connection, final Boolean isEdition) {
         MongoConnection mongoConnection = (MongoConnection) connection;
-        if (storeConnection(connection, NODE_TYPE, isEdition)) {
+        if (storeConnection(mongoConnection, NODE_TYPE, isEdition)) {
             if (isEdition) {
-                if (!connection.getId().equals(connection.getOldId())) {
-                    if (registry.get(connection.getOldId()).isConnected()) {
-                        registry.get(connection.getOldId()).unregisterAsService();
+                if (!mongoConnection.getId().equals(mongoConnection.getOldId())) {
+                    if (registry.get(mongoConnection.getOldId()).isConnected()) {
+                        registry.get(mongoConnection.getOldId()).unregisterAsService();
                     }
-                    registry.remove(connection.getOldId());
+                    registry.remove(mongoConnection.getOldId());
                 }
-                registry.put(connection.getId(), mongoConnection);
+                registry.put(mongoConnection.getId(), mongoConnection);
             }
             else {
-                registry.put(connection.getId(), mongoConnection);
+                registry.put(mongoConnection.getId(), mongoConnection);
             }
-            if (connection.isConnected()) {
-                ((MongoConnection) connection).beforeRegisterAsService();
+            if (mongoConnection.isConnected()) {
+                mongoConnection.registerAsService();
             }
             return true;
         }

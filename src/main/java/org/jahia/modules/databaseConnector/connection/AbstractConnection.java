@@ -68,7 +68,7 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
 
     public abstract void beforeUnregisterAsService();
 
-    protected void registerAsService() {
+    public void registerAsService() {
         Object service = beforeRegisterAsService();
         registerAsService(service, false);
         this.isConnected = true;
@@ -144,6 +144,10 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
 
     public String getOldId() {
         return oldId;
+    }
+
+    public void setOldId(String oldId) {
+        this.oldId = oldId;
     }
 
     public String getHost() {

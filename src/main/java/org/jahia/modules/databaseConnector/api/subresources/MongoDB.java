@@ -148,6 +148,9 @@ public class MongoDB {
             if (!connectionParameters.has("id") || StringUtils.isEmpty(connectionParameters.getString("id"))) {
                 missingParameters.put("id");
             }
+            if (!connectionParameters.has("oldId") || StringUtils.isEmpty(connectionParameters.getString("oldId"))) {
+                missingParameters.put("oldId");
+            }
             if (!connectionParameters.has("host") || StringUtils.isEmpty(connectionParameters.getString("host"))) {
                 missingParameters.put("host");
             }
@@ -161,6 +164,7 @@ public class MongoDB {
                 return Response.status(Response.Status.BAD_REQUEST).entity("{\"missingParameters\":" + missingParameters.toString() + "}").build();
             } else {
                 String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
+                String oldId = connectionParameters.has("oldId") ? connectionParameters.getString("oldId") : null;
                 String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
                 Integer port = connectionParameters.has("port") ? connectionParameters.getInt("port") : null;
                 Boolean isConnected = connectionParameters.has("isConnected") ? connectionParameters.getBoolean("isConnected") : false;
@@ -170,6 +174,7 @@ public class MongoDB {
                 String writeConcern = connectionParameters.has("writeConcern") ? connectionParameters.getString("writeConcern") : null;
                 String authDb = connectionParameters.has("authDb") ? connectionParameters.getString("authDb") : null;
                 MongoConnection connection = new MongoConnection(id);
+                connection.setOldId(oldId);
                 connection.setHost(host);
                 connection.setPort(port);
                 connection.isConnected(isConnected);

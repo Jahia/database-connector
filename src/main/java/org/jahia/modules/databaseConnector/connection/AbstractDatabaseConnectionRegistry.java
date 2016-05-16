@@ -52,8 +52,12 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
                 JCRNodeWrapper connectionNode;
                 if (isEdition) {
                     connectionNode = (JCRNodeWrapper) getDatabaseConnectionNode(connection.getOldId(), session);
-                    Assert.isTrue(connectionNode.getPrimaryNodeTypeName().equals(nodeType), "Stored node's primary type not equal "+nodeType);
-                    session.checkout(connectionNode);
+                    if (isConnectionIdAvailable(connection.getId(), session)) {
+                        Assert.isTrue(connectionNode.getPrimaryNodeTypeName().equals(nodeType), "Stored node's primary type not equal " + nodeType);
+                        session.checkout(connectionNode);
+                    } else {
+                      return false;
+                    }
                 }
                 else {
                     // As is the id of a database connection is editable, if you need it to be final uncomment
@@ -62,9 +66,13 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
                     // for id in the file dc_serverSettings.html.serverSettings.flow.enterConfig.jsp and get rid of
                     // the javascript code corresponding to the warning modal
 //                    connectionNode = databaseConnectorNode.addNode(connection.getId(), nodeType);
-                    connectionNode = databaseConnectorNode.addNode(
-                            JCRContentUtils.findAvailableNodeName(databaseConnectorNode, connection.getDatabaseType().name().toLowerCase()),
-                            nodeType);
+                    if (isConnectionIdAvailable(connection.getId(), session)) {
+                        connectionNode = databaseConnectorNode.addNode(
+                                JCRContentUtils.findAvailableNodeName(databaseConnectorNode, connection.getDatabaseType().name().toLowerCase()),
+                                nodeType);
+                    } else {
+                        return false;
+                    }
                 }
                 connectionNode.setProperty(ID_KEY, connection.getId());
                 if (connection.getHost() != null) {
@@ -176,6 +184,12 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
             throw new IllegalArgumentException("No database connection with ID '"+databaseConnectionId+"' stored in the JCR");
         }
         return nodes.nextNode();
+    }
+
+    private boolean isConnectionIdAvailable(String databaseConnectionId, JCRSessionWrapper session) throws RepositoryException{
+        String statement = "SELECT * FROM [" + NODE_TYPE + "] WHERE [" + ID_KEY + "] = '" + databaseConnectionId + "'";
+        NodeIterator nodes = query(statement, session).getNodes();
+        return !nodes.hasNext();
     }
 
     protected JCRNodeWrapper getDatabaseConnectorNode(JCRSessionWrapper session) throws RepositoryException {

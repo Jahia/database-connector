@@ -71,7 +71,7 @@ public class DCAPI {
 
     //SUBRESOURCES MAPPINGS
     @Path(MongoDB.MAPPING)
-    public Class<MongoDB> getSaveToJCRSubResource() {
+    public Class<MongoDB> getMongoDbSubResource() {
         return MongoDB.class;
     }
 }
