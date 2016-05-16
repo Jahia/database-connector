@@ -40,19 +40,15 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                 QueryResult queryResult = query("SELECT * FROM ["+ NODE_TYPE +"]", session);
                 NodeIterator it = queryResult.getNodes();
                 while (it.hasNext()) {
-                    JCRNodeWrapper connection = (JCRNodeWrapper) it.next();
-                    String id = connection.getProperty(ID_KEY).getString();
-                    String host = connection.getProperty(HOST_KEY).getString();
-                    Integer port = (int) connection.getProperty(PORT_KEY).getLong();
-                    Boolean isConnected = connection.getProperty(IS_CONNECTED_KEY).getBoolean();
-                    String password = connection.hasProperty(PASSWORD_KEY) ?
-                            connection.getProperty(PASSWORD_KEY).getString() : null;
-                    String user = connection.hasProperty(USER_KEY) ?
-                            decodePassword(connection.getProperty(PASSWORD_KEY).getString()) : null;
-                    Integer timeout = connection.hasProperty(TIMEOUT_KEY) ?
-                            (int) connection.getProperty(TIMEOUT_KEY).getLong() : null;
-                    Integer weight = connection.hasProperty(WEIGHT_KEY) ?
-                            (int) connection.getProperty(WEIGHT_KEY).getLong() : null;
+                    JCRNodeWrapper connectionNode = (JCRNodeWrapper) it.next();
+                    String id = setStringConnectionProperty(connectionNode, ID_KEY, true);
+                    String host = setStringConnectionProperty(connectionNode, HOST_KEY, true);
+                    Integer port = setIntegerConnectionProperty(connectionNode, PORT_KEY, true);
+                    Boolean isConnected = setBooleanConnectionProperty(connectionNode, IS_CONNECTED_KEY);
+                    String password = decodePassword(connectionNode, PASSWORD_KEY);
+                    String user = setStringConnectionProperty(connectionNode, USER_KEY, false);
+                    Integer timeout = setIntegerConnectionProperty(connectionNode, TIMEOUT_KEY, false);
+                    Integer weight = setIntegerConnectionProperty(connectionNode, WEIGHT_KEY, false);
                     RedisConnection storedConnection =
                             new RedisConnection(id, host, port, isConnected, password, user, null, timeout, weight);
                     registry.put(id, storedConnection);

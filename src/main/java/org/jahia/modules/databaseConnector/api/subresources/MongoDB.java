@@ -23,11 +23,15 @@
  */
 package org.jahia.modules.databaseConnector.api.subresources;
 
+import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
+import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
 import org.jahia.services.content.JCRTemplate;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,13 +85,102 @@ public class MongoDB {
     }
 
     @POST
-    @Path("/addeditconnection/{isEdition}")
+    @Path("/add")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addEditConnection(@PathParam("isEdition") Boolean isEdition, String data) {
+    public Response addConnection(String data) {
         try {
-            databaseConnector.addEditConnection(data, isEdition);
-            return Response.status(Response.Status.OK).entity("{\"success\": \"" + (isEdition ? "Connection successfully edited" : "Successfully connected to database") + "\"}").build();
+            JSONObject connectionParameters = new JSONObject(data);
+            JSONArray missingParameters = new JSONArray();
+            if (!connectionParameters.has("id") || StringUtils.isEmpty(connectionParameters.getString("id"))) {
+                missingParameters.put("id");
+            }
+            if (!connectionParameters.has("host") || StringUtils.isEmpty(connectionParameters.getString("host"))) {
+                missingParameters.put("host");
+            }
+            if (!connectionParameters.has("port") || StringUtils.isEmpty(connectionParameters.getString("port"))) {
+                missingParameters.put("port");
+            }
+            if (!connectionParameters.has("dbName") || StringUtils.isEmpty(connectionParameters.getString("dbName"))) {
+                missingParameters.put("dbName");
+            }
+            if (missingParameters.length() > 0) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("{\"missingParameters\":" + missingParameters.toString() + "}").build();
+            } else {
+                String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
+                String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
+                Integer port = connectionParameters.has("port") ? connectionParameters.getInt("port") : null;
+                Boolean isConnected = connectionParameters.has("isConnected") ? connectionParameters.getBoolean("isConnected") : false;
+                String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
+                String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
+                String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
+                String writeConcern = connectionParameters.has("writeConcern") ? connectionParameters.getString("writeConcern") : null;
+                String authDb = connectionParameters.has("authDb") ? connectionParameters.getString("authDb") : null;
+                MongoConnection connection = new MongoConnection(id);
+                connection.setHost(host);
+                connection.setPort(port);
+                connection.isConnected(isConnected);
+                connection.setDbName(dbName);
+                connection.setUser(user);
+                connection.setPassword(password);
+                connection.setWriteConcern(writeConcern);
+                connection.setAuthDb(authDb);
+                databaseConnector.addEditConnection(connection, false);
+                return Response.status(Response.Status.OK).entity("{\"success\": \"Connection successfully added\"}").build();
+            }
+        } catch(JSONException e) {
+            logger.error("Cannot parse json data : {}", data);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
+        } catch (UnknownHostException ex) {
+            logger.error("Cannot add connection: {}", data);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Invalid connection parameters\"}").build();
+        }
+    }
+
+    @PUT
+    @Path("/edit")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response editConnection(String data) {
+        try {
+            JSONObject connectionParameters = new JSONObject(data);
+            JSONArray missingParameters = new JSONArray();
+            if (!connectionParameters.has("id") || StringUtils.isEmpty(connectionParameters.getString("id"))) {
+                missingParameters.put("id");
+            }
+            if (!connectionParameters.has("host") || StringUtils.isEmpty(connectionParameters.getString("host"))) {
+                missingParameters.put("host");
+            }
+            if (!connectionParameters.has("port") || StringUtils.isEmpty(connectionParameters.getString("port"))) {
+                missingParameters.put("port");
+            }
+            if (!connectionParameters.has("dbName") || StringUtils.isEmpty(connectionParameters.getString("dbName"))) {
+                missingParameters.put("dbName");
+            }
+            if (missingParameters.length() > 0) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("{\"missingParameters\":" + missingParameters.toString() + "}").build();
+            } else {
+                String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
+                String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
+                Integer port = connectionParameters.has("port") ? connectionParameters.getInt("port") : null;
+                Boolean isConnected = connectionParameters.has("isConnected") ? connectionParameters.getBoolean("isConnected") : false;
+                String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
+                String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
+                String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
+                String writeConcern = connectionParameters.has("writeConcern") ? connectionParameters.getString("writeConcern") : null;
+                String authDb = connectionParameters.has("authDb") ? connectionParameters.getString("authDb") : null;
+                MongoConnection connection = new MongoConnection(id);
+                connection.setHost(host);
+                connection.setPort(port);
+                connection.isConnected(isConnected);
+                connection.setDbName(dbName);
+                connection.setUser(user);
+                connection.setPassword(password);
+                connection.setWriteConcern(writeConcern);
+                connection.setAuthDb(authDb);
+                databaseConnector.addEditConnection(connection, true);
+                return Response.status(Response.Status.OK).entity("{\"success\": \"Connection successfully edited\"}").build();
+            }
         } catch(JSONException e) {
             logger.error("Cannot parse json data : {}", data);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
@@ -98,7 +191,7 @@ public class MongoDB {
     }
 
     @DELETE
-    @Path("/removeconnection/{connectionId}")
+    @Path("/remove/{connectionId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response removeConnection(@PathParam("connectionId") String connectionId) {
         databaseConnector.removeConnection(connectionId, DatabaseTypes.MONGO);

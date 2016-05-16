@@ -8,75 +8,98 @@ import java.io.Serializable;
  * @author Frédéric Pierre
  * @version 1.0
  */
-public class ConnectionData implements Serializable {
+public abstract class ConnectionData implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final String id;
+    protected String id;
 
-    private final String host;
+    protected String host;
 
-    private final Integer port;
+    protected Integer port;
 
-    private final Boolean isConnected;
+    protected Boolean isConnected;
 
-    private final String dbName;
+    protected String dbName;
 
-    private final String uri;
+    protected String uri;
 
-    private final String user;
+    protected String user;
 
-    private final String password;
+    protected String password;
 
-    private final DatabaseTypes databaseType;
-
-    public ConnectionData(String id, String host, Integer port,  Boolean isConnected, String dbName,
-                          String uri, String user, String password, DatabaseTypes databaseType) {
-        this.id = id;
-        this.host = host;
-        this.port = port;
-        this.isConnected = isConnected;
-        this.dbName = dbName;
-        this.uri = uri;
-        this.user = user;
-        this.password = password;
-        this.databaseType = databaseType;
-    }
+    protected DatabaseTypes databaseType;
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getHost() {
         return host;
     }
 
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     public Integer getPort() {
         return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
     }
 
     public Boolean getIsConnected() {
         return isConnected;
     }
 
+    public void isConnected(Boolean connected) {
+        isConnected = connected;
+    }
+
     public String getDbName() {
         return dbName;
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
     }
 
     public String getUri() {
         return uri;
     }
 
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
     public String getUser() {
         return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public String getPassword() {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public DatabaseTypes getDatabaseType() {
         return databaseType;
+    }
+
+    public void setDatabaseType(DatabaseTypes databaseType) {
+        this.databaseType = databaseType;
     }
 
     public String getDisplayName() {

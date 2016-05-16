@@ -71,6 +71,7 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
     protected void registerAsService() {
         Object service = beforeRegisterAsService();
         registerAsService(service, false);
+        this.isConnected = true;
     }
 
     public void unregisterAsService() {
@@ -80,6 +81,7 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
             serviceRegistration.unregister();
         }
         serviceRegistrations.clear();
+        this.isConnected = false;
         logger.info("OSGi services successfully unregistered for DatabaseConnection of type {} with id '{}'", getDatabaseType().getDisplayName(), id);
     }
 

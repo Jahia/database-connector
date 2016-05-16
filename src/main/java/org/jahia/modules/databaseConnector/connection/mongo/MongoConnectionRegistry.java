@@ -7,12 +7,10 @@ import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.query.QueryResult;
-import java.net.UnknownHostException;
 import java.util.Map;
 
 import static org.jahia.modules.databaseConnector.Utils.query;
@@ -44,21 +42,25 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                 NodeIterator it = queryResult.getNodes();
                 while (it.hasNext()) {
                     JCRNodeWrapper connectionNode = (JCRNodeWrapper) it.next();
-                    String id = connectionNode.getProperty(ID_KEY).getString();
-                    String host = connectionNode.getProperty(HOST_KEY).getString();
-                    Integer port = (int) connectionNode.getProperty(PORT_KEY).getLong();
-                    Boolean isConnected = connectionNode.getProperty(IS_CONNECTED_KEY).getBoolean();
-                    String dbName = connectionNode.hasProperty(DB_NAME_KEY) ? connectionNode.getProperty(DB_NAME_KEY).getString() : null;
-                    String user = connectionNode.hasProperty(USER_KEY) ? connectionNode.getProperty(USER_KEY).getString() : null;
-                    String password = connectionNode.hasProperty(PASSWORD_KEY) ? decodePassword(connectionNode.getProperty(PASSWORD_KEY).getString()) : null;
-                    String writeConcern = connectionNode.hasProperty(WRITE_CONCERN_KEY) ? connectionNode.getProperty(WRITE_CONCERN_KEY).getString() : null;
-                    String dbAuth = connectionNode.hasProperty(AUTH_DB_KEY) ? connectionNode.getProperty(AUTH_DB_KEY).getString() : null;
-                    try {
-                        MongoConnection storedConnection = new MongoConnection(id, host, port, isConnected, dbName, user, password, dbAuth, writeConcern);
-                        registry.put(id, storedConnection);
-                    } catch (UnknownHostException e) {
-                        logger.error(e.getMessage(), e);
-                    }
+                    String id = setStringConnectionProperty(connectionNode, ID_KEY, true);
+                    String host = setStringConnectionProperty(connectionNode, HOST_KEY, true);
+                    Integer port = setIntegerConnectionProperty(connectionNode, PORT_KEY, true);
+                    Boolean isConnected = setBooleanConnectionProperty(connectionNode, IS_CONNECTED_KEY);
+                    String dbName = setStringConnectionProperty(connectionNode, DB_NAME_KEY, false);
+                    String user = setStringConnectionProperty(connectionNode, USER_KEY, false);
+                    String password = decodePassword(connectionNode, PASSWORD_KEY);
+                    String writeConcern = setStringConnectionProperty(connectionNode, WRITE_CONCERN_KEY, false);
+                    String authDb = setStringConnectionProperty(connectionNode, AUTH_DB_KEY, false);
+                    MongoConnection storedConnection = new MongoConnection(id);
+                    storedConnection.setHost(host);
+                    storedConnection.setPort(port);
+                    storedConnection.isConnected(isConnected);
+                    storedConnection.setDbName(dbName);
+                    storedConnection.setUser(user);
+                    storedConnection.setPassword(password);
+                    storedConnection.setWriteConcern(writeConcern);
+                    storedConnection.setAuthDb(authDb);
+                    registry.put(id, storedConnection);
                 }
                 return true;
             }
@@ -72,9 +74,6 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
     }
 
     public boolean addEditConnection(final AbstractConnection connection, final Boolean isEdition) {
-        Assert.hasText(connection.getHost(), "Host must be defined");
-        Assert.notNull(connection.getPort(), "Port must be defined");
-        Assert.hasText(connection.getDbName(), "DB name must be defined");
         MongoConnection mongoConnection = (MongoConnection) connection;
         if (storeConnection(connection, NODE_TYPE, isEdition)) {
             if (isEdition) {

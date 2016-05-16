@@ -3,7 +3,6 @@ package org.jahia.modules.databaseConnector.connection.redis;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.modules.databaseConnector.connection.ConnectionData;
 
 /**
@@ -14,23 +13,28 @@ import org.jahia.modules.databaseConnector.connection.ConnectionData;
  */
 public class RedisConnectionData extends ConnectionData{
 
-    private final Integer timeout;
+    private Integer timeout;
 
-    private final Integer weight;
+    private Integer weight;
 
-    public RedisConnectionData(String id, String host, Integer port, Boolean isConnected, String dbName, String uri,
-                                   String user, String password, DatabaseTypes databaseType, Integer timeout, Integer weight) {
-        super(id, host, port, isConnected, dbName, uri, user, password, databaseType);
-        this.timeout = timeout;
-        this.weight = weight;
+    public RedisConnectionData(String id) {
+        this.id = id;
     }
 
     public Integer getTimeout() {
         return timeout;
     }
 
+    public void setTimeout(Integer timeout) {
+        this.timeout = timeout;
+    }
+
     public Integer getWeight() {
         return weight;
+    }
+
+    public void setWeight(Integer weight) {
+        this.weight = weight;
     }
 
     @JsonIgnore

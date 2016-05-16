@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jahia.modules.databaseConnector.connection.ConnectionData;
-import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.MONGO;
 
 public class MongoConnectionData extends ConnectionData {
 
@@ -12,19 +11,24 @@ public class MongoConnectionData extends ConnectionData {
 
     private String authDb;
 
-    public MongoConnectionData(String id, String host, Integer port, Boolean isConnected, String dbName,
-                               String uri, String user, String password, String authDb, String writeConcern) {
-        super(id, host, port, isConnected, dbName, uri, user, password, MONGO);
-        this.writeConcern = writeConcern;
-        this.authDb = authDb;
+    public MongoConnectionData(String id) {
+        this.id = id;
     }
 
     public String getWriteConcern() {
         return this.writeConcern;
     }
 
+    public void setWriteConcern(String writeConcern) {
+        this.writeConcern = writeConcern;
+    }
+
     public String getAuthDb() {
         return this.authDb;
+    }
+
+    public void setAuthDb(String authDb) {
+        this.authDb = authDb;
     }
 
     @JsonIgnore

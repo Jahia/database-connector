@@ -192,7 +192,19 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
         return EncryptionUtils.passwordBaseEncrypt(password);
     }
 
-    protected String decodePassword(String encryptedPassword) {
-        return EncryptionUtils.passwordBaseDecrypt(encryptedPassword);
+    protected String decodePassword(JCRNodeWrapper connectionNode, String property) throws RepositoryException{
+        return connectionNode.hasProperty(property) ? EncryptionUtils.passwordBaseDecrypt(connectionNode.getProperty(property).getString()) : null;
+    }
+
+    protected String setStringConnectionProperty(JCRNodeWrapper connectionNode, String property, boolean isMandatory) throws RepositoryException {
+        return isMandatory ? connectionNode.getProperty(property).getString() : connectionNode.hasProperty(property) ? connectionNode.getProperty(property).getString() : null;
+    }
+
+    protected Boolean setBooleanConnectionProperty(JCRNodeWrapper connectionNode, String property) throws RepositoryException {
+        return connectionNode.getProperty(property).getBoolean();
+    }
+
+    protected Integer setIntegerConnectionProperty(JCRNodeWrapper connectionNode, String property, boolean isMandatory) throws RepositoryException {
+        return isMandatory ? (int) connectionNode.getProperty(property).getLong() : connectionNode.hasProperty(property) ? (int) connectionNode.getProperty(property).getLong() : null;
     }
 }

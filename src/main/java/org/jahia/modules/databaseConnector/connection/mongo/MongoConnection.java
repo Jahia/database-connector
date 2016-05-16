@@ -5,9 +5,6 @@ import com.mongodb.client.MongoDatabase;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-
 /**
  * Date: 11/1/2013
  *
@@ -30,39 +27,27 @@ public class MongoConnection extends AbstractConnection {
 
     private MongoClient mongoClient;
 
-    private final String writeConcern;
+    private String writeConcern;
 
-    private final String authDb;
+    private String authDb;
 
-    public MongoConnection(String id, String host, Integer port, Boolean isConnected) throws UnknownHostException {
-        this(id, host, port, isConnected, null, null, null, null);
+    public MongoConnection(String id) {
+        this.id = id;
+        this.writeConcern = WRITE_CONCERN_DEFAULT_VALUE;
     }
-
-    public MongoConnection(String id, String host, Integer port, Boolean isConnected, String dbName) throws UnknownHostException {
-        this(id, host, port, isConnected, dbName, null, null, null);
-    }
-
-    public MongoConnection(String id, String host, Integer port, Boolean isConnected, String dbName, String user, String password) throws UnknownHostException {
-        this(id, host, port, isConnected, dbName, user, password, null);
-    }
-
-    public MongoConnection(String id, String host, Integer port, Boolean isConnected, String dbName, String user, String password, String authDb) throws UnknownHostException {
-        this(id, host, port, isConnected, dbName, user, password, authDb, null);
-    }
-
-    public MongoConnection(String id, String host, Integer port, Boolean isConnected, String dbName, String user, String password, String authDb, String writeConcern) throws UnknownHostException {
-        if (writeConcern == null) {
-            this.writeConcern = WRITE_CONCERN_DEFAULT_VALUE;
-        }
-        else {
-            this.writeConcern = writeConcern;
-        }
-        this.authDb = authDb;
-    }
-
 
     public MongoConnectionData makeConnectionData() {
-        return new MongoConnectionData(id, host, port, isConnected, dbName, uri, user, password, authDb, writeConcern);
+        MongoConnectionData mongoConnectionData = new MongoConnectionData(id);
+        mongoConnectionData.setHost(host);
+        mongoConnectionData.setPort(port);
+        mongoConnectionData.isConnected(isConnected);
+        mongoConnectionData.setDbName(dbName);
+        mongoConnectionData.setUser(user);
+        mongoConnectionData.setPassword(password);
+        mongoConnectionData.setWriteConcern(writeConcern);
+        mongoConnectionData.setAuthDb(authDb);
+        mongoConnectionData.setDatabaseType(DATABASE_TYPE);
+        return mongoConnectionData;
     }
 
     @Override
@@ -86,6 +71,14 @@ public class MongoConnection extends AbstractConnection {
 
     public String getAuthDb() {
         return this.authDb;
+    }
+
+    public void setWriteConcern(String writeConcern) {
+        this.writeConcern = writeConcern;
+    }
+
+    public void setAuthDb(String authDb) {
+        this.authDb = authDb;
     }
 
     private String buildUri() {

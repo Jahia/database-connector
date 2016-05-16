@@ -51,7 +51,17 @@ public class RedisConnection extends AbstractConnection {
 
     @Override
     public RedisConnectionData makeConnectionData() {
-        return new RedisConnectionData(id, host, port, isConnected, dbName, uri, user, password, databaseType, timeout, weight);
+        RedisConnectionData redisConnectionData = new RedisConnectionData(id);
+        redisConnectionData.setHost(host);
+        redisConnectionData.setPort(port);
+        redisConnectionData.isConnected(isConnected);
+        redisConnectionData.setDbName(dbName);
+        redisConnectionData.setUser(user);
+        redisConnectionData.setPassword(password);
+        redisConnectionData.setTimeout(timeout);
+        redisConnectionData.setWeight(weight);
+        redisConnectionData.setDatabaseType(DATABASE_TYPE);
+        return redisConnectionData;
     }
 
     @Override

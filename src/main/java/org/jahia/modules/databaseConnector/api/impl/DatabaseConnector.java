@@ -76,19 +76,7 @@ public class DatabaseConnector extends AbstractResource {
         return connections == null ? new JSONArray().toString() : connections;
     }
 
-    public boolean addEditConnection(String data, Boolean isEdition) throws JSONException, UnknownHostException{
-        JSONObject connectionParameters = new JSONObject(data);
-        String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
-        String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
-        Integer port = connectionParameters.has("port") ? connectionParameters.getInt("port") : null;
-        Boolean isConnected = connectionParameters.has("isConnected") ? connectionParameters.getBoolean("isConnected") : false;
-        String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
-        String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
-        String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
-        String writeConcern = connectionParameters.has("writeConcern") ? connectionParameters.getString("writeConcern") : null;
-        String authDb = connectionParameters.has("authDb") ? connectionParameters.getString("authDb") : null;
-        AbstractConnection connection = new MongoConnection(id, host, port, isConnected, dbName, user,
-        password, authDb, writeConcern);
+    public boolean addEditConnection(AbstractConnection connection, Boolean isEdition) throws JSONException, UnknownHostException{
         return databaseConnectorManager.addEditConnection(connection, isEdition);
     }
 
