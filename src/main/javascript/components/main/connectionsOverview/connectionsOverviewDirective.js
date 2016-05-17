@@ -109,6 +109,7 @@
         }
 
         function resetCreationProcess() {
+            $scope.cpc.connection = {};
             $scope.cpc.databaseTypeSelected = false;
             $scope.cpc.selectedDatabaseType = '';
         }

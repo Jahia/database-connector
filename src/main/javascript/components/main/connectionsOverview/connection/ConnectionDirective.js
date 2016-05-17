@@ -23,7 +23,7 @@
         .module('databaseConnector')
         .directive('dcMongoConnection', ['$log', 'contextualData', Connection]);
 
-    var ConnectionController = function($scope, contextualData, dcDataFactory, $mdDialog) {
+    var ConnectionController = function($scope, contextualData, dcDataFactory, $mdDialog, $filter) {
         var cc = this;
         cc.imageUrl = contextualData.context + '/modules/database-connector/images/' + cc.connection.databaseType + '/logo_60.png';
         cc.originalConnection = angular.copy(cc.connection);
@@ -31,6 +31,15 @@
         cc.openDeleteConnectionDialog = openDeleteConnectionDialog;
         cc.editConnection = editConnection;
 
+        init();
+
+        function init() {
+            //Replace any null values, so they dont show up.
+            for (var i in cc.connection) {
+               cc.connection[i] = $filter('replaceNull')(cc.connection[i]);
+            }
+            cc.originalConnection = angular.copy(cc.connection);
+        }
         function updateConnection(connect) {
             var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[cc.connection.databaseType] + '/' + (connect ? 'connect' : 'disconnect') + '/' + cc.connection.id;
             dcDataFactory.customRequest({
@@ -103,7 +112,7 @@
         }
     };
 
-    ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog'];
+    ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', '$filter'];
     
     function EditConnectionPopupController($scope, $mdDialog, connection) {
         $scope.ecp = this;

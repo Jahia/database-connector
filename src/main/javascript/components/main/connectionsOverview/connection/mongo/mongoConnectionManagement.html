@@ -52,7 +52,7 @@
             <input type="password" name="password" ng-model="cmcc.connection.password" ng-change="cmcc.updateIsEmpty('password');">
         </md-input-container>
 
-        <md-input-container class="md-block" ng-if="!cmcc.isEmpty.password">
+        <md-input-container class="md-block" ng-if="!cmcc.isEmpty.password && !cmcc.isEmpty.user">
             <label>Authentication Database</label>
             <input required name="authDb" ng-model="cmcc.connection.authDb" >
             <div ng-messages="mongoForm.authDb.$error">
