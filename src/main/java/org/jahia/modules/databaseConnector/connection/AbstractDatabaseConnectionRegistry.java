@@ -51,13 +51,13 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
                 session.checkout(databaseConnectorNode);
                 JCRNodeWrapper connectionNode;
                 if (isEdition) {
-                    connectionNode = (JCRNodeWrapper) getDatabaseConnectionNode(connection.getOldId(), session);
-                    if (isConnectionIdAvailable(connection.getId(), session)) {
-                        Assert.isTrue(connectionNode.getPrimaryNodeTypeName().equals(nodeType), "Stored node's primary type not equal " + nodeType);
-                        session.checkout(connectionNode);
-                    } else {
-                      return false;
+                    if (!connection.getId().equals(connection.getOldId()) && !isConnectionIdAvailable(connection.getId(), session)) {
+                        return false;
                     }
+                    connectionNode = (JCRNodeWrapper) getDatabaseConnectionNode(connection.getOldId(), session);
+                    Assert.isTrue(connectionNode.getPrimaryNodeTypeName().equals(nodeType), "Stored node's primary type not equal " + nodeType);
+                    session.checkout(connectionNode);
+
                 }
                 else {
                     // As is the id of a database connection is editable, if you need it to be final uncomment

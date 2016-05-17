@@ -1,0 +1,14 @@
+<md-dialog>
+    <form >
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                Update  Connection
+            </div>
+        </md-toolbar>
+        <md-dialog-content class="databaseSelection">
+            <div ng-switch="ecp.connection.databaseType">
+                <mongo-connection-management ng-switch-when="MONGO" mode="edit" connection="ecp.connection"></mongo-connection-management>
+            </div>
+        </md-dialog-content>
+    </form>
+</md-dialog>

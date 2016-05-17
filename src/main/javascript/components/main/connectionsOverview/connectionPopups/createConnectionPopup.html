@@ -17,7 +17,7 @@
                 </div>
             </div>
             <div ng-switch="cpc.selectedDatabaseType">
-                <create-mongo-connection ng-switch-when="MONGO"></create-mongo-connection>
+                <mongo-connection-management ng-switch-when="MONGO" mode="create" connection="cpc.connection"></mongo-connection-management>
             </div>
         </md-dialog-content>
     </form>

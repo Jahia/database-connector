@@ -66,7 +66,7 @@ public class MongoDB {
     }
 
     @GET
-    @Path("/getconnection/{databaseId}")
+    @Path("/connection/{databaseId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnection(@PathParam("databaseId") String databaseId) {
 

@@ -78,18 +78,32 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
         if (storeConnection(mongoConnection, NODE_TYPE, isEdition)) {
             if (isEdition) {
                 if (!mongoConnection.getId().equals(mongoConnection.getOldId())) {
+                    //If this connection has a new id, un register previous connection if it was registered.
                     if (registry.get(mongoConnection.getOldId()).isConnected()) {
                         registry.get(mongoConnection.getOldId()).unregisterAsService();
                     }
+                    //If new connection is connected, register it.
+                    if (mongoConnection.isConnected()) {
+                        mongoConnection.registerAsService();
+                    }
+                    //remove the old unused connection.
                     registry.remove(mongoConnection.getOldId());
+                } else {
+                    //If this is the same connection, register it if it was previously un registered, or vice versa.
+                    if(!mongoConnection.isConnected() && registry.get(mongoConnection.getId()).isConnected()) {
+                        registry.get(mongoConnection.getId()).unregisterAsService();
+                    } else if(mongoConnection.isConnected() && !registry.get(mongoConnection.getId()).isConnected()) {
+                        mongoConnection.registerAsService();
+                    }
                 }
+                //Add the new modified connection to the registry.
                 registry.put(mongoConnection.getId(), mongoConnection);
-            }
-            else {
+            } else {
+                //If this is a new connection, just add it to registry and register the service if it should be connected.
                 registry.put(mongoConnection.getId(), mongoConnection);
-            }
-            if (mongoConnection.isConnected()) {
-                mongoConnection.registerAsService();
+                if (mongoConnection.isConnected()) {
+                    mongoConnection.registerAsService();
+                }
             }
             return true;
         }

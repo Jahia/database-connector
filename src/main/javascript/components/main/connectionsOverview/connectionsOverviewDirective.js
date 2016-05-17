@@ -49,27 +49,26 @@
         }
 
         function createConnection(ev) {
-            console.log($mdDialog);
-
             $mdDialog.show({
                 locals: {
                     updateConnections: coc.getConnections
                 },
-                controller: ConnectionPopupsController,
-                templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connectionPopups/connectionPopups.html',
+                controller: CreateConnectionPopupController,
+                templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connectionPopups/createConnectionPopup.html',
                 parent: angular.element(document.body),
                 targetEvent: ev,
                 clickOutsideToClose:true,
                 fullscreen: true
-
-        })
+            }).then(function(){
+                getConnections();
+            }, function(){});
         }
     };
 
     connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog'];
 
 
-    function ConnectionPopupsController($scope, $mdDialog, contextualData, dcDataFactory, updateConnections) {
+    function CreateConnectionPopupController($scope, $mdDialog, contextualData, dcDataFactory) {
         $scope.cpc = this;
         $scope.cpc.databaseTypeSelected = false;
         $scope.cpc.setSelectedDatabaseType = setSelectedDatabaseType;
@@ -77,22 +76,12 @@
         init();
 
         function init() {
+            $scope.cpc.connection = {};
             getDatabaseTypes();
         }
 
-        $scope.hide = function() {
-            $mdDialog.hide();
-        };
-        $scope.cancel = function() {
-            $mdDialog.cancel();
-        };
-        $scope.answer = function(answer) {
-            $mdDialog.hide(answer);
-        };
-
         $scope.$on('connectionSuccessfullyCreated', function(){
-            updateConnections();
-            $scope.hide();
+            $mdDialog.hide();
         });
 
         $scope.$on('creationCancelled', function() {
@@ -123,11 +112,8 @@
         }
     
     }
-
     
-    ConnectionPopupsController.$inject = ['$scope', '$mdDialog', 'contextualData', 'dcDataFactory', 'updateConnections'];
-
-
+    CreateConnectionPopupController.$inject = ['$scope', '$mdDialog', 'contextualData', 'dcDataFactory', 'updateConnections'];
 
 })();
 
