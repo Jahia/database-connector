@@ -17,7 +17,6 @@
         return directive;
 
         function linkFunc(scope, el, attr, ctrls) {}
-
     };
 
     angular
@@ -64,20 +63,15 @@
             var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[cc.connection.databaseType] + '/' +'remove'+ '/' + cc.connection.id;
             dcDataFactory.customRequest({
                 url: url,
-                method: 'DELETE',
+                method: 'DELETE'
             }).then(function(response){
                 cc.connection = response;
                 $scope.$emit('connectionSuccessfullyDeleted', null);
-
             }, function(response){
                 console.log('error connection not deleted', response);
             });
-
-
         }
         
-        
-
         function editConnection(ev) {
             $mdDialog.show({
                 locals: {
@@ -110,9 +104,7 @@
     };
 
     ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog'];
-
-
-
+    
     function EditConnectionPopupController($scope, $mdDialog, connection) {
         $scope.ecp = this;
         $scope.ecp.connection = connection;
@@ -124,15 +116,10 @@
         $scope.$on('creationCancelled', function() {
             $mdDialog.cancel();
         });
-
-
     }
 
     EditConnectionPopupController.$inject = ['$scope', '$mdDialog', 'connection'];
-
-
-
-
+    
     function DeleteConnectionPopupController($scope, $mdDialog) {
         $scope.dcp = this;
         $scope.dcp.cancel = cancel;
@@ -143,19 +130,10 @@
         }
 
         function deleteConnection() {
-            console.log('deleting');
             $mdDialog.hide();
         }
-
-        $scope.$on('connectionSuccessfullyDeleted', function(){
-            getConnections();
-        });
     }
 
-
-
     DeleteConnectionPopupController.$inject = ['$scope', '$mdDialog'];
-
-
-
+    
 })();

@@ -63,6 +63,10 @@
                 getConnections();
             }, function(){});
         }
+
+        $scope.$on('connectionSuccessfullyDeleted', function(){
+            getConnections();
+        });
     };
 
     connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog'];
@@ -89,9 +93,6 @@
             resetCreationProcess();
         });
 
-        $scope.$on('connectionSuccessfullyDeleted', function(){
-            getConnections();
-        });
 
         function getDatabaseTypes() {
             var url = contextualData.context + '/modules/databaseconnector/databasetypes';
@@ -119,7 +120,6 @@
     }
     
     CreateConnectionPopupController.$inject = ['$scope', '$mdDialog', 'contextualData', 'dcDataFactory', 'updateConnections'];
-
 })();
 
 
