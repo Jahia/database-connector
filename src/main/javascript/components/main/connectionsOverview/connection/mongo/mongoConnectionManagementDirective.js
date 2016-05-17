@@ -71,6 +71,19 @@
                 console.log('error', response);
             });
         }
+
+/*        function deleteMongoConnection() {
+            var url = contextualData.context + '/modules/databaseconnector/remove';
+            dcDataFactory.customRequest({
+                url: url,
+                method: 'DELETE',
+                data: cmcc.connection
+            }).then(function(response){
+                $scope.$emit('connectionSuccessfullyCreated', null);
+            }, function(response){
+                console.log('error', response);
+            });
+        }*/
         
          function cancelCreation() {
              $scope.$emit('creationCancelled', null);

@@ -1,0 +1,19 @@
+
+<md-dialog>
+    <form >
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                Delete  Connection
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div>
+                <span>You are about to delete a connection, this cannot be undone.</span>
+                <br/>
+                <span>Do you wish to to continue?</span>
+            </div>
+            <md-button class="md-button md-warn pull-right" ng-click="dcp.deleteConnection()">Delete</md-button>
+            <md-button class="md-button md-primary pull-right" ng-click="dcp.cancel()">Cancel</md-button>
+        </md-dialog-content>
+    </form>
+</md-dialog>
