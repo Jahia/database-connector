@@ -80,12 +80,17 @@
             getDatabaseTypes();
         }
 
+
         $scope.$on('connectionSuccessfullyCreated', function(){
             $mdDialog.hide();
         });
 
         $scope.$on('creationCancelled', function() {
             resetCreationProcess();
+        });
+
+        $scope.$on('connectionSuccessfullyDeleted', function(){
+            getConnections();
         });
 
         function getDatabaseTypes() {

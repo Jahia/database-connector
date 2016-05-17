@@ -73,6 +73,7 @@
                 console.log('error connection not deleted', response);
             });
 
+
         }
         
         
@@ -124,6 +125,7 @@
             $mdDialog.cancel();
         });
 
+
     }
 
     EditConnectionPopupController.$inject = ['$scope', '$mdDialog', 'connection'];
@@ -145,6 +147,9 @@
             $mdDialog.hide();
         }
 
+        $scope.$on('connectionSuccessfullyDeleted', function(){
+            getConnections();
+        });
     }
 
 
