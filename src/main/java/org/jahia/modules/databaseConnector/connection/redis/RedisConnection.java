@@ -73,4 +73,9 @@ public class RedisConnection extends AbstractConnection {
     public void beforeUnregisterAsService() {
 
     }
+
+    @Override
+    public boolean testConnectionCreation() {
+        return false;
+    }
 }

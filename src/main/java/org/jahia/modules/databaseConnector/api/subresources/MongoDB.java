@@ -131,9 +131,6 @@ public class MongoDB {
         } catch(JSONException e) {
             logger.error("Cannot parse json data : {}", data);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
-        } catch (UnknownHostException ex) {
-            logger.error("Cannot add connection: {}", data);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Invalid connection parameters\"}").build();
         }
     }
 
@@ -189,9 +186,6 @@ public class MongoDB {
         } catch(JSONException e) {
             logger.error("Cannot parse json data : {}", data);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
-        } catch (UnknownHostException ex) {
-            logger.error("Cannot add connection: {}", data);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Invalid connection parameters\"}").build();
         }
     }
 
@@ -219,5 +213,54 @@ public class MongoDB {
     public Response disconnect(@PathParam("connectionId") String connectionId) {
         databaseConnector.updateConnection(connectionId, DatabaseTypes.MONGO, false);
         return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully disconnected from database\"}").build();
+    }
+
+    @POST
+    @Path("/testconnection")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response testConnection(String data) {
+        try {
+            JSONObject connectionParameters = new JSONObject(data);
+            JSONArray missingParameters = new JSONArray();
+            if (!connectionParameters.has("id") || StringUtils.isEmpty(connectionParameters.getString("id"))) {
+                missingParameters.put("id");
+            }
+            if (!connectionParameters.has("host") || StringUtils.isEmpty(connectionParameters.getString("host"))) {
+                missingParameters.put("host");
+            }
+            if (!connectionParameters.has("port") || StringUtils.isEmpty(connectionParameters.getString("port"))) {
+                missingParameters.put("port");
+            }
+            if (!connectionParameters.has("dbName") || StringUtils.isEmpty(connectionParameters.getString("dbName"))) {
+                missingParameters.put("dbName");
+            }
+            if (missingParameters.length() > 0) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("{\"missingParameters\":" + missingParameters.toString() + "}").build();
+            } else {
+                String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
+                String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
+                Integer port = connectionParameters.has("port") ? connectionParameters.getInt("port") : null;
+                Boolean isConnected = connectionParameters.has("isConnected") ? connectionParameters.getBoolean("isConnected") : false;
+                String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
+                String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
+                String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
+                String writeConcern = connectionParameters.has("writeConcern") ? connectionParameters.getString("writeConcern") : null;
+                String authDb = connectionParameters.has("authDb") ? connectionParameters.getString("authDb") : null;
+                MongoConnection connection = new MongoConnection(id);
+                connection.setHost(host);
+                connection.setPort(port);
+                connection.isConnected(isConnected);
+                connection.setDbName(dbName);
+                connection.setUser(user);
+                connection.setPassword(password);
+                connection.setWriteConcern(writeConcern);
+                connection.setAuthDb(authDb);
+                return Response.status(Response.Status.OK).entity("{\"result\": " + databaseConnector.testConnection(connection) + "}").build();
+            }
+        } catch(JSONException e) {
+            logger.error("Cannot parse json data : {}", data);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
+        }
     }
 }

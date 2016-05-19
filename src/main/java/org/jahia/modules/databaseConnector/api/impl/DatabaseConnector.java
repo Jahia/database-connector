@@ -76,10 +76,13 @@ public class DatabaseConnector extends AbstractResource {
         return connections == null ? new JSONArray().toString() : connections;
     }
 
-    public boolean addEditConnection(AbstractConnection connection, Boolean isEdition) throws JSONException, UnknownHostException{
+    public boolean addEditConnection(AbstractConnection connection, Boolean isEdition){
         return databaseConnectorManager.addEditConnection(connection, isEdition);
     }
 
+    public boolean testConnection(AbstractConnection connection) {
+        return databaseConnectorManager.testConnection(connection);
+    }
 
     public boolean removeConnection(String connectionId, DatabaseTypes databaseType) {
         return databaseConnectorManager.removeConnection(connectionId, databaseType);

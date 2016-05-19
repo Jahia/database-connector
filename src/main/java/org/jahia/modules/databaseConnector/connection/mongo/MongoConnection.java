@@ -2,6 +2,7 @@ package org.jahia.modules.databaseConnector.connection.mongo;
 
 import com.mongodb.*;
 import com.mongodb.client.MongoDatabase;
+import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 
@@ -83,9 +84,9 @@ public class MongoConnection extends AbstractConnection {
 
     private String buildUri() {
         String uri = "mongodb://";
-        if (user != null) {
+        if (!StringUtils.isEmpty(user)) {
             uri += user;
-            if (password != null) {
+            if (!StringUtils.isEmpty(password)) {
                 uri += ":" + password;
             }
             uri += "@";
@@ -97,20 +98,32 @@ public class MongoConnection extends AbstractConnection {
 
         uri += "/";
 
-        if (authDb != null) {
+        if (!StringUtils.isEmpty(authDb)) {
             uri += authDb;
         }
 
         //If there are options or user, add query parameter start
         //@TODO add options array check when it is implemented
-        if (user != null) {
+        if (!StringUtils.isEmpty(user)) {
             uri += "?";
         }
 
         //Options to be added:
-        if (user != null) {
-            uri += (password != null ? "authMechanism=SCRAM-SHA-1" : "authMechanism=GSSAPI");
+        if (!StringUtils.isEmpty(user)) {
+            uri += (!StringUtils.isEmpty(password) ? "authMechanism=SCRAM-SHA-1" : "authMechanism=GSSAPI");
         }
         return uri;
+    }
+
+    @Override
+    public boolean testConnectionCreation() {
+        try {
+            mongoClient = new MongoClient(new MongoClientURI(buildUri(), MongoClientOptions.builder().serverSelectionTimeout(5000)));
+            mongoClient.getServerAddressList();
+        } catch (MongoTimeoutException ex) {
+            //If the connection timeouts, the connection is invalid.
+            return false;
+        }
+        return true;
     }
 }

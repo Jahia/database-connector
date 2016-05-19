@@ -25,13 +25,17 @@
         .module('databaseConnector')
         .directive('mongoConnectionManagement', ['$log', 'contextualData', mongoConnectionManagement]);
 
-    var mongoConnectionManagementController = function($scope, contextualData, dcDataFactory) {
+    var mongoConnectionManagementController = function($scope, contextualData, dcDataFactory, toaster) {
         var cmcc = this;
         cmcc.imageUrl = contextualData.context + '/modules/database-connector/images/' + cmcc.connection.databaseType + '/logo_60.png';
         cmcc.isEmpty = {};
-
+        cmcc.spinnerOptions = {
+            showSpinner: false,
+            mode: 'indeterminate'
+        };
         cmcc.createMongoConnection = createMongoConnection;
         cmcc.editMongoConnection = editMongoConnection;
+        cmcc.testMongoConnection = testMongoConnection;
         cmcc.cancelCreation = cancelCreation;
         cmcc.updateIsEmpty = updateIsEmpty;
 
@@ -72,15 +76,45 @@
             });
         }
 
-         function cancelCreation() {
-             $scope.$emit('creationCancelled', null);
-         }
+        function testMongoConnection() {
+            cmcc.spinnerOptions.showSpinner = true;
+            var url = contextualData.context + '/modules/databaseconnector/mongodb/testconnection';
+            dcDataFactory.customRequest({
+                url: url,
+                method: 'POST',
+                data: cmcc.connection
+            }).then(function(response){
+                if (response.result) {
+                    toaster.pop({
+                        type   : 'success',
+                        title: 'Connection is valid!',
+                        toastId: 'ctv',
+                        timeout: 3000
+                    });
+                } else {
+                    toaster.pop({
+                        type   : 'error',
+                        title: 'Connection is invalid!',
+                        toastId: 'cti',
+                        timeout: 3000
+                    });
+                }
+                cmcc.spinnerOptions.showSpinner = false;
+            }, function(response){
+                console.log('error', response);
+                cmcc.spinnerOptions.showSpinner = false;
+            });
+        }
+
+        function cancelCreation() {
+         $scope.$emit('creationCancelled', null);
+        }
 
         function updateIsEmpty(property) {
             return cmcc.isEmpty[property] = cmcc.connection[property] === undefined || cmcc.connection[property] === null || (typeof cmcc.connection[property] === 'string' && cmcc.connection[property].trim().length === 0);
         }
     };
 
-    mongoConnectionManagementController.$inject = ['$scope', 'contextualData','dcDataFactory'];
+    mongoConnectionManagementController.$inject = ['$scope', 'contextualData','dcDataFactory', 'toaster'];
 
 })();

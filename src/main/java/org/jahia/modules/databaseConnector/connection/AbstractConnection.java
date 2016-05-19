@@ -68,6 +68,8 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
 
     public abstract void beforeUnregisterAsService();
 
+    public abstract boolean testConnectionCreation();
+
     public void registerAsService() {
         Object service = beforeRegisterAsService();
         registerAsService(service, false);

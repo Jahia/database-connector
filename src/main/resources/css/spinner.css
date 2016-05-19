@@ -1,46 +1,17 @@
-.ffSpinner {
-    position:absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 1095;
-}
-.ffSpinnerBacksplash {
-    position:absolute;
-    top:0;
-    left:0;
+.overlay{
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1094;
-    background: white;
-    opacity: 0.65;
+    min-width:100px;
+    min-height:100px;
+    z-index: 100;
+    background-color: rgba(0,0,0,0.3); /*dim the background*/
 }
-.ffSpinnerright {
-    position:absolute;
-    top: 50%;
-    left: 75%;
-    z-index: 1095;
-}
-.ffSpinnerrightup {
-    position:absolute;
-    top: 25%;
-    left: 75%;
-    z-index: 1095;
-}
-.ffSpinnerleft {
-    position:absolute;
-    top: 50%;
-    left: 25%;
-    z-index: 1095;
-}
-.ffSpinnerleftup {
-    position:absolute;
-    top: 25%;
-    left: 25%;
-    z-index: 1095;
-}
-.ffSpinnerup {
-    position:absolute;
-    top: 25%;
-    left: 50%;
-    z-index: 1095;
+
+.spinner{
+    z-index:100;
+    position: absolute;
+    top: 47%; left: 47%;
 }

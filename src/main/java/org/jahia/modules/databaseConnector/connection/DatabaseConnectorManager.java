@@ -148,6 +148,10 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         return true;
     }
 
+    public boolean testConnection(AbstractConnection connection) {
+        return databaseConnectionRegistries.get(connection.getDatabaseType()).testConnection(connection);
+    }
+
     protected BundleContext getBundleContext() {
         return bundleContext;
     }

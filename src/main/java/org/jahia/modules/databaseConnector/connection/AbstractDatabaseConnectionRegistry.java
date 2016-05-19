@@ -221,4 +221,8 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
     protected Integer setIntegerConnectionProperty(JCRNodeWrapper connectionNode, String property, boolean isMandatory) throws RepositoryException {
         return isMandatory ? (int) connectionNode.getProperty(property).getLong() : connectionNode.hasProperty(property) ? (int) connectionNode.getProperty(property).getLong() : null;
     }
+
+    public boolean testConnection(AbstractConnection connection) {
+        return connection.testConnectionCreation();
+    }
 }

@@ -113,3 +113,11 @@ form legend {
     font-size: 0.8em;
     text-align: left;
     width: 100%; }
+
+.md-button.md-fab.md-success:not([disabled]){
+    background-color:#5cb85c;
+}
+
+.md-button.md-fab.md-success:not([disabled]):hover {
+    background-color:#5cb85c;
+}
