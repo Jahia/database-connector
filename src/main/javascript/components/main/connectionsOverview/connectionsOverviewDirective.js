@@ -37,14 +37,7 @@
                 url: url,
                 method: 'GET'
             }).then(function(response) {
-                coc.connections = [];
-                for (var i in response.connections) {
-                    if (i % 2 == 0) {
-                        coc.connections.push([response.connections[i]]);
-                    } else {
-                        coc.connections[coc.connections.length - 1].push(response.connections[i]);
-                    }
-                }
+                coc.connections = response.connections;
             }, function(response) {});
         }
 

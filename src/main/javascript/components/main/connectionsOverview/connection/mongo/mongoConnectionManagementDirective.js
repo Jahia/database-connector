@@ -51,28 +51,48 @@
             }
         }
         function createMongoConnection() {
+            cmcc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/mongodb/add';
             dcDataFactory.customRequest({
                 url: url,
                 method: 'POST',
                 data: cmcc.connection
             }).then(function(response){
+                cmcc.spinnerOptions.showSpinner = false;
                 $scope.$emit('connectionSuccessfullyCreated', null);
+                showConfirmationToast(response.connectionVerified);
             }, function(response){
+                cmcc.spinnerOptions.showSpinner = false;
                 console.log('error', response);
+                toaster.pop({
+                    type   : 'error',
+                    title: 'Connection is invalid!',
+                    toastId: 'cti',
+                    timeout: 3000
+                });
             });
         }
 
         function editMongoConnection() {
+            cmcc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/mongodb/edit';
             dcDataFactory.customRequest({
                 url: url,
                 method: 'PUT',
                 data: cmcc.connection
             }).then(function(response){
+                cmcc.spinnerOptions.showSpinner = false;
                 $scope.$emit('connectionSuccessfullyCreated', null);
+                showConfirmationToast(response.connectionVerified);
             }, function(response){
+                cmcc.spinnerOptions.showSpinner = false;
                 console.log('error', response);
+                toaster.pop({
+                    type   : 'error',
+                    title: 'Connection is invalid!',
+                    toastId: 'cti',
+                    timeout: 3000
+                });
             });
         }
 
@@ -112,6 +132,26 @@
 
         function updateIsEmpty(property) {
             return cmcc.isEmpty[property] = cmcc.connection[property] === undefined || cmcc.connection[property] === null || (typeof cmcc.connection[property] === 'string' && cmcc.connection[property].trim().length === 0);
+        }
+
+        function showConfirmationToast(verified) {
+            if (verified) {
+                toaster.pop({
+                    type   : 'success',
+                    title: 'Connection Successfully Saved!',
+                    body: 'Connection verification was successful!',
+                    toastId: 'cm',
+                    timeout: 4000
+                });
+            } else {
+                toaster.pop({
+                    type   : 'warning',
+                    title: 'Connection Successfully Saved!',
+                    body: 'Connection verification failed!',
+                    toastId: 'cm',
+                    timeout: 4000
+                });
+            }
         }
     };
 

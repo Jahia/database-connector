@@ -125,8 +125,16 @@ public class MongoDB {
                 connection.setPassword(password);
                 connection.setWriteConcern(writeConcern);
                 connection.setAuthDb(authDb);
+                JSONObject jsonAnswer = new JSONObject();
+                if (!databaseConnector.testConnection(connection)) {
+                    connection.isConnected(false);
+                    jsonAnswer.put("connectionVerified", false);
+                } else {
+                    jsonAnswer.put("connectionVerified", true);
+                }
                 databaseConnector.addEditConnection(connection, false);
-                return Response.status(Response.Status.OK).entity("{\"success\": \"Connection successfully added\"}").build();
+                jsonAnswer.put("success", "Connection successfully added");
+                return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
             }
         } catch(JSONException e) {
             logger.error("Cannot parse json data : {}", data);
@@ -180,8 +188,16 @@ public class MongoDB {
                 connection.setPassword(password);
                 connection.setWriteConcern(writeConcern);
                 connection.setAuthDb(authDb);
+                JSONObject jsonAnswer = new JSONObject();
+                if (!databaseConnector.testConnection(connection)) {
+                    connection.isConnected(false);
+                    jsonAnswer.put("connectionVerified", false);
+                } else {
+                    jsonAnswer.put("connectionVerified", true);
+                }
                 databaseConnector.addEditConnection(connection, true);
-                return Response.status(Response.Status.OK).entity("{\"success\": \"Connection successfully edited\"}").build();
+                jsonAnswer.put("success", "Connection successfully edited");
+                return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
             }
         } catch(JSONException e) {
             logger.error("Cannot parse json data : {}", data);
