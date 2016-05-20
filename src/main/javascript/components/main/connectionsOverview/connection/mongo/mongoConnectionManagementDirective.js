@@ -37,18 +37,30 @@
         cmcc.validations = {
             host: {
                 'required'      : 'Field is required',
-                'md-maxlength'  : 'This has to be less than the specified number of characters.',
-                'md-minlength'  : 'This has to be more than the specified number of characters.',
-                'pattern'       : 'The appropriate pattern is required'
+                'md-maxlength'  : 'This has to be less than 15 characters.',
+                'minlength'     : 'This has to be more than 4 characters.'
             },
             port:{
                 'required'      : 'Field is required',
-                'md-maxlength'  : 'This has to be less than the specified number of characters.',
+                'md-maxlength'  : 'This has to be less than 5 digits.',
                 'pattern'       : 'This should consist of a number ranging from 1 - 65535'
             },
             id: {
-                'required': 'Field is required',
-                'connection-id-validator' : 'This connection Id is already being used'
+                'required'      : 'Field is required',
+                'connection-id-validator' : 'This connection Id is already being used',
+                'pattern'       : 'The appropriate pattern is required',
+                'md-maxlength'  : 'This has to be less than 30 characters.',
+                'minlength'     : 'This has to be more than 5 characters.'
+
+            },
+            dbName: {
+                'required'      : 'Field is required',
+                'md-maxlength'  : 'This has to be less than 30 characters.',
+                'minlength'     : 'This has to be more than 5 characters.'
+
+            },
+            authDb:{
+                'required': 'Field is required'
             }
         };
 

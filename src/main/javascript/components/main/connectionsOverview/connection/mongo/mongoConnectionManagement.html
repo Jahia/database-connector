@@ -18,7 +18,7 @@
 
         <md-input-container class="md-block" flex-gt-sm="">
          <label>Host</label>
-            <input required="" md-maxlength="15" md-no-asterisk name="host" ng-model="cmcc.connection.host">
+            <input required="" ng-minlength="4" md-maxlength="15"  name="host" ng-model="cmcc.connection.host">
 
             <div ng-messages="mongoForm.host.$error">
                 <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.host">{{validationMessage}}</div>
@@ -35,15 +35,15 @@
 
         <md-input-container class="md-block">
             <label>Connection Name (id)</label>
-            <input md-maxlength="30" name="id" required ng-model="cmcc.connection.id" original-value="{{cmcc.connection.oldId}}" connection-id-validator>
-            <div ng-messages="mongoForm.id.$error" multiple>
+            <input ng-minlength="5" md-maxlength="30" name="id" required ng-model="cmcc.connection.id" original-value="{{cmcc.connection.oldId}}" connection-id-validator>
+            <div ng-messages="mongoForm.id.$error" >
                 <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.id">{{validationMessage}}</div>
             </div>
         </md-input-container>
 
         <md-input-container class="md-block">
             <label>Database Name</label>
-            <input md-maxlength="30" required name="dbName" ng-model="cmcc.connection.dbName" >
+            <input ng-minlength="5" md-maxlength="30" required name="dbName" ng-model="cmcc.connection.dbName" >
             <div ng-messages="mongoForm.dbName.$error">
                 <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.host">{{validationMessage}}</div>
             </div>
