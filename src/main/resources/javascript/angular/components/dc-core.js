@@ -1,4 +1,36 @@
 (function() {
+    var dataFactory = function($http, $log) {
+        return {
+            getData: getData,
+            customRequest: customRequest
+        };
+
+        function getData(url) {
+            return $http.get(url)
+                .then(getDataComplete)
+                .catch(getDataFailed);
+        }
+
+        function customRequest(obj) {
+            return $http(obj).then(getDataComplete);
+        }
+
+        function getDataComplete(response) {
+            return response.data;
+        }
+
+        function getDataFailed(error) {
+            $log.error('XHR Failed to execute your request.' + error.data);
+            return error.data;
+        }
+    };
+
+    dataFactory.$inject = ['$http', '$log'];
+
+    angular
+        .module('databaseConnector.dataFactory', [])
+        .factory('dcDataFactory', dataFactory);
+})();(function() {
 
     var DownloadZipFactory = function($log, $resource, contextualData) {
         return $resource(null, null,
@@ -48,7 +80,38 @@
         .factory('dcDownloadZipFactory', DownloadZipFactory);
 
 })();
-(function() {
+(function () {
+    'use strict';
+    var spinner = function(contextualData) {
+
+        var directive = {
+            restrict        : 'E',
+            templateUrl     : contextualData.context + '/modules/database-connector/javascript/angular/components/dcSpinner.html',
+            scope           : {
+                spinnerMode: '=',
+                show: '='
+            },
+            link            : linkFunc
+        };
+            return directive;
+
+            function linkFunc(scope, el, attr, ctrl) {}
+
+    };
+    angular
+        .module('databaseConnector')
+        .directive('dcSpinner', ['contextualData', spinner]);
+    
+})();(function() {
+    var replaceNull = function() {
+        return function(value) {
+            return value === null ? '' : value;
+        }
+    };
+
+    angular.module('databaseConnector')
+        .filter('replaceNull', [replaceNull]);
+})();(function() {
     'use strict';
 
     var i18nMessageKeyDirectiveFunction = function(i18nService) {
