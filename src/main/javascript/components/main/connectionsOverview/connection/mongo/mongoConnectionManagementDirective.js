@@ -48,7 +48,7 @@
             },
             id: {
                 'required': 'Field is required',
-                'connection-id-validator' : 'This database Id is already being used'
+                'connection-id-validator' : 'This connection Id is already being used'
             }
         };
 
