@@ -231,6 +231,13 @@ public class MongoDB {
         return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully disconnected from database\"}").build();
     }
 
+    @GET
+    @Path("/isconnectionvalid/{connectionId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response isConnectionIdAvailable(@PathParam("connectionId") String connectionId) {
+        return Response.status(Response.Status.OK).entity(databaseConnector.isConnectionIdAvailable(connectionId, DatabaseTypes.MONGO)).build();
+    }
+
     @POST
     @Path("/testconnection")
     @Consumes(MediaType.APPLICATION_JSON)

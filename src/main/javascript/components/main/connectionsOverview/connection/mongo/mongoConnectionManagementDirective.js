@@ -33,6 +33,25 @@
             showSpinner: false,
             mode: 'indeterminate'
         };
+        
+        cmcc.validations = {
+            host: {
+                'required'      : 'Field is required',
+                'md-maxlength'  : 'This has to be less than the specified number of characters.',
+                'md-minlength'  : 'This has to be more than the specified number of characters.',
+                'pattern'       : 'The appropriate pattern is required'
+            },
+            port:{
+                'required'      : 'Field is required',
+                'md-maxlength'  : 'This has to be less than the specified number of characters.',
+                'pattern'       : 'This should consist of a number ranging from 1 - 65535'
+            },
+            id: {
+                'required': 'Field is required',
+                'connection-id-validator' : 'This database Id is already being used'
+            }
+        };
+
         cmcc.createMongoConnection = createMongoConnection;
         cmcc.editMongoConnection = editMongoConnection;
         cmcc.testMongoConnection = testMongoConnection;
@@ -50,6 +69,7 @@
                 cmcc.connection.isConnected = true;
             }
         }
+
         function createMongoConnection() {
             cmcc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/mongodb/add';

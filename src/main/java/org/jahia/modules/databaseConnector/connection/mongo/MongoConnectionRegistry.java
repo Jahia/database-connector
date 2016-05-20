@@ -52,6 +52,7 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                     String writeConcern = setStringConnectionProperty(connectionNode, WRITE_CONCERN_KEY, false);
                     String authDb = setStringConnectionProperty(connectionNode, AUTH_DB_KEY, false);
                     MongoConnection storedConnection = new MongoConnection(id);
+                    storedConnection.setOldId(id);
                     storedConnection.setHost(host);
                     storedConnection.setPort(port);
                     storedConnection.isConnected(isConnected);

@@ -16,36 +16,36 @@
             <i class="fa fa-lg fa-check-circle-o"></i>
         </md-button>
 
-        <md-input-container class="md-block">
-            <label>Host</label>
-            <input required md-no-asterisk name="host" ng-model="cmcc.connection.host">
+        <md-input-container class="md-block" flex-gt-sm="">
+         <label>Host</label>
+            <input required="" md-maxlength="15" md-no-asterisk name="host" ng-model="cmcc.connection.host">
+
             <div ng-messages="mongoForm.host.$error">
-                <div ng-message="required">This is required.</div>
-                <div ng-message="md-maxlength">The name has to be less than 30 characters long.</div>
+                <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.host">{{validationMessage}}</div>
             </div>
         </md-input-container>
 
         <md-input-container class="md-block">
             <label>Port</label>
-            <input required ng-pattern="/[0-9]+/" name="port" ng-model="cmcc.connection.port">
-            <div ng-messages="mongoForm.port.$error" role="alert">
-                <div ng-message="required">This is required.</div>
+            <input md-maxlength="5" required ng-pattern="/[0-9]+/" name="port" ng-model="cmcc.connection.port">
+            <div ng-messages="mongoForm.port.$error" role="alert" style="color:maroon">
+                <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.port">{{validationMessage}}</div>
             </div>
         </md-input-container>
 
         <md-input-container class="md-block">
-            <label>Connection Name</label>
-            <input required name="id" ng-model="cmcc.connection.id" >
-            <div ng-messages="mongoForm.id.$error">
-                <div ng-message="required">This is required.</div>
+            <label>Connection Name (id)</label>
+            <input md-maxlength="30" name="id" required ng-model="cmcc.connection.id" original-value="{{cmcc.connection.oldId}}" connection-id-validator>
+            <div ng-messages="mongoForm.id.$error" multiple>
+                <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.id">{{validationMessage}}</div>
             </div>
         </md-input-container>
 
         <md-input-container class="md-block">
             <label>Database Name</label>
-            <input required name="dbName" ng-model="cmcc.connection.dbName" >
+            <input md-maxlength="30" required name="dbName" ng-model="cmcc.connection.dbName" >
             <div ng-messages="mongoForm.dbName.$error">
-                <div ng-message="required">This is required.</div>
+                <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.host">{{validationMessage}}</div>
             </div>
         </md-input-container>
 
@@ -63,7 +63,7 @@
             <label>Authentication Database</label>
             <input required name="authDb" ng-model="cmcc.connection.authDb" >
             <div ng-messages="mongoForm.authDb.$error">
-                <div ng-message="required">This is required.</div>
+                <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.host">{{validationMessage}}</div>
             </div>
         </md-input-container>
         <md-button ng-if="cmcc.mode=='create'" class="md-raised md-primary pull-right" ng-click="cmcc.createMongoConnection()" ng-disabled="mongoForm.$invalid">
@@ -72,6 +72,7 @@
                 Update </md-button>
         <md-button class="md-raised md-primary pull-right" ng-click="cmcc.cancelCreation()">
             Back </md-button>
+
 
     </form>
 </md-content>

@@ -99,4 +99,16 @@ public class DatabaseConnector extends AbstractResource {
         }
         return databaseTypes.toString();
     }
+
+    public boolean isConnectionIdAvailable(String connectionId, DatabaseTypes databaseType) {
+        Map<String, AbstractConnection> connections = databaseConnectorManager.getRegisteredConnections(databaseType);
+        if (connections != null) {
+            for (Map.Entry<String, AbstractConnection> entry : connections.entrySet()) {
+                if (entry.getKey().equals(connectionId)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
