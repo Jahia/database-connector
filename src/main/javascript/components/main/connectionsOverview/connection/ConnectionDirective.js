@@ -23,14 +23,17 @@
         .module('databaseConnector')
         .directive('dcMongoConnection', ['$log', 'contextualData', Connection]);
 
-    var ConnectionController = function($scope, contextualData, dcDataFactory, $mdDialog, $filter) {
+    var ConnectionController = function($scope, contextualData, dcDataFactory, $mdDialog, $filter, toaster) {
         var cc = this;
         cc.imageUrl = contextualData.context + '/modules/database-connector/images/' + cc.connection.databaseType + '/logo_60.png';
         cc.originalConnection = angular.copy(cc.connection);
         cc.updateConnection = updateConnection;
         cc.openDeleteConnectionDialog = openDeleteConnectionDialog;
         cc.editConnection = editConnection;
-
+        cc.spinnerOptions = {
+            mode: 'indeterminate',
+            showSpinner: false
+        };
         init();
 
         function init() {
@@ -41,13 +44,32 @@
             cc.originalConnection = angular.copy(cc.connection);
         }
         function updateConnection(connect) {
+            cc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[cc.connection.databaseType] + '/' + (connect ? 'connect' : 'disconnect') + '/' + cc.connection.id;
             dcDataFactory.customRequest({
                 url: url,
                 method: 'PUT'
             }).then(function(response) {
-                cc.connection.isConnected = connect;
-            }, function(response) {});
+                if (response.success) {
+                    cc.connection.isConnected = connect;
+                    toaster.pop({
+                        type   : 'success',
+                        title: 'Connection status successfully updated!',
+                        toastId: 'cu',
+                        timeout: 3000
+                    });
+                } else {
+                    toaster.pop({
+                        type   : 'error',
+                        title: 'Connection status update failed!',
+                        toastId: 'cu',
+                        timeout: 3000
+                    });
+                }
+                cc.spinnerOptions.showSpinner = false;
+            }, function(response) {
+                cc.spinnerOptions.showSpinner = false;
+            });
         }
 
         function openDeleteConnectionDialog(ev1) {
@@ -69,6 +91,7 @@
             }, function(){});
         }
         function deleteConnection() {
+            cc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[cc.connection.databaseType] + '/' +'remove'+ '/' + cc.connection.id;
             dcDataFactory.customRequest({
                 url: url,
@@ -76,8 +99,22 @@
             }).then(function(response){
                 cc.connection = response;
                 $scope.$emit('connectionSuccessfullyDeleted', null);
+                toaster.pop({
+                    type   : 'success',
+                    title: 'Successfully deleted connection!',
+                    toastId: 'cd',
+                    timeout: 3000
+                });
+                cc.spinnerOptions.showSpinner = false;
             }, function(response){
                 console.log('error connection not deleted', response);
+                cc.spinnerOptions.showSpinner = false;
+                toaster.pop({
+                    type   : 'error',
+                    title: 'Failed to delete connection',
+                    toastId: 'cd',
+                    timeout: 3000
+                });
             });
         }
         
@@ -112,7 +149,7 @@
         }
     };
 
-    ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', '$filter'];
+    ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', '$filter', 'toaster'];
     
     function EditConnectionPopupController($scope, $mdDialog, connection) {
         $scope.ecp = this;

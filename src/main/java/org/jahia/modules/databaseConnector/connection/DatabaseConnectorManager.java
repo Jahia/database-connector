@@ -141,7 +141,11 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
 
     public boolean updateConnection(String connectionId, DatabaseTypes databaseType, boolean connect) {
         if (connect) {
-            databaseConnectionRegistries.get(databaseType).connect(connectionId);
+            if (((AbstractConnection) databaseConnectionRegistries.get(databaseType).getRegistry().get((connectionId))).testConnectionCreation()) {
+                databaseConnectionRegistries.get(databaseType).connect(connectionId);
+            } else {
+                return false;
+            }
         } else {
             databaseConnectionRegistries.get(databaseType).disconnect(connectionId);
         }

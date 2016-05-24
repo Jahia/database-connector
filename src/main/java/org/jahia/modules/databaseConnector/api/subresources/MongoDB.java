@@ -218,8 +218,18 @@ public class MongoDB {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response connect(@PathParam("connectionId") String connectionId) {
-        databaseConnector.updateConnection(connectionId, DatabaseTypes.MONGO, true);
-        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully connected to database\"}").build();
+        JSONObject jsonAnswer = new JSONObject();
+        try {
+            if (databaseConnector.updateConnection(connectionId, DatabaseTypes.MONGO, true)) {
+                jsonAnswer.put("success", "Successfully connected to database");
+            } else {
+                jsonAnswer.put("failed", "Connection failed to update");
+            }
+        } catch (JSONException ex) {
+            logger.error(ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\": \"\"Invalid connection parameter\"}").build();
+        }
+        return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
     }
 
     @PUT
