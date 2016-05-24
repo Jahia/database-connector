@@ -27,7 +27,8 @@
 
         <md-input-container class="md-block">
             <label>Port</label>
-            <input md-maxlength="5" required ng-pattern="/[0-9]+/" name="port" ng-model="cmcc.connection.port">
+            <input md-maxlength="5" required ng-pattern="/[0-9]+/" name="port" ng-model="cmcc.connection.port" length-parser length-parser-min="1" length-parser-max="5" range-parser range-parser-max="65535">
+
             <div ng-messages="mongoForm.port.$error" role="alert" style="color:maroon">
                 <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.port">{{validationMessage}}</div>
             </div>
@@ -35,7 +36,8 @@
 
         <md-input-container class="md-block">
             <label>Connection Name (id)</label>
-            <input ng-minlength="5" md-maxlength="30" name="id" required ng-model="cmcc.connection.id" original-value="{{cmcc.connection.oldId}}" connection-id-validator>
+            <input ng-minlength="3" md-maxlength="30" name="id" required  ng-pattern="/^[a-zA-Z0-9]+$/"
+                    ng-model="cmcc.connection.id"  original-value="{{cmcc.connection.oldId}}" connection-id-validator>
             <div ng-messages="mongoForm.id.$error" >
                 <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.id">{{validationMessage}}</div>
             </div>
@@ -43,7 +45,7 @@
 
         <md-input-container class="md-block">
             <label>Database Name</label>
-            <input ng-minlength="5" md-maxlength="30" required name="dbName" ng-model="cmcc.connection.dbName" >
+            <input ng-minlength="2" md-maxlength="30" required ng-pattern="/^[a-zA-Z0-9]+$/" name="dbName" ng-model="cmcc.connection.dbName" >
             <div ng-messages="mongoForm.dbName.$error">
                 <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.host">{{validationMessage}}</div>
             </div>
@@ -51,7 +53,7 @@
 
         <md-input-container class="md-block">
             <label>User</label>
-            <input name="user"  ng-model="cmcc.connection.user" ng-change="cmcc.updateIsEmpty('user');">
+            <input name="user"  ng-model="cmcc.connection.user" ng-pattern="/^[a-zA-Z0-9]{4,10}$/" ng-change="cmcc.updateIsEmpty('user');">
         </md-input-container>
 
         <md-input-container class="md-block" ng-if="!cmcc.isEmpty.user">
