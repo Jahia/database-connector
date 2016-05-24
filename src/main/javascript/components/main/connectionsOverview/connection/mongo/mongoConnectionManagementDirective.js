@@ -42,7 +42,6 @@
             },
             port:{
                 'required'      : 'Field is required',
-                'md-maxlength'  : 'This has to be less than 5 digits.',
                 'pattern'       : 'This should consist of a number ranging from 1 - 65535'
             },
             id: {

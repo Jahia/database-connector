@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    var rangeParserDirective = function($log) {
+    var rangeParserDirective = function($log, $timeout) {
 
         var directive = {
             restrict: 'A',
@@ -13,24 +13,31 @@
 
         function linkFunction(scope, el, attr, ctrls) {
             var model = ctrls[0];
-            var origValue = model.viewValue;
-            // var minRangeChars = attr['rangeParserMin'];
-            var maxRangeChars = attr['rangeParserMax'];
-            console.log(attr);
+            var maxValue = parseInt(attr['rangeMaxValue']);
             model.$parsers.push(function(value) {
-                console.log(value);
-                console.log( 'max Range #: ' + maxRangeChars);
-                if (!_.isUndefined(maxRangeChars)) {
-                    if (value > maxRangeChars ){
-                        value = origValue;
-                        model.$setViewValue(value);
-                        model.$render();
-                    } else {
-                        origValue = value;
-                    }
-                } else {
-                    origValue = value;
+
+                if (value != parseInt(value)) {
+                    value = parseInt(value);
                 }
+
+                if (isNaN(value)) {
+                    value = '';
+                    model.$setViewValue(value);
+                    model.$render();
+                    return value;
+                }
+
+                if (!_.isUndefined(maxValue)) {
+                    if (value > maxValue ){
+                        value = maxValue;
+                    }
+                }
+                model.$setViewValue(value);
+                model.$render();
+                //Override the md-maxlength since we are taking care of that validation through the parser.
+                $timeout(function () {
+                    model.$setValidity('md-maxlength', true);
+                });
                 return value;
             });
         }
@@ -38,5 +45,5 @@
 
     angular
         .module('databaseConnector')
-        .directive('rangeParser',  ['$log', rangeParserDirective]);
+        .directive('rangeParser',  ['$log', '$timeout', rangeParserDirective]);
 })();

@@ -27,7 +27,7 @@
 
         <md-input-container class="md-block">
             <label>Port</label>
-            <input md-maxlength="5" required ng-pattern="/[0-9]+/" name="port" ng-model="cmcc.connection.port" length-parser length-parser-min="1" length-parser-max="5" range-parser range-parser-max="65535">
+            <input md-maxlength="5" required ng-pattern="/[0-9]+/" name="port" ng-model="cmcc.connection.port" length-parser length-parser-max="5" range-parser range-max-value="65535">
 
             <div ng-messages="mongoForm.port.$error" role="alert" style="color:maroon">
                 <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.port">{{validationMessage}}</div>

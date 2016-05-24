@@ -15,14 +15,11 @@
         function linkFunction(scope, el, attr, ctrls) {
             var model = ctrls[0];
             var origValue = model.viewValue;
-            var minChars = attr['lengthParserMin'];
             var maxChars = attr['lengthParserMax'];
-            console.log(attr);
             model.$parsers.push(function(value) {
-                // console.log(value);
-                // console.log('min: ' +minChars, 'max: ' + maxChars);
-                if (!_.isUndefined(minChars) && !_.isUndefined(maxChars)) {
-                    if (value.length > maxChars || value.length < minChars ){
+                var testValue = value + '';
+                if (!_.isUndefined(maxChars)) {
+                    if (testValue.length > maxChars){
                         value = origValue;
                         model.$setViewValue(value);
                         model.$render();
@@ -35,9 +32,6 @@
                 return value;
 
             });
-            // model.$formatters.push(function(value) {
-            //     return parseInt(value);
-            // });
         }
     };
 
