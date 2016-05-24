@@ -69,7 +69,6 @@ public class MongoDB {
     @Path("/connection/{databaseId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnection(@PathParam("databaseId") String databaseId) {
-
         return Response.status(Response.Status.OK).entity(databaseConnector.getConnection(databaseId, DatabaseTypes.MONGO)).build();
     }
 
@@ -134,6 +133,7 @@ public class MongoDB {
                 }
                 databaseConnector.addEditConnection(connection, false);
                 jsonAnswer.put("success", "Connection successfully added");
+                logger.info("Successfully created MongoDB connection: " + id);
                 return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
             }
         } catch(JSONException e) {
@@ -197,6 +197,7 @@ public class MongoDB {
                 }
                 databaseConnector.addEditConnection(connection, true);
                 jsonAnswer.put("success", "Connection successfully edited");
+                logger.info("Successfully edited MongoDB connection: " + id);
                 return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
             }
         } catch(JSONException e) {
@@ -210,6 +211,7 @@ public class MongoDB {
     @Produces(MediaType.APPLICATION_JSON)
     public Response removeConnection(@PathParam("connectionId") String connectionId) {
         databaseConnector.removeConnection(connectionId, DatabaseTypes.MONGO);
+        logger.info("Successfully deleted MongoDB connection: " + connectionId);
         return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully removed database connection\"}").build();
     }
 
@@ -222,8 +224,10 @@ public class MongoDB {
         try {
             if (databaseConnector.updateConnection(connectionId, DatabaseTypes.MONGO, true)) {
                 jsonAnswer.put("success", "Successfully connected to database");
+                logger.info("Successfully enabled MongoDB connection, for connection with id: " + connectionId);
             } else {
                 jsonAnswer.put("failed", "Connection failed to update");
+                logger.info("Failed to establish MongoDB connection, for connection with id: " + connectionId);
             }
         } catch (JSONException ex) {
             logger.error(ex.getMessage());
@@ -238,6 +242,7 @@ public class MongoDB {
     @Produces(MediaType.APPLICATION_JSON)
     public Response disconnect(@PathParam("connectionId") String connectionId) {
         databaseConnector.updateConnection(connectionId, DatabaseTypes.MONGO, false);
+        logger.info("Successfully disconnected MongoDB connection, for connection with id: " + connectionId);
         return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully disconnected from database\"}").build();
     }
 
@@ -289,7 +294,9 @@ public class MongoDB {
                 connection.setPassword(password);
                 connection.setWriteConcern(writeConcern);
                 connection.setAuthDb(authDb);
-                return Response.status(Response.Status.OK).entity("{\"result\": " + databaseConnector.testConnection(connection) + "}").build();
+                boolean connectionTestPassed = databaseConnector.testConnection(connection);
+                logger.info(connectionTestPassed ? "Connection test successfully passed" : "Connection test failed" + " for MongoDB with id: " + id);
+                return Response.status(Response.Status.OK).entity("{\"result\": " + connectionTestPassed + "}").build();
             }
         } catch(JSONException e) {
             logger.error("Cannot parse json data : {}", data);
