@@ -45,9 +45,9 @@
 
         <md-input-container class="md-block">
             <label>Database Name</label>
-            <input ng-minlength="2" md-maxlength="30" required ng-pattern="/^[a-zA-Z0-9]+$/" name="dbName" ng-model="cmcc.connection.dbName" >
+            <input ng-minlength="2" md-maxlength="30" required ng-pattern="/^[a-zA-Z0-9_]+$/" name="dbName" ng-model="cmcc.connection.dbName" >
             <div ng-messages="mongoForm.dbName.$error">
-                <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.host">{{validationMessage}}</div>
+                <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.dbName">{{validationMessage}}</div>
             </div>
         </md-input-container>
 
@@ -65,7 +65,7 @@
             <label>Authentication Database</label>
             <input required name="authDb" ng-model="cmcc.connection.authDb" >
             <div ng-messages="mongoForm.authDb.$error">
-                <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.host">{{validationMessage}}</div>
+                <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.authDb">{{validationMessage}}</div>
             </div>
         </md-input-container>
         <md-button ng-if="cmcc.mode=='create'" class="md-raised md-primary pull-right" ng-click="cmcc.createMongoConnection()" ng-disabled="mongoForm.$invalid">

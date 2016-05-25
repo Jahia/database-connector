@@ -60,7 +60,7 @@
 
             },
             authDb:{
-                'required': 'Field is required'
+                // 'required': 'Field is required'
             }
         };
 
