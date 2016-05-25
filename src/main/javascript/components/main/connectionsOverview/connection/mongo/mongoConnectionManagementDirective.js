@@ -48,19 +48,19 @@
                 'required'      : 'Field is required',
                 'connection-id-validator' : 'This connection Id is already being used',
                 'pattern'       : 'It should contain alphanumeric characters only.',
-                'md-maxlength'  : 'This has to be less than 30 characters.',
-                'minlength'     : 'This has to be more than 3 characters.'
+                'md-maxlength'  : 'This has to be less than 30 characters.'
 
             },
             dbName: {
                 'required'      : 'Field is required',
                 'pattern'       : 'It should contain alphanumeric characters only.',
-                'md-maxlength'  : 'This has to be less than 30 characters.',
-                'minlength'     : 'This has to be more than 2 characters.'
-
+                'md-maxlength'  : 'This has to be less than 30 characters.'
+            },
+            user : {
+                'pattern' : 'User should contain alphanumeric characters and consist of 4-10 characters'
             },
             authDb:{
-                // 'required': 'Field is required'
+                'required': 'Field is required'
             }
         };
 

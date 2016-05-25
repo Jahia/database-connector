@@ -72,7 +72,7 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
 
     public void registerAsService() {
         Object service = beforeRegisterAsService();
-        registerAsService(service, false);
+        registerAsService(service, true);
         this.isConnected = true;
     }
 
