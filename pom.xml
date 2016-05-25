@@ -39,7 +39,7 @@
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver</artifactId>
+            <artifactId>mongo-java-driver</artifactId>
             <version>3.2.2</version>
         </dependency>
         <dependency>
@@ -132,6 +132,9 @@
                         </Import-Package>
                         <Export-Package>org.jahia.modules.databaseConnector,
                             com.mongodb,
+                            com.mongodb.client,
+                            org.bson,
+                            org.bson.conversions,
                             org.jahia.modules.databaseConnector.api,
                             org.jahia.modules.databaseConnector.api.*,
                         </Export-Package>
