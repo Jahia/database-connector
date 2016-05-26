@@ -90,6 +90,11 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
     }
 
     @Override
+    public boolean importConnection(Map<String, Object> map) {
+        return false;
+    }
+
+    @Override
     protected void storeAdvancedConfig(AbstractConnection connection, JCRNodeWrapper node) throws RepositoryException {
         RedisConnection redisConnection = (RedisConnection) connection;
         if (redisConnection.getTimeout() != null) {

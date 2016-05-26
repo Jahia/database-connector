@@ -12,11 +12,9 @@ import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.services.content.JCRTemplate;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.UnknownHostException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -127,5 +125,7 @@ public class DatabaseConnector extends AbstractResource {
         return connection;
     }
 
-
+    public boolean importConnections(InputStream source) {
+        return databaseConnectorManager.executeConnectionImportHandler(source);
+    }
 }

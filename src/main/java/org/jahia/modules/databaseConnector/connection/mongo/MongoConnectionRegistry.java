@@ -103,6 +103,11 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
     }
 
     @Override
+    public boolean importConnection(Map<String, Object> map) {
+        return false;
+    }
+
+    @Override
     protected void storeAdvancedConfig(AbstractConnection connection, JCRNodeWrapper node) throws RepositoryException {
         MongoConnection mongoConnection = (MongoConnection) connection;
         node.setProperty(WRITE_CONCERN_KEY, mongoConnection.getWriteConcern());

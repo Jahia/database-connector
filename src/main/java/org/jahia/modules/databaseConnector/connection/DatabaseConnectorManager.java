@@ -1,12 +1,16 @@
 package org.jahia.modules.databaseConnector.connection;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
+import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
+import org.jahia.modules.databaseConnector.dsl.DSLHandler;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
+import java.io.*;
 import java.util.*;
 
 import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.getAllDatabaseTypes;
@@ -28,6 +32,10 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
     private static DatabaseConnectorManager instance;
 
     private BundleContext bundleContext;
+
+    private DSLExecutor dslExecutor;
+
+    private Map<String,DSLHandler> dslHandlerMap;
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectorManager.class);
 
@@ -156,7 +164,37 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         return databaseConnectionRegistries.get(connection.getDatabaseType()).testConnection(connection);
     }
 
+    public boolean executeConnectionImportHandler(InputStream source) {
+        File file = null;
+        FileInputStream fileInputStream = null;
+        try {
+            file = File.createTempFile("temporaryImportFile", ".wzd");
+            FileUtils.copyInputStreamToFile(source, file);
+            dslExecutor.execute(file.toURI().toURL(), dslHandlerMap.get("importConnection"));
+        } catch (FileNotFoundException ex) {
+            logger.error(ex.getMessage(), ex);
+        } catch (IOException ex) {
+            logger.error(ex.getMessage(), ex);
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+        return true;
+    }
+
+    public boolean importConnections(Map<String, Object> map) {
+        logger.info("Importing connection " + map);
+        return true;
+    }
+
     protected BundleContext getBundleContext() {
         return bundleContext;
+    }
+
+    public void setDslExecutor(DSLExecutor dslExecutor) {
+        this.dslExecutor = dslExecutor;
+    }
+
+    public void setDslHandlerMap(Map<String, DSLHandler> dslHandlerMap) {
+        this.dslHandlerMap = dslHandlerMap;
     }
 }

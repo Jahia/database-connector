@@ -16,6 +16,8 @@ public interface DatabaseConnectionRegistry<T>{
 
     public boolean addEditConnection(final AbstractConnection connection, final Boolean isEdition);
 
+    public boolean importConnection(final Map<String, Object> map);
+
     public boolean testConnection(final AbstractConnection connection);
 
     public boolean removeConnection(String databaseConnectionId);

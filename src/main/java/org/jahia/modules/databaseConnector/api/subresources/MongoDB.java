@@ -40,7 +40,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.net.UnknownHostException;
+import java.io.InputStream;
 
 /**
  * @author stefan on 2016-05-02.
@@ -304,4 +304,12 @@ public class MongoDB {
         }
     }
 
+    @POST
+    @Path("/importtest")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    public Response importTest(InputStream source){
+        databaseConnector.importConnections(source);
+        return Response.status(Response.Status.OK).entity("{\"success\": \"Import successful\"}").build();
+    }
 }

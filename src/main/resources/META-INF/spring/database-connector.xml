@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.eclipse.org/gemini/blueprint/schema/blueprint http://www.eclipse.org/gemini/blueprint/schema/blueprint/gemini-blueprint.xsd
+        http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-3.0.xsd">
 
     <!--OSGi Service-->
-    <bean class="org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager" id="databaseConnectorManager" factory-method="getInstance"/>
+    <bean class="org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager" id="databaseConnectorManager" factory-method="getInstance">
+        <property name="dslExecutor" ref="dslExecutor"/>
+        <property name="dslHandlerMap">
+            <map key-type="java.lang.String" value-type="org.jahia.modules.databaseConnector.dsl.DSLHandler">
+                <entry key="importConnection" value-ref="dcConnectionImportHandler"/>
+            </map>
+        </property>
+    </bean>
 
-    <!--Choice List Initializers-->
     <bean id="springBeansAccess" class="org.jahia.modules.databaseConnector.api.SpringBeansAccess"
           factory-method="getInstance">
         <property name="databaseConnectorManager" ref="databaseConnectorManager"/>
         <property name="jcrTemplate" ref="jcrTemplate"/>
     </bean>
+
+    <lang:groovy id="dslExecutor" script-source="classpath:org/jahia/modules/databaseConnector/dsl/DSLExecutorImpl.groovy"></lang:groovy>
+    <lang:groovy id="dcConnectionImportHandler" script-source="classpath:org/jahia/modules/databaseConnector/dsl/ConnectionImportHandler.groovy">
+        <lang:property name="databaseConnectorManager" ref="databaseConnectorManager"/>
+    </lang:groovy>
 </beans>
