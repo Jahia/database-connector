@@ -6,7 +6,8 @@
             restrict        : 'E',
             templateUrl     : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connection/Connection.html',
             scope: {
-                connection: '='
+                connection: '=',
+                exportConnections: '='
             },
             controller      : ConnectionController,
             controllerAs    : 'cc',
@@ -21,7 +22,7 @@
 
     angular
         .module('databaseConnector')
-        .directive('dcMongoConnection', ['$log', 'contextualData', Connection]);
+        .directive('dcConnection', ['$log', 'contextualData', Connection]);
 
     var ConnectionController = function($scope, contextualData, dcDataFactory, $mdDialog, $filter, toaster) {
         var cc = this;
@@ -30,6 +31,7 @@
         cc.updateConnection = updateConnection;
         cc.openDeleteConnectionDialog = openDeleteConnectionDialog;
         cc.editConnection = editConnection;
+        cc.exportValueChanged = exportValueChanged;
         cc.spinnerOptions = {
             mode: 'indeterminate',
             showSpinner: false
@@ -146,6 +148,25 @@
                 cc.connection = response;
                 cc.originalConnection = angular.copy(response);
             }, function(response) {});
+        }
+        
+        function exportValueChanged() {
+            if (cc.connection.export) {
+                var exportConnectionsTemp = {};
+                for (var i in cc.exportConnections) {
+                    exportConnectionsTemp[i] = cc.exportConnections[i];
+                }
+                cc.exportConnections = exportConnectionsTemp;
+                cc.exportConnections[cc.connection.id] = cc.connection.databaseType;
+            } else {
+                var exportConnectionsTemp2 = {};
+                for (var i in cc.exportConnections) {
+                    if (i != cc.connection.id) {
+                        exportConnectionsTemp2[i] = cc.exportConnections[i];
+                    }
+                }
+                cc.exportConnections = exportConnectionsTemp;
+            }
         }
     };
 

@@ -111,4 +111,21 @@ public class DatabaseConnector extends AbstractResource {
         }
         return true;
     }
+
+    public String export(String connectionId, DatabaseTypes databaseType) {
+        String connection = null;
+        switch (databaseType) {
+            case MONGO:
+                MongoConnection mongoConnection = databaseConnectorManager.getConnection(connectionId, databaseType);
+                connection = mongoConnection.makeConnectionData().getJson();
+                break;
+            case REDIS:
+                RedisConnection redisConnection = databaseConnectorManager.getConnection(connectionId, databaseType);
+                connection = redisConnection.makeConnectionData().getJson();
+                break;
+        }
+        return connection;
+    }
+
+
 }

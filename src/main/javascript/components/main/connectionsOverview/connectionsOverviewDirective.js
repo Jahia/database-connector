@@ -20,13 +20,21 @@
     angular
         .module('databaseConnector')
         .directive('dcConnectionsOverview', ['$log', 'contextualData', connectionsOverview]);
-    
+
     var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog) {
         var coc = this;
         coc.getConnections = getConnections;
         coc.createConnection = createConnection;
+        coc.exportConnections = {};
+        coc.exportSelectedConnections = exportSelectedConnections;
+
         init();
 
+        $scope.$watch(function(){
+            return coc.exportConnections;
+        }, function(value){
+            console.log(value);
+        });
         function init() {
             getConnections();
         }
@@ -55,6 +63,19 @@
             }).then(function(){
                 getConnections();
             }, function(){});
+        }
+
+        function exportSelectedConnections() {
+            var url = contextualData.context + '/modules/databaseconnector/export';
+            dcDataFactory.customRequest({
+                url: url,
+                method: 'POST'
+            }).then(function(response) {
+                console.log(response);
+                coc.connections = response.connections;
+            }, function(response) {
+                coc.getConnections();
+            });
         }
 
         $scope.$on('connectionSuccessfullyDeleted', function(){

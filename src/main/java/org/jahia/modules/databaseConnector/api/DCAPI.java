@@ -31,9 +31,7 @@ import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -73,5 +71,14 @@ public class DCAPI {
     @Path(MongoDB.MAPPING)
     public Class<MongoDB> getMongoDbSubResource() {
         return MongoDB.class;
+    }
+
+    @POST
+    @Path("/export")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response exportConnection(String data) {
+        return Response.status(Response.Status.OK).entity("{\"success\":\"The connections are exported\"}").build();
+//        return Response.status(Response.Status.OK).entity(databaseConnector.isConnectionIdAvailable(connectionId, DatabaseTypes.MONGO)).build();
     }
 }
