@@ -94,6 +94,9 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
                 if (connection.getPassword() != null) {
                     connectionNode.setProperty(PASSWORD_KEY, encodePassword(connection.getPassword()));
                 }
+                if (connection.getOptions() != null) {
+                    connectionNode.setProperty(OPTIONS_KEY, connection.getOptions());
+                }
                 storeAdvancedConfig(connection, connectionNode);
                 session.save();
                 return true;

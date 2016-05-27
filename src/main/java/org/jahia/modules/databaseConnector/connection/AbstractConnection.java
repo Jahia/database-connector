@@ -7,10 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.DATABASE_TYPE_KEY;
 
@@ -40,6 +37,8 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
 
     protected String password;
 
+    protected String options;
+
     protected Boolean isConnected;
 
     protected DatabaseTypes databaseType;
@@ -61,6 +60,8 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
     public final static String IS_CONNECTED_KEY = "dc:isConnected";
 
     private final static String DATABASE_ID_KEY = "databaseId";
+
+    public final static String OPTIONS_KEY = "dc:options";
 
     private final List<ServiceRegistration> serviceRegistrations = new LinkedList<>();
 
@@ -219,6 +220,16 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
     public String getDisplayName() {
         return databaseType.getDisplayName();
     }
+
+    public String getOptions() {
+        return options;
+    }
+
+    public void setOptions(String options) {
+        this.options = options;
+    }
+
+    public abstract String parseOptions(LinkedHashMap<String, Object> options);
 
     public abstract T makeConnectionData();
 

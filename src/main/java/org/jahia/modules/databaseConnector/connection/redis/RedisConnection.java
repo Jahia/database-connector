@@ -5,6 +5,8 @@ import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import redis.clients.jedis.Protocol;
 import redis.clients.util.Sharded;
 
+import java.util.LinkedHashMap;
+
 /**
  * @author by stefan on 2016-05-11.
  */
@@ -77,5 +79,11 @@ public class RedisConnection extends AbstractConnection {
     @Override
     public boolean testConnectionCreation() {
         return false;
+    }
+
+    @Override
+    public String parseOptions(LinkedHashMap options) {
+        //@TODO Implement the parsing of options.
+        return null;
     }
 }

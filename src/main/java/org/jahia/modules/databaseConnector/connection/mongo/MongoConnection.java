@@ -6,6 +6,8 @@ import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 
+import java.util.LinkedHashMap;
+
 /**
  * Date: 11/1/2013
  *
@@ -48,6 +50,7 @@ public class MongoConnection extends AbstractConnection {
         mongoConnectionData.setWriteConcern(writeConcern);
         mongoConnectionData.setAuthDb(authDb);
         mongoConnectionData.setDatabaseType(DATABASE_TYPE);
+        mongoConnectionData.setOptions(options);
         return mongoConnectionData;
     }
 
@@ -64,6 +67,12 @@ public class MongoConnection extends AbstractConnection {
 
     public DatabaseTypes getDatabaseType() {
         return DATABASE_TYPE;
+    }
+    
+    @Override
+    public String parseOptions(LinkedHashMap options) {
+        //@TODO implement the structure of Mongo options object
+        return null;
     }
 
     public String getWriteConcern() {

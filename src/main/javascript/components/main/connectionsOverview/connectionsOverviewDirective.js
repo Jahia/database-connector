@@ -39,6 +39,26 @@
             getConnections();
         }
 
+        $scope.uploadFiles = function(file, errFiles) {
+            $scope.f = file;
+            $scope.errFile = errFiles && errFiles[0];
+            if (file) {
+                var request = {
+                    url: contextualData.context + '/modules/databaseconnector/import',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/octet-stream'
+                    },
+                    data: file
+                };
+
+            }
+            var url = contextualData.context + '/modules/databaseconnector/mongodb/getconnections';
+            dcDataFactory.customRequest(request).then(function(response) {
+                getConnections();
+            }, function(response) {});
+        };
+        
         function getConnections() {
             var url = contextualData.context + '/modules/databaseconnector/mongodb/getconnections';
             dcDataFactory.customRequest({

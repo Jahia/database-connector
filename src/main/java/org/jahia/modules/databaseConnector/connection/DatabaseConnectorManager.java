@@ -164,26 +164,86 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         return databaseConnectionRegistries.get(connection.getDatabaseType()).testConnection(connection);
     }
 
-    public boolean executeConnectionImportHandler(InputStream source) {
+    public Map executeConnectionImportHandler(InputStream source) {
         File file = null;
-        FileInputStream fileInputStream = null;
+        Map<String, Map> importedConnectionsResults = new LinkedHashMap<>();
+        Map<String, String> report = new LinkedHashMap<>();
         try {
             file = File.createTempFile("temporaryImportFile", ".wzd");
             FileUtils.copyInputStreamToFile(source, file);
-            dslExecutor.execute(file.toURI().toURL(), dslHandlerMap.get("importConnection"));
+            dslExecutor.execute(file.toURI().toURL(), dslHandlerMap.get("importConnection"), importedConnectionsResults);
+            logger.info("Done importing connections" + importedConnectionsResults);
+            report.put("status", "success");
         } catch (FileNotFoundException ex) {
+            report.put("status", "failed");
+            report.put("reason", "fileNotFound");
             logger.error(ex.getMessage(), ex);
         } catch (IOException ex) {
+            report.put("status", "failed");
+            report.put("reason", "io");
             logger.error(ex.getMessage(), ex);
         } catch (Exception ex) {
+            report.put("status", "failed");
+            report.put("reason", "other");
             logger.error(ex.getMessage(), ex);
+        } finally {
+            FileUtils.deleteQuietly(file);
         }
-        return true;
+        importedConnectionsResults.put("report", report);
+        return importedConnectionsResults;
     }
 
-    public boolean importConnections(Map<String, Object> map) {
+    public Map <String, Object> importConnection(Map<String, Object> map) {
         logger.info("Importing connection " + map);
-        return true;
+        Map<String, String> status = new LinkedHashMap<>();
+        switch (DatabaseTypes.valueOf((String) map.get("type"))) {
+            case MONGO:
+                try {
+                    if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey((String) map.get("identifier"))) {
+                        status.put("result", "failed");
+                        status.put("reason", "connectionExists");
+                    } else {
+                        //Create connection object
+                        MongoConnection connection = new MongoConnection((String)map.get("identifier"));
+                        String host = map.containsKey("host") ? (String) map.get("host") : null;
+                        Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : null;
+                        Boolean isConnected = map.containsKey("isConnected") ? Boolean.parseBoolean((String) map.get("isConnected")) : false;
+                        String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : null;
+                        String user = map.containsKey("user") ? (String) map.get("user") : null;
+                        String password = map.containsKey("password") ? (String) map.get("password") : null;
+                        String writeConcern = map.containsKey("writeConcern") ? (String) map.get("writeConcern") : null;
+                        String authDb = map.containsKey("authDb") ? (String) map.get("authDb") : null;
+                        String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
+
+                        connection.setHost(host);
+                        connection.setPort(port);
+                        connection.isConnected(isConnected);
+                        connection.setDbName(dbName);
+                        connection.setUser(user);
+                        connection.setPassword(password);
+                        connection.setWriteConcern(writeConcern);
+                        connection.setAuthDb(authDb);
+                        connection.setOptions(options);
+                        databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).addEditConnection(connection, false);
+                        status.put("result", "success");
+                    }
+
+                } catch (Exception ex) {
+                    status.put("result", "failed");
+                    status.put("reason", "creationFailed");
+                    logger.info("Import " + (map.containsKey("identifier") ? "for connection: '" + map.get("identifier") + "'" : "") + " failed", ex.getMessage(), ex);
+                }
+                break;
+            case REDIS:
+                //@TODO Implement importing of a redis connection
+                status.put("result", "success");
+                break;
+            default:
+                status.put("result", "failed");
+                status.put("reason", "invalidDatabaseType");
+        }
+        map.put("status", status);
+        return map;
     }
 
     protected BundleContext getBundleContext() {

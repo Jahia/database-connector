@@ -125,7 +125,7 @@ public class DatabaseConnector extends AbstractResource {
         return connection;
     }
 
-    public boolean importConnections(InputStream source) {
+    public Map importConnections(InputStream source) {
         return databaseConnectorManager.executeConnectionImportHandler(source);
     }
 }

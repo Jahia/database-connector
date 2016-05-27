@@ -27,6 +27,8 @@ import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.api.subresources.MongoDB;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.services.content.JCRTemplate;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 
@@ -74,8 +76,14 @@ public class DCAPI {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     public Response importTest(InputStream source){
-        databaseConnector.importConnections(source);
-        return Response.status(Response.Status.OK).entity("{\"success\": \"Import successful\"}").build();
+        JSONObject jsonAnswer = new JSONObject();
+        try {
+            jsonAnswer.put("results", databaseConnector.importConnections(source));
+            return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
+        } catch (JSONException ex) {
+            logger.error("Failed to perform import", ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Failed to perform import\"}").build();
+        }
     }
 
     //SUBRESOURCES MAPPINGS

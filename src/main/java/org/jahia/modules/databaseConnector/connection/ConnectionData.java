@@ -28,6 +28,8 @@ public abstract class ConnectionData implements Serializable {
 
     protected String password;
 
+    protected String options;
+
     protected DatabaseTypes databaseType;
 
     public String getId() {
@@ -104,5 +106,13 @@ public abstract class ConnectionData implements Serializable {
 
     public String getDisplayName() {
         return databaseType.getDisplayName();
+    }
+
+    public String getOptions() {
+        return options;
+    }
+
+    public void setOptions(String options) {
+        this.options = options;
     }
 }

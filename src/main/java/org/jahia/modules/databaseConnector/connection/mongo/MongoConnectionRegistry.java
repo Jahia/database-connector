@@ -51,6 +51,7 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                     String password = decodePassword(connectionNode, PASSWORD_KEY);
                     String writeConcern = setStringConnectionProperty(connectionNode, WRITE_CONCERN_KEY, false);
                     String authDb = setStringConnectionProperty(connectionNode, AUTH_DB_KEY, false);
+                    String options = setStringConnectionProperty(connectionNode, OPTIONS_KEY, false);
                     MongoConnection storedConnection = new MongoConnection(id);
                     storedConnection.setOldId(id);
                     storedConnection.setHost(host);
@@ -61,6 +62,7 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                     storedConnection.setPassword(password);
                     storedConnection.setWriteConcern(writeConcern);
                     storedConnection.setAuthDb(authDb);
+                    storedConnection.setOptions(options);
                     registry.put(id, storedConnection);
                 }
                 return true;

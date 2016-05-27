@@ -23,6 +23,7 @@
  - dc:user (String)
  - dc:password (String)
  - dc:isConnected (boolean)
+ - dc:options (String)
 
 [dc:databaseConnector] > jnt:content
  + * (dcmix:databaseConnection)
