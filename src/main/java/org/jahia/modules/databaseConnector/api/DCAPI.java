@@ -35,6 +35,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import java.io.InputStream;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -65,6 +67,15 @@ public class DCAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDatabaseTypes() {
         return Response.status(Response.Status.OK).entity(databaseConnector.getDatabaseTypes()).build();
+    }
+
+    @POST
+    @Path("/import")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    public Response importTest(InputStream source){
+        databaseConnector.importConnections(source);
+        return Response.status(Response.Status.OK).entity("{\"success\": \"Import successful\"}").build();
     }
 
     //SUBRESOURCES MAPPINGS
