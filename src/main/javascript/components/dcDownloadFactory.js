@@ -1,6 +1,6 @@
 (function() {
 
-    var DownloadFactory = function($log, $resource, contextualData) {
+    var DownloadFactory = function($log, $resource) {
         return {
             download: download
         };
@@ -50,7 +50,7 @@
         }
     };
 
-    DownloadFactory.$inject = ['$log', '$resource', 'contextualData'];
+    DownloadFactory.$inject = ['$log', '$resource'];
 
     angular
         .module('databaseConnector.downloadFactory', [])

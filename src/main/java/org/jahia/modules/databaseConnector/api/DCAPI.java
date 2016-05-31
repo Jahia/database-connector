@@ -24,6 +24,7 @@
 package org.jahia.modules.databaseConnector.api;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.api.subresources.MongoDB;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
@@ -101,6 +102,9 @@ public class DCAPI {
     @Produces("text/plain")
     public Response exportConnection(String data) {
         try {
+            if (StringUtils.isEmpty(data)) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\":\"Missing Data\"}").build();
+            }
             JSONObject jsonObject = new JSONObject(data);
             File exportedConnections = databaseConnector.exportConnections(jsonObject);
             Response.ResponseBuilder response;
