@@ -167,7 +167,52 @@
                 }
             }
             cc.exportConnections = exportConnectionsTemp;
+
         }
+        
+        function exportConnectionsCheck() {
+            cc.spinnerOptions.showSpinner = true;
+            var url = contextualData.context + '/modules/databaseconnector/export';
+            dcDataFactory.customRequest({
+                url: url,
+                method: 'POST',
+                data: cc.connection
+            }).then(function(response){
+                cc.spinnerOptions.showSpinner = false;
+                // $scope.$emit('connectionSuccessfullyCreated', null);
+                showExportToast(response.connectionExported);
+            }, function(response){
+                cc.spinnerOptions.showSpinner = false;
+                console.log('error', response);
+                toaster.pop({
+                    type   : 'error',
+                    title: 'Export Connection Failed!',
+                    toastId: 'eti',
+                    timeout: 3000
+                });
+            });
+        }
+        function showExportToast(exported) {
+            if (exported) {
+                toaster.pop({
+                    type   : 'success',
+                    title: 'Connection Successfully Exported!',
+                    body: 'Connection Export was successful!',
+                    toastId: 'cm',
+                    timeout: 4000
+                });
+            } else {
+                toaster.pop({
+                    type   : 'warning',
+                    title: 'Connection Not Exported!',
+                    body: 'Connection Exported failed!',
+                    toastId: 'cm',
+                    timeout: 4000
+                });
+            }
+        }
+
+
     };
 
     ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', '$filter', 'toaster'];

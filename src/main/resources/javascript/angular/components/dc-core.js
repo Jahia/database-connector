@@ -32,37 +32,46 @@
         .factory('dcDataFactory', dataFactory);
 })();(function() {
 
-    var DownloadZipFactory = function($log, $resource, contextualData) {
-        return $resource(null, null,
-            {
-                download: {
-                    //@TODO Update to work with all databases.
-                    url: contextualData.context + '/modules/databaseconnector/export',
-                    method: 'POST',
-                    headers: {
-                        accept: 'application/zip'
-                    },
-                    responseType: 'arraybuffer',
-                    cache: false,
-                    transformResponse: function(data, headers) {
-                        var zip = null;
-                        if (data) {
-                            zip = new Blob([data], {
-                                type: 'application/zip'
-                            });
+    var DownloadFactory = function($log, $resource) {
+        return {
+            download: download
+        };
+
+        function download(url, mimeType, data) {
+            if (_.isUndefined(url) || url === null || _.isUndefined(mimeType) || mimeType === null ) {
+                return null;
+            }
+            return $resource(null, null,
+                {
+                    download: {
+                        //@TODO Update to work with all databases.
+                        url: url,
+                        method: 'POST',
+                        headers: {
+                            accept: mimeType
+                        },
+                        responseType: 'arraybuffer',
+                        cache: false,
+                        transformResponse: function(data, headers) {
+                            var zip = null;
+                            if (data) {
+                                zip = new Blob([data], {
+                                    type: mimeType
+                                });
+                            }
+                            var fileName = getFileNameFromHeader(headers('content-disposition'));
+                            var result = {
+                                blob: zip,
+                                fileName: fileName
+                            };
+                            return {
+                                response: result
+                            };
                         }
-                        var fileName = getFileNameFromHeader(headers('content-disposition'));
-                        var result = {
-                            blob: zip,
-                            fileName: fileName
-                        };
-                        return {
-                            response: result
-                        };
                     }
                 }
-            }
-        );
+            ).download(data);
+        }
 
         function getFileNameFromHeader(header) {
             if (!header) {
@@ -73,12 +82,11 @@
         }
     };
 
-    DownloadZipFactory.$inject = ['$log', '$resource', 'contextualData'];
+    DownloadFactory.$inject = ['$log', '$resource'];
 
     angular
-        .module('databaseConnector.downloadZipFactory', [])
-        .factory('dcDownloadZipFactory', DownloadZipFactory);
-
+        .module('databaseConnector.downloadFactory', [])
+        .factory('dcDownloadFactory', DownloadFactory);
 })();
 (function () {
     'use strict';

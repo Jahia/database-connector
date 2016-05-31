@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+    var connectionsOverviewController;
     var connectionsOverview = function($log, contextualData) {
 
         var directive = {
@@ -21,7 +22,7 @@
         .module('databaseConnector')
         .directive('dcConnectionsOverview', ['$log', 'contextualData', connectionsOverview]);
 
-    var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog, dcDownloadFactory, toaster) {
+    connectionsOverviewController = function ($scope, contextualData, dcDataFactory, $mdDialog, dcDownloadFactory, toaster) {
         var coc = this;
         coc.getConnections = getConnections;
         coc.createConnection = createConnection;
@@ -36,7 +37,7 @@
             getConnections();
         }
 
-        $scope.uploadFiles = function(file, errFiles) {
+        $scope.uploadFiles = function (file, errFiles) {
             $scope.f = file;
             $scope.errFile = errFiles && errFiles[0];
             if (file) {
@@ -51,21 +52,21 @@
 
             }
 
-            dcDataFactory.customRequest(request).then(function(response) {
+            dcDataFactory.customRequest(request).then(function (response) {
                 var allConnectionsImported = true;
                 console.log(response);
                 for (var i in coc.databaseTypes) {
                     if (!_.isUndefined(response.results[coc.databaseTypes[i]])) {
-                        if (_.findWhere(response.results[coc.databaseTypes[i]].status, {result : 'failed'}) != undefined) {
+                        if (_.findWhere(response.results[coc.databaseTypes[i]].status, {result: 'failed'}) != undefined) {
                             allConnectionsImported = false;
                         }
                     }
                 }
 
                 toaster.pop({
-                    type   : allConnectionsImported ? 'success': 'warning',
+                    type: allConnectionsImported ? 'success' : 'warning',
                     title: 'Import Successful',
-                    body: allConnectionsImported ? 'All connections imported successfully!': 'Not all imports were successful!',
+                    body: allConnectionsImported ? 'All connections imported successfully!' : 'Not all imports were successful!',
                     toastId: 'ims',
                     timeout: 3000
                 });
@@ -78,14 +79,15 @@
                     controller: ImportConnectionsPopupController,
                     templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connectionPopups/importResultsPopup.html',
                     parent: angular.element(document.body),
-                    clickOutsideToClose:true,
+                    clickOutsideToClose: true,
                     fullscreen: true
-                }).then(function(){
+                }).then(function () {
                     getConnections();
-                }, function(){});
-            }, function(response) {
+                }, function () {
+                });
+            }, function (response) {
                 toaster.pop({
-                    type   : 'error',
+                    type: 'error',
                     title: 'Import Failed',
                     body: 'Failed to perform import!',
                     toastId: 'ims',
@@ -93,15 +95,16 @@
                 });
             });
         };
-        
+
         function getConnections() {
             var url = contextualData.context + '/modules/databaseconnector/mongodb/getconnections';
             dcDataFactory.customRequest({
                 url: url,
                 method: 'GET'
-            }).then(function(response) {
+            }).then(function (response) {
                 coc.connections = response.connections;
-            }, function(response) {});
+            }, function (response) {
+            });
         }
 
         function getDatabaseTypes() {
@@ -109,9 +112,10 @@
             dcDataFactory.customRequest({
                 url: url,
                 method: 'GET'
-            }).then(function(response) {
+            }).then(function (response) {
                 coc.databaseTypes = response;
-            }, function(response) {});
+            }, function (response) {
+            });
         }
 
         function createConnection(ev) {
@@ -123,11 +127,12 @@
                 templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connectionPopups/createConnectionPopup.html',
                 parent: angular.element(document.body),
                 targetEvent: ev,
-                clickOutsideToClose:true,
+                clickOutsideToClose: true,
                 fullscreen: true
-            }).then(function(){
+            }).then(function () {
                 getConnections();
-            }, function(){});
+            }, function () {
+            });
         }
 
         function exportSelectedConnections() {
@@ -140,18 +145,43 @@
             }
             var url = contextualData.context + '/modules/databaseconnector/export';
             return dcDownloadFactory.download(url, 'text/plain', data).$promise.then(function (data) {
-                saveAs(data.response.blob, data.response.fileName);
+                saveAs(data.response.blob, data.response.fileName)
+
+                if (data.response.blob != null) {
+
+                    // $scope.exported = true;
+                    saveAs(data.response.blob, data.response.fileName);
+                    toaster.pop({
+                        type: 'success',
+                        title: 'Connection Successfully Exported!',
+                        body: 'Connection Export was successful!',
+                        toastId: 'ce',
+                        timeout: 4000
+                    });
+                } else {
+                    // $scope.exported = false;
+                    console.log('error', response);
+                    toaster.pop({
+                        type: 'error',
+                        title: 'Export Connection Failed!',
+                        toastId: 'eti',
+                        timeout: 3000
+                    });
+                };
             });
         }
+
+
 
         function isExportDisabled() {
             return _.isEmpty(coc.exportConnections);
         }
 
-        $scope.$on('connectionSuccessfullyDeleted', function(){
+        $scope.$on('connectionSuccessfullyDeleted', function () {
             getConnections();
         });
     };
+
 
     connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', 'dcDownloadFactory', 'toaster'];
 
