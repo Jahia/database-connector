@@ -3,7 +3,7 @@
 
     angular.module('databaseConnector', [
         'ui.router', 'datatables', 'datatables.bootstrap', 'i18n',
-        'ui.bootstrap', 'ui.bootstrap.tooltip', 'ngResource', 'databaseConnector.downloadZipFactory',
+        'ui.bootstrap', 'ui.bootstrap.tooltip', 'ngResource', 'databaseConnector.downloadFactory',
         'checklist-model', 'uiSwitch','toaster', 'ngAnimate', 'ngSanitize', 'ngMaterial', 'ngMessages',
         'databaseConnector.dataFactory', 'ngFileUpload'
     ]).config(function ($mdThemingProvider, $uibTooltipProvider) {

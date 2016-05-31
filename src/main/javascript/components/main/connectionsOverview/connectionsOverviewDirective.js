@@ -21,7 +21,7 @@
         .module('databaseConnector')
         .directive('dcConnectionsOverview', ['$log', 'contextualData', connectionsOverview]);
 
-    var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog, dcDownloadZipFactory, toaster) {
+    var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog, dcDownloadFactory, toaster) {
         var coc = this;
         coc.getConnections = getConnections;
         coc.createConnection = createConnection;
@@ -131,7 +131,6 @@
         }
 
         function exportSelectedConnections() {
-            var url = contextualData.context + '/modules/databaseconnector/export';
             var data = {};
             for (var i in coc.exportConnections) {
                 if (_.isUndefined(data[coc.exportConnections[i]])) {
@@ -139,8 +138,8 @@
                 }
                 data[coc.exportConnections[i]].push(i);
             }
-
-            return dcDownloadZipFactory.download(data).$promise.then(function (data) {
+            var url = contextualData.context + '/modules/databaseconnector/export';
+            return dcDownloadFactory.download(url, 'text/plain', data).$promise.then(function (data) {
                 saveAs(data.response.blob, data.response.fileName);
             });
         }
@@ -154,7 +153,7 @@
         });
     };
 
-    connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', 'dcDownloadZipFactory', 'toaster'];
+    connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', 'dcDownloadFactory', 'toaster'];
 
 
     function CreateConnectionPopupController($scope, $mdDialog, contextualData, dcDataFactory) {

@@ -23,6 +23,7 @@
  */
 package org.jahia.modules.databaseConnector.api;
 
+import org.apache.commons.io.FileUtils;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.api.subresources.MongoDB;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
@@ -97,20 +98,24 @@ public class DCAPI {
     @POST
     @Path("/export")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces("application/zip")
+    @Produces("text/plain")
     public Response exportConnection(String data) {
         try {
             JSONObject jsonObject = new JSONObject(data);
-            File exportedZipFile = databaseConnector.exportConnectionsToZip(jsonObject);
+            File exportedConnections = databaseConnector.exportConnections(jsonObject);
             Response.ResponseBuilder response;
-            if (exportedZipFile != null){
-                response = Response.ok(exportedZipFile);
-                response.type("application/zip").header("Content-Disposition", "attachment; filename=ExportedConnections.zip");
+            if (exportedConnections != null){
+                response = Response.ok(exportedConnections);
+                response.type("text/plain").header("Content-Disposition", "attachment; filename=ExportedConnections.txt");
             }
             else {
                 response = Response.serverError();
             }
-            return response.build();
+            try {
+                return response.build();
+            } finally {
+                FileUtils.forceDeleteOnExit(exportedConnections);
+            }
         } catch(JSONException ex) {
             logger.error(ex.getMessage(), ex);
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\":\"Invalid JSON object\"}").build();

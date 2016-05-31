@@ -81,18 +81,22 @@ public class MongoConnection extends AbstractConnection {
 
     @Override
     public String getSerializedExportData() {
-
-
-        //Implement the exported content data
         StringBuilder serializedString = new StringBuilder();
-        serializedString.append( NEW_LINE + " connection {" + NEW_LINE + TABU + "type " + DATABASE_TYPE + Utils.NEW_LINE +
-                TABU +"host " + this.host + NEW_LINE + TABU + "port " + this.port + NEW_LINE + TABU +
-                "dbName" + this.dbName + NEW_LINE + TABU + "identifier " + this.id );
+        serializedString.append(
+                TABU + "type " + DOUBLE_QUOTE + DATABASE_TYPE + DOUBLE_QUOTE + Utils.NEW_LINE +
+                TABU +"host " + DOUBLE_QUOTE + this.host + DOUBLE_QUOTE + NEW_LINE +
+                TABU + "port " + DOUBLE_QUOTE + this.port + DOUBLE_QUOTE + NEW_LINE +
+                TABU + "dbName" + DOUBLE_QUOTE + this.dbName + DOUBLE_QUOTE + NEW_LINE +
+                TABU + "identifier " + DOUBLE_QUOTE + this.id + DOUBLE_QUOTE + NEW_LINE +
+                TABU + "user " + DOUBLE_QUOTE + this.user + DOUBLE_QUOTE + NEW_LINE +
+                TABU + "password " + DOUBLE_QUOTE + this.password + DOUBLE_QUOTE + NEW_LINE +
+                TABU + "authDb " + DOUBLE_QUOTE + this.authDb + DOUBLE_QUOTE + NEW_LINE +
+                TABU + "isConnected " + DOUBLE_QUOTE + this.isConnected() + DOUBLE_QUOTE
+        );
         if (this.options != null) {
-            serializedString.append( NEW_LINE + TABU + "options " + "{ "+ this.options + NEW_LINE + TABU  + "}");
+            //@TODO implement options structure
+            serializedString.append(NEW_LINE + TABU + "options " + "{" + NEW_LINE + TABU + "}");
         }
-        serializedString.append(NEW_LINE + TABU + "user " + this.user + NEW_LINE + TABU +
-                "password " + this.password + NEW_LINE + TABU + "authDb " + this.authDb + NEW_LINE + "}");
         return serializedString.toString();
     }
 

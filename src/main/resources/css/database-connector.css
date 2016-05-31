@@ -126,3 +126,7 @@ form legend {
 .importContainer {
     min-width: 800px;
 }
+
+.connectionContainer {
+    width: 400px;
+}
