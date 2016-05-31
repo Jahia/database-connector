@@ -37,7 +37,7 @@
             {
                 download: {
                     //@TODO Update to work with all databases.
-                    url: contextualData.context + '/modules/databaseconnector/mongodb/export' + contextualData.locale,
+                    url: contextualData.context + '/modules/databaseconnector/export',
                     method: 'POST',
                     headers: {
                         accept: 'application/zip'
