@@ -165,8 +165,8 @@
                         exportConnectionsTemp2[i] = cc.exportConnections[i];
                     }
                 }
-                cc.exportConnections = exportConnectionsTemp;
             }
+            cc.exportConnections = exportConnectionsTemp;
         }
     };
 

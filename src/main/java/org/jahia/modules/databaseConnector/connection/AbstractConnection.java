@@ -221,6 +221,8 @@ public abstract class AbstractConnection <T extends ConnectionData> implements S
         return databaseType.getDisplayName();
     }
 
+    public abstract String getSerializedExportData();
+
     public String getOptions() {
         return options;
     }

@@ -17,6 +17,9 @@ import javax.jcr.query.QueryResult;
  */
 public class Utils {
 
+//    public final static char NEW_LINE = System.newLine();
+    public final static char WHITE_SPACE = '\u0020';
+    public final static char TABU = '\u0009';
     public static QueryResult query(String statement, JCRSessionWrapper session) throws RepositoryException {
         QueryManager queryManager = session.getWorkspace().getQueryManager();
         Query query = queryManager.createQuery(statement, Query.JCR_SQL2);

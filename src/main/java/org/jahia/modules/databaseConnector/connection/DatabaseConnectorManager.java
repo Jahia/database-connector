@@ -5,13 +5,17 @@ import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
 import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
 import org.jahia.modules.databaseConnector.dsl.DSLHandler;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-
+import java.util.zip.*;
 import java.io.*;
 import java.util.*;
+
 
 import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.getAllDatabaseTypes;
 
@@ -257,4 +261,80 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
     public void setDslHandlerMap(Map<String, DSLHandler> dslHandlerMap) {
         this.dslHandlerMap = dslHandlerMap;
     }
+
+    public File exportConnections (JSONObject connections) throws JSONException {
+
+        File connectionsZip = null;
+        FileOutputStream connectionZipOutStream = null;
+
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        File file = null;
+        ZipOutputStream zipOutputStream = null;
+
+        try {
+
+            file = new File("ExportedConnections.wzd");
+//            file = new File("connectionsZip");
+            connectionsZip = File.createTempFile("exportedConnections", ".zip");
+            connectionZipOutStream = new FileOutputStream(connectionsZip);
+            zipOutputStream = new ZipOutputStream(connectionZipOutStream);
+
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            fw = new FileWriter(file.getAbsoluteFile());
+            bw = new BufferedWriter(fw);
+
+            Iterator iterator = connections.keys();
+            while (iterator.hasNext()) {
+                String type = (String) iterator.next();
+                JSONArray connectionsArray = (JSONArray) connections.get(type);
+                for (int i = 0; i < connectionsArray.length(); i++) {
+                    String connectionId = connectionsArray.getString(i);
+                    bw.write(getConnection(connectionId, DatabaseTypes.valueOf(type)).getSerializedExportData());
+                }
+            }
+
+            zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
+            FileInputStream fileInputStream = new FileInputStream(file);
+            for (int readBytes = fileInputStream.read(); readBytes != -1; readBytes = fileInputStream.read()) {
+                zipOutputStream.write(readBytes);
+            }
+            zipOutputStream.closeEntry();
+
+            System.out.println("Done iterating");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ex) {
+                    logger.error(ex.getMessage(), ex);
+                }
+            }
+            if (connectionZipOutStream != null) {
+                try {
+                    connectionZipOutStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            FileUtils.deleteQuietly(file);
+        }
+        if (zipOutputStream != null) {
+            try {
+                zipOutputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return connectionsZip;
+    }
+
+
 }

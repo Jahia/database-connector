@@ -86,4 +86,9 @@ public class RedisConnection extends AbstractConnection {
         //@TODO Implement the parsing of options.
         return null;
     }
+
+    @Override
+    public String getSerializedExportData() {
+        return null;
+    }
 }

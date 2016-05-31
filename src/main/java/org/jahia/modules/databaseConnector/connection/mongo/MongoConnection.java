@@ -3,11 +3,12 @@ package org.jahia.modules.databaseConnector.connection.mongo;
 import com.mongodb.*;
 import com.mongodb.client.MongoDatabase;
 import org.apache.commons.lang.StringUtils;
+import org.jahia.modules.databaseConnector.Utils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 
-import java.util.LinkedHashMap;
 
+import java.util.LinkedHashMap;
 /**
  * Date: 11/1/2013
  *
@@ -73,6 +74,27 @@ public class MongoConnection extends AbstractConnection {
     public String parseOptions(LinkedHashMap options) {
         //@TODO implement the structure of Mongo options object
         return null;
+    }
+
+    @Override
+    public String getSerializedExportData() {
+
+        String newLine = System.getProperty("line.separator");//This will retrieve line separator dependent on OS.
+
+        //Implement the exported content data
+        StringBuilder serializedString = new StringBuilder();
+        serializedString.append( newLine + " connection {" + newLine + Utils.TABU + "type " + DATABASE_TYPE + newLine +
+                Utils.TABU +"host " + this.host + newLine + Utils.TABU + "port " + this.port + newLine + Utils.TABU +
+                "dbName" + this.dbName + newLine + Utils.TABU + "identifier " + this.id );
+        //
+        if (this.options != null) {
+            serializedString.append( newLine + Utils.TABU + "options " + "{ "+ this.options + newLine + Utils.TABU  + "}");
+        }
+        serializedString.append(newLine + Utils.TABU + "user " + this.user + newLine + Utils.TABU +
+                "password " + this.password + newLine + Utils.TABU + "authDb " + this.authDb + newLine  + "}");
+
+
+        return serializedString.toString();
     }
 
     public String getWriteConcern() {

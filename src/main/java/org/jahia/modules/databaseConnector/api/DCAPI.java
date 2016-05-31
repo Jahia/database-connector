@@ -31,12 +31,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
-
 import javax.inject.Inject;
+import javax.jcr.RepositoryException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -95,9 +97,32 @@ public class DCAPI {
     @POST
     @Path("/export")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response exportConnection(String data) {
-        return Response.status(Response.Status.OK).entity("{\"success\":\"The connections are exported\"}").build();
-//        return Response.status(Response.Status.OK).entity(databaseConnector.isConnectionIdAvailable(connectionId, DatabaseTypes.MONGO)).build();
+        try {
+            JSONObject jsonObject = new JSONObject(data);
+            File exportedZipFile = databaseConnector.exportConnectionsToZip(jsonObject);
+            Response.ResponseBuilder response;
+            if (exportedZipFile != null){
+                response = Response.ok(exportedZipFile);
+                response.type("application/zip").header("Content-Disposition", "attachment; filename=ExportedConnections.zip");
+            }
+            else {
+                response = Response.serverError();
+            }
+            return response.build();
+        } catch(JSONException ex) {
+            logger.error(ex.getMessage(), ex);
+            return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\":\"Invalid JSON object\"}").build();
+        } catch(RepositoryException ex) {
+            logger.error(ex.getMessage(), ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Could not perform connection export\"}").build();
+        } catch (IOException ex) {
+            logger.error(ex.getMessage(), ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Could not perform connection export\"}").build();
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Could not perform connection export\"}").build();
+        }
+
     }
 }

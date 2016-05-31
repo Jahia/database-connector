@@ -1,5 +1,6 @@
 package org.jahia.modules.databaseConnector.api.impl;
 
+import org.apache.commons.io.FileUtils;
 import org.jahia.modules.databaseConnector.connection.ConnectionData;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
@@ -9,15 +10,27 @@ import org.jahia.modules.databaseConnector.connection.redis.RedisConnection;
 import org.jahia.modules.databaseConnector.connection.redis.RedisConnectionData;
 import org.jahia.modules.databaseConnector.serialization.models.DbConnections;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
+import org.jahia.services.content.JCRNodeWrapper;
+import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.content.JCRTemplate;
+import org.jahia.services.importexport.ImportExportService;
+import org.jahia.settings.SettingsBean;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.InputStream;
+import org.xml.sax.SAXException;
+
+import javax.jcr.RepositoryException;
+import javax.xml.transform.TransformerException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @author donnylam on 2016-05-04.
@@ -110,19 +123,10 @@ public class DatabaseConnector extends AbstractResource {
         return true;
     }
 
-    public String export(String connectionId, DatabaseTypes databaseType) {
-        String connection = null;
-        switch (databaseType) {
-            case MONGO:
-                MongoConnection mongoConnection = databaseConnectorManager.getConnection(connectionId, databaseType);
-                connection = mongoConnection.makeConnectionData().getJson();
-                break;
-            case REDIS:
-                RedisConnection redisConnection = databaseConnectorManager.getConnection(connectionId, databaseType);
-                connection = redisConnection.makeConnectionData().getJson();
-                break;
-        }
-        return connection;
+
+    public File exportConnectionsToZip(JSONObject data)
+            throws IOException, RepositoryException, TransformerException, SAXException, JSONException {
+        return databaseConnectorManager.exportConnections(data);
     }
 
     public Map importConnections(InputStream source) {
