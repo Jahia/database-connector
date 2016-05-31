@@ -9,6 +9,9 @@ import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 
 
 import java.util.LinkedHashMap;
+
+import static org.jahia.modules.databaseConnector.Utils.*;
+
 /**
  * Date: 11/1/2013
  *
@@ -79,21 +82,17 @@ public class MongoConnection extends AbstractConnection {
     @Override
     public String getSerializedExportData() {
 
-        String newLine = System.getProperty("line.separator");//This will retrieve line separator dependent on OS.
 
         //Implement the exported content data
         StringBuilder serializedString = new StringBuilder();
-        serializedString.append( newLine + " connection {" + newLine + Utils.TABU + "type " + DATABASE_TYPE + newLine +
-                Utils.TABU +"host " + this.host + newLine + Utils.TABU + "port " + this.port + newLine + Utils.TABU +
-                "dbName" + this.dbName + newLine + Utils.TABU + "identifier " + this.id );
-        //
+        serializedString.append( NEW_LINE + " connection {" + NEW_LINE + TABU + "type " + DATABASE_TYPE + Utils.NEW_LINE +
+                TABU +"host " + this.host + NEW_LINE + TABU + "port " + this.port + NEW_LINE + TABU +
+                "dbName" + this.dbName + NEW_LINE + TABU + "identifier " + this.id );
         if (this.options != null) {
-            serializedString.append( newLine + Utils.TABU + "options " + "{ "+ this.options + newLine + Utils.TABU  + "}");
+            serializedString.append( NEW_LINE + TABU + "options " + "{ "+ this.options + NEW_LINE + TABU  + "}");
         }
-        serializedString.append(newLine + Utils.TABU + "user " + this.user + newLine + Utils.TABU +
-                "password " + this.password + newLine + Utils.TABU + "authDb " + this.authDb + newLine  + "}");
-
-
+        serializedString.append(NEW_LINE + TABU + "user " + this.user + NEW_LINE + TABU +
+                "password " + this.password + NEW_LINE + TABU + "authDb " + this.authDb + NEW_LINE + "}");
         return serializedString.toString();
     }
 

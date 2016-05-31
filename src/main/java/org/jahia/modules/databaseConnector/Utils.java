@@ -16,9 +16,7 @@ import javax.jcr.query.QueryResult;
  * @version 1.0
  */
 public class Utils {
-
-//    public final static char NEW_LINE = System.newLine();
-    public final static char WHITE_SPACE = '\u0020';
+    public final static String NEW_LINE = System.getProperty("line.separator");//This will retrieve line separator dependent on OS.
     public final static char TABU = '\u0009';
     public static QueryResult query(String statement, JCRSessionWrapper session) throws RepositoryException {
         QueryManager queryManager = session.getWorkspace().getQueryManager();

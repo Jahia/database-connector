@@ -97,6 +97,7 @@ public class DCAPI {
     @POST
     @Path("/export")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces("application/zip")
     public Response exportConnection(String data) {
         try {
             JSONObject jsonObject = new JSONObject(data);
