@@ -7,7 +7,10 @@ module.exports = function(grunt) {
                 separator: ''
             },
             databaseconnector  : {
-                src : ['src/main/javascript/components/main/databaseConnectorModule.js', 'src/main/javascript/components/main/dcRouterConfig.js','src/main/javascript/components/main/connectionsOverview/**/*.js', 'src/main/javascript/components/main/connectionManagement/**/*.js'],
+                src : ['src/main/javascript/components/main/databaseConnectorModule.js',
+                    'src/main/javascript/components/main/dcRouterConfig.js',
+                    'src/main/javascript/components/main/connectionsOverview/**/*.js',
+                    'src/main/javascript/components/main/connectionManagement/**/*.js'],
                 dest: 'src/main/resources/javascript/angular/components/dc-main.js'
             },
             core         : {

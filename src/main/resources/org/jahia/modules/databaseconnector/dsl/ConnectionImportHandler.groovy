@@ -26,9 +26,14 @@ class ConnectionImportHandler implements DSLHandler {
     def createWizard(Map<String, Object> map, Map<String, Map> importedConnectionsResults) {
         //create the storage container for the connections of specific database type if it does not exist
         if (!importedConnectionsResults.containsKey(map.get("type"))) {
-            importedConnectionsResults.put(map.get("type"), new LinkedHashMap());
+            //Create map to hold success connections and failed connections
+            Map<String, Map> results = new LinkedHashMap<>()
+            results.put("success", new LinkedHashMap<>())
+            results.put("failed", new LinkedHashMap<>())
+            importedConnectionsResults.put(map.get("type"), results)
         }
         //Added connection import result into the appropriate database type linked hash map
-        importedConnectionsResults.get(map.get("type")).put(map.get("identifier"), databaseConnectorManager.importConnection(map));
+        map = databaseConnectorManager.importConnection(map);
+        importedConnectionsResults.get(map.get("type")).get(map.get("status")).put(map.get("identifier"), map);
     }
 }
