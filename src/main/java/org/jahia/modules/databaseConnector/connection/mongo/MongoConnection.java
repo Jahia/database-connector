@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.Utils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
+import org.jahia.utils.EncryptionUtils;
 
 
 import java.util.LinkedHashMap;
@@ -83,16 +84,21 @@ public class MongoConnection extends AbstractConnection {
     public String getSerializedExportData() {
         StringBuilder serializedString = new StringBuilder();
         serializedString.append(
-                TABU + "type " + DOUBLE_QUOTE + DATABASE_TYPE + DOUBLE_QUOTE + Utils.NEW_LINE +
+                TABU + "type " + DOUBLE_QUOTE + DATABASE_TYPE + DOUBLE_QUOTE + NEW_LINE +
                 TABU +"host " + DOUBLE_QUOTE + this.host + DOUBLE_QUOTE + NEW_LINE +
                 TABU + "port " + DOUBLE_QUOTE + this.port + DOUBLE_QUOTE + NEW_LINE +
                 TABU + "dbName" + DOUBLE_QUOTE + this.dbName + DOUBLE_QUOTE + NEW_LINE +
                 TABU + "identifier " + DOUBLE_QUOTE + this.id + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "user " + DOUBLE_QUOTE + this.user + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "password " + DOUBLE_QUOTE + this.password + DOUBLE_QUOTE + NEW_LINE +
+                TABU + "isConnected " + DOUBLE_QUOTE + this.isConnected() + DOUBLE_QUOTE + NEW_LINE +
                 TABU + "authDb " + DOUBLE_QUOTE + this.authDb + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "isConnected " + DOUBLE_QUOTE + this.isConnected() + DOUBLE_QUOTE
+                TABU + "user " + DOUBLE_QUOTE + this.user + DOUBLE_QUOTE + NEW_LINE
         );
+
+        if (!StringUtils.isEmpty(this.password)) {
+            serializedString.append(TABU + "password " + DOUBLE_QUOTE + EncryptionUtils.passwordBaseEncrypt(this.password) + "_ENC" + DOUBLE_QUOTE );
+        }
+
+
         if (this.options != null) {
             //@TODO implement options structure
             serializedString.append(NEW_LINE + TABU + "options " + "{" + NEW_LINE + TABU + "}");
