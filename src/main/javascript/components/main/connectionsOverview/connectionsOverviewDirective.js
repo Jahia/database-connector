@@ -145,11 +145,7 @@
             }
             var url = contextualData.context + '/modules/databaseconnector/export';
             return dcDownloadFactory.download(url, 'text/plain', data).$promise.then(function (data) {
-                saveAs(data.response.blob, data.response.fileName)
-
                 if (data.response.blob != null) {
-
-                    // $scope.exported = true;
                     saveAs(data.response.blob, data.response.fileName);
                     toaster.pop({
                         type: 'success',
@@ -159,8 +155,6 @@
                         timeout: 4000
                     });
                 } else {
-                    // $scope.exported = false;
-                    console.log('error', response);
                     toaster.pop({
                         type: 'error',
                         title: 'Export Connection Failed!',
