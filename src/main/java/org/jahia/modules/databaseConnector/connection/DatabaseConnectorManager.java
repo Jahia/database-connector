@@ -1,11 +1,13 @@
 package org.jahia.modules.databaseConnector.connection;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.jahia.modules.databaseConnector.Utils;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
 import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
 import org.jahia.modules.databaseConnector.dsl.DSLHandler;
+import org.jahia.utils.EncryptionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -213,10 +215,17 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         Boolean isConnected = map.containsKey("isConnected") ? Boolean.parseBoolean((String) map.get("isConnected")) : false;
                         String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : null;
                         String user = map.containsKey("user") ? (String) map.get("user") : null;
-                        String password = map.containsKey("password") ? (String) map.get("password") : null;
+//                        String password = map.containsKey("password") ? (String) map.get("password") : null;
                         String writeConcern = map.containsKey("writeConcern") ? (String) map.get("writeConcern") : null;
                         String authDb = map.containsKey("authDb") ? (String) map.get("authDb") : null;
                         String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
+
+                        String password = (String) map.get("password");
+                        if(password != null && password.contains("_ENC")) {
+                            password = password.substring(0,32);
+                            password = EncryptionUtils.passwordBaseDecrypt(password);
+                            map.put("password",password);
+                         }
 
                         connection.setHost(host);
                         connection.setPort(port);
