@@ -28,12 +28,12 @@ class ConnectionImportHandler implements DSLHandler {
         if (!importedConnectionsResults.containsKey(map.get("type"))) {
             //Create map to hold success connections and failed connections
             Map<String, Map> results = new LinkedHashMap<>()
-            results.put("success", new LinkedHashMap<>())
-            results.put("failed", new LinkedHashMap<>())
+            results.put("success", new LinkedList<>())
+            results.put("failed", new LinkedList<>())
             importedConnectionsResults.put(map.get("type"), results)
         }
         //Added connection import result into the appropriate database type linked hash map
         map = databaseConnectorManager.importConnection(map);
-        importedConnectionsResults.get(map.get("type")).get(map.get("status")).put(map.get("identifier"), map);
+        importedConnectionsResults.get(map.get("type")).get(map.get("status")).add(map);
     }
 }

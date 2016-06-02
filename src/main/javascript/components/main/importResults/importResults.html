@@ -1,0 +1,65 @@
+<toaster-container
+        toaster-options="{'time-out': 6000, 'close-button':true, 'animation-class': 'toast-top-right', 'prevent-duplicates': true}"></toaster-container>
+<md-content>
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h3><span>Import Results</span></h3>
+            <span flex></span>
+            <md-button class="md-icon-button">
+                <md-icon class="md-secondary" ng-click="irc.goToConnections()"><i class="fa fa-home fa-2x"></i></md-icon>
+            </md-button>
+        </div>
+
+
+    </md-toolbar>
+    <md-list>
+        <div ng-if="irc.hasResults(databaseType)" ng-repeat="databaseType in irc.databaseTypes">
+            <md-subheader>
+                <h4>Imported {{databaseType}} connections</h4>
+            </md-subheader>
+            <md-divider></md-divider>
+            <md-list-item ng-repeat="failedConnection in irc.importResults[databaseType].failed">
+                <div class="errorStatusBar"></div>
+                <div>
+                    <h3>
+                        {{failedConnection.identifier}}
+                    </h3>
+                    <span>
+                        {{failedConnection.statusMessage}}
+                    </span>
+                </div>
+                <md-checkbox class="green md-secondary"
+                             aria-label="Select connection"
+                             ng-model="failedConnection.reImport"
+                             ng-true-value="'{{failedConnection.identifier}}'"
+                             ng-false-value="null"
+                             ng-change="irc.updateSelectedImports($index, databaseType)">
+                </md-checkbox>
+                <md-icon class="md-secondary"
+                           aria-label="Import connection"
+                           ng-click="irc.editConnection($index)">
+                    <i class="fa fa-pencil"></i>
+                </md-icon>
+                <md-icon class="md-secondary"
+                           aria-label="Import connection"
+                           ng-click="irc.reImportConnection(failedConnection)">
+                    <i class="fa fa-upload"></i>
+                </md-icon>
+                <md-divider></md-divider>
+            </md-list-item>
+
+            <md-list-item ng-repeat="successConnection in irc.importResults[databaseType].success">
+                <div class="successStatusBar"></div>
+                <div>
+                    <h3>
+                        {{successConnection.identifier}}
+                    </h3>
+                    <span>
+                        Successfully imported
+                    </span>
+                </div>
+                <md-divider></md-divider>
+            </md-list-item>
+        </div>
+    </md-list>
+</md-content>

@@ -1,6 +1,5 @@
 (function() {
     'use strict';
-    var connectionsOverviewController;
     var connectionsOverview = function($log, contextualData) {
 
         var directive = {
@@ -22,14 +21,15 @@
         .module('databaseConnector')
         .directive('dcConnectionsOverview', ['$log', 'contextualData', connectionsOverview]);
 
-    connectionsOverviewController = function ($scope, contextualData, dcDataFactory, $mdDialog, dcDownloadFactory, toaster) {
+    var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog, dcDownloadFactory, toaster, $state) {
         var coc = this;
         coc.getConnections = getConnections;
         coc.createConnection = createConnection;
         coc.exportConnections = {};
         coc.exportSelectedConnections = exportSelectedConnections;
         coc.isExportDisabled = isExportDisabled;
-
+        coc.importConnections = importConnections;
+        
         init();
 
         function init() {
@@ -37,7 +37,7 @@
             getConnections();
         }
 
-        $scope.uploadFiles = function (file, errFiles) {
+        function importConnections (file, errFiles) {
             $scope.f = file;
             $scope.errFile = errFiles && errFiles[0];
             if (file) {
@@ -54,37 +54,13 @@
 
             dcDataFactory.customRequest(request).then(function (response) {
                 var allConnectionsImported = true;
-                console.log(response);
                 for (var i in coc.databaseTypes) {
-                    if (!_.isUndefined(response.results[coc.databaseTypes[i]])) {
-                        if (_.findWhere(response.results[coc.databaseTypes[i]].status, {result: 'failed'}) != undefined) {
-                            allConnectionsImported = false;
-                        }
+                    if (!_.isUndefined(response.results[coc.databaseTypes[i]]) && !_.isEmpty(response.results[coc.databaseTypes[i]].failed)) {
+                        allConnectionsImported = false;
+                        break;
                     }
                 }
-
-                toaster.pop({
-                    type: allConnectionsImported ? 'success' : 'warning',
-                    title: 'Import Successful',
-                    body: allConnectionsImported ? 'All connections imported successfully!' : 'Not all imports were successful!',
-                    toastId: 'ims',
-                    timeout: 3000
-                });
-
-                $mdDialog.show({
-                    locals: {
-                        importResults: response.results,
-                        databaseTypes: coc.databaseTypes
-                    },
-                    controller: ImportConnectionsPopupController,
-                    templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connectionPopups/importResultsPopup.html',
-                    parent: angular.element(document.body),
-                    clickOutsideToClose: true,
-                    fullscreen: true
-                }).then(function () {
-                    getConnections();
-                }, function () {
-                });
+                $state.go('importResults', {results:response.results, status: allConnectionsImported});
             }, function (response) {
                 toaster.pop({
                     type: 'error',
@@ -165,8 +141,6 @@
             });
         }
 
-
-
         function isExportDisabled() {
             return _.isEmpty(coc.exportConnections);
         }
@@ -176,8 +150,7 @@
         });
     };
 
-
-    connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', 'dcDownloadFactory', 'toaster'];
+    connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', 'dcDownloadFactory', 'toaster', '$state'];
 
 
     function CreateConnectionPopupController($scope, $mdDialog, contextualData, dcDataFactory) {
@@ -229,32 +202,4 @@
     }
     
     CreateConnectionPopupController.$inject = ['$scope', '$mdDialog', 'contextualData', 'dcDataFactory', 'updateConnections'];
-
-    function ImportConnectionsPopupController($scope, $mdDialog, contextualData, dcDataFactory, importResults, databaseTypes) {
-        $scope.icpc = this;
-        $scope.icpc.importResults = importResults;
-        $scope.icpc.databaseTypes = databaseTypes;
-        $scope.icpc.hasResults = hasResults;
-
-        init();
-
-        function init() {
-            console.log($scope.icpc.importResults);
-        }
-
-        function reImportConnection(connection) {
-            var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[connection.type] + '/add';
-            dcDataFactory.customRequest({
-                url: url,
-                method: 'GET'
-            }).then(function(response) {
-            }, function(response) {});
-        }
-
-        function hasResults(databaseType) {
-            return !_.isUndefined($scope.icpc.importResults[databaseType]);
-        }
-    }
-
-    ImportConnectionsPopupController.$inject = ['$scope', '$mdDialog', 'contextualData', 'dcDataFactory', 'importResults', 'databaseTypes'];
 })();
