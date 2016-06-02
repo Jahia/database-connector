@@ -48,7 +48,7 @@ import java.io.InputStream;
 @Singleton
 public class MongoDB {
     private static final Logger logger = LoggerFactory.getLogger(MongoDB.class);
-    public static final String MAPPING = "mongodb";
+    public static final String MAPPING = "mongdb";
 
     private DatabaseConnector databaseConnector;
 
@@ -301,6 +301,19 @@ public class MongoDB {
         } catch(JSONException e) {
             logger.error("Cannot parse json data : {}", data);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
+        }
+    }
+
+
+    @GET
+    @Path("/status")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getServerStatus() {
+        try {
+            return Response.status(Response.Status.OK).entity("{\"success\":\"Found database status\"}").build();
+        }
+        catch(Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot get database status\"}").build();
         }
     }
 }
