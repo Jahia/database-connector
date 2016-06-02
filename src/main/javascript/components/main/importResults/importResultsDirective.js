@@ -21,9 +21,10 @@
         .module('databaseConnector')
         .directive('dcImportResults', ['$log', 'contextualData', importResults]);
 
-    function ImportResultsController($scope, contextualData, dcDataFactory, $state, $stateParams, toaster) {
+    function ImportResultsController($scope, contextualData, dcDataFactory, $state, $stateParams, toaster, $mdDialog) {
         var irc = this;
         irc.importResults = {};
+        irc.selectedImports = {};
         irc.hasResults = hasResults;
         irc.updateSelectedImports = updateSelectedImports;
         irc.reImportConnections = reImportConnections;
@@ -81,22 +82,42 @@
 
         function updateSelectedImports(index, databaseType) {
             if (irc.importResults[databaseType].failed[index].reImport !== null) {
-                var tempSelectedImports = angular.copy(irc.selectedImports);
+                var tempSelectedImports = _.isUndefined(irc.selectedImports[databaseType]) ? [] : angular.copy(irc.selectedImports[databaseType]);
                 tempSelectedImports.push(irc.importResults[databaseType].failed[index].reImport);
-                irc.selectedImports = tempSelectedImports
+                irc.selectedImports[databaseType] = tempSelectedImports;
             } else {
                 var tempSelectedImports = [];
-                for (var i in  irc.selectedImports) {
-                    if ( irc.selectedImports[i] !==  irc.importResults[databaseType].failed[index].reImport) {
-                        tempSelectedImports.push( irc.selectedImports[i]);
+                for (var i in  irc.selectedImports[databaseType]) {
+                    if ( irc.selectedImports[databaseType][i] !==  irc.importResults[databaseType].failed[index].reImport) {
+                        tempSelectedImports.push( irc.selectedImports[databaseType][i]);
                     }
                 }
-                 irc.selectedImports = tempSelectedImports;
+                 irc.selectedImports[databaseType] = tempSelectedImports;
             }
         }
 
-        function editConnection() {
+        function editConnection($index, databaseType, ev) {
+            var backupConnection = angular.copy(irc.importResults[databaseType].failed[$index]);
+            $mdDialog.show({
+                locals: {
+                    connection: irc.importResults[databaseType].failed[$index]
+                },
+                controller: EditImportedConnectionPopupController,
+                templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/importResults/importPopups/editImportedConnectionPopup.html',
+                parent: angular.element(document.body),
+                targetEvent: ev,
+                clickOutsideToClose:true,
+                fullscreen: true
 
+            }).then(function(connection){
+                console.log(connection);
+                if (!_.isUndefined(connection) && connection !== null) {
+                    irc.importResults[databaseType].failed[$index] = {};
+                    irc.importResults[databaseType].failed[$index] = connection;
+                }
+            }, function(){
+                irc.importResults[databaseType].failed[$index] = backupConnection;
+            });
         }
 
         function goToConnections() {
@@ -104,5 +125,22 @@
         }
     }
 
-    ImportResultsController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$state', '$stateParams', 'toaster'];
+    ImportResultsController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$state', '$stateParams', 'toaster', '$mdDialog'];
+
+    function EditImportedConnectionPopupController($scope, $mdDialog, connection) {
+        $scope.eicc = this;
+
+        init();
+
+        function init() {
+            $scope.eicc.connection = connection;
+        }
+        
+        $scope.$on('importConnectionClosed', function(event, connection){
+            $mdDialog.hide(connection);
+        });
+
+    }
+
+    EditImportedConnectionPopupController.$inject = ['$scope', '$mdDialog', 'connection'];
 })();

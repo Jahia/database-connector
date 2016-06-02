@@ -36,8 +36,8 @@
                              ng-change="irc.updateSelectedImports($index, databaseType)">
                 </md-checkbox>
                 <md-icon class="md-secondary"
-                           aria-label="Import connection"
-                           ng-click="irc.editConnection($index)">
+                           aria-label="Edit import connection"
+                           ng-click="irc.editConnection($index, databaseType, $event)">
                     <i class="fa fa-pencil"></i>
                 </md-icon>
                 <md-icon class="md-secondary"

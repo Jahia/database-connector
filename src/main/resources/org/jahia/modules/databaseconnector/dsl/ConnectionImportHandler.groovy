@@ -32,6 +32,8 @@ class ConnectionImportHandler implements DSLHandler {
             results.put("failed", new LinkedList<>())
             importedConnectionsResults.put(map.get("type"), results)
         }
+        map.put("id", map.get("identifier"))
+        map.put("databaseType", map.get("type"))
         //Added connection import result into the appropriate database type linked hash map
         map = databaseConnectorManager.importConnection(map);
         importedConnectionsResults.get(map.get("type")).get(map.get("status")).add(map);

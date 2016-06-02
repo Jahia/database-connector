@@ -131,6 +131,10 @@ form legend {
     width: 400px;
 }
 
+.editConnectionContainer {
+    min-width: 700px;
+}
+
 .successStatusBar {
     position: relative;
     margin-left:-16px;

@@ -75,9 +75,12 @@
             Create </md-button>
         <md-button ng-if="cmcc.mode=='edit'" class="md-raised md-primary pull-right" ng-click="cmcc.editMongoConnection()" ng-disabled="mongoForm.$invalid">
                 Update </md-button>
-        <md-button class="md-raised md-primary pull-right" ng-click="cmcc.cancelCreation()">
-            Back </md-button>
-
-
+        <md-button class="md-raised md-primary pull-right" ng-if="cmcc.mode=='import-edit'" ng-click="cmcc.updateImportedConnection()">
+            Ok
+        </md-button>
+        <md-button class="md-raised md-primary pull-right" ng-click="cmcc.cancel()">
+            <span ng-if="cmcc.mode=='edit' || cmcc.mode=='create'">Back</span>
+            <span ng-if="cmcc.mode=='import-edit'">Cancel</span>
+        </md-button>
     </form>
 </md-content>

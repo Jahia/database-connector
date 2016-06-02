@@ -67,15 +67,16 @@
         cmcc.createMongoConnection = createMongoConnection;
         cmcc.editMongoConnection = editMongoConnection;
         cmcc.testMongoConnection = testMongoConnection;
-        cmcc.cancelCreation = cancelCreation;
+        cmcc.cancel = cancel;
         cmcc.updateIsEmpty = updateIsEmpty;
+        cmcc.updateImportedConnection = updateImportedConnection;
 
         init();
 
         function init() {
             cmcc.isEmpty.password = updateIsEmpty('password');
             cmcc.isEmpty.user = updateIsEmpty('user');
-            if (cmcc.mode === 'edit') {
+            if (cmcc.mode === 'edit' || cmcc.mode === 'import-edit') {
                 cmcc.connection.oldId = angular.copy(cmcc.connection.id);
             } else {
                 cmcc.connection.isConnected = true;
@@ -83,6 +84,9 @@
         }
 
         function createMongoConnection() {
+            if (cmcc.mode === 'import-edit') {
+                return;
+            }
             cmcc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/mongodb/add';
             dcDataFactory.customRequest({
@@ -106,6 +110,9 @@
         }
 
         function editMongoConnection() {
+            if (cmcc.mode === 'import-edit') {
+                return;
+            }
             cmcc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/mongodb/edit';
             dcDataFactory.customRequest({
@@ -158,8 +165,12 @@
             });
         }
 
-        function cancelCreation() {
-         $scope.$emit('creationCancelled', null);
+        function cancel() {
+            if (cmcc.mode === 'import-edit') {
+                $scope.$emit('importConnectionClosed', null);
+            } else {
+             $scope.$emit('creationCancelled', null);
+            }
         }
 
         function updateIsEmpty(property) {
@@ -186,6 +197,9 @@
             }
         }
 
+        function updateImportedConnection() {
+            $scope.$emit('importConnectionClosed', cmcc.connection);
+        }
 
     };
 
