@@ -296,18 +296,15 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
 
     public Map<String, Object> getServerStatus(String connectionId, DatabaseTypes databaseType ) {
 
-         MongoConnection connection = getConnection(connectionId, databaseType);
-
+         AbstractConnection connection = getConnection(connectionId, databaseType);
 
         try {
-            return (Map) connection.getServerStatus();
+              return (Map<String, Object>) connection.getServerStatus();
 
         } catch (NullPointerException e) {
             logger.error(e.getMessage(), e);
             return null;
         }
-
-
 
     }
 
