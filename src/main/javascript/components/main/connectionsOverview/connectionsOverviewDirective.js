@@ -78,6 +78,7 @@
                 url: url,
                 method: 'GET'
             }).then(function (response) {
+                coc.connections = {};
                 coc.connections = response.connections;
             }, function (response) {
             });
@@ -125,6 +126,7 @@
                     saveAs(data.response.blob, data.response.fileName);
                     coc.exportConnections = {};
                     $scope.$broadcast('resetExportSelection', null);
+                    getConnections();
                     toaster.pop({
                         type: 'success',
                         title: 'Connection Successfully Exported!',
