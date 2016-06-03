@@ -126,5 +126,4 @@ public class DatabaseConnector extends AbstractResource {
     public Map<String, Object> getServerStatus(String connectionId, DatabaseTypes databaseType ) {
         return databaseConnectorManager.getServerStatus(connectionId,databaseType);
     }
-
-    }
+}

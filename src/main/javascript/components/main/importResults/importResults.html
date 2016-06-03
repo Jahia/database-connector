@@ -2,9 +2,9 @@
         toaster-options="{'time-out': 6000, 'close-button':true, 'animation-class': 'toast-top-right', 'prevent-duplicates': true}"></toaster-container>
 <dc-spinner spinner-mode="indeterminiate" show="irc.importInProgress"></dc-spinner>
 <md-content>
-    <md-toolbar>
+    <md-toolbar layout-padding>
         <div class="md-toolbar-tools">
-            <h3><span>Import Results</span></h3>
+            <h2><span>Import Results</span></h2>
             <span flex></span>
             <md-button class="md-icon-button">
                 <md-icon class="md-secondary" ng-click="irc.goToConnections()"><i class="fa fa-home fa-2x"></i></md-icon>
@@ -13,8 +13,6 @@
                 <md-icon class="md-secondary" ng-click="irc.reImportConnections()"><i class="fa fa-download fa-2x"></i></md-icon>
             </md-button>
         </div>
-
-
     </md-toolbar>
     <md-list>
         <div ng-if="irc.hasResults(databaseType)" ng-repeat="databaseType in irc.databaseTypes">

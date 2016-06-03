@@ -14,11 +14,10 @@ angular.module('databaseConnector').config(function(contextualData, $stateProvid
             templateUrl:contextualData.urlBaseSiteSettingsTemplates + 'main.html.ajax'
         })
         .state('connectionsStatus', {
-            url: '/connectionsStatus',
+            url: '/connections-status',
             template: '<dc-connection-status>',
             params: {
-                connectionId: null,
-                options: {}
+                connection: null
             }
         })
         .state('importResults', {

@@ -27,6 +27,15 @@
         csc.goToConnections = goToConnections;
         csc.checkServerStatus = checkServerStatus;
 
+        init();
+
+        function init() {
+            if (!$stateParams.connection) {
+                goToConnections();
+            } else {
+                csc.connection = $stateParams.connection;
+            }
+        }
 
         function checkServerStatus(connection) {
             var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[connection.type] + '/status/'+ csc.connection.id;
@@ -50,6 +59,4 @@
     }
 
     ConnectionStatusController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$state', '$stateParams', 'toaster', '$mdDialog'];
-
-
 })();

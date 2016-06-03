@@ -29,7 +29,6 @@ import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
 import org.jahia.services.content.JCRTemplate;
-import org.jahia.utils.EncryptionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,8 +40,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * @author stefan on 2016-05-02.
@@ -308,7 +305,8 @@ public class MongoDB {
 
 
     @GET
-    @Path("/status/{connectionId}")    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/status/{connectionId}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getServerStatus(@PathParam("connectionId") String connectionId) {
         try {
             logger.info("Successfully retrieved Status for MongoDB connection  with id: " + connectionId);

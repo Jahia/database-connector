@@ -31,6 +31,7 @@
                                <md-button class="md-icon-button" ng-if="!cc.connection.isConnected" ng-click="cc.updateConnection(true)"><i class="fa fa-plug" aria-label="connect to database"></i></md-button>
                                <md-button class="md-icon-button" ng-if="cc.connection.isConnected" ng-click="cc.updateConnection(false)"><i class="fa fa-chain-broken" aria-label="disconnect from database"></i></md-button>
                                <md-button class="md-icon-button" ng-click="cc.editConnection($event)"><i class="fa fa-pencil-square-o" aria-label="edit connections details"></i></md-button>
+                               <md-button class="md-icon-button" ng-click="cc.goToStatus()"><i class="fa fa-line-chart" aria-label="connection status"></i></md-button>
                                <md-button class="md-icon-button" ng-click="cc.openDeleteConnectionDialog($event)"><i class="fa fa-trash-o" aria-label="delete connection"></i></md-button>
                            </div>
                        </div>

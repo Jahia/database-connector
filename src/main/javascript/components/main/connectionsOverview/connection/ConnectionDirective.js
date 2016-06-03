@@ -24,7 +24,7 @@
         .module('databaseConnector')
         .directive('dcConnection', ['$log', 'contextualData', Connection]);
 
-    var ConnectionController = function($scope, contextualData, dcDataFactory, $mdDialog, $filter, toaster) {
+    var ConnectionController = function($scope, contextualData, dcDataFactory, $mdDialog, $filter, toaster, $state) {
         var cc = this;
         cc.imageUrl = contextualData.context + '/modules/database-connector/images/' + cc.connection.databaseType + '/logo_60.png';
         cc.originalConnection = angular.copy(cc.connection);
@@ -32,6 +32,8 @@
         cc.openDeleteConnectionDialog = openDeleteConnectionDialog;
         cc.editConnection = editConnection;
         cc.exportValueChanged = exportValueChanged;
+        cc.goToStatus = goToStatus;
+        
         cc.spinnerOptions = {
             mode: 'indeterminate',
             showSpinner: false
@@ -173,9 +175,13 @@
 
         }
         
+        function goToStatus() {
+            $state.go('connectionsStatus', {connection: cc.connection});
+        }
+        
     };
 
-    ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', '$filter', 'toaster'];
+    ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', '$filter', 'toaster', '$state'];
     
     function EditConnectionPopupController($scope, $mdDialog, connection) {
         $scope.ecp = this;
