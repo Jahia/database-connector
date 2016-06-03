@@ -25,7 +25,8 @@ angular.module('databaseConnector').config(function(contextualData, $stateProvid
             url: '/import-results',
             template: '<dc-import-results>',
             params: {
-                results: null
+                results: null,
+                status: null
             }
         })
 }, ['contextualData', '$stateProvider', '$urlRouterProvider']);

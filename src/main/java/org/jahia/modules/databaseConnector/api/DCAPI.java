@@ -25,10 +25,13 @@ package org.jahia.modules.databaseConnector.api;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.jahia.modules.databaseConnector.Utils;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.api.subresources.MongoDB;
+import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.services.content.JCRTemplate;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
@@ -42,6 +45,9 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -134,5 +140,59 @@ public class DCAPI {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Could not perform connection export\"}").build();
         }
 
+    }
+
+    @POST
+    @Path("/reimport/{multiple}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reImportConnections(@PathParam("multiple") boolean multiple, String data) {
+        try {
+            JSONObject jsonAnswer = new JSONObject();
+            if (multiple) {
+                Map<String, LinkedList> importResults = new LinkedHashMap<>();
+                LinkedList failed = new LinkedList();
+                LinkedList success = new LinkedList();
+                JSONArray connectionsToImport = new JSONArray(data);
+                for (int i = 0; i < connectionsToImport.length(); i++) {
+                    Map<String, Object> result = Utils.buildConnection(connectionsToImport.getJSONObject(i));
+                    if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
+                        AbstractConnection connection = ((AbstractConnection)result.get("connection"));
+                        if (connection.isConnected() && !databaseConnector.testConnection(connection)) {
+                            connection.isConnected(false);
+                        }
+                        if (databaseConnector.addEditConnection(connection, false)) {
+                            result.put("connection", Utils.buildConnectionMap(connection));
+                            success.push(result);
+                        } else {
+                            result.put("connection", Utils.buildConnectionMap(connection));
+                            failed.push(result);
+                        }
+                    } else {
+                        failed.push(result);
+                    }
+                }
+                importResults.put("failed", failed);
+                importResults.put("success", success);
+                jsonAnswer.put("connections", importResults);
+            } else {
+                Map<String, Object> result = Utils.buildConnection( new JSONObject(data));
+                if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
+                    AbstractConnection connection = (AbstractConnection)result.get("connection");
+                    if (connection.isConnected() && !databaseConnector.testConnection(connection)) {
+                        connection.isConnected(false);
+                    }
+                    databaseConnector.addEditConnection(connection, false);
+                    jsonAnswer.put("connection", Utils.buildConnectionMap(connection));
+                } else {
+                    return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"Invalid json object!\"}").build();
+                }
+            }
+            return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
+
+        } catch(JSONException e) {
+            logger.error("Cannot parse json data : {}", data);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
+        }
     }
 }

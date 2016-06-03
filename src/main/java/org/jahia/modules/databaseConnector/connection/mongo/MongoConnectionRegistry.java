@@ -86,15 +86,19 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                 if (!mongoConnection.getId().equals(mongoConnection.getOldId())) {
                     registry.remove(mongoConnection.getOldId());
                 }
-                if (mongoConnection.isConnected()) {
+                if (mongoConnection.isConnected() && mongoConnection.testConnectionCreation()) {
                     mongoConnection.registerAsService();
+                }else {
+                    mongoConnection.isConnected(false);
                 }
                 registry.put(mongoConnection.getId(), mongoConnection);
             } else {
                 //If this is a new connection, just add it to registry and register the service if it should be connected.
                 registry.put(mongoConnection.getId(), mongoConnection);
-                if (mongoConnection.isConnected()) {
+                if (mongoConnection.isConnected() && mongoConnection.testConnectionCreation()) {
                     mongoConnection.registerAsService();
+                } else {
+                    mongoConnection.isConnected(false);
                 }
             }
             return true;

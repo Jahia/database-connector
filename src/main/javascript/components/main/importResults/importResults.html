@@ -1,5 +1,6 @@
 <toaster-container
         toaster-options="{'time-out': 6000, 'close-button':true, 'animation-class': 'toast-top-right', 'prevent-duplicates': true}"></toaster-container>
+<dc-spinner spinner-mode="indeterminiate" show="irc.importInProgress"></dc-spinner>
 <md-content>
     <md-toolbar>
         <div class="md-toolbar-tools">
@@ -7,6 +8,9 @@
             <span flex></span>
             <md-button class="md-icon-button">
                 <md-icon class="md-secondary" ng-click="irc.goToConnections()"><i class="fa fa-home fa-2x"></i></md-icon>
+            </md-button>
+            <md-button class="md-icon-button" ng-disabled="irc.isReImportDisabled()">
+                <md-icon class="md-secondary" ng-click="irc.reImportConnections()"><i class="fa fa-download fa-2x"></i></md-icon>
             </md-button>
         </div>
 
@@ -31,7 +35,7 @@
                 <md-checkbox class="green md-secondary"
                              aria-label="Select connection"
                              ng-model="failedConnection.reImport"
-                             ng-true-value="'{{failedConnection.identifier}}'"
+                             ng-true-value="'{{$index}}'"
                              ng-false-value="null"
                              ng-change="irc.updateSelectedImports($index, databaseType)">
                 </md-checkbox>
@@ -43,7 +47,7 @@
                 <md-icon class="md-secondary"
                            aria-label="Import connection"
                            ng-click="irc.reImportConnection(failedConnection)">
-                    <i class="fa fa-upload"></i>
+                    <i class="fa fa-download"></i>
                 </md-icon>
                 <md-divider></md-divider>
             </md-list-item>

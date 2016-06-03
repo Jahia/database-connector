@@ -32,6 +32,8 @@
         irc.editConnection = editConnection;
         irc.goToConnections = goToConnections;
         irc.filterFailedConnections = filterFailedConnections;
+        irc.isReImportDisabled = isReImportDisabled;
+        irc.importInProgress = false;
         init();
 
         function init() {
@@ -50,7 +52,6 @@
                         toastId: 'irc',
                         timeout: 3000
                     });
-                    console.log(irc);
                 } else {
                     $state.go('connections');
                 }
@@ -60,7 +61,8 @@
         }
 
         function reImportConnection(connection, $index) {
-            var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[connection.type] + '/reimport/false';
+            irc.importInProgress = true;
+            var url = contextualData.context + '/modules/databaseconnector/reimport/false';
             dcDataFactory.customRequest({
                 url: url,
                 method: 'POST',
@@ -71,16 +73,39 @@
                     irc.importResults[connection.databaseType].failed[$index] = null;
                     irc.importResults[connection.databaseType].failed[$index] = connection.ignore = true;
                 }
-            }, function(response) {});
+                irc.importInProgress = false;
+            }, function(response) {
+                irc.importInProgress = false;
+            });
         }
 
         function reImportConnections() {
-            var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[connection.type] + '/reimport/true';
+            irc.importInProgress = true;
+            var url = contextualData.context + '/modules/databaseconnector/reimport/true';
+            var connections = [];
+            for (var databaseType in irc.selectedImports) {
+                for(var i in irc.selectedImports[databaseType]) {
+                    connections.push(irc.importResults[databaseType].failed[irc.selectedImports[databaseType][i]]);
+                }
+            }
             dcDataFactory.customRequest({
                 url: url,
-                method: 'POST'
+                method: 'POST',
+                data:connections
             }).then(function(response) {
-            }, function(response) {});
+                var results = response.connections;
+                for (var i in results.success) {
+                    irc.importResults[results.success[i].connection.databaseType].success.push(results.success[i].connection);
+                    results.success[i].connection.ignore = true;
+                    irc.importResults[results.success[i].connection.databaseType].failed[results.success[i].reImport] = null;
+                    irc.importResults[results.success[i].connection.databaseType].failed[results.success[i].reImport] = results.success[i].connection;
+                }
+                irc.importInProgress = false;
+                clearSelectedImports();
+            }, function(response) {
+                irc.importInProgress = false;
+                clearSelectedImports();
+            });
         }
 
         function hasResults(databaseType) {
@@ -93,13 +118,7 @@
                 tempSelectedImports.push(irc.importResults[databaseType].failed[index].reImport);
                 irc.selectedImports[databaseType] = tempSelectedImports;
             } else {
-                var tempSelectedImports = [];
-                for (var i in  irc.selectedImports[databaseType]) {
-                    if ( irc.selectedImports[databaseType][i] !==  irc.importResults[databaseType].failed[index].reImport) {
-                        tempSelectedImports.push( irc.selectedImports[databaseType][i]);
-                    }
-                }
-                 irc.selectedImports[databaseType] = tempSelectedImports;
+                irc.selectedImports[databaseType].splice(index, 1);
             }
         }
 
@@ -133,6 +152,24 @@
         function filterFailedConnections(connection) {
             return (!connection.ignore);
         }
+
+        function isReImportDisabled() {
+            for(var i in irc.selectedImports) {
+                if (!_.isUndefined(irc.selectedImports[i]) && !_.isEmpty(irc.selectedImports[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function clearSelectedImports() {
+            for (var databaseType in irc.selectedImports) {
+                for (var i in irc.selectedImports[databaseType]) {
+                    irc.importResults[databaseType].failed[irc.selectedImports[databaseType][i]].reImport = null;
+                }
+            }
+            irc.selectedImports = {};
+        }
     }
 
     ImportResultsController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$state', '$stateParams', 'toaster', '$mdDialog'];
@@ -147,7 +184,6 @@
         }
         
         $scope.$on('importConnectionClosed', function(event, connection){
-            console.log('connection when import edit dialog closed ', connection);
             $mdDialog.hide(connection);
         });
 
