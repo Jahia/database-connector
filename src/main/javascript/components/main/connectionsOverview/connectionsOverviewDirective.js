@@ -123,6 +123,8 @@
             return dcDownloadFactory.download(url, 'text/plain', data).$promise.then(function (data) {
                 if (data.response.blob != null) {
                     saveAs(data.response.blob, data.response.fileName);
+                    coc.exportConnections = {};
+                    $scope.$broadcast('resetExportSelection', null);
                     toaster.pop({
                         type: 'success',
                         title: 'Connection Successfully Exported!',

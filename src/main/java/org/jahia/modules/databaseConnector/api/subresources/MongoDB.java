@@ -29,6 +29,7 @@ import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
 import org.jahia.services.content.JCRTemplate;
+import org.jahia.utils.EncryptionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,7 +41,8 @@ import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.InputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author stefan on 2016-05-02.
@@ -48,7 +50,7 @@ import java.io.InputStream;
 @Singleton
 public class MongoDB {
     private static final Logger logger = LoggerFactory.getLogger(MongoDB.class);
-    public static final String MAPPING = "mongdb";
+    public static final String MAPPING = "mongodb";
 
     private DatabaseConnector databaseConnector;
 
@@ -315,5 +317,100 @@ public class MongoDB {
         catch(Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot get database status\"}").build();
         }
+    }
+
+    @POST
+    @Path("/reimport/{multiple}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reImportConnections(@PathParam("multiple") boolean multiple, String data) {
+        try {
+            JSONObject jsonAnswer = new JSONObject();
+            if (multiple) {
+
+            } else {
+                Map<String, Object> result = buildConnection( new JSONObject(data));
+                if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
+                    databaseConnector.addEditConnection((MongoConnection)result.get("connection"), false);
+                    jsonAnswer.put("connection", buildConnectionMap((MongoConnection)result.get("connection")));
+                } else {
+                    return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"Invalid json object!\"}").build();
+                }
+            }
+            return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
+
+        } catch(JSONException e) {
+            logger.error("Cannot parse json data : {}", data);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
+        }
+    }
+
+    private Map<String, Object> buildConnection(JSONObject jsonConnectionData) throws JSONException{
+        Map<String, Object> result = new LinkedHashMap<>();
+        JSONArray missingParameters = new JSONArray();
+        if (!jsonConnectionData.has("id") || StringUtils.isEmpty(jsonConnectionData.getString("id"))) {
+            missingParameters.put("id");
+        }
+        if (!jsonConnectionData.has("host") || StringUtils.isEmpty(jsonConnectionData.getString("host"))) {
+            missingParameters.put("host");
+        }
+        if (!jsonConnectionData.has("port") || StringUtils.isEmpty(jsonConnectionData.getString("port"))) {
+            missingParameters.put("port");
+        }
+        if (!jsonConnectionData.has("dbName") || StringUtils.isEmpty(jsonConnectionData.getString("dbName"))) {
+            missingParameters.put("dbName");
+        }
+        if (missingParameters.length() > 0) {
+            result.put("connectionStatus", "failed");
+        } else {
+            String id = jsonConnectionData.has("id") ? jsonConnectionData.getString("id") : null;
+            String host = jsonConnectionData.has("host") ? jsonConnectionData.getString("host") : null;
+            Integer port = jsonConnectionData.has("port") ? jsonConnectionData.getInt("port") : null;
+            Boolean isConnected = jsonConnectionData.has("isConnected") ? jsonConnectionData.getBoolean("isConnected") : false;
+            String dbName = jsonConnectionData.has("dbName") ? jsonConnectionData.getString("dbName") : null;
+            String user = jsonConnectionData.has("user") ? jsonConnectionData.getString("user") : null;
+            String password = jsonConnectionData.has("password") ? jsonConnectionData.getString("password") : null;
+            String writeConcern = jsonConnectionData.has("writeConcern") ? jsonConnectionData.getString("writeConcern") : null;
+            String authDb = jsonConnectionData.has("authDb") ? jsonConnectionData.getString("authDb") : null;
+            MongoConnection connection = new MongoConnection(id);
+            connection.setHost(host);
+            connection.setPort(port);
+            connection.isConnected(isConnected);
+            connection.setDbName(dbName);
+            connection.setUser(user);
+            if(password != null && password.contains("_ENC")) {
+                password = password.substring(0,32);
+                password = EncryptionUtils.passwordBaseDecrypt(password);
+            }
+            connection.setPassword(password);
+            connection.setWriteConcern(writeConcern);
+            connection.setAuthDb(authDb);
+            JSONObject jsonAnswer = new JSONObject();
+            if (!databaseConnector.testConnection(connection)) {
+                connection.isConnected(false);
+                jsonAnswer.put("connectionVerified", false);
+            } else {
+                jsonAnswer.put("connectionVerified", true);
+            }
+            result.put("connectionStatus", "success");
+            result.put("connection", connection);
+        }
+        return result;
+    }
+
+    private Map<String, Object> buildConnectionMap(MongoConnection connection) throws JSONException{
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("id", connection.getId());
+        result.put("host", connection.getHost());
+        result.put("isConnected", connection.isConnected());
+        result.put("dbName", connection.getDbName());
+        result.put("authDb", connection.getAuthDb());
+        result.put("databaseType", connection.getDatabaseType());
+        result.put("user", connection.getUser());
+        result.put("writeConcern", connection.getWriteConcern());
+        if (!StringUtils.isEmpty(connection.getPassword())) {
+            result.put("password", EncryptionUtils.passwordBaseEncrypt(connection.getPassword()) + "_ENC");
+        }
+        return result;
     }
 }

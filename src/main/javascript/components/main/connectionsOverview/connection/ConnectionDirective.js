@@ -38,6 +38,9 @@
         };
         init();
 
+        $scope.$on('resetExportSelection', function(){
+           cc.connection.export = false;
+        });
         function init() {
             //Replace any null values, so they dont show up.
             for (var i in cc.connection) {

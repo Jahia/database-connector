@@ -31,6 +31,7 @@
         irc.reImportConnection = reImportConnection;
         irc.editConnection = editConnection;
         irc.goToConnections = goToConnections;
+        irc.filterFailedConnections = filterFailedConnections;
         init();
 
         function init() {
@@ -58,16 +59,22 @@
             });
         }
 
-        function reImportConnection(connection) {
+        function reImportConnection(connection, $index) {
             var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[connection.type] + '/reimport/false';
             dcDataFactory.customRequest({
                 url: url,
-                method: 'POST'
+                method: 'POST',
+                data: connection
             }).then(function(response) {
+                if (!_.isUndefined(response.connection)) {
+                    irc.importResults[connection.databaseType].success.push(connection);
+                    irc.importResults[connection.databaseType].failed[$index] = null;
+                    irc.importResults[connection.databaseType].failed[$index] = connection.ignore = true;
+                }
             }, function(response) {});
         }
 
-        function reImportConnections(connection) {
+        function reImportConnections() {
             var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[connection.type] + '/reimport/true';
             dcDataFactory.customRequest({
                 url: url,
@@ -110,7 +117,6 @@
                 fullscreen: true
 
             }).then(function(connection){
-                console.log(connection);
                 if (!_.isUndefined(connection) && connection !== null) {
                     irc.importResults[databaseType].failed[$index] = {};
                     irc.importResults[databaseType].failed[$index] = connection;
@@ -122,6 +128,10 @@
 
         function goToConnections() {
             $state.go('connections');
+        }
+        
+        function filterFailedConnections(connection) {
+            return (!connection.ignore);
         }
     }
 
@@ -137,6 +147,7 @@
         }
         
         $scope.$on('importConnectionClosed', function(event, connection){
+            console.log('connection when import edit dialog closed ', connection);
             $mdDialog.hide(connection);
         });
 

@@ -18,11 +18,11 @@
                 <h4>Imported {{databaseType}} connections</h4>
             </md-subheader>
             <md-divider></md-divider>
-            <md-list-item ng-repeat="failedConnection in irc.importResults[databaseType].failed">
+            <md-list-item ng-repeat="failedConnection in irc.importResults[databaseType].failed | filter:irc.filterFailedConnections track by $index">
                 <div class="errorStatusBar"></div>
                 <div>
                     <h3>
-                        {{failedConnection.identifier}}
+                        {{failedConnection.id}}
                     </h3>
                     <span>
                         {{failedConnection.statusMessage}}
@@ -52,7 +52,7 @@
                 <div class="successStatusBar"></div>
                 <div>
                     <h3>
-                        {{successConnection.identifier}}
+                        {{successConnection.id}}
                     </h3>
                     <span>
                         Successfully imported
