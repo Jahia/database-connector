@@ -11,7 +11,8 @@ module.exports = function(grunt) {
                     'src/main/javascript/components/main/dcRouterConfig.js',
                     'src/main/javascript/components/main/connectionsOverview/**/*.js',
                     'src/main/javascript/components/main/importResults/**/*.js',
-                    'src/main/javascript/components/main/connectionManagement/**/*.js'],
+                    'src/main/javascript/components/main/connectionManagement/**/*.js',
+                    'src/main/javascript/components/main/connectionStatus/**/*.js'],
                 dest: 'src/main/resources/javascript/angular/components/dc-main.js'
             },
             core         : {
