@@ -122,4 +122,9 @@ public class DatabaseConnector extends AbstractResource {
     public Map importConnections(InputStream source) {
         return databaseConnectorManager.executeConnectionImportHandler(source);
     }
-}
+
+    public Map<String, Object> getServerStatus(String connectionId, DatabaseTypes databaseType ) {
+        return databaseConnectorManager.getServerStatus(connectionId,databaseType);
+    }
+
+    }

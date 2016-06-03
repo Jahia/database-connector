@@ -308,11 +308,12 @@ public class MongoDB {
 
 
     @GET
-    @Path("/status")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getServerStatus() {
+    @Path("/status/{connectionId}")    @Produces(MediaType.APPLICATION_JSON)
+    public Response getServerStatus(@PathParam("connectionId") String connectionId) {
         try {
-            return Response.status(Response.Status.OK).entity("{\"success\":\"Found database status\"}").build();
+            logger.info("Successfully retrieved Status for MongoDB connection  with id: " + connectionId);
+//            return Response.status(Response.Status.OK).entity("{\"success\":\"Found database status\"}").build();
+            return Response.status(Response.Status.OK).entity(databaseConnector.getServerStatus(connectionId, DatabaseTypes.MONGO)).build();
         }
         catch(Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot get database status\"}").build();

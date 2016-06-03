@@ -220,11 +220,11 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
 
                         String password = (String) map.get("password");
-                        if(password != null && password.contains("_ENC")) {
-                            password = password.substring(0,32);
-                            password = EncryptionUtils.passwordBaseDecrypt(password);
-                            map.put("password",password);
-                        }
+                            if(password != null && password.contains("_ENC")) {
+                                password = password.substring(0,32);
+                                password = EncryptionUtils.passwordBaseDecrypt(password);
+                                map.put("password",password);
+                             }
 
                         connection.setHost(host);
                         connection.setPort(port);
@@ -293,5 +293,23 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         }
         return file;
     }
+
+    public Map<String, Object> getServerStatus(String connectionId, DatabaseTypes databaseType ) {
+
+         MongoConnection connection = getConnection(connectionId, databaseType);
+
+
+        try {
+            return (Map) connection.getServerStatus();
+
+        } catch (NullPointerException e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+
+
+
+    }
+
 
 }

@@ -67,6 +67,11 @@ public class RedisConnection extends AbstractConnection {
     }
 
     @Override
+    public Object getServerStatus() {
+        return null;
+    }
+
+    @Override
     protected Object beforeRegisterAsService() {
         return null;
     }

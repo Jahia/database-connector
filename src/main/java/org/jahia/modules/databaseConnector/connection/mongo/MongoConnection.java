@@ -3,11 +3,14 @@ package org.jahia.modules.databaseConnector.connection.mongo;
 import com.mongodb.*;
 import com.mongodb.client.MongoDatabase;
 import org.apache.commons.lang.StringUtils;
+import org.bson.BsonDocument;
+import org.bson.BsonInt32;
+import org.bson.Document;
 import org.jahia.modules.databaseConnector.Utils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
+import org.jahia.modules.databaseConnector.connection.ConnectionData;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.utils.EncryptionUtils;
-
 
 import java.util.LinkedHashMap;
 
@@ -57,6 +60,13 @@ public class MongoConnection extends AbstractConnection {
         mongoConnectionData.setDatabaseType(DATABASE_TYPE);
         mongoConnectionData.setOptions(options);
         return mongoConnectionData;
+    }
+
+    @Override
+    public Object getServerStatus() {
+        Document serverStatus = this.databaseConnection.runCommand(new BsonDocument().append("serverStatus", new BsonInt32(1)).append("repl", new BsonInt32(0))
+                .append("metrics", new BsonInt32(0)).append("locks", new BsonInt32(0)));
+        return serverStatus;
     }
 
     @Override
