@@ -21,7 +21,7 @@
         .module('databaseConnector')
         .directive('dcConnectionStatus', ['$log', 'contextualData', connectionStatus]);
 
-    function ConnectionStatusController($scope, $state, $stateParams) {
+    function ConnectionStatusController($scope, $state, $stateParams, dcConnectionStatusService) {
         var csc = this;
         csc.connectionStatus = connectionStatus;
         csc.goToConnections = goToConnections;
@@ -49,5 +49,5 @@
 
     }
 
-    ConnectionStatusController.$inject = ['$scope', '$state', '$stateParams'];
+    ConnectionStatusController.$inject = ['$scope', '$state', '$stateParams', 'dcConnectionStatusService'];
 })();
