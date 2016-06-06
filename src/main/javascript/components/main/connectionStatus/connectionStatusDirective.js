@@ -21,11 +21,15 @@
         .module('databaseConnector')
         .directive('dcConnectionStatus', ['$log', 'contextualData', connectionStatus]);
 
-    function ConnectionStatusController($scope, contextualData, dcDataFactory, $state, $stateParams, toaster, $mdDialog) {
+    function ConnectionStatusController($scope, $state, $stateParams) {
         var csc = this;
         csc.connectionStatus = connectionStatus;
         csc.goToConnections = goToConnections;
-        csc.checkServerStatus = checkServerStatus;
+
+        $scope.$on('$destroy', function() {
+            //disable the connection status service
+            dcConnectionStatusService.disable();
+        });
 
         init();
 
@@ -34,22 +38,9 @@
                 goToConnections();
             } else {
                 csc.connection = $stateParams.connection;
+                //enable the connection status service
+                dcConnectionStatusService.enable(csc.connection.id, csc.connection.databaseType);
             }
-        }
-
-        function checkServerStatus(connection) {
-            var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[connection.type] + '/status/'+ csc.connection.id;
-            dcDataFactory.customRequest({
-                url: url,
-                method: 'Get',
-                data: connection
-            }).then(function(response) {
-                if (!_.isUndefined(response.connection)) {
-
-                }
-            }, function(response) {
-                console.log("here is the server status !")
-            });
         }
 
         function goToConnections() {
@@ -58,5 +49,5 @@
 
     }
 
-    ConnectionStatusController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$state', '$stateParams', 'toaster', '$mdDialog'];
+    ConnectionStatusController.$inject = ['$scope', '$state', '$stateParams'];
 })();
