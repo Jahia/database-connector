@@ -7,8 +7,9 @@
             controllerAs: 'cmuc',
             bindToController: true,
             scope       : {
-                chartHeight: '=',
-                chartWidth : '='
+                chartHeight : '=',
+                chartWidth  : '=',
+                pointSize   : '='
             },
             link        : linkFunc
         };
@@ -27,6 +28,8 @@
         var cmuc            = this;
         var DEFAULT_HEIGHT  = 480;
         var DEFAULT_WIDTH   = 640;
+        var DEFAULT_POINT_SIZE = 5;
+
         var CHART_ENTRY_TEMPLATE = {
                 "c": [
                     {
@@ -66,6 +69,7 @@
         }
 
         function initChart() {
+            cmuc.pointSize = _.isUndefined(cmuc.pointSize) || cmuc.pointSize === null || _.isString(cmuc.pointSize) && cmuc.pointSize == '' ? DEFAULT_POINT_SIZE : cmuc.pointSize;
             cmuc.memoryUsageChart = {
                 type        : 'LineChart',
                 displayed   : true,
@@ -104,6 +108,7 @@
                     isStacked           : true,
                     fill: 20,
                     displayExactValues  : true,
+                    pointSize: cmuc.pointSize,
                     vAxis               : {
                         title: "Megabytes",
                         gridlines: {
