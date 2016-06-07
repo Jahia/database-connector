@@ -9,7 +9,7 @@
             scope       : {
                 chartHeight : '=',
                 chartWidth  : '=',
-                pointSize   : '='
+                pointSize   : '=?'
             },
             link        : linkFunc
         };
