@@ -39,6 +39,9 @@
         }
 
         function getFormattedUptime() {
+            if (cso.connectionStatus === null) {
+                return null;
+            }
             return moment().subtract(cso.connectionStatus.uptime, 'seconds').format('MMMM Do YYYY, h:mm:ss a').toString();
         }
 
