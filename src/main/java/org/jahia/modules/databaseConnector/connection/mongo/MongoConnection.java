@@ -64,8 +64,12 @@ public class MongoConnection extends AbstractConnection {
 
     @Override
     public Object getServerStatus() {
-        Document serverStatus = this.databaseConnection.runCommand(new BsonDocument().append("serverStatus", new BsonInt32(1)).append("repl", new BsonInt32(0))
-                .append("metrics", new BsonInt32(0)).append("locks", new BsonInt32(0)));
+        Document serverStatus = this.databaseConnection.runCommand(new BsonDocument()
+                .append("serverStatus", new BsonInt32(1))
+                .append("repl", new BsonInt32(0))
+                .append("metrics", new BsonInt32(1))
+                .append("locks", new BsonInt32(0))
+        );
         return serverStatus;
     }
 
