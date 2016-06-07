@@ -5,6 +5,13 @@
         }
     };
 
+    var momentFilter = function() {
+        return function(dateString, format) {
+            return moment(dateString).format(format);
+        };
+    };
+
     angular.module('databaseConnector')
-        .filter('replaceNull', [replaceNull]);
+        .filter('replaceNull', [replaceNull])
+        .filter('momentFilter', [momentFilter]);
 })();

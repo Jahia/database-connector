@@ -69,6 +69,8 @@ public class MongoConnection extends AbstractConnection {
                 .append("repl", new BsonInt32(0))
                 .append("metrics", new BsonInt32(1))
                 .append("locks", new BsonInt32(0))
+                .append("dbStats", new BsonInt32(1))
+                .append("collStats", new BsonInt32(1))
         );
         return serverStatus;
     }
