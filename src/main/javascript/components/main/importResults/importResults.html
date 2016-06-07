@@ -15,9 +15,9 @@
         </div>
     </md-toolbar>
     <md-list>
-        <div ng-if="irc.hasResults(databaseType)" ng-repeat="databaseType in irc.databaseTypes">
+        <div ng-if="irc.hasResults(databaseType)" ng-repeat="(databaseType, displayableName) in irc.databaseTypes">
             <md-subheader>
-                <h4>Imported {{databaseType}} connections</h4>
+                <h4>Imported {{displayableName}} connections</h4>
             </md-subheader>
             <md-divider></md-divider>
             <md-list-item ng-repeat="failedConnection in irc.importResults[databaseType].failed | filter:irc.filterFailedConnections track by $index">

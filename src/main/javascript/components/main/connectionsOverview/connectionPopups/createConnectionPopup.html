@@ -9,7 +9,7 @@
         <md-dialog-content>
             <div class="md-dialog-content databaseSelection">
                 <div layout layout-wrap ng-if="!cpc.databaseTypeSelected">
-                    <div ng-repeat="databaseType in cpc.databaseTypes" flex="50">
+                    <div ng-repeat="(databaseType, displayableName) in cpc.databaseTypes" flex="50">
                         <md-button class="md-button" ng-click="cpc.setSelectedDatabaseType(databaseType)">
                             <img ng-src="{{cpc.images[databaseType]}}">
                         </md-button>

@@ -54,8 +54,8 @@
 
             dcDataFactory.customRequest(request).then(function (response) {
                 var allConnectionsImported = true;
-                for (var i in coc.databaseTypes) {
-                    if (!_.isUndefined(response.results[coc.databaseTypes[i]]) && !_.isEmpty(response.results[coc.databaseTypes[i]].failed)) {
+                for (var databaseType in coc.databaseTypes) {
+                    if (!_.isUndefined(response.results[databaseType]) && !_.isEmpty(response.results[databaseType].failed)) {
                         allConnectionsImported = false;
                         break;
                     }
@@ -187,8 +187,8 @@
             }).then(function(response) {
                 $scope.cpc.images = {};
                 $scope.cpc.databaseTypes = response;
-                for (var i in $scope.cpc.databaseTypes) {
-                    $scope.cpc.images[$scope.cpc.databaseTypes[i]] = contextualData.context + '/modules/database-connector/images/' + $scope.cpc.databaseTypes[i].toLowerCase() + '/logo_60.png';
+                for (var databaseType in $scope.cpc.databaseTypes) {
+                    $scope.cpc.images[databaseType] = contextualData.context + '/modules/database-connector/images/' + databaseType.toLowerCase() + '/logo_60.png';
                 }
             }, function(response) {});
         }

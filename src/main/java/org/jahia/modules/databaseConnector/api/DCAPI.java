@@ -78,7 +78,12 @@ public class DCAPI {
     @Path("/databasetypes")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDatabaseTypes() {
-        return Response.status(Response.Status.OK).entity(databaseConnector.getDatabaseTypes()).build();
+        try {
+            return Response.status(Response.Status.OK).entity(databaseConnector.getDatabaseTypes()).build();
+        } catch (JSONException ex) {
+            logger.error("Failed to retrieve database types", ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Failed to retrieve database types\"}").build();
+        }
     }
 
     @POST

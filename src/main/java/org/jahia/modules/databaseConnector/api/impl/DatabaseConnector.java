@@ -93,10 +93,10 @@ public class DatabaseConnector extends AbstractResource {
         return databaseConnectorManager.updateConnection(connectionId, databaseType, connect);
     }
 
-    public String getDatabaseTypes() {
-        JSONArray databaseTypes = new JSONArray();
+    public String getDatabaseTypes() throws JSONException{
+        JSONObject databaseTypes = new JSONObject();
         for (DatabaseTypes databaseType: DatabaseTypes.getAllDatabaseTypes()) {
-            databaseTypes.put(databaseType.name());
+            databaseTypes.put(databaseType.name(), databaseType.getDisplayName());
         }
         return databaseTypes.toString();
     }
