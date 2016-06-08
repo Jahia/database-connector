@@ -30,14 +30,10 @@
 
                 if (!_.isUndefined(maxValue)) {
                     if (value < maxValue ){
-                        value = parseInt(value);
                         backupValue = value;
-                        console.log("backup1", backupValue)
                     }
                     else{
-                          value = backupValue;
-                        console.log("backup2", backupValue)
-
+                        value = backupValue;
                     }
 
 

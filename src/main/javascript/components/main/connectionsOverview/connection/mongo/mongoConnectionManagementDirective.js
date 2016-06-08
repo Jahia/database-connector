@@ -79,7 +79,7 @@
             if (cmcc.mode === 'edit' || cmcc.mode === 'import-edit') {
                 cmcc.connection.oldId = angular.copy(cmcc.connection.id);
             } else {
-                cmcc.connection.isConnected = false;
+                cmcc.connection.isConnected = true;
             }
         }
 
