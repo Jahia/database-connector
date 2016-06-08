@@ -16,20 +16,18 @@
             <i class="fa fa-lg fa-check-circle-o"></i>
         </md-button>
 
-        <md-input-container class="md-block" flex-gt-sm="">
+        <md-input-container class="md-block" flex-gt-sm="1">
          <label>Host</label>
-            <input required="" ng-minlength="4" md-maxlength="15"  name="host" ng-model="cmcc.connection.host">
-
-            <div ng-messages="mongoForm.host.$error">
-                <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.host">{{validationMessage}}</div>
+            <input required ng-minlength="4" md-maxlength="15"  name="host" ng-model="cmcc.connection.host">
+            <div ng-messages="mongoForm.host.$error" multiple md-auto-hide="false">
+                <div ng-message-exp='validationName' ng-repeat="(validationName, validationMessage) in cmcc.validations.host">{{validationMessage}}</div>
             </div>
         </md-input-container>
 
         <md-input-container class="md-block">
             <label>Port</label>
             <input md-maxlength="5" required ng-pattern="/[0-9]+/" name="port" ng-model="cmcc.connection.port" length-parser length-parser-max="5" range-parser range-max-value="65535">
-
-            <div ng-messages="mongoForm.port.$error" role="alert" style="color:maroon">
+            <div ng-messages="mongoForm.port.$error" multiple md-auto-hide="false" style="color:maroon">
                 <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.port">{{validationMessage}}</div>
             </div>
         </md-input-container>
@@ -38,7 +36,7 @@
             <label>Connection Name (id)</label>
             <input md-maxlength="30" name="id" required  ng-pattern="/^[a-zA-Z0-9]+$/"
                     ng-model="cmcc.connection.id"  original-value="{{cmcc.connection.oldId}}" connection-id-validator>
-            <div ng-messages="mongoForm.id.$error" >
+            <div ng-messages="mongoForm.id.$error" multiple md-auto-hide="false" >
                 <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.id">{{validationMessage}}</div>
             </div>
         </md-input-container>
@@ -46,7 +44,7 @@
         <md-input-container class="md-block">
             <label>Database Name</label>
             <input md-maxlength="30" required ng-pattern="/^[a-zA-Z0-9_]+$/" name="dbName" ng-model="cmcc.connection.dbName" >
-            <div ng-messages="mongoForm.dbName.$error">
+            <div ng-messages="mongoForm.dbName.$error" multiple md-auto-hide="false">
                 <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.dbName">{{validationMessage}}</div>
             </div>
         </md-input-container>
@@ -54,7 +52,7 @@
         <md-input-container class="md-block">
             <label>User</label>
             <input name="user"  ng-model="cmcc.connection.user" ng-pattern="/^[a-zA-Z0-9]{4,10}$/" ng-change="cmcc.updateIsEmpty('user');">
-            <div ng-messages="mongoForm.user.$error">
+            <div ng-messages="mongoForm.user.$error" multiple md-auto-hide="false">
                 <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.user">{{validationMessage}}</div>
             </div>
         </md-input-container>
@@ -67,7 +65,7 @@
         <md-input-container class="md-block" ng-if="!cmcc.isEmpty.password && !cmcc.isEmpty.user">
             <label>Authentication Database</label>
             <input required name="authDb" ng-model="cmcc.connection.authDb">
-            <div ng-messages="mongoForm.authDb.$error">
+            <div ng-messages="mongoForm.authDb.$error" multiple md-auto-hide="false">
                 <div ng-message-exp="validationName" ng-repeat="(validationName, validationMessage) in cmcc.validations.authDb">{{validationMessage}}</div>
             </div>
         </md-input-container>
