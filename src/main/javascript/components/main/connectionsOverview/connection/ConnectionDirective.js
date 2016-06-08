@@ -59,6 +59,7 @@
             }).then(function(response) {
                 if (response.success) {
                     cc.connection.isConnected = connect;
+                    cc.originalConnection.isConnected = connect;
                     toaster.pop({
                         type   : 'success',
                         title: 'Connection status successfully updated!',
