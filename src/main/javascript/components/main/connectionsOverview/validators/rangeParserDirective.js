@@ -14,6 +14,7 @@
         function linkFunction(scope, el, attr, ctrls) {
             var model = ctrls[0];
             var maxValue = parseInt(attr['rangeMaxValue']);
+            var backupValue = null;
             model.$parsers.push(function(value) {
 
                 if (value != parseInt(value)) {
@@ -28,9 +29,17 @@
                 }
 
                 if (!_.isUndefined(maxValue)) {
-                    if (value > maxValue ){
-                        value = maxValue;
+                    if (value < maxValue ){
+                        value = parseInt(value);
+                        backupValue = value;
                     }
+                    else{
+                          value = backupValue;
+                    }
+
+                    return value;
+                    // value = maxValue;
+
                 }
                 model.$setViewValue(value);
                 model.$render();
@@ -38,7 +47,6 @@
                 $timeout(function () {
                     model.$setValidity('md-maxlength', true);
                 });
-                return value;
             });
         }
     };
