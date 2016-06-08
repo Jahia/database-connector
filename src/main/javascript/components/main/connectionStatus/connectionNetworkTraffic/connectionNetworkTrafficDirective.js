@@ -4,7 +4,7 @@
             restrict    : 'E',
             templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/connectionNetworkTraffic/connectionNetworkTraffic.html',
             controller  : ConnectionNetworkTrafficController,
-            controllerAs: 'cmuc',
+            controllerAs: 'cntc',
             bindToController: true,
             scope       : {
                 chartHeight : '=',

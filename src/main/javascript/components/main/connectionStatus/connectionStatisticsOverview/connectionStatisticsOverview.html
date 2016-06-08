@@ -1,30 +1,30 @@
-
-
 <md-content flex layout-padding class="">
     <h2 class="md-title bg-info center-align">Basic Mongo Connections Data  </h2>
 
-            <h3>Host Name : {{cso.connectionStatus.host}}</h3>
-            <h4> Launched at : <time> {{cso.connectionStatus.uptime.unix() | momentFilter: 'MMMM Do YYYY, h:mm:ss a'}} </time> </h4>
-            <h4> Local time : <time> {{cso.connectionStatus.localTime  | momentFilter: 'MMMM Do YYYY, h:mm:ss a' }} </time> </h4>
-            <h4>Up since : {{cso.getFormattedUptime()}}</h4>
-            <h4>Storage size: {{cso.connectionStatus.mem.virtual}} Mb</h4>
-    <h4>Process Name : {{cso.connectionStatus.process}}</h4>
-            <h4>Process Id : {{cso.connectionStatus.pid}}</h4>
-            <h4>Mongo Version : {{cso.connectionStatus.version}}</h4>
-        <h2 class="md-title bg-primary center-align"> Connections  </h2 >
-            <h4>Current : {{cso.connectionStatus.connections.current}}</h4>
-            <h4>Available : {{cso.connectionStatus.connections.available}}</h4>
-            <h4>Total Created : {{cso.connectionStatus.connections.totalCreated}}</h4>
-        <h2 class="md-title bg-primary center-align" > Network Info  </h2>
-            <h4>Bytes In : {{cso.connectionStatus.network.bytesIn}} </h4>
-            <h4>Bytes Out : {{cso.connectionStatus.network.bytesOut}} </h4>
-            <h4>Number Of Request : {{cso.connectionStatus.network.numRequests}} </h4>
-
+    <div layout="row" layout-padding>
+        <div flex="50" >
+            <dl>
+                <dt>Host Name :</dt>
+                <dd>{{cso.connectionStatus.host}}</dd>
+                <dt>Launched at :</dt>
+                <dd><time> {{cso.connectionStatus.uptime.unix() | momentFilter: 'MMMM Do YYYY, h:mm:ss a'}} </time></dd>
+                <dt>Local time :</dt>
+                <dd>{{cso.connectionStatus.localTime | momentFilter: 'MMMM Do YYYY, h:mm:ss a'}} </dd>
+                <dt>Up since :</dt>
+                <dd><time>{{cso.uptime}} </time></dd>
+            </dl>
+        </div>
+        <div flex="50" >
+            <dl>
+                <dt>Storage size :</dt>
+                <dd>{{cso.connectionStatus.mem.virtual}} Mb</dd>
+                <dt>Process Name :</dt>
+                <dd> <time> {{cso.connectionStatus.process}} </time></dd>
+                <dt>Process Id :</dt>
+                <dd>{{cso.connectionStatus.pid}}</dd>
+                <dt>Mongo Version :</dt>
+                <dd>{{cso.connectionStatus.version}}</dd>
+            </dl>
+        </div>
+    </div>
 </md-content>
-
-
-<connection-memory-usage chart-height="480" chart-width="'100%'" point-size="5"></connection-memory-usage>
-
-<connection-network-traffic chart-height="480" chart-width="'100%'"> </connection-network-traffic>
-
-<connections-available chart-height="480" chart-width="'100%'"></connections-available>

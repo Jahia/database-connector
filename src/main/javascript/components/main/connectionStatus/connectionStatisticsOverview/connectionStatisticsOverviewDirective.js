@@ -25,16 +25,18 @@
         
         var cso = this;
         cso.goToConnections = goToConnections;
-        cso.getFormattedUptime = getFormattedUptime;
-
-
+        cso.uptime = null;
         init();
 
         function init() {
 
             cso.connectionStatus = dcConnectionStatusService.getCurrentConnectionStatus();
+            cso.uptime = getFormattedUptime();
             $scope.$on('connectionStatusUpdate', function(event, connectionStatus) {
                 cso.connectionStatus = connectionStatus;
+                if (cso.uptime === null) {
+                    cso.uptime = getFormattedUptime();
+                }
             });
         }
 
