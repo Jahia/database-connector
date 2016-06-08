@@ -26,15 +26,12 @@
 
     var connectionsAvailableController = function($scope, dcConnectionStatusService) {
         var cac            = this;
-        var DEFAULT_HEIGHT  = 480;
-        var DEFAULT_WIDTH   = 640;
+        var DEFAULT_HEIGHT  = '480px';
+        var DEFAULT_WIDTH   = '640px';
         var DEFAULT_POINT_SIZE = 5;
 
         var CHART_ENTRY_TEMPLATE = {
             "c": [
-                {
-                    v: ''
-                },
                 {
                     v: ''
                 },
@@ -92,21 +89,15 @@
                             label   : 'Available',
                             type    : 'number',
                             p       : {}
-                        },
-                        {
-                            id      : 'totalCreated',
-                            label   : 'Total Created ',
-                            type    : 'number',
-                            p       : {}
                         }
                     ],
                     rows: [
                     ]
                 },
                 options: {
-                    title               : "Connections Available",
-                    isStacked           : true,
-                    fill: 20,
+                    title               : "Connections Created: ",
+                    colors              : ['#009900', '#3366ff'],
+                    fill                : 20,
                     displayExactValues  : true,
                     pointSize: cac.pointSize,
                     vAxis               : {
@@ -123,8 +114,7 @@
             entry.c[0].v = moment(connectionStatus.localTime).format('HH:mm:ss').toString();
             entry.c[1].v = connectionStatus.connections.current;
             entry.c[2].v = connectionStatus.connections.available;
-            entry.c[3].v = connectionStatus.connections.totalCreated;
-
+            cac.connectionsChart.options.title = 'Connections Created: ' + connectionStatus.connections.totalCreated;
             if (cac.connectionsChart.data.rows.length == 10) {
                 cac.connectionsChart.data.rows.shift();
             }

@@ -88,7 +88,7 @@ form legend {
     text-align: center;
 }
 
-.status-wrap {
+.box-wrap {
     border: solid 1px #bbbbbb;
     background: #fff;
     border-radius: 2px;
@@ -158,4 +158,9 @@ form legend {
     background-color: #d80502;
     margin-right:10px;
     border:solid 1px white;
+}
+
+.statusContainer {
+    border:solid 1px #d1d1d1;
+    box-shadow: -2px 2px 3px -3px rgba(0,0,0,1);
 }

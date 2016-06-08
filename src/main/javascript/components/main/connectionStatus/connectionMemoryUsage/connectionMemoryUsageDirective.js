@@ -26,8 +26,8 @@
 
     var ConnectionMemoryUsageController = function($scope, dcConnectionStatusService) {
         var cmuc            = this;
-        var DEFAULT_HEIGHT  = 480;
-        var DEFAULT_WIDTH   = 640;
+        var DEFAULT_HEIGHT  = '480px';
+        var DEFAULT_WIDTH   = '640px';
         var DEFAULT_POINT_SIZE = 5;
 
         var CHART_ENTRY_TEMPLATE = {
@@ -105,8 +105,8 @@
                 },
                 options: {
                     title               : "Memory Usage",
-                    isStacked           : true,
-                    fill: 20,
+                    colors              : ['#009900', '#3366ff', '#cc66ff'],
+                    fill                : 20,
                     displayExactValues  : true,
                     pointSize: cmuc.pointSize,
                     vAxis               : {

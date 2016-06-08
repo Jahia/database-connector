@@ -26,8 +26,8 @@
 
     var ConnectionOperationCountersController = function($scope, dcConnectionStatusService) {
         var cocc            = this;
-        var DEFAULT_HEIGHT  = 480;
-        var DEFAULT_WIDTH   = 640;
+        var DEFAULT_HEIGHT  = '480px';
+        var DEFAULT_WIDTH   = '640px';
         var DEFAULT_POINT_SIZE = 5;
         cocc.getHeight = getHeight;
         cocc.getWidth  = getWidth;
@@ -61,14 +61,13 @@
                         {
                             id      : 'operations',
                             label   : '',
-                            type    : 'string',
-                            p       : {}
+                            type    : 'string'
                         },
                         {
                             id      : 'value',
                             label   : 'Value',
-                            type    : 'number',
-                            p       : {}
+                            type    : 'number'
+
                         }
                     ],
                     rows: [
@@ -101,6 +100,7 @@
                                     v: 0
                                 }
                             ]
+
                         },
                         {
                             "c": [
@@ -126,11 +126,13 @@
                 },
                 options: {
                     title               : "Operation Counters",
+                    colors              : ['#00ff00'],
                     isStacked           : true,
-                    fill: 20,
+                    fill                : 20,
                     displayExactValues  : true,
                     pointSize: cocc.pointSize,
                     drawZeroLine: true,
+                    dataOpacity: 0.5,
                     vAxis               : {
                         gridlines: {
                             count: 5

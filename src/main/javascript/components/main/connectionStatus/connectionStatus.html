@@ -9,4 +9,31 @@
             </md-button>
         </div>
     </md-toolbar>
+    <div class="statusContainer">
+        <dc-connection-statistics-overview></dc-connection-statistics-overview>
+
+        <md-divider></md-divider>
+        <div layout style="background-color: #f2f2f2" layout-wrap layout-padding>
+            <div flex="100">
+                <div class="box-wrap">
+                    <connection-memory-usage chart-height="'320px'" chart-width="'100%'"></connection-memory-usage>
+                </div>
+            </div>
+            <div flex="50">
+                <div class="box-wrap">
+                    <connection-network-traffic chart-height="'320px'" chart-width="'100%'"></connection-network-traffic>
+                </div>
+            </div>
+            <div flex="50">
+                <div class="box-wrap">
+                    <connections-available chart-height="'320px'" chart-width="'100%'"></connections-available>
+                </div>
+            </div>
+            <div flex="100">
+                <div class="box-wrap">
+                    <connection-operation-counters chart-height="'320px'" chart-width="'100%'"></connection-operation-counters>
+                </div>
+            </div>
+        </div>
+    </div>
 </md-content>

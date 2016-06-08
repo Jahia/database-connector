@@ -26,8 +26,8 @@
 
     var ConnectionNetworkTrafficController = function($scope, dcConnectionStatusService) {
         var cntc            = this;
-        var DEFAULT_HEIGHT  = 480;
-        var DEFAULT_WIDTH   = 640;
+        var DEFAULT_HEIGHT  = '480px';
+        var DEFAULT_WIDTH   = '640px';
         var DEFAULT_POINT_SIZE = 5;
 
         var CHART_ENTRY_TEMPLATE = {
@@ -105,13 +105,12 @@
                 },
                 options: {
                     title               : "Network Traffic",
-                    isStacked           : true,
-                    fill: 20,
+                    fill                : 20,
                     displayExactValues  : true,
                     pointSize: cntc.pointSize,
                     vAxis               : {
                         gridlines: {
-                            count: 10
+                            count: 10,
                         }
                     }
                 }
