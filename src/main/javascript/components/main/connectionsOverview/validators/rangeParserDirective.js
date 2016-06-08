@@ -32,21 +32,26 @@
                     if (value < maxValue ){
                         value = parseInt(value);
                         backupValue = value;
+                        console.log("backup1", backupValue)
                     }
                     else{
                           value = backupValue;
+                        console.log("backup2", backupValue)
+
                     }
 
-                    return value;
-                    // value = maxValue;
 
                 }
+
                 model.$setViewValue(value);
                 model.$render();
                 //Override the md-maxlength since we are taking care of that validation through the parser.
                 $timeout(function () {
                     model.$setValidity('md-maxlength', true);
+
                 });
+                return value;
+
             });
         }
     };
