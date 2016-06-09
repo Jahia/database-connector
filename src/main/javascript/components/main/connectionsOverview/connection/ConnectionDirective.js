@@ -26,7 +26,7 @@
 
     var ConnectionController = function($scope, contextualData, dcDataFactory, $mdDialog, $filter, toaster, $state) {
         var cc = this;
-        cc.imageUrl = contextualData.context + '/modules/database-connector/images/' + cc.connection.databaseType + '/logo_60.png';
+        cc.imageUrl = contextualData.context + '/modules/database-connector/images/' + cc.connection.databaseType.toLowerCase() + '/logo_60.png';
         cc.originalConnection = angular.copy(cc.connection);
         cc.updateConnection = updateConnection;
         cc.openDeleteConnectionDialog = openDeleteConnectionDialog;
