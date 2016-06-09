@@ -116,7 +116,7 @@
             entry.c[0].v = moment(connectionStatus.localTime).format('HH:mm:ss').toString();
             entry.c[1].v = Math.round(connectionStatus.network.bytesIn / 1024 / 1024);
             entry.c[2].v = Math.round(connectionStatus.network.bytesOut / 1024 / 1024);
-            cntc.networkTrafficChart.options.title = 'Network Traffic: ' + connectionStatus.network.numRequests + ' Requests ' ;
+            cntc.networkTrafficChart.options.title = 'Network Traffic (Requests, ' + connectionStatus.network.numRequests + ')' ;
 
             if (cntc.networkTrafficChart.data.rows.length == 10) {
                 cntc.networkTrafficChart.data.rows.shift();
