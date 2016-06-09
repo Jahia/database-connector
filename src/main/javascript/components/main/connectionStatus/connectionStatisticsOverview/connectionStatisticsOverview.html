@@ -12,7 +12,7 @@
                 <dt>Local time :</dt>
                 <dd>{{cso.connectionStatus.localTime | momentFilter: 'MMMM Do YYYY, h:mm:ss a'}} </dd>
                 <dt>Up since :</dt>
-                <dd><time>{{cso.getCalendarTime()}} </time></dd>
+                <dd><time>{{cso.connectionStatus.uptime | momentFormatter : 'second' : 'fancy'}} </time></dd>
             </dl>
         </div>
         <div flex="50" >

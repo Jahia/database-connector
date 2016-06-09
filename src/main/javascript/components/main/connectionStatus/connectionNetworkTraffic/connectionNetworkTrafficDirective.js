@@ -82,12 +82,6 @@
                             p       : {}
                         },
                         {
-                            id      : 'requests',
-                            label   : 'Requests',
-                            type    : 'number',
-                            p       : {}
-                        },
-                        {
                             id      : 'incoming_mb',
                             label   : 'Incoming MB',
                             type    : 'number',
@@ -110,7 +104,7 @@
                     pointSize: cntc.pointSize,
                     vAxis               : {
                         gridlines: {
-                            count: 10,
+                            count: 10
                         }
                     }
                 }
@@ -120,10 +114,9 @@
         function updateChartEntries(connectionStatus) {
             var entry = angular.copy(CHART_ENTRY_TEMPLATE);
             entry.c[0].v = moment(connectionStatus.localTime).format('HH:mm:ss').toString();
-            entry.c[1].v = connectionStatus.network.numRequests;
-            entry.c[2].v = Math.round(connectionStatus.network.bytesIn / 1024 / 1024);
-            entry.c[3].v = Math.round(connectionStatus.network.bytesOut / 1024 / 1024);
-            cntc.networkTrafficChart.options.title = 'Network Traffic: ' + connectionStatus.network.numRequests;
+            entry.c[1].v = Math.round(connectionStatus.network.bytesIn / 1024 / 1024);
+            entry.c[2].v = Math.round(connectionStatus.network.bytesOut / 1024 / 1024);
+            cntc.networkTrafficChart.options.title = 'Network Traffic: ' + connectionStatus.network.numRequests + ' Requests ' ;
 
             if (cntc.networkTrafficChart.data.rows.length == 10) {
                 cntc.networkTrafficChart.data.rows.shift();
