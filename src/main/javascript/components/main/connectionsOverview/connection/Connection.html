@@ -21,6 +21,14 @@
                                    <p><b>Database Name:</b> <i>{{cc.connection.dbName}}</i></p>
                                    <p><b>Host:</b> <i>{{cc.connection.host}}</i></p>
                                    <p><b>Port:</b> <i>{{cc.connection.port}}</i></p>
+                                   <span ng-if="cc.serverStatusAvailable()">
+                                       <p><b>Uptime:</b> <i>{{cc.connection.uptime | momentFormatter : 'second' : 'fancy'}}</i></p>
+                                       <p><b>Version:</b> <i>{{cc.connection.dbVersion}}</i></p>
+                                   </span>
+                                   <span ng-if="!cc.serverStatusAvailable()">
+                                       <p><b class="statusWarningMessage" md-colors="{color: 'deep-orange-500'}">Server Statistics Unavailable</b></p>
+                                   </span>
+
 
                                </div>
                            </div>
@@ -28,7 +36,7 @@
                                <md-button class="md-icon-button" ng-if="!cc.connection.isConnected" ng-click="cc.updateConnection(true)"><i class="fa fa-plug" aria-label="connect to database"></i></md-button>
                                <md-button class="md-icon-button" ng-if="cc.connection.isConnected" ng-click="cc.updateConnection(false)"><i class="fa fa-chain-broken" aria-label="disconnect from database"></i></md-button>
                                <md-button class="md-icon-button" ng-click="cc.editConnection($event)"><i class="fa fa-pencil-square-o" aria-label="edit connections details"></i></md-button>
-                               <md-button class="md-icon-button" ng-if="cc.connection.isConnected" ng-click="cc.goToStatus()"><i class="fa fa-line-chart" aria-label="connection status"></i></md-button>
+                               <md-button class="md-icon-button" ng-disabled="!cc.serverStatusAvailable()" ng-click="cc.goToStatus()"><i class="fa fa-line-chart" aria-label="connection status"></i></md-button>
                                <md-button class="md-icon-button" ng-click="cc.openDeleteConnectionDialog($event)"><i class="fa fa-trash-o" aria-label="delete connection"></i></md-button>
                            </div>
                        </div>

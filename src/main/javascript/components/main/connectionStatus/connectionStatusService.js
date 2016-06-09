@@ -28,7 +28,7 @@
                 url: contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[databaseType] + '/status/' + connectionId, 
                 method: 'GET'
            }).then(function(response) {
-               currentConnectionStatus = response;
+               currentConnectionStatus = response.success;
                $rootScope.$broadcast('connectionStatusUpdate', currentConnectionStatus);
            }, function() {
            });

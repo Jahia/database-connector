@@ -33,7 +33,8 @@
         cc.editConnection = editConnection;
         cc.exportValueChanged = exportValueChanged;
         cc.goToStatus = goToStatus;
-        
+        cc.serverStatusAvailable = serverStatusAvailable;
+
         cc.spinnerOptions = {
             mode: 'indeterminate',
             showSpinner: false
@@ -49,6 +50,7 @@
                cc.connection[i] = $filter('replaceNull')(cc.connection[i]);
             }
             cc.originalConnection = angular.copy(cc.connection);
+            verifyServerStatus();
         }
         function updateConnection(connect) {
             cc.spinnerOptions.showSpinner = true;
@@ -60,6 +62,12 @@
                 if (response.success) {
                     cc.connection.isConnected = connect;
                     cc.originalConnection.isConnected = connect;
+                    if (connect) {
+                        verifyServerStatus();
+                    } else {
+                        cc.connection.canRetrieveStatus = false;
+                        cc.originalConnection.canRetrieveStatus = cc.connection.canRetrieveStatus;
+                    }
                     toaster.pop({
                         type   : 'success',
                         title: 'Connection status successfully updated!',
@@ -73,10 +81,14 @@
                         toastId: 'cu',
                         timeout: 3000
                     });
+                    cc.connection.canRetrieveStatus = false;
+                    cc.originalConnection.canRetrieveStatus = cc.connection.canRetrieveStatus;
                 }
                 cc.spinnerOptions.showSpinner = false;
             }, function(response) {
                 cc.spinnerOptions.showSpinner = false;
+                cc.connection.canRetrieveStatus = false;
+                cc.originalConnection.canRetrieveStatus = cc.connection.canRetrieveStatus;
             });
         }
 
@@ -153,6 +165,7 @@
             }).then(function(response) {
                 cc.connection = response;
                 cc.originalConnection = angular.copy(response);
+                verifyServerStatus();
             }, function(response) {});
         }
         
@@ -179,7 +192,36 @@
         function goToStatus() {
             $state.go('connectionsStatus', {connection: cc.connection});
         }
-        
+
+        function verifyServerStatus() {
+            //verify if this connection is authenticated to retrieve server status
+            var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[cc.connection.databaseType] + '/status/' + cc.connection.id;
+            dcDataFactory.customRequest({
+                url: url,
+                method: 'GET'
+            }).then(function(response) {
+                //status can be retrieved
+                if (_.isUndefined(response.failed)) {
+                    cc.connection.canRetrieveStatus = true;
+                    cc.originalConnection.canRetrieveStatus = true;
+                    cc.connection.dbVersion = response.success.version;
+                    cc.originalConnection.dbVersion = cc.connection.version;
+                    cc.connection.uptime = response.success.uptime;
+                    cc.originalConnection.uptime = cc.connection.uptime;
+                } else {
+                    cc.connection.canRetrieveStatus = false;
+                    cc.originalConnection.canRetrieveStatus = cc.connection.canRetrieveStatus;
+                }
+            }, function(response) {
+                //status cannot be retrieved
+                cc.connection.canRetrieveStatus = false;
+                cc.originalConnection.canRetrieveStatus = false;
+            });
+        }
+
+        function serverStatusAvailable() {
+            return !_.isUndefined(cc.connection.canRetrieveStatus) && cc.connection.canRetrieveStatus && cc.connection.isConnected;
+        }
     };
 
     ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', '$filter', 'toaster', '$state'];

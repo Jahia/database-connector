@@ -38,7 +38,10 @@
                 goToConnections();
             } else {
                 csc.connection = $stateParams.connection;
-                //enable the connection status service
+                if (!csc.connection.canRetrieveStatus) {
+                    //verify that we can retrieve the request, else we redirect.
+                    goToConnections();
+                }
                 dcConnectionStatusService.enable(csc.connection.id, csc.connection.databaseType);
             }
         }

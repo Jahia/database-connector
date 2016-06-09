@@ -23,6 +23,7 @@
  */
 package org.jahia.modules.databaseConnector.api.subresources;
 
+import com.mongodb.MongoCommandException;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
@@ -40,6 +41,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Map;
 
 /**
  * @author stefan on 2016-05-02.
@@ -309,12 +311,19 @@ public class MongoDB {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getServerStatus(@PathParam("connectionId") String connectionId) {
         try {
-            logger.info("Successfully retrieved Status for MongoDB connection  with id: " + connectionId);
-//            return Response.status(Response.Status.OK).entity("{\"success\":\"Found database status\"}").build();
-            return Response.status(Response.Status.OK).entity(databaseConnector.getServerStatus(connectionId, DatabaseTypes.MONGO)).build();
-        }
-        catch(Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot get database status\"}").build();
+            Map<String, Object> serverStatus = databaseConnector.getServerStatus(connectionId, DatabaseTypes.MONGO);
+            if (serverStatus.containsKey("failed")) {
+                logger.info("Failed to retriev Status for MongoDB connection with id: " + connectionId);
+            } else {
+                logger.info("Successfully retrieved Status for MongoDB connection with id: " + connectionId);
+            }
+            return Response.status(Response.Status.OK).entity(serverStatus).build();
+        } catch(MongoCommandException e) {
+            logger.info("Authorization failed for status request, MongoDB connection with id: " + connectionId);
+            return Response.status(Response.Status.OK).entity("{\"failed\":\"Access Denied\"}").build();
+        } catch(Exception e) {
+            logger.error("Failed retrieve Status for MongoDB connection with id: " + connectionId);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"failed\":\"Cannot get database status\"}").build();
         }
     }
 }

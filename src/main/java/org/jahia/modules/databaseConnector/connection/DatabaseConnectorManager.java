@@ -295,16 +295,14 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
     }
 
     public Map<String, Object> getServerStatus(String connectionId, DatabaseTypes databaseType ) {
-
-         AbstractConnection connection = getConnection(connectionId, databaseType);
-
-        try {
-              return (Map<String, Object>) connection.getServerStatus();
-
-        } catch (NullPointerException e) {
-            logger.error(e.getMessage(), e);
-            return null;
+        AbstractConnection connection = getConnection(connectionId, databaseType);
+        Map<String, Object> serverStatus = new LinkedHashMap<>();
+        if (!connection.isConnected()) {
+            serverStatus.put("failed", "Connection is disconnected");
+            return serverStatus;
         }
+        serverStatus.put("success", connection.getServerStatus());
+        return serverStatus;
 
     }
 }
