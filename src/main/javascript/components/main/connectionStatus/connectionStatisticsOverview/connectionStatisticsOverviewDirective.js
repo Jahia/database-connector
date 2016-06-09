@@ -25,6 +25,8 @@
         
         var cso = this;
         cso.goToConnections = goToConnections;
+        cso.getTimeFromNow = getTimeFromNow;
+        cso.getCalendarTime = getCalendarTime;
         cso.uptime = null;
         init();
 
@@ -46,6 +48,22 @@
             }
             return moment().subtract(cso.connectionStatus.uptime, 'seconds').format('MMMM Do YYYY, h:mm:ss a').toString();
         }
+
+        function getTimeFromNow() {
+            if (cso.connectionStatus === null) {
+                return null;
+            }
+            return moment(cso.connectionStatus.uptime.unix).fromNow().toString();
+        }
+        
+        function getCalendarTime() {
+            if (cso.connectionStatus === null) {
+                return null;
+            }
+            return moment().subtract(cso.connectionStatus.uptime, 'seconds').calendar().toString();
+
+        }
+
 
         function goToConnections() {
             $state.go('connections');

@@ -7,12 +7,12 @@
             <dl>
                 <dt>Host Name :</dt>
                 <dd>{{cso.connectionStatus.host}}</dd>
-                <dt>Launched at :</dt>
-                <dd><time> {{cso.connectionStatus.uptime.unix() | momentFilter: 'MMMM Do YYYY, h:mm:ss a'}} </time></dd>
+                <dt>Monitoring Started at :</dt>
+                <dd><time> {{cso.getTimeFromNow()}} </time></dd>
                 <dt>Local time :</dt>
                 <dd>{{cso.connectionStatus.localTime | momentFilter: 'MMMM Do YYYY, h:mm:ss a'}} </dd>
                 <dt>Up since :</dt>
-                <dd><time>{{cso.uptime}} </time></dd>
+                <dd><time>{{cso.getCalendarTime()}} </time></dd>
             </dl>
         </div>
         <div flex="50" >
