@@ -6,12 +6,14 @@ import org.apache.commons.lang.StringUtils;
 import org.bson.BsonDocument;
 import org.bson.BsonInt32;
 import org.bson.Document;
-import org.jahia.modules.databaseConnector.Utils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
-import org.jahia.modules.databaseConnector.connection.ConnectionData;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.utils.EncryptionUtils;
-
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.LinkedHashMap;
 
 import static org.jahia.modules.databaseConnector.Utils.*;
@@ -23,6 +25,8 @@ import static org.jahia.modules.databaseConnector.Utils.*;
  * @version 1.0
  */
 public class MongoConnection extends AbstractConnection {
+
+    private static final Logger logger = LoggerFactory.getLogger(MongoConnection.class);
 
     public static final String NODE_TYPE = "dc:mongoConnection";
 
@@ -81,7 +85,7 @@ public class MongoConnection extends AbstractConnection {
     }
 
     protected Object beforeRegisterAsService() {
-        mongoClient = new MongoClient(new MongoClientURI(buildUri()));
+        mongoClient = new MongoClient(buildMongoClientUri(false));
         databaseConnection = mongoClient.getDatabase(dbName);
         return databaseConnection;
     }
@@ -138,6 +142,23 @@ public class MongoConnection extends AbstractConnection {
         this.authDb = authDb;
     }
 
+    private MongoClientURI buildMongoClientUri(boolean isTest) {
+        if (!StringUtils.isEmpty(options)) {
+            if (isTest) {
+                return new MongoClientURI(buildUri(), buildMongoClientOptions().serverSelectionTimeout(5000));
+            } else {
+                return new MongoClientURI(buildUri(), buildMongoClientOptions());
+            }
+        } else {
+            if (isTest) {
+                return new MongoClientURI(buildUri(), MongoClientOptions.builder().serverSelectionTimeout(5000));
+
+            } else {
+                return new MongoClientURI(buildUri());
+            }
+        }
+    }
+
     private String buildUri() {
         String uri = "mongodb://";
         if (!StringUtils.isEmpty(user)) {
@@ -148,8 +169,28 @@ public class MongoConnection extends AbstractConnection {
             uri += "@";
         }
         uri += host;
+
         if (port != null) {
             uri += ":" + port;
+        }
+        //Check if it is a replica set.
+        if (!StringUtils.isEmpty(options)) {
+            try {
+                JSONObject jsonOptions = new JSONObject(options);
+                if (jsonOptions.has("repl")) {
+                    JSONArray members = jsonOptions.getJSONObject("repl").getJSONArray("members");
+                    for (int i = 0; i < members.length(); i++) {
+                        JSONObject member = members.getJSONObject(i);
+                        //concatenate all the address separated by commas, representing the replica set members
+                        uri += "," + member.get("host");
+                        if (member.has("port") && !StringUtils.isEmpty(member.getString("port"))) {
+                            uri += ":" + member.getString("port");
+                        }
+                    }
+                }
+            } catch (JSONException ex) {
+                logger.error("Failed to parse connection options json", ex.getMessage());
+            }
         }
 
         uri += "/";
@@ -164,17 +205,63 @@ public class MongoConnection extends AbstractConnection {
             uri += "?";
         }
 
-        //Options to be added:
         if (!StringUtils.isEmpty(user)) {
             uri += (!StringUtils.isEmpty(password) ? "authMechanism=SCRAM-SHA-1" : "authMechanism=GSSAPI");
         }
         return uri;
     }
 
+    private MongoClientOptions.Builder buildMongoClientOptions() {
+        try {
+            JSONObject jsonOptions = new JSONObject(options);
+            MongoClientOptions.Builder builder = MongoClientOptions.builder();
+            //Handle replicate set options
+            if (jsonOptions.has("repl")) {
+                JSONObject jsonRepl = jsonOptions.getJSONObject("repl");
+                if(jsonRepl.has("replicaSet") && !StringUtils.isEmpty(jsonRepl.getString("replicaSet"))) {
+                    builder.requiredReplicaSetName(jsonRepl.getString("replicaSet"));
+                } else {
+                    //If there is no replica set name then we throw an exception.
+                    throw new MongoClientException("No replica set name found");
+                }
+            }
+            //Handle connection pool settings
+            if (jsonOptions.has("connPool")) {
+                JSONObject jsonConnPool = new JSONObject(jsonOptions.get("connPool"));
+                if (jsonConnPool.has("minPoolSize") && !StringUtils.isEmpty(jsonConnPool.getString("minPoolSize"))) {
+                    builder.minConnectionsPerHost(jsonConnPool.getInt("minPoolSize"));
+                }
+                if (jsonConnPool.has("maxPoolSize") && !StringUtils.isEmpty(jsonConnPool.getString("maxPoolSize"))) {
+                    builder.connectionsPerHost(jsonConnPool.getInt("maxPoolSize"));
+                }
+                if (jsonConnPool.has("waitQueueTimeoutMS") && !StringUtils.isEmpty(jsonConnPool.getString("waitQueueTimeoutMS"))) {
+                    builder.maxWaitTime(jsonConnPool.getInt("waitQueueTimeoutMS"));
+                }
+            }
+            //Handle connection settings
+            if (jsonOptions.has("conn")) {
+                JSONObject jsonConn = new JSONObject(jsonOptions.get("conn"));
+                if (jsonConn.has("connectTimeoutMS") && !StringUtils.isEmpty(jsonConn.getString("connectTimeoutMS"))) {
+                    builder.connectTimeout(jsonConn.getInt("connectTimeoutMS"));
+                }
+                if (jsonConn.has("socketTimeoutMS") && !StringUtils.isEmpty(jsonConn.getString("socketTimeoutMS"))) {
+                    builder.connectTimeout(jsonConn.getInt("socketTimeoutMS"));
+                }
+            }
+            return builder;
+        } catch (JSONException ex) {
+            logger.error("Failed to parse connection options json", ex.getMessage());
+            return null;
+        } catch (MongoClientException ex) {
+            logger.error("Failed to build Mongo client options", ex.getMessage());
+            return null;
+        }
+    }
+
     @Override
     public boolean testConnectionCreation() {
         try {
-            mongoClient = new MongoClient(new MongoClientURI(buildUri(), MongoClientOptions.builder().serverSelectionTimeout(5000)));
+            mongoClient = new MongoClient(buildMongoClientUri(true));
             mongoClient.getServerAddressList();
         } catch (MongoTimeoutException ex) {
             //If the connection timeouts, the connection is invalid.

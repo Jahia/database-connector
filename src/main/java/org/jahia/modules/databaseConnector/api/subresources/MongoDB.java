@@ -313,7 +313,7 @@ public class MongoDB {
         try {
             Map<String, Object> serverStatus = databaseConnector.getServerStatus(connectionId, DatabaseTypes.MONGO);
             if (serverStatus.containsKey("failed")) {
-                logger.info("Failed to retriev Status for MongoDB connection with id: " + connectionId);
+                logger.info("Failed to retrieve Status for MongoDB connection with id: " + connectionId);
             } else {
                 logger.info("Successfully retrieved Status for MongoDB connection with id: " + connectionId);
             }
