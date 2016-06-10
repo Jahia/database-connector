@@ -33,7 +33,7 @@
             showSpinner: false,
             mode: 'indeterminate'
         };
-        
+
         cmcc.validations = {
             host: {
                 'required'      : 'Field is required',
@@ -70,16 +70,40 @@
         cmcc.cancel = cancel;
         cmcc.updateIsEmpty = updateIsEmpty;
         cmcc.updateImportedConnection = updateImportedConnection;
+        cmcc.addReplicaMember = addReplicaMember;
 
         init();
 
         function init() {
+
             cmcc.isEmpty.password = updateIsEmpty('password');
             cmcc.isEmpty.user = updateIsEmpty('user');
             if (cmcc.mode === 'edit' || cmcc.mode === 'import-edit') {
                 cmcc.connection.oldId = angular.copy(cmcc.connection.id);
             } else {
                 cmcc.connection.isConnected = true;
+            }
+            if (_.isUndefined(cmcc.connection.options) || cmcc.connection.options == null || _.isString(cmcc.connection.options) && cmcc.connection.options.trim() == ''){
+                console.log("the advanced options are empty! ");
+                cmcc.connection.options = {};
+            } else {
+                cmcc.connection.options = JSON.parse(cmcc.connection.options);
+            }
+            if (_.isUndefined(cmcc.connection.options.repl)) {
+                cmcc.connection.options.repl = {
+                    replicaSet: null,
+                    members: []
+                }
+            }
+            if (_.isUndefined(cmcc.connection.options.conn)) {
+                cmcc.connection.options.conn = {
+                    conn: {}
+                }
+            }
+            if (_.isUndefined(cmcc.connection.options.connPool)) {
+                cmcc.connection.options.connPool = {
+                    connPool: {}
+                }
             }
         }
 
@@ -199,6 +223,16 @@
 
         function updateImportedConnection() {
             $scope.$emit('importConnectionClosed', cmcc.connection);
+        }
+
+        function addReplicaMember() {
+            if(!_.isUndefined(cmcc.connection.options.repl.members)){
+                cmcc.connection.options.repl.members.push({})
+
+            }
+            else {
+                console.log("repl Members is Undefined !", cmcc.connection.options.repl.members);
+            }
         }
 
     };
