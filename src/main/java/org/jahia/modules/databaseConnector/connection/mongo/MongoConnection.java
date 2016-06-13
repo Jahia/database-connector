@@ -68,14 +68,27 @@ public class MongoConnection extends AbstractConnection {
 
     @Override
     public Object getServerStatus() {
-        Document serverStatus = this.databaseConnection.runCommand(new BsonDocument()
+        BsonDocument serverStatusCommand = new BsonDocument()
                 .append("serverStatus", new BsonInt32(1))
-                .append("repl", new BsonInt32(0))
                 .append("metrics", new BsonInt32(1))
                 .append("locks", new BsonInt32(0))
                 .append("dbStats", new BsonInt32(1))
-                .append("collStats", new BsonInt32(1))
-        );
+                .append("collStats", new BsonInt32(1));
+        if (!StringUtils.isEmpty(options)) {
+            try {
+                JSONObject jsonOptions = new JSONObject(options);
+                if (jsonOptions.has("repl")) {
+                    serverStatusCommand.append("repl", new BsonInt32(1));
+                    return this.databaseConnection.runCommand(serverStatusCommand);
+                }
+            } catch (JSONException ex) {
+                logger.error("Failed to parse connection options json", ex.getMessage());
+                return null;
+            }
+        }
+        serverStatusCommand.append("repl", new BsonInt32(0));
+        Document serverStatus = this.databaseConnection.runCommand(serverStatusCommand);
+
         return serverStatus;
     }
 
