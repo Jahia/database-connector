@@ -116,6 +116,7 @@ public class MongoDB {
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
                 String writeConcern = connectionParameters.has("writeConcern") ? connectionParameters.getString("writeConcern") : null;
                 String authDb = connectionParameters.has("authDb") ? connectionParameters.getString("authDb") : null;
+                String options = connectionParameters.has("options") ? connectionParameters.getString("options") : null;
                 MongoConnection connection = new MongoConnection(id);
                 connection.setHost(host);
                 connection.setPort(port);
@@ -125,6 +126,7 @@ public class MongoDB {
                 connection.setPassword(password);
                 connection.setWriteConcern(writeConcern);
                 connection.setAuthDb(authDb);
+                connection.setOptions(options);
                 JSONObject jsonAnswer = new JSONObject();
                 if (!databaseConnector.testConnection(connection)) {
                     connection.isConnected(false);
@@ -179,6 +181,7 @@ public class MongoDB {
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
                 String writeConcern = connectionParameters.has("writeConcern") ? connectionParameters.getString("writeConcern") : null;
                 String authDb = connectionParameters.has("authDb") ? connectionParameters.getString("authDb") : null;
+                String options = connectionParameters.has("options") ? connectionParameters.getString("options") : null;
                 MongoConnection connection = new MongoConnection(id);
                 connection.setOldId(oldId);
                 connection.setHost(host);
@@ -189,6 +192,7 @@ public class MongoDB {
                 connection.setPassword(password);
                 connection.setWriteConcern(writeConcern);
                 connection.setAuthDb(authDb);
+                connection.setOptions(options);
                 JSONObject jsonAnswer = new JSONObject();
                 if (!databaseConnector.testConnection(connection)) {
                     connection.isConnected(false);
@@ -286,6 +290,7 @@ public class MongoDB {
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
                 String writeConcern = connectionParameters.has("writeConcern") ? connectionParameters.getString("writeConcern") : null;
                 String authDb = connectionParameters.has("authDb") ? connectionParameters.getString("authDb") : null;
+                String options = connectionParameters.has("options") ? connectionParameters.getString("options") : null;
                 MongoConnection connection = new MongoConnection(id);
                 connection.setHost(host);
                 connection.setPort(port);
@@ -295,6 +300,7 @@ public class MongoDB {
                 connection.setPassword(password);
                 connection.setWriteConcern(writeConcern);
                 connection.setAuthDb(authDb);
+                connection.setOptions(options);
                 boolean connectionTestPassed = databaseConnector.testConnection(connection);
                 logger.info(connectionTestPassed ? "Connection test successfully passed" : "Connection test failed" + " for MongoDB with id: " + id);
                 return Response.status(Response.Status.OK).entity("{\"result\": " + connectionTestPassed + "}").build();
