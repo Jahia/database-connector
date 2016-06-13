@@ -118,9 +118,9 @@ public class MongoConnection extends AbstractConnection {
         StringBuilder serializedString = new StringBuilder();
         serializedString.append(
                 TABU + "type " + DOUBLE_QUOTE + DATABASE_TYPE + DOUBLE_QUOTE + NEW_LINE +
-                TABU +"host " + DOUBLE_QUOTE + this.host + DOUBLE_QUOTE + NEW_LINE +
+                TABU + "host " + DOUBLE_QUOTE + this.host + DOUBLE_QUOTE + NEW_LINE +
                 TABU + "port " + DOUBLE_QUOTE + this.port + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "dbName" + DOUBLE_QUOTE + this.dbName + DOUBLE_QUOTE + NEW_LINE +
+                TABU + "dbName " + DOUBLE_QUOTE + this.dbName + DOUBLE_QUOTE + NEW_LINE +
                 TABU + "identifier " + DOUBLE_QUOTE + this.id + DOUBLE_QUOTE + NEW_LINE +
                 TABU + "isConnected " + DOUBLE_QUOTE + this.isConnected() + DOUBLE_QUOTE + NEW_LINE +
                 TABU + "authDb " + DOUBLE_QUOTE + this.authDb + DOUBLE_QUOTE + NEW_LINE +
@@ -128,13 +128,63 @@ public class MongoConnection extends AbstractConnection {
         );
 
         if (!StringUtils.isEmpty(this.password)) {
-            serializedString.append(TABU + "password " + DOUBLE_QUOTE + EncryptionUtils.passwordBaseEncrypt(this.password) + "_ENC" + DOUBLE_QUOTE );
+            serializedString.append(TABU + "password " + DOUBLE_QUOTE + EncryptionUtils.passwordBaseEncrypt(this.password) + "_ENC" + DOUBLE_QUOTE + NEW_LINE);
         }
 
 
         if (this.options != null) {
-            //@TODO implement options structure
-            serializedString.append(NEW_LINE + TABU + "options " + "{" + NEW_LINE + TABU + "}");
+            try {
+                JSONObject jsonOptions = new JSONObject(this.options);
+                serializedString.append(TABU + "options {");
+                //Handle connection pool settings
+                if (jsonOptions.has("connPool")) {
+                    JSONObject jsonConnPool = new JSONObject(jsonOptions.get("connPoolSettings"));
+                    serializedString.append(NEW_LINE + TABU + TABU + "connPool {");
+                    if (jsonConnPool.has("minPoolSize") && !StringUtils.isEmpty(jsonConnPool.getString("minPoolSize"))) {
+                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "minPoolSize " + DOUBLE_QUOTE + jsonConnPool.getString("minPoolSize") + DOUBLE_QUOTE);
+                    }
+                    if (jsonConnPool.has("maxPoolSize") && !StringUtils.isEmpty(jsonConnPool.getString("maxPoolSize"))) {
+                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "maxPoolSize " + DOUBLE_QUOTE + jsonConnPool.getString("maxPoolSize") + DOUBLE_QUOTE);
+                    }
+                    if (jsonConnPool.has("waitQueueTimeoutMS") && !StringUtils.isEmpty(jsonConnPool.getString("waitQueueTimeoutMS"))) {
+                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "waitQueueTimeoutMS " + DOUBLE_QUOTE + jsonConnPool.getString("waitQueueTimeoutMS") + DOUBLE_QUOTE);
+                    }
+                    serializedString.append(NEW_LINE + TABU + TABU + "}");
+                }
+                //Handle connection settings
+                if (jsonOptions.has("conn")) {
+                    JSONObject jsonConn = new JSONObject(jsonOptions.get("conn"));
+                    serializedString.append(NEW_LINE + TABU + TABU + "connSettings {");
+                    if (jsonConn.has("connectTimeoutMS") && !StringUtils.isEmpty(jsonConn.getString("connectTimeoutMS"))) {
+                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "connectTimeoutMS " + DOUBLE_QUOTE + jsonConn.getInt("connectTimeoutMS") + DOUBLE_QUOTE);
+                    }
+                    if (jsonConn.has("socketTimeoutMS") && !StringUtils.isEmpty(jsonConn.getString("socketTimeoutMS"))) {
+                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "socketTimeoutMS " + DOUBLE_QUOTE + jsonConn.getInt("socketTimeoutMS") + DOUBLE_QUOTE);
+                    }
+                    serializedString.append(NEW_LINE + TABU + TABU + "}");
+                }
+                //Handle replicate set options
+                if (jsonOptions.has("repl")) {
+                    JSONObject jsonRepl = jsonOptions.getJSONObject("repl");
+                    serializedString.append(NEW_LINE + TABU + TABU + "connSettings {");
+                    if (jsonRepl.has("replicaSet") && !StringUtils.isEmpty(jsonRepl.getString("replicaSet"))) {
+                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "name " + DOUBLE_QUOTE + jsonRepl.getString("replicaSet") + DOUBLE_QUOTE);
+                    }
+                    JSONArray members = jsonRepl.getJSONArray("members");
+                    serializedString.append(NEW_LINE + TABU + TABU + TABU + "members ");
+                    for (int i = 0; i < members.length(); i++) {
+                        if (i != 0) {
+                            serializedString.append(", ");
+                        }
+                        JSONObject member = members.getJSONObject(i);
+                        serializedString.append(DOUBLE_QUOTE + member.getString("host") + (member.has("port") && !StringUtils.isEmpty(member.getString("port")) ? ":" + member.getString("port"): "") + DOUBLE_QUOTE);
+                    }
+                    serializedString.append(NEW_LINE + TABU + TABU + "}");
+                }
+                serializedString.append(NEW_LINE + TABU + "}");
+            } catch (JSONException ex) {
+                logger.error("Failed to parse connection options json", ex.getMessage());
+            }
         }
         return serializedString.toString();
     }
