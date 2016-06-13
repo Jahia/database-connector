@@ -77,6 +77,7 @@
         init();
 
         function init() {
+            cmcc.connection.port = "27017";
 
             cmcc.isEmpty.password = updateIsEmpty('password');
             cmcc.isEmpty.user = updateIsEmpty('user');
