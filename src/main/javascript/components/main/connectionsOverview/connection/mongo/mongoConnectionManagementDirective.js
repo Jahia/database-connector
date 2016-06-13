@@ -151,7 +151,7 @@
                 }
             }
 
-            data = angular.copy(cmcc.connection);
+            var data = angular.copy(cmcc.connection);
             data.options = JSON.stringify(data.options);
             dcDataFactory.customRequest({
                 url: url,
@@ -215,7 +215,7 @@
                     delete cmcc.connection.options.connPool.waitQueueTimeoutMS
                 }
             }
-            data = angular.copy(cmcc.connection);
+            var data = angular.copy(cmcc.connection);
             data.options = JSON.stringify(data.options);
             dcDataFactory.customRequest({
                 url: url,

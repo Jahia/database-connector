@@ -32,7 +32,7 @@
 
                     <md-input-container class="md-block">
                         <label>Port</label>
-                        <input md-maxlength="5" required ng-pattern="/[0-9]+/" name="port"
+                        <input md-maxlength="5" ng-pattern="/[0-9]+/" name="port"
                                ng-model="cmcc.connection.port" length-parser length-parser-max="5" range-parser
                                range-max-value="65535">
                         <div ng-messages="mongoForm.port.$error" ng-if="mongoForm.port.$dirty">
