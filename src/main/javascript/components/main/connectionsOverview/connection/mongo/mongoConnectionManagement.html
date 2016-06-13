@@ -1,126 +1,174 @@
 <dc-spinner spinner-mode="cmcc.spinnerOptions.mode" show="cmcc.spinnerOptions.showSpinner"></dc-spinner>
+
 <md-content layout-padding>
-    <md-tabs md-dynamic-height md-border-bottom>
+    <md-tabs md-dynamic-height md-border-bottom md-no-ink-bar md-autoselect>
+
         <md-tab label="Settings">
-            <md-content class="md-padding">
-                <h1 class="md-display-1 center-align"></h1>
-    <form name="mongoForm">
-        <md-checkbox ng-model="cmcc.connection.isConnected" aria-label="Automatic startup after Creation"
-                     ng-true-value="true" ng-false-value="false"
-                     class="md-warn md-align-top-left" flex>
-            <span class="ipsum">
-              Enable connection
-            </span>
-        </md-checkbox>
+            <form name="mongoForm">
+                <md-content class="md-padding">
+                    <h1 class="md-display-1 center-align"></h1>
+                    <md-checkbox ng-model="cmcc.connection.isConnected" aria-label="Automatic startup after Creation"
+                                 ng-true-value="true" ng-false-value="false"
+                                 class="md-warn md-align-top-left" flex>
+                        <span class="ipsum">Enable connection</span>
+                    </md-checkbox>
 
-        <md-button class="md-fab md-mini md-success pull-right"
-                   ng-click="cmcc.testMongoConnection()"
-                   ng-disabled="mongoForm.$invalid"
-                   uib-tooltip="Test connection">
-            <i class="fa fa-lg fa-check-circle-o"></i>
-        </md-button>
+                    <md-button class="md-fab md-mini md-success pull-right"
+                               ng-click="cmcc.testMongoConnection()"
+                               ng-disabled="mongoForm.$invalid"
+                               uib-tooltip="Test connection">
+                        <i class="fa fa-lg fa-check-circle-o"></i>
+                    </md-button>
+                    <md-input-container class="md-block" flex-gt-sm="1">
+                        <label>Host</label>
+                        <input required ng-minlength="4" md-maxlength="15" name="host" ng-model="cmcc.connection.host">
+                        <div ng-messages="mongoForm.host.$error" ng-if="mongoForm.host.$dirty">
+                            <div ng-message-exp="validationName"
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.host">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
 
-        <md-input-container class="md-block" flex-gt-sm="1">
-         <label>Host</label>
-            <input required ng-minlength="4" md-maxlength="15"  name="host" ng-model="cmcc.connection.host">
-            <div ng-messages="mongoForm.host.$error" multiple md-auto-hide="false">
-                <div ng-message-exp='validationName' ng-if="mongoForm.host.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.host">{{validationMessage}}</div>
-            </div>
-        </md-input-container>
+                    <md-input-container class="md-block">
+                        <label>Port</label>
+                        <input md-maxlength="5" required ng-pattern="/[0-9]+/" name="port"
+                               ng-model="cmcc.connection.port" length-parser length-parser-max="5" range-parser
+                               range-max-value="65535">
+                        <div ng-messages="mongoForm.port.$error" ng-if="mongoForm.port.$dirty">
+                            <div ng-message-exp="validationName"
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.port">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
 
-        <md-input-container class="md-block">
-            <label>Port</label>
-            <input md-maxlength="5" required ng-pattern="/[0-9]+/" name="port" ng-model="cmcc.connection.port" length-parser length-parser-max="5" range-parser range-max-value="65535">
-            <div ng-messages="mongoForm.port.$error" multiple md-auto-hide="false" style="color:#801e2c">
-                <div ng-message-exp="validationName" ng-if="mongoForm.port.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.port">{{validationMessage}}</div>
-            </div>
-        </md-input-container>
+                    <md-input-container class="md-block">
+                        <label>Connection Name (id)</label>
+                        <input md-maxlength="30" name="id" required ng-pattern="/^[a-zA-Z0-9]+$/"
+                               ng-model="cmcc.connection.id" original-value="{{cmcc.connection.oldId}}"
+                               connection-id-validator>
+                        <div ng-messages="mongoForm.id.$error" ng-if="mongoForm.id.$dirty">
+                            <div ng-message-exp="validationName"
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.id">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
 
-        <md-input-container class="md-block">
-            <label>Connection Name (id)</label>
-            <input md-maxlength="30" name="id" required  ng-pattern="/^[a-zA-Z0-9]+$/"
-                    ng-model="cmcc.connection.id"  original-value="{{cmcc.connection.oldId}}" connection-id-validator>
-            <div ng-messages="mongoForm.id.$error" multiple md-auto-hide="false" >
-                <div ng-message-exp="validationName" ng-if="mongoForm.id.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.id">{{validationMessage}}</div>
-            </div>
-        </md-input-container>
+                    <md-input-container class="md-block">
+                        <label>Database Name</label>
+                        <input md-maxlength="30" required ng-pattern="/^[a-zA-Z0-9_]+$/" name="dbName"
+                               ng-model="cmcc.connection.dbName">
+                        <div ng-messages="mongoForm.dbName.$error" ng-if="mongoForm.dbName.$dirty">
+                            <div ng-message-exp="validationName"
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.dbName">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
 
-        <md-input-container class="md-block">
-            <label>Database Name</label>
-            <input md-maxlength="30" required ng-pattern="/^[a-zA-Z0-9_]+$/" name="dbName" ng-model="cmcc.connection.dbName" >
-            <div ng-messages="mongoForm.dbName.$error" multiple md-auto-hide="false">
-                <div ng-message-exp="validationName" ng-if="mongoForm.dbName.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.dbName">{{validationMessage}}</div>
-            </div>
-        </md-input-container>
+                    <md-input-container class="md-block">
+                        <label>User</label>
+                        <input name="user" ng-model="cmcc.connection.user" ng-pattern="/^[a-zA-Z0-9]{4,10}$/"
+                               ng-change="cmcc.updateIsEmpty('user');">
+                        <div ng-messages="mongoForm.user.$error" ng-if="mongoForm.user.$dirty">
+                            <div ng-message-exp="validationName"
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.user">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
 
-        <md-input-container class="md-block">
-            <label>User</label>
-            <input name="user"  ng-model="cmcc.connection.user" ng-pattern="/^[a-zA-Z0-9]{4,10}$/" ng-change="cmcc.updateIsEmpty('user');">
-            <div ng-messages="mongoForm.user.$error" multiple md-auto-hide="false">
-                <div ng-message-exp="validationName" ng-if="mongoForm.user.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.user">{{validationMessage}}</div>
-            </div>
-        </md-input-container>
+                    <md-input-container class="md-block" ng-if="!cmcc.isEmpty.user">
+                        <label>Password</label>
+                        <input type="password" name="password" ng-model="cmcc.connection.password"
+                               ng-change="cmcc.updateIsEmpty('password');">
+                    </md-input-container>
 
-        <md-input-container class="md-block" ng-if="!cmcc.isEmpty.user">
-            <label>Password</label>
-            <input type="password" name="password" ng-model="cmcc.connection.password" ng-change="cmcc.updateIsEmpty('password');">
-        </md-input-container>
+                    <md-input-container class="md-block" ng-if="!cmcc.isEmpty.password && !cmcc.isEmpty.user">
+                        <label>Authentication Database</label>
+                        <input required name="authDb" ng-model="cmcc.connection.authDb">
+                        <div ng-messages="mongoForm.authDb.$error" ng-if="mongoForm.authDb.$dirty">
+                            <div ng-message-exp="validationName"
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.authDb">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
+                    <md-button ng-if="cmcc.mode=='create'" class="md-raised md-primary pull-right"
+                               ng-click="cmcc.createMongoConnection()" ng-disabled="mongoForm.$invalid">
+                        Create
+                    </md-button>
+                    <md-button ng-if="cmcc.mode=='edit'" class="md-raised md-primary pull-right"
+                               ng-click="cmcc.editMongoConnection()" ng-disabled="mongoForm.$invalid">
+                        Update
+                    </md-button>
+                    <md-button class="md-raised md-primary pull-right" ng-if="cmcc.mode=='import-edit'"
+                               ng-click="cmcc.updateImportedConnection()">
+                        Ok
+                    </md-button>
+                    <md-button class="md-raised md-primary pull-right" ng-click="cmcc.cancel()">
+                        <span ng-if="cmcc.mode=='edit' || cmcc.mode=='create'">Back</span>
+                        <span ng-if="cmcc.mode=='import-edit'">Cancel</span>
+                    </md-button>
 
-        <md-input-container class="md-block" ng-if="!cmcc.isEmpty.password && !cmcc.isEmpty.user">
-            <label>Authentication Database</label>
-            <input required name="authDb" ng-model="cmcc.connection.authDb">
-            <div ng-messages="mongoForm.authDb.$error" multiple md-auto-hide="false">
-                <div ng-message-exp="validationName" ng-if="mongoForm.authDb.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.authDb">{{validationMessage}}</div>
-            </div>
-        </md-input-container>
-        <md-button ng-if="cmcc.mode=='create'" class="md-raised md-primary pull-right" ng-click="cmcc.createMongoConnection()" ng-disabled="mongoForm.$invalid">
-            Create  </md-button>
-        <md-button ng-if="cmcc.mode=='edit'" class="md-raised md-primary pull-right" ng-click="cmcc.editMongoConnection()" ng-disabled="mongoForm.$invalid">
-            Update  </md-button>
-        <md-button class="md-raised md-primary pull-right" ng-if="cmcc.mode=='import-edit'" ng-click="cmcc.updateImportedConnection()">
-            Ok      </md-button>
-        <md-button class="md-raised md-primary pull-right" ng-click="cmcc.cancel()">
-            <span ng-if="cmcc.mode=='edit' || cmcc.mode=='create'">Back</span>
-            <span ng-if="cmcc.mode=='import-edit'">Cancel</span>
-        </md-button>
-    </form>
+                </md-content>
+            </form>
 
-            </md-content>
         </md-tab>
+
         <md-tab label="Advanced Settings">
             <md-content class="">
                 <form name="mongoAdvancedForm">
-                        <md-subheader>
-                            <h4 class="center-align">Replica Set</h4>
-                        </md-subheader>
-                            <md-input-container class="md-block">
-                            <label>Name</label>
-                                <input required ng-minlength="" md-maxlength="" name="replicaSetName" ng-model="cmcc.connection.options.repl.replicaSet.name">
-                                    <div ng-messages="mongoAdvancedForm.replicaSetName.$error" multiple md-auto-hide="false">
-                                        <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.replicaSetName.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.replicaSet.name">{{validationMessage}}</div>
-                                    </div>
-                            </md-input-container>
+
+                    <md-subheader class=" md-no-sticky"><span>Replica Set</span></md-subheader>
+
+                    <md-input-container class="md-block col-md-offset-3">
+                        <label>Name</label>
+                        <input md-inset required ng-minlength="" md-maxlength="" name="replicaSetName"
+                               ng-model="cmcc.connection.options.repl.replicaSet.name">
+                        <div ng-messages="mongoAdvancedForm.replicaSetName.$error" multiple md-auto-hide="false">
+                            <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.replicaSetName.$dirty"
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.replicaSet.name">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
                     <md-list>
 
-
-                        <md-list-item ng-repeat="member in cmcc.connection.options.repl.members track by $index">
-                            <md-input-container class="md-block" layout="flex">
+                        <md-list-item ng-repeat="member in cmcc.connection.options.repl.members track by $index"
+                                      layout-margin layout-padding class="box-wrap">
+                            <md-input-container class="md-block " layout="flex">
                                 <label>Host</label>
-                                <input class="md-primary" required ng-minlength="" md-maxlength="" name="replicaSetHost" ng-model="cmcc.connection.options.repl.members.host">
-                                <div ng-messages="mongoAdvancedForm.replicaSetHost.$error" multiple md-auto-hide="false">
-                                    <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.replicaSetHost.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.replicaSet.host">{{validationMessage}}</div>
-                                </div>
-                            </md-input-container>  :
-                            <md-input-container class="md-block" layout="flex">
-                                <label>Port</label>
-                                <input class="md-primary" required ng-minlength="" md-maxlength="" name="replicaSetPort" ng-model="cmcc.connection.options.repl.members.port">
-                                <div ng-messages="mongoAdvancedForm.replicaSetPort.$error" multiple md-auto-hide="false">
-                                    <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.replicaSetPort.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.replicaSet.port">{{validationMessage}}</div>
+                                <input class="md-primary" required ng-minlength="" md-maxlength="" name="replicaSetHost"
+                                       ng-model="cmcc.connection.options.repl.members.host">
+                                <div ng-messages="mongoAdvancedForm.replicaSetHost.$error" multiple
+                                     md-auto-hide="false">
+                                    <div ng-message-exp='validationName'
+                                         ng-show="mongoAdvancedForm.replicaSetHost.$dirty"
+                                         ng-repeat="(validationName, validationMessage) in cmcc.validations.replicaSet.host">
+                                        {{validationMessage}}
+                                    </div>
                                 </div>
                             </md-input-container>
-                            <md-icon class="md-primary"
+                            :
+                            <md-input-container class="md-block" layout="flex">
+                                <label>Port</label>
+                                <input class="md-primary" ng-minlength="" md-maxlength="" name="replicaSetPort"
+                                       ng-model="cmcc.connection.options.repl.members.port">
+                                <div ng-messages="mongoAdvancedForm.replicaSetPort.$error" multiple
+                                     md-auto-hide="false">
+                                    <div ng-message-exp='validationName'
+                                         ng-show="mongoAdvancedForm.replicaSetPort.$dirty"
+                                         ng-repeat="(validationName, validationMessage) in cmcc.validations.replicaSet.port">
+                                        {{validationMessage}}
+                                    </div>
+                                </div>
+                            </md-input-container>
+                            <md-icon class="md-secondary "
                                      aria-label="Delete connection"
-                                     ng-click="cmcc.cancel()">
+                                     ng-click="cmcc.removeReplicaMember()">
                                 <i class="fa fa-trash-o"></i>
                             </md-icon>
                         </md-list-item>
@@ -133,43 +181,71 @@
                             </md-icon>
                         </md-list-item>
                     </md-list>
+                    <md-divider></md-divider>
 
+                    <md-subheader class="md-no-sticky"><span>Connection Timeouts</span></md-subheader>
 
-                    <md-input-container class="md-block" flex-gt-sm="1">
+                    <md-input-container class="md-block col-md-offset-3" flex="80">
                         <label>Connect Timeout</label>
-                        <input required ng-minlength="" md-maxlength="" name="connectTimeoutMS" ng-model="cmcc.connection.options.conn.connectTimeoutMS">
-                            <div ng-messages="mongoAdvancedForm.connectTimeoutMS.$error" multiple md-auto-hide="false">
-                                <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.connectTimeoutMS.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.connectTimeoutMS">{{validationMessage}}</div>
+                        <input required ng-minlength="" md-maxlength="" name="connectTimeoutMS"
+                               ng-model="cmcc.connection.options.conn.connectTimeoutMS">
+                        <div ng-messages="mongoAdvancedForm.connectTimeoutMS.$error" multiple md-auto-hide="false">
+                            <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.connectTimeoutMS.$dirty"
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.connectTimeoutMS">
+                                {{validationMessage}}
                             </div>
+                        </div>
                     </md-input-container>
-                    <md-input-container class="md-block" flex-gt-sm="1">
+                    <md-input-container class="md-block col-md-offset-3" flex="80">
                         <label>Socket Timeout</label>
-                        <input required ng-minlength="" md-maxlength=""  name="socketTimeoutMS" ng-model="cmcc.connection.options.conn.socketTimeoutMS">
-                            <div ng-messages="mongoAdvancedForm.connectTimeoutMS.$error" multiple md-auto-hide="false">
-                                <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.socketTimeoutMS.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.socketTimeoutMS">{{validationMessage}}</div>
+                        <input layout-align="end center" required ng-minlength="" md-maxlength="" name="socketTimeoutMS"
+                               ng-model="cmcc.connection.options.conn.socketTimeoutMS">
+                        <div ng-messages="mongoAdvancedForm.connectTimeoutMS.$error" multiple md-auto-hide="false">
+                            <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.socketTimeoutMS.$dirty"
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.socketTimeoutMS">
+                                {{validationMessage}}
                             </div>
+                        </div>
+
                     </md-input-container>
-                    <!--<h4 class="center-align"><span>Connection Pool Setings</span></h4>-->
-                    <md-input-container class="md-block" flex-gt-sm="1">
+                    <md-divider></md-divider>
+
+                    <md-subheader class=" md-no-sticky"><span>Connection Pool Settings</span>
+                    </md-subheader>
+
+                    <md-input-container class="md-block col-md-offset-3" flex="80">
                         <label>Max PoolSize</label>
-                        <input required ng-minlength="" md-maxlength=""  name="maxPoolSize" ng-model="cmcc.connection.options.connPool.maxPoolSize">
-                            <div ng-messages="mongoAdvancedForm.maxPoolSize.$error" multiple md-auto-hide="false">
-                                <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.maxPoolSize.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.maxPoolSize">{{validationMessage}}</div>
+                        <input required ng-minlength="" md-maxlength="" name="maxPoolSize"
+                               ng-model="cmcc.connection.options.connPool.maxPoolSize">
+                        <div ng-messages="mongoAdvancedForm.maxPoolSize.$error" multiple md-auto-hide="false">
+                            <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.maxPoolSize.$dirty"
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.maxPoolSize">
+                                {{validationMessage}}
                             </div>
+                        </div>
                     </md-input-container>
-                    <md-input-container class="md-block" flex-gt-sm="1">
+                    <md-input-container class="md-block col-md-offset-3" flex="80">
                         <label>Min PoolSize</label>
-                        <input required ng-minlength="" md-maxlength=""  name="minPoolSize" ng-model="cmcc.connection.options.connPool.minPoolSize">
-                            <div ng-messages="mongoAdvancedForm.minPoolSize.$error" multiple md-auto-hide="false">
-                                <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.minPoolSize.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.minPoolSize">{{validationMessage}}</div>
+                        <input required ng-minlength="" md-maxlength="" name="minPoolSize"
+                               ng-model="cmcc.connection.options.connPool.minPoolSize">
+                        <div ng-messages="mongoAdvancedForm.minPoolSize.$error" multiple md-auto-hide="false">
+                            <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.minPoolSize.$dirty"
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.minPoolSize">
+                                {{validationMessage}}
                             </div>
+                        </div>
                     </md-input-container>
-                    <md-input-container class="md-block" flex-gt-sm="1">
+                    <md-input-container class="md-block col-md-offset-3" flex="80">
                         <label>Wait Queue Timeout</label>
-                        <input required ng-minlength="" md-maxlength=""  name="waitQueueTimeoutMS" ng-model="cmcc.connection.options.connPool.waitQueueTimeoutMS">
-                            <div ng-messages="mongoAdvancedForm.minPoolSize.$error" multiple md-auto-hide="false">
-                                <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.waitQueueTimeoutMS.$dirty" ng-repeat="(validationName, validationMessage) in cmcc.validations.waitQueueTimeoutMS">{{validationMessage}}</div>
+                        <input required ng-minlength="" md-maxlength="" name="waitQueueTimeoutMS"
+                               ng-model="cmcc.connection.options.connPool.waitQueueTimeoutMS">
+                        <div ng-messages="mongoAdvancedForm.minPoolSize.$error" multiple md-auto-hide="false">
+                            <div ng-message-exp='validationName'
+                                 ng-show="mongoAdvancedForm.waitQueueTimeoutMS.$dirty"
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.waitQueueTimeoutMS">
+                                {{validationMessage}}
                             </div>
+                        </div>
                     </md-input-container>
                 </form>
             </md-content>
