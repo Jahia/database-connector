@@ -166,7 +166,7 @@ public class MongoConnection extends AbstractConnection {
                 //Handle replicate set options
                 if (jsonOptions.has("repl")) {
                     JSONObject jsonRepl = jsonOptions.getJSONObject("repl");
-                    serializedString.append(NEW_LINE + TABU + TABU + "connSettings {");
+                    serializedString.append(NEW_LINE + TABU + TABU + "replicaSet {");
                     if (jsonRepl.has("replicaSet") && !StringUtils.isEmpty(jsonRepl.getString("replicaSet"))) {
                         serializedString.append(NEW_LINE + TABU + TABU + TABU + "name " + DOUBLE_QUOTE + jsonRepl.getString("replicaSet") + DOUBLE_QUOTE);
                     }
