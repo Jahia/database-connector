@@ -76,10 +76,10 @@
                 }
             },
             connectTimeoutMS: {
-                'pattern' : 'Timeout is in seconds'
+                'pattern' : 'Should be an integer'
             },
             socketTimeoutMS: {
-                'pattern' : 'Timeout is in seconds'
+                'pattern' : 'Should be an integer'
 
             },
             maxPoolSize: {
@@ -91,7 +91,7 @@
 
             },
             waitQueueTimeoutMS: {
-                'pattern' : 'Timeout is in seconds'
+                'pattern' : 'Should be an integer'
             }
             
         };

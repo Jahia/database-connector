@@ -13,7 +13,7 @@
 
         function linkFunction(scope, el, attr, ctrls) {
             var model = ctrls[0];
-            var maxValue = parseInt(attr['rangeMaxValue']);
+            var maxValue = isNaN(parseInt(attr['rangeMaxValue'])) ? undefined : parseInt(attr['rangeMaxValue']);
             var backupValue = null;
             model.$parsers.push(function(value) {
 

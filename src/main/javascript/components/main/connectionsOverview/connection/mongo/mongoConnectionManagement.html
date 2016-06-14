@@ -174,8 +174,8 @@
                     <md-subheader class="md-no-sticky"><span>Connection Timeouts</span></md-subheader>
 
                     <md-input-container class="md-block col-md-offset-2">
-                        <label>Connect Timeout</label>
-                        <input name="connectTimeoutMS"
+                        <label>Connect Timeout (milliseconds)</label>
+                        <input name="connectTimeoutMS" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.conn.connectTimeoutMS">
                         <div ng-messages="mongoAdvancedForm.connectTimeoutMS.$error" ng-if="mongoAdvancedForm.connectTimeoutMS.$dirty">
@@ -186,8 +186,8 @@
                         </div>
                     </md-input-container>
                     <md-input-container class="md-block col-md-offset-2">
-                        <label>Socket Timeout</label>
-                        <input name="socketTimeoutMS"
+                        <label>Socket Timeout (milliseconds)</label>
+                        <input name="socketTimeoutMS" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.conn.socketTimeoutMS">
                         <div ng-messages="mongoAdvancedForm.socketTimeoutMS.$error" ng-if="mongoAdvancedForm.socketTimeoutMS.$dirty">
@@ -200,12 +200,12 @@
                     </md-input-container>
                     <md-divider></md-divider>
 
-                    <md-subheader class=" md-no-sticky"><span>Connection Pool Settings</span>
+                    <md-subheader class="md-no-sticky"><span>Connection Pool Settings</span>
                     </md-subheader>
 
                     <md-input-container class="md-block col-md-offset-2">
-                        <label>Max PoolSize</label>
-                        <input name="maxPoolSize"
+                        <label>Max Pool Size</label>
+                        <input name="maxPoolSize" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.connPool.maxPoolSize">
                         <div ng-messages="mongoAdvancedForm.maxPoolSize.$error" ng-if="mongoAdvancedForm.maxPoolSize.$dirty">
@@ -216,8 +216,8 @@
                         </div>
                     </md-input-container>
                     <md-input-container class="md-block col-md-offset-2">
-                        <label>Min PoolSize</label>
-                        <input name="minPoolSize"
+                        <label>Min Pool Size</label>
+                        <input name="minPoolSize" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.connPool.minPoolSize">
                         <div ng-messages="mongoAdvancedForm.minPoolSize.$error" ng-if="mongoAdvancedForm.minPoolSize.$dirty">
@@ -228,8 +228,8 @@
                         </div>
                     </md-input-container>
                     <md-input-container class="md-block col-md-offset-2">
-                        <label>Wait Queue Timeout</label>
-                        <input name="waitQueueTimeoutMS"
+                        <label>Wait Queue Timeout (milliseconds)</label>
+                        <input name="waitQueueTimeoutMS" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.connPool.waitQueueTimeoutMS">
                         <div ng-messages="mongoAdvancedForm.waitQueueTimeoutMS.$error" ng-if="mongoAdvancedForm.waitQueueTimeoutMS.$dirty">
