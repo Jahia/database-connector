@@ -15,6 +15,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.jahia.modules.databaseConnector.Utils.*;
 
@@ -109,8 +111,43 @@ public class MongoConnection extends AbstractConnection {
     
     @Override
     public String parseOptions(LinkedHashMap options) {
-        //@TODO implement the structure of Mongo options object
-        return null;
+        JSONObject formattedOptions = new JSONObject();
+        try {
+            if (options.containsKey("connSettings")) {
+                //Add connection settings
+                formattedOptions.put("conn", options.get("connSettings"));
+            }
+            if (options.containsKey("connPoolSettings")) {
+                //Add connection pool settings
+                formattedOptions.put("connPool", options.get("connPoolSettings"));
+            }
+            if (options.containsKey("replicaSet")) {
+                //Add replica settings
+                LinkedHashMap repl = new LinkedHashMap();
+                if (((LinkedHashMap) options.get("replicaSet")).containsKey("name")) {
+                    repl.put("replicaSet", ((LinkedHashMap) options.get("replicaSet")).get("name"));
+                }
+                if (((LinkedHashMap) options.get("replicaSet")).containsKey("members")) {
+                    LinkedList formattedMembers = new LinkedList();
+                    List<String> members = (List) ((LinkedHashMap) options.get("replicaSet")).get("members");
+                    for (String member : members) {
+                        LinkedHashMap formattedMember = new LinkedHashMap();
+                        if (member.contains(":")) {
+                            formattedMember.put("host", member.substring(0, member.indexOf(":")));
+                            formattedMember.put("port", member.substring(member.indexOf(":") + 1, member.length()));
+                        } else {
+                            formattedMember.put("host", member);
+                        }
+                        formattedMembers.push(formattedMember);
+                    }
+                    repl.put("members", formattedMembers);
+                }
+                formattedOptions.put("repl", repl);
+            }
+        } catch(JSONException ex) {
+            logger.error("Failed to serialize imported connection options", ex.getMessage());
+        }
+        return formattedOptions.toString();
     }
 
     @Override
@@ -119,18 +156,26 @@ public class MongoConnection extends AbstractConnection {
         serializedString.append(
                 TABU + "type " + DOUBLE_QUOTE + DATABASE_TYPE + DOUBLE_QUOTE + NEW_LINE +
                 TABU + "host " + DOUBLE_QUOTE + this.host + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "port " + DOUBLE_QUOTE + this.port + DOUBLE_QUOTE + NEW_LINE +
                 TABU + "dbName " + DOUBLE_QUOTE + this.dbName + DOUBLE_QUOTE + NEW_LINE +
                 TABU + "identifier " + DOUBLE_QUOTE + this.id + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "isConnected " + DOUBLE_QUOTE + this.isConnected() + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "authDb " + DOUBLE_QUOTE + this.authDb + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "user " + DOUBLE_QUOTE + this.user + DOUBLE_QUOTE + NEW_LINE
+                TABU + "isConnected " + DOUBLE_QUOTE + this.isConnected() + DOUBLE_QUOTE + NEW_LINE
         );
+
+        if (this.port != null) {
+            serializedString.append(TABU + "port " + DOUBLE_QUOTE + this.port + DOUBLE_QUOTE + NEW_LINE);
+        }
+
+        if (!StringUtils.isEmpty(this.authDb)) {
+            serializedString.append(TABU + "authDb " + DOUBLE_QUOTE + this.authDb + DOUBLE_QUOTE + NEW_LINE);
+        }
+
+        if (!StringUtils.isEmpty(this.user)) {
+            serializedString.append(TABU + "user " + DOUBLE_QUOTE + this.user + DOUBLE_QUOTE + NEW_LINE);
+        }
 
         if (!StringUtils.isEmpty(this.password)) {
             serializedString.append(TABU + "password " + DOUBLE_QUOTE + EncryptionUtils.passwordBaseEncrypt(this.password) + "_ENC" + DOUBLE_QUOTE + NEW_LINE);
         }
-
 
         if (this.options != null) {
             try {
