@@ -21,7 +21,7 @@
                         return mUptime.fromNow().toString();
                     } else {
                         //use calendar time
-                        return moment().calendar(mUptime).toString();
+                        return mUptime.calendar().toString();
                     }
                     break;
                 default:
