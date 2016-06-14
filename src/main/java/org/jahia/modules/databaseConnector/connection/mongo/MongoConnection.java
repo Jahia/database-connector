@@ -185,7 +185,7 @@ public class MongoConnection extends AbstractConnection {
                 serializedString.append(TABU + "options {");
                 //Handle connection pool settings
                 if (jsonOptions.has("connPool")) {
-                    JSONObject jsonConnPool = new JSONObject(jsonOptions.get("connPool"));
+                    JSONObject jsonConnPool = jsonOptions.getJSONObject("connPool");
                     serializedString.append(NEW_LINE + TABU + TABU + "connPoolSettings {");
                     if (jsonConnPool.has("minPoolSize") && !StringUtils.isEmpty(jsonConnPool.getString("minPoolSize"))) {
                         serializedString.append(NEW_LINE + TABU + TABU + TABU + "minPoolSize " + DOUBLE_QUOTE + jsonConnPool.getString("minPoolSize") + DOUBLE_QUOTE);
@@ -200,7 +200,7 @@ public class MongoConnection extends AbstractConnection {
                 }
                 //Handle connection settings
                 if (jsonOptions.has("conn")) {
-                    JSONObject jsonConn = new JSONObject(jsonOptions.get("conn"));
+                    JSONObject jsonConn = jsonOptions.getJSONObject("conn");
                     serializedString.append(NEW_LINE + TABU + TABU + "connSettings {");
                     if (jsonConn.has("connectTimeoutMS") && !StringUtils.isEmpty(jsonConn.getString("connectTimeoutMS"))) {
                         serializedString.append(NEW_LINE + TABU + TABU + TABU + "connectTimeoutMS " + DOUBLE_QUOTE + jsonConn.getInt("connectTimeoutMS") + DOUBLE_QUOTE);
