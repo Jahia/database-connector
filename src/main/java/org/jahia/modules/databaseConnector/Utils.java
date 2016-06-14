@@ -46,9 +46,6 @@ public class Utils {
         if (!jsonConnectionData.has("host") || StringUtils.isEmpty(jsonConnectionData.getString("host"))) {
             missingParameters.put("host");
         }
-        if (!jsonConnectionData.has("port") || StringUtils.isEmpty(jsonConnectionData.getString("port"))) {
-            missingParameters.put("port");
-        }
         if (!jsonConnectionData.has("dbName") || StringUtils.isEmpty(jsonConnectionData.getString("dbName"))) {
             missingParameters.put("dbName");
         }
@@ -57,7 +54,7 @@ public class Utils {
         } else {
             String id = jsonConnectionData.has("id") ? jsonConnectionData.getString("id") : null;
             String host = jsonConnectionData.has("host") ? jsonConnectionData.getString("host") : null;
-            Integer port = jsonConnectionData.has("port") ? jsonConnectionData.getInt("port") : null;
+            Integer port = jsonConnectionData.has("port") && !StringUtils.isEmpty(jsonConnectionData.getString("port")) ? jsonConnectionData.getInt("port") : null;
             Boolean isConnected = jsonConnectionData.has("isConnected") ? jsonConnectionData.getBoolean("isConnected") : false;
             String dbName = jsonConnectionData.has("dbName") ? jsonConnectionData.getString("dbName") : null;
             String user = jsonConnectionData.has("user") ? jsonConnectionData.getString("user") : null;

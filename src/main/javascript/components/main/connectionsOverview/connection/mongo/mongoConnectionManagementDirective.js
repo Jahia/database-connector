@@ -77,7 +77,10 @@
         init();
 
         function init() {
-            cmcc.connection.port = "27017";
+
+            if (_.isUndefined(cmcc.connection.port) || cmcc.connection.port == null){
+                cmcc.connection.port = "27017";
+            }
 
             cmcc.isEmpty.password = updateIsEmpty('password');
             cmcc.isEmpty.user = updateIsEmpty('user');
@@ -116,48 +119,13 @@
             }
             cmcc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/mongodb/add';
-            if (_.isEmpty(cmcc.connection.options.repl) || cmcc.connection.options.repl == null) {
-                delete cmcc.connection.options.repl
-            } else {
-                if (_.isEmpty(cmcc.connection.options.repl.replicaSet) || cmcc.connection.options.repl.replicaSet == null) {
-                    delete cmcc.connection.options.repl.replicaSet
-                }
-                if (_.isEmpty(cmcc.connection.options.repl.members) || cmcc.connection.options.repl.members == null) {
-                    delete cmcc.connection.options.repl.members
-                }
-            }
-            if (_.isEmpty(cmcc.connection.options.conn) || cmcc.connection.options.conn == null) {
-                delete cmcc.connection.options.conn;
-            } else {
-                if (_.isEmpty(cmcc.connection.options.conn.connectTimeoutMS) || cmcc.connection.options.conn.connectTimeoutMS == null) {
-                    delete cmcc.connection.options.conn.connectTimeoutMS
-                }
-                if (_.isEmpty(cmcc.connection.options.conn.socketTimeoutMS) || cmcc.connection.options.conn.socketTimeoutMS == null) {
-                    delete cmcc.connection.options.conn.socketTimeoutMS
-                }
-            }
-
-            if (_.isEmpty(cmcc.connection.options.connPool) || cmcc.connection.options.connPool == null) {
-                delete cmcc.connection.options.connPool
-
-            } else {
-                if (_.isEmpty(cmcc.connection.options.connPool.maxPoolSize) || cmcc.connection.options.connPool.maxPoolSize == null) {
-                    delete cmcc.connection.options.connPool.maxPoolSize
-                }
-                if (_.isEmpty(cmcc.connection.options.connPool.minPoolSize) || cmcc.connection.options.connPool.minPoolSize == null) {
-                    delete cmcc.connection.options.connPool.minPoolSize
-                }
-                if (_.isEmpty(cmcc.connection.options.connPool.waitQueueTimeoutMS) || cmcc.connection.options.connPool.waitQueueTimeoutMS == null) {
-                    delete cmcc.connection.options.connPool.waitQueueTimeoutMS
-                }
-            }
 
             var data = angular.copy(cmcc.connection);
-            data.options = JSON.stringify(data.options);
+            data.options = prepareOptions(data.options);
             dcDataFactory.customRequest({
                 url: url,
                 method: 'POST',
-                data: cmcc.connection
+                data: data
             }).then(function (response) {
 
                 cmcc.spinnerOptions.showSpinner = false;
@@ -181,49 +149,13 @@
             }
             cmcc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/mongodb/edit';
-            if (_.isEmpty(cmcc.connection.options.repl) || cmcc.connection.options.repl == null) {
-                delete cmcc.connection.options.repl
-            } else {
-                if (_.isEmpty(cmcc.connection.options.repl.replicaSet) || cmcc.connection.options.repl.replicaSet == null) {
-                    delete cmcc.connection.options.repl.replicaSet
-                }
-                if (_.isEmpty(cmcc.connection.options.repl.members) || cmcc.connection.options.repl.members == null) {
-                    delete cmcc.connection.options.repl.members
-                }
-            }
-            if (_.isEmpty(cmcc.connection.options.conn) || cmcc.connection.options.conn == null) {
-                delete cmcc.connection.options.conn;
-            } else {
-                if (_.isEmpty(cmcc.connection.options.conn.connectTimeoutMS) || cmcc.connection.options.conn.connectTimeoutMS == null) {
-                    delete cmcc.connection.options.conn.connectTimeoutMS
-                }
-                if (_.isEmpty(cmcc.connection.options.conn.socketTimeoutMS) || cmcc.connection.options.conn.socketTimeoutMS == null) {
-                    delete cmcc.connection.options.conn.socketTimeoutMS
-                }
-            }
-
-            if (_.isEmpty(cmcc.connection.options.connPool) || cmcc.connection.options.connPool == null) {
-                delete cmcc.connection.options.connPool
-
-            } else {
-                if (_.isEmpty(cmcc.connection.options.connPool.maxPoolSize) || cmcc.connection.options.connPool.maxPoolSize == null) {
-                    delete cmcc.connection.options.connPool.maxPoolSize
-                }
-                if (_.isEmpty(cmcc.connection.options.connPool.minPoolSize) || cmcc.connection.options.connPool.minPoolSize == null) {
-                    delete cmcc.connection.options.connPool.minPoolSize
-                }
-                if (_.isEmpty(cmcc.connection.options.connPool.waitQueueTimeoutMS) || cmcc.connection.options.connPool.waitQueueTimeoutMS == null) {
-                    delete cmcc.connection.options.connPool.waitQueueTimeoutMS
-                }
-            }
             var data = angular.copy(cmcc.connection);
-            data.options = JSON.stringify(data.options);
+            data.options = prepareOptions(data.options);
             dcDataFactory.customRequest({
                 url: url,
                 method: 'PUT',
-                data: cmcc.connection
+                data: data
             }).then(function (response) {
-
                 cmcc.spinnerOptions.showSpinner = false;
                 $scope.$emit('connectionSuccessfullyCreated', null);
                 showConfirmationToast(response.connectionVerified);
@@ -242,10 +174,12 @@
         function testMongoConnection() {
             cmcc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/mongodb/testconnection';
+            var data = angular.copy(cmcc.connection);
+            data.options = prepareOptions(data.options);
             dcDataFactory.customRequest({
                 url: url,
                 method: 'POST',
-                data: cmcc.connection
+                data: data
             }).then(function (response) {
                 if (response.result) {
                     toaster.pop({
@@ -301,24 +235,62 @@
             }
         }
 
+        function prepareOptions(options) {
+            if (_.isEmpty(options.repl) || options.repl == null) {
+                delete options.repl
+            } else {
+                if (_.isEmpty(options.repl.replicaSet) || options.repl.replicaSet == null) {
+                    delete options.repl.replicaSet
+                }
+                if (_.isEmpty(options.repl.members) || options.repl.members == null) {
+                    delete options.repl.members
+                }
+            }
+            if (_.isEmpty(options.conn) || options.conn == null) {
+                delete options.conn;
+            } else {
+                if (_.isEmpty(options.conn.connectTimeoutMS) || options.conn.connectTimeoutMS == null) {
+                    delete options.conn.connectTimeoutMS
+                }
+                if (_.isEmpty(options.conn.socketTimeoutMS) || options.conn.socketTimeoutMS == null) {
+                    delete options.conn.socketTimeoutMS
+                }
+            }
+
+            if (_.isEmpty(options.connPool) || options.connPool == null) {
+                delete options.connPool
+
+            } else {
+                if (_.isEmpty(options.connPool.maxPoolSize) || options.connPool.maxPoolSize == null) {
+                    delete options.connPool.maxPoolSize
+                }
+                if (_.isEmpty(options.connPool.minPoolSize) || options.connPool.minPoolSize == null) {
+                    delete options.connPool.minPoolSize
+                }
+                if (_.isEmpty(options.connPool.waitQueueTimeoutMS) || options.connPool.waitQueueTimeoutMS == null) {
+                    delete options.connPool.waitQueueTimeoutMS
+                }
+            }
+
+            return JSON.stringify(options);
+        }
+
         function updateImportedConnection() {
             $scope.$emit('importConnectionClosed', cmcc.connection);
         }
 
         function addReplicaMember() {
             if (!_.isUndefined(cmcc.connection.options.repl.members)) {
-                cmcc.connection.options.repl.members.push({})
-
+                cmcc.connection.options.repl.members.push({});
             }
             else {
                 console.log("repl Members is Undefined !", cmcc.connection.options.repl.members);
             }
         }
 
-        function removeReplicaMember() {
+        function removeReplicaMember(index) {
             if (!_.isUndefined(cmcc.connection.options.repl.members)) {
-                cmcc.connection.options.repl.members.pop()
-
+                cmcc.connection.options.repl.members.splice(index, 1);
             }
             else {
                 console.log("repl Members is Undefined !", cmcc.connection.options.repl.members);

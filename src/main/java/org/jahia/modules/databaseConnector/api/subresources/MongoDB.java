@@ -98,9 +98,6 @@ public class MongoDB {
             if (!connectionParameters.has("host") || StringUtils.isEmpty(connectionParameters.getString("host"))) {
                 missingParameters.put("host");
             }
-            if (!connectionParameters.has("port") || StringUtils.isEmpty(connectionParameters.getString("port"))) {
-                missingParameters.put("port");
-            }
             if (!connectionParameters.has("dbName") || StringUtils.isEmpty(connectionParameters.getString("dbName"))) {
                 missingParameters.put("dbName");
             }
@@ -110,7 +107,7 @@ public class MongoDB {
                 String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
                 String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
                 Integer port = connectionParameters.has("port") ? connectionParameters.getInt("port") : null;
-                Boolean isConnected = connectionParameters.has("isConnected") ? connectionParameters.getBoolean("isConnected") : false;
+                Boolean isConnected = connectionParameters.has("isConnected") && !StringUtils.isEmpty(connectionParameters.getString("port")) ? connectionParameters.getBoolean("isConnected") : false;
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
                 String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
@@ -162,9 +159,6 @@ public class MongoDB {
             if (!connectionParameters.has("host") || StringUtils.isEmpty(connectionParameters.getString("host"))) {
                 missingParameters.put("host");
             }
-            if (!connectionParameters.has("port") || StringUtils.isEmpty(connectionParameters.getString("port"))) {
-                missingParameters.put("port");
-            }
             if (!connectionParameters.has("dbName") || StringUtils.isEmpty(connectionParameters.getString("dbName"))) {
                 missingParameters.put("dbName");
             }
@@ -174,7 +168,7 @@ public class MongoDB {
                 String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
                 String oldId = connectionParameters.has("oldId") ? connectionParameters.getString("oldId") : null;
                 String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
-                Integer port = connectionParameters.has("port") ? connectionParameters.getInt("port") : null;
+                Integer port = connectionParameters.has("port") && !StringUtils.isEmpty(connectionParameters.getString("port")) ? connectionParameters.getInt("port") : null;
                 Boolean isConnected = connectionParameters.has("isConnected") ? connectionParameters.getBoolean("isConnected") : false;
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
                 String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
@@ -272,9 +266,6 @@ public class MongoDB {
             if (!connectionParameters.has("host") || StringUtils.isEmpty(connectionParameters.getString("host"))) {
                 missingParameters.put("host");
             }
-            if (!connectionParameters.has("port") || StringUtils.isEmpty(connectionParameters.getString("port"))) {
-                missingParameters.put("port");
-            }
             if (!connectionParameters.has("dbName") || StringUtils.isEmpty(connectionParameters.getString("dbName"))) {
                 missingParameters.put("dbName");
             }
@@ -283,7 +274,7 @@ public class MongoDB {
             } else {
                 String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
                 String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
-                Integer port = connectionParameters.has("port") ? connectionParameters.getInt("port") : null;
+                Integer port = connectionParameters.has("port") && !StringUtils.isEmpty(connectionParameters.getString("port"))  ? connectionParameters.getInt("port") : null;
                 Boolean isConnected = connectionParameters.has("isConnected") ? connectionParameters.getBoolean("isConnected") : false;
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
                 String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;

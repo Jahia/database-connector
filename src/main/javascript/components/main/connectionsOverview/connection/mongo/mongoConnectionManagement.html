@@ -1,7 +1,7 @@
 <dc-spinner spinner-mode="cmcc.spinnerOptions.mode" show="cmcc.spinnerOptions.showSpinner"></dc-spinner>
 
 <md-content layout-padding>
-    <md-tabs md-dynamic-height md-border-bottom md-no-ink-bar md-autoselect>
+    <md-tabs md-dynamic-height md-border-bottom >
 
         <md-tab label="Settings">
             <form name="mongoForm">
@@ -32,7 +32,7 @@
 
                     <md-input-container class="md-block">
                         <label>Port</label>
-                        <input md-maxlength="5" ng-pattern="/[0-9]+/" name="port"
+                        <input md-maxlength="5" ng-pattern="/[0-9]*/" name="port"
                                ng-model="cmcc.connection.port" length-parser length-parser-max="5" range-parser
                                range-max-value="65535">
                         <div ng-messages="mongoForm.port.$error" ng-if="mongoForm.port.$dirty">
@@ -104,7 +104,7 @@
                                ng-click="cmcc.editMongoConnection()" ng-disabled="mongoForm.$invalid">
                         Update
                     </md-button>
-                    <md-button class="md-raised md-primary pull-right" ng-if="cmcc.mode=='import-edit'"
+                    <md-button class="md-raised md-primary pull-right" ng-if="cmcc.mode=='import-edit' "
                                ng-click="cmcc.updateImportedConnection()">
                         Ok
                     </md-button>
@@ -124,9 +124,9 @@
 
                     <md-subheader class=" md-no-sticky"><span>Replica Set</span></md-subheader>
 
-                    <md-input-container class="md-block col-md-offset-3">
+                    <md-input-container class="md-block col-md-offset-2">
                         <label>Name</label>
-                        <input md-inset required ng-minlength="" md-maxlength="" name="replicaSetName"
+                        <input required ng-minlength="" md-maxlength="" name="replicaSetName"
                                ng-model="cmcc.connection.options.repl.replicaSet.name">
                         <div ng-messages="mongoAdvancedForm.replicaSetName.$error" multiple md-auto-hide="false">
                             <div ng-message-exp='validationName' ng-show="mongoAdvancedForm.replicaSetName.$dirty"
@@ -138,11 +138,11 @@
                     <md-list>
 
                         <md-list-item ng-repeat="member in cmcc.connection.options.repl.members track by $index"
-                                      layout-margin layout-padding class="box-wrap">
-                            <md-input-container class="md-block " layout="flex">
+                                      layout-margin layout-padding layout-fill layout-wrap="" class="box-wrap2">
+                            <md-input-container class="md-block" layout="flex">
                                 <label>Host</label>
                                 <input class="md-primary" required ng-minlength="" md-maxlength="" name="replicaSetHost"
-                                       ng-model="cmcc.connection.options.repl.members.host">
+                                       ng-model="member.host">
                                 <div ng-messages="mongoAdvancedForm.replicaSetHost.$error" multiple
                                      md-auto-hide="false">
                                     <div ng-message-exp='validationName'
@@ -156,7 +156,7 @@
                             <md-input-container class="md-block" layout="flex">
                                 <label>Port</label>
                                 <input class="md-primary" ng-minlength="" md-maxlength="" name="replicaSetPort"
-                                       ng-model="cmcc.connection.options.repl.members.port">
+                                       ng-model="member.port">
                                 <div ng-messages="mongoAdvancedForm.replicaSetPort.$error" multiple
                                      md-auto-hide="false">
                                     <div ng-message-exp='validationName'
@@ -168,7 +168,7 @@
                             </md-input-container>
                             <md-icon class="md-secondary "
                                      aria-label="Delete connection"
-                                     ng-click="cmcc.removeReplicaMember()">
+                                     ng-click="cmcc.removeReplicaMember($index)">
                                 <i class="fa fa-trash-o"></i>
                             </md-icon>
                         </md-list-item>
@@ -185,7 +185,7 @@
 
                     <md-subheader class="md-no-sticky"><span>Connection Timeouts</span></md-subheader>
 
-                    <md-input-container class="md-block col-md-offset-3" flex="80">
+                    <md-input-container class="md-block col-md-offset-2">
                         <label>Connect Timeout</label>
                         <input required ng-minlength="" md-maxlength="" name="connectTimeoutMS"
                                ng-model="cmcc.connection.options.conn.connectTimeoutMS">
@@ -196,7 +196,7 @@
                             </div>
                         </div>
                     </md-input-container>
-                    <md-input-container class="md-block col-md-offset-3" flex="80">
+                    <md-input-container class="md-block col-md-offset-2" >
                         <label>Socket Timeout</label>
                         <input layout-align="end center" required ng-minlength="" md-maxlength="" name="socketTimeoutMS"
                                ng-model="cmcc.connection.options.conn.socketTimeoutMS">
@@ -213,7 +213,7 @@
                     <md-subheader class=" md-no-sticky"><span>Connection Pool Settings</span>
                     </md-subheader>
 
-                    <md-input-container class="md-block col-md-offset-3" flex="80">
+                    <md-input-container class="md-block col-md-offset-2" >
                         <label>Max PoolSize</label>
                         <input required ng-minlength="" md-maxlength="" name="maxPoolSize"
                                ng-model="cmcc.connection.options.connPool.maxPoolSize">
@@ -224,7 +224,7 @@
                             </div>
                         </div>
                     </md-input-container>
-                    <md-input-container class="md-block col-md-offset-3" flex="80">
+                    <md-input-container class="md-block col-md-offset-2">
                         <label>Min PoolSize</label>
                         <input required ng-minlength="" md-maxlength="" name="minPoolSize"
                                ng-model="cmcc.connection.options.connPool.minPoolSize">
@@ -235,7 +235,7 @@
                             </div>
                         </div>
                     </md-input-container>
-                    <md-input-container class="md-block col-md-offset-3" flex="80">
+                    <md-input-container class="md-block col-md-offset-2" >
                         <label>Wait Queue Timeout</label>
                         <input required ng-minlength="" md-maxlength="" name="waitQueueTimeoutMS"
                                ng-model="cmcc.connection.options.connPool.waitQueueTimeoutMS">
