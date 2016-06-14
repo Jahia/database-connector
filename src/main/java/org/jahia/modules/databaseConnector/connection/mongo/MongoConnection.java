@@ -38,6 +38,8 @@ public class MongoConnection extends AbstractConnection {
 
     public static final String WRITE_CONCERN_DEFAULT_VALUE = "SAFE";
 
+    private static final Integer DEFAULT_PORT = new Integer(27017);
+
     private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.MONGO;
 
     private MongoDatabase databaseConnection;
@@ -56,7 +58,7 @@ public class MongoConnection extends AbstractConnection {
     public MongoConnectionData makeConnectionData() {
         MongoConnectionData mongoConnectionData = new MongoConnectionData(id);
         mongoConnectionData.setHost(host);
-        mongoConnectionData.setPort(port);
+        mongoConnectionData.setPort(port == null ? DEFAULT_PORT : port);
         mongoConnectionData.isConnected(isConnected);
         mongoConnectionData.setDbName(dbName);
         mongoConnectionData.setUser(user);
@@ -183,8 +185,8 @@ public class MongoConnection extends AbstractConnection {
                 serializedString.append(TABU + "options {");
                 //Handle connection pool settings
                 if (jsonOptions.has("connPool")) {
-                    JSONObject jsonConnPool = new JSONObject(jsonOptions.get("connPoolSettings"));
-                    serializedString.append(NEW_LINE + TABU + TABU + "connPool {");
+                    JSONObject jsonConnPool = new JSONObject(jsonOptions.get("connPool"));
+                    serializedString.append(NEW_LINE + TABU + TABU + "connPoolSettings {");
                     if (jsonConnPool.has("minPoolSize") && !StringUtils.isEmpty(jsonConnPool.getString("minPoolSize"))) {
                         serializedString.append(NEW_LINE + TABU + TABU + TABU + "minPoolSize " + DOUBLE_QUOTE + jsonConnPool.getString("minPoolSize") + DOUBLE_QUOTE);
                     }

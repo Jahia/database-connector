@@ -205,7 +205,7 @@
                     cc.connection.canRetrieveStatus = true;
                     cc.originalConnection.canRetrieveStatus = true;
                     cc.connection.dbVersion = response.success.version;
-                    cc.originalConnection.dbVersion = cc.connection.version;
+                    cc.originalConnection.dbVersion = cc.connection.dbVersion;
                     cc.connection.uptime = response.success.uptime;
                     cc.originalConnection.uptime = cc.connection.uptime;
                 } else {

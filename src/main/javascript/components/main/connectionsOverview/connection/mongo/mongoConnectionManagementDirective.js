@@ -105,7 +105,8 @@
         cmcc.updateImportedConnection = updateImportedConnection;
         cmcc.addReplicaMember = addReplicaMember;
         cmcc.removeReplicaMember = removeReplicaMember;
-
+        cmcc.updateReplicaSetOptions = updateReplicaSetOptions;
+        
         init();
 
         function init() {
@@ -127,21 +128,12 @@
             } else {
                 cmcc.connection.options = JSON.parse(cmcc.connection.options);
             }
-            if (_.isUndefined(cmcc.connection.options.repl)) {
-                cmcc.connection.options.repl = {
-                    replicaSet: null,
-                    members: []
-                }
-            }
+            cmcc.isReplicaSet = !_.isUndefined(cmcc.connection.options.repl);
             if (_.isUndefined(cmcc.connection.options.conn)) {
-                cmcc.connection.options.conn = {
-                    conn: {}
-                }
+                cmcc.connection.options.conn = {}
             }
             if (_.isUndefined(cmcc.connection.options.connPool)) {
-                cmcc.connection.options.connPool = {
-                    connPool: {}
-                }
+                cmcc.connection.options.connPool = {}
             }
         }
 
@@ -153,7 +145,12 @@
             var url = contextualData.context + '/modules/databaseconnector/mongodb/add';
 
             var data = angular.copy(cmcc.connection);
-            data.options = prepareOptions(data.options);
+            var options = prepareOptions(options);
+            if (options == null) {
+                delete data.options;
+            } else {
+                data.options = options;
+            }
             dcDataFactory.customRequest({
                 url: url,
                 method: 'POST',
@@ -268,43 +265,46 @@
         }
 
         function prepareOptions(options) {
-            if (_.isEmpty(options.repl) || options.repl == null) {
-                delete options.repl
-            } else {
-                if (_.isEmpty(options.repl.replicaSet) || options.repl.replicaSet == null) {
+            if (!_.isEmpty(options.repl)) {
+                if (options.repl.replicaSet == null || (_.isString(options.repl.replicaSet) && options.repl.replicaSet.trim().length == 0)) {
                     delete options.repl.replicaSet
                 }
                 if (_.isEmpty(options.repl.members) || options.repl.members == null) {
                     delete options.repl.members
                 }
             }
-            if (_.isEmpty(options.conn) || options.conn == null) {
-                delete options.conn;
-            } else {
-                if (_.isEmpty(options.conn.connectTimeoutMS) || options.conn.connectTimeoutMS == null) {
-                    delete options.conn.connectTimeoutMS
-                }
-                if (_.isEmpty(options.conn.socketTimeoutMS) || options.conn.socketTimeoutMS == null) {
-                    delete options.conn.socketTimeoutMS
-                }
+            //Check if the repl object is empty after we checked the members
+            if (_.isEmpty(options.repl) || options.repl == null) {
+                delete options.repl
             }
 
+            if (options.conn.connectTimeoutMS == null || (_.isString(options.conn.connectTimeoutMS) && options.conn.connectTimeoutMS.trim().length == 0)) {
+                delete options.conn.connectTimeoutMS
+            }
+            if (options.conn.socketTimeoutMS == null || (_.isString(options.conn.socketTimeoutMS) && options.conn.socketTimeoutMS.trim().length == 0)) {
+                delete options.conn.socketTimeoutMS
+            }
+            //Check if the conn object is empty after we checked the members
+            if (_.isEmpty(options.conn) || options.conn == null) {
+                delete options.conn;
+            }
+
+            if (options.connPool.maxPoolSize == null || (_.isString(options.connPool.maxPoolSize) && options.connPool.maxPoolSize.trim().length == 0)) {
+                delete options.connPool.maxPoolSize
+            }
+            if (options.connPool.minPoolSize == null || (_.isString(options.connPool.minPoolSize) && options.connPool.minPoolSize.trim().length == 0)) {
+                delete options.connPool.minPoolSize
+            }
+            if (options.connPool.waitQueueTimeoutMS == null || (_.isString(options.connPool.waitQueueTimeoutMS) && options.connPool.waitQueueTimeoutMS.trim().length == 0)) {
+                delete options.connPool.waitQueueTimeoutMS
+            }
+            //Check if the connPool object is empty after we checked the members
             if (_.isEmpty(options.connPool) || options.connPool == null) {
                 delete options.connPool
 
-            } else {
-                if (_.isEmpty(options.connPool.maxPoolSize) || options.connPool.maxPoolSize == null) {
-                    delete options.connPool.maxPoolSize
-                }
-                if (_.isEmpty(options.connPool.minPoolSize) || options.connPool.minPoolSize == null) {
-                    delete options.connPool.minPoolSize
-                }
-                if (_.isEmpty(options.connPool.waitQueueTimeoutMS) || options.connPool.waitQueueTimeoutMS == null) {
-                    delete options.connPool.waitQueueTimeoutMS
-                }
             }
 
-            return JSON.stringify(options);
+            return _.isEmpty(options) ? null : JSON.stringify(options);
         }
 
         function updateImportedConnection() {
@@ -326,6 +326,21 @@
             }
             else {
                 console.log("repl Members is Undefined !", cmcc.connection.options.repl.members);
+            }
+        }
+
+        function updateReplicaSetOptions() {
+            if (cmcc.isReplicaSet) {
+                if (_.isUndefined(cmcc.connection.options.repl) || cmcc.connection.options.repl == null) {
+                    //create replica set object
+                    cmcc.connection.options.repl = {
+                        replicaSet: "",
+                        members: []
+                    }
+                }
+            } else {
+                //remove replicaSetObject
+                delete cmcc.connection.options.repl;
             }
         }
 
