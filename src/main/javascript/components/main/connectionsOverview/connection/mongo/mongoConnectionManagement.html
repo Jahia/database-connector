@@ -93,23 +93,6 @@
                             </div>
                         </div>
                     </md-input-container>
-                    <md-button ng-if="cmcc.mode=='create'" class="md-raised md-primary pull-right"
-                               ng-click="cmcc.createMongoConnection()" ng-disabled="mongoForm.$invalid">
-                        Create
-                    </md-button>
-                    <md-button ng-if="cmcc.mode=='edit'" class="md-raised md-primary pull-right"
-                               ng-click="cmcc.editMongoConnection()" ng-disabled="mongoForm.$invalid">
-                        Update
-                    </md-button>
-                    <md-button class="md-raised md-primary pull-right" ng-if="cmcc.mode=='import-edit' "
-                               ng-click="cmcc.updateImportedConnection()">
-                        Ok
-                    </md-button>
-                    <md-button class="md-raised md-primary pull-right" ng-click="cmcc.cancel()">
-                        <span ng-if="cmcc.mode=='edit' || cmcc.mode=='create'">Back</span>
-                        <span ng-if="cmcc.mode=='import-edit'">Cancel</span>
-                    </md-button>
-
                 </md-content>
             </form>
         </md-tab>
@@ -207,7 +190,7 @@
                         <input name="socketTimeoutMS"
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.conn.socketTimeoutMS">
-                        <div ng-messages="mongoAdvancedForm.connectTimeoutMS.$error" ng-if="mongoAdvancedForm.socketTimeoutMS.$dirty">
+                        <div ng-messages="mongoAdvancedForm.socketTimeoutMS.$error" ng-if="mongoAdvancedForm.socketTimeoutMS.$dirty">
                             <div ng-message-exp='validationName'
                                  ng-repeat="(validationName, validationMessage) in cmcc.validations.socketTimeoutMS">
                                 {{validationMessage}}
@@ -249,7 +232,7 @@
                         <input name="waitQueueTimeoutMS"
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.connPool.waitQueueTimeoutMS">
-                        <div ng-messages="mongoAdvancedForm.minPoolSize.$error" ng-if="mongoAdvancedForm.waitQueueTimeoutMS.$dirty">
+                        <div ng-messages="mongoAdvancedForm.waitQueueTimeoutMS.$error" ng-if="mongoAdvancedForm.waitQueueTimeoutMS.$dirty">
                             <div ng-message-exp='validationName'
                                  ng-repeat="(validationName, validationMessage) in cmcc.validations.waitQueueTimeoutMS">
                                 {{validationMessage}}
@@ -260,4 +243,20 @@
             </md-content>
         </md-tab>
     </md-tabs>
+    <md-button ng-if="cmcc.mode=='create'" class="md-raised md-primary pull-right"
+               ng-click="cmcc.createMongoConnection()" ng-disabled="mongoForm.$invalid || mongoAdvancedForm.$invalid">
+        Create
+    </md-button>
+    <md-button ng-if="cmcc.mode=='edit'" class="md-raised md-primary pull-right"
+               ng-click="cmcc.editMongoConnection()" ng-disabled="mongoForm.$invalid || mongoAdvancedForm.$invalid">
+        Update
+    </md-button>
+    <md-button class="md-raised md-primary pull-right" ng-if="cmcc.mode=='import-edit' "
+               ng-click="cmcc.updateImportedConnection()">
+        Ok
+    </md-button>
+    <md-button class="md-raised md-primary pull-right" ng-click="cmcc.cancel()">
+        <span ng-if="cmcc.mode=='edit' || cmcc.mode=='create'">Back</span>
+        <span ng-if="cmcc.mode=='import-edit'">Cancel</span>
+    </md-button>
 </md-content>

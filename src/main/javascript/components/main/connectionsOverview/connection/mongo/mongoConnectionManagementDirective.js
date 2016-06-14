@@ -76,22 +76,21 @@
                 }
             },
             connectTimeoutMS: {
-                'required': 'Field is required',
                 'pattern' : 'Timeout is in seconds'
             },
             socketTimeoutMS: {
-                'required': 'Field is required',
                 'pattern' : 'Timeout is in seconds'
 
             },
             maxPoolSize: {
-                'required': 'Field is required'
+                'pattern' : 'Should be an integer'
+
             },
             minPoolSize: {
-                'required': 'Field is required'
+                'pattern' : 'Should be an integer'
+
             },
             waitQueueTimeoutMS: {
-                'required': 'Field is required',
                 'pattern' : 'Timeout is in seconds'
             }
             
