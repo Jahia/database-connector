@@ -7,12 +7,12 @@
             <dl>
                 <dt>Host Name :</dt>
                 <dd>{{cso.connectionStatus.host}}</dd>
-                <dt>Monitoring Started at :</dt>
-                <dd><time> {{cso.getTimeFromNow()}} </time></dd>
                 <dt>Local time :</dt>
                 <dd>{{cso.connectionStatus.localTime | momentFilter: 'MMMM Do YYYY, h:mm:ss a'}} </dd>
                 <dt>Up since :</dt>
                 <dd><time>{{cso.connectionStatus.uptime | momentFormatter : 'second' : 'fancy'}} </time></dd>
+                <dt>Mongo Version :</dt>
+                <dd>{{cso.connectionStatus.version}}</dd>
             </dl>
         </div>
         <div flex="50" >
@@ -23,8 +23,6 @@
                 <dd> <time> {{cso.connectionStatus.process}} </time></dd>
                 <dt>Process Id :</dt>
                 <dd>{{cso.connectionStatus.pid}}</dd>
-                <dt>Mongo Version :</dt>
-                <dd>{{cso.connectionStatus.version}}</dd>
             </dl>
         </div>
     </div>
