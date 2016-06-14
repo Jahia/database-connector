@@ -145,7 +145,7 @@
             var url = contextualData.context + '/modules/databaseconnector/mongodb/add';
 
             var data = angular.copy(cmcc.connection);
-            var options = prepareOptions(options);
+            var options = prepareOptions(data.options);
             if (options == null) {
                 delete data.options;
             } else {
@@ -179,7 +179,12 @@
             cmcc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/mongodb/edit';
             var data = angular.copy(cmcc.connection);
-            data.options = prepareOptions(data.options);
+            var options = prepareOptions(data.options);
+            if (options == null) {
+                delete data.options;
+            } else {
+                data.options = options;
+            }
             dcDataFactory.customRequest({
                 url: url,
                 method: 'PUT',
@@ -204,7 +209,12 @@
             cmcc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/mongodb/testconnection';
             var data = angular.copy(cmcc.connection);
-            data.options = prepareOptions(data.options);
+            var options = prepareOptions(data.options);
+            if (options == null) {
+                delete data.options;
+            } else {
+                data.options = options;
+            }
             dcDataFactory.customRequest({
                 url: url,
                 method: 'POST',
@@ -265,7 +275,7 @@
         }
 
         function prepareOptions(options) {
-            if (!_.isEmpty(options.repl)) {
+            if (!_.isEmpty(options.repl) && options.repl == null) {
                 if (options.repl.replicaSet == null || (_.isString(options.repl.replicaSet) && options.repl.replicaSet.trim().length == 0)) {
                     delete options.repl.replicaSet
                 }
