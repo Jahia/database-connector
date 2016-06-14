@@ -42,7 +42,6 @@
                 'minlength': 'This has to be more than 4 characters.'
             },
             port: {
-                'required': 'Field is required',
                 'pattern': 'This should consist of a number ranging from 1 - 65535'
             },
             id: {
@@ -62,7 +61,40 @@
             },
             authDb: {
                 'required': 'Field is required'
+            },
+            replicaSet: {
+                name: {
+                    'required': 'Field is required'
+                }
+            },
+            members: {
+                host: {
+                    'required': 'Field is required'
+                },
+                port: {
+                    'pattern': 'This should consist of a number ranging from 1 - 65535'
+                }
+            },
+            connectTimeoutMS: {
+                'required': 'Field is required',
+                'pattern' : 'Timeout is in seconds'
+            },
+            socketTimeoutMS: {
+                'required': 'Field is required',
+                'pattern' : 'Timeout is in seconds'
+
+            },
+            maxPoolSize: {
+                'required': 'Field is required'
+            },
+            minPoolSize: {
+                'required': 'Field is required'
+            },
+            waitQueueTimeoutMS: {
+                'required': 'Field is required',
+                'pattern' : 'Timeout is in seconds'
             }
+            
         };
 
         cmcc.createMongoConnection = createMongoConnection;
@@ -78,7 +110,7 @@
 
         function init() {
 
-            if (_.isUndefined(cmcc.connection.port) || cmcc.connection.port == null){
+            if (_.isUndefined(cmcc.connection.port) || cmcc.connection.port == null) {
                 cmcc.connection.port = "27017";
             }
 

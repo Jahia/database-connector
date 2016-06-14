@@ -1,14 +1,13 @@
 
 <md-dialog>
-    <form >
         <md-toolbar>
             <div class="md-toolbar-tools">
                 Create  Connection
             </div>
         </md-toolbar>
-        <md-dialog-content>
-            <div class="md-dialog-content databaseSelection">
-                <div layout layout-wrap ng-if="!cpc.databaseTypeSelected">
+        <md-dialog-content class="databaseSelection">
+            <div ng-if="!cpc.databaseTypeSelected">
+                <div layout layout-wrap>
                     <div ng-repeat="(databaseType, displayableName) in cpc.databaseTypes" flex="50">
                         <md-button class="md-button" ng-click="cpc.setSelectedDatabaseType(databaseType)">
                             <img ng-src="{{cpc.images[databaseType]}}">
@@ -20,5 +19,4 @@
                 <mongo-connection-management ng-switch-when="MONGO" mode="create" connection="cpc.connection"></mongo-connection-management>
             </div>
         </md-dialog-content>
-    </form>
 </md-dialog>
