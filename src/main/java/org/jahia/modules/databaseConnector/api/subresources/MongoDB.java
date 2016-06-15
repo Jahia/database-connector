@@ -25,8 +25,8 @@ package org.jahia.modules.databaseConnector.api.subresources;
 
 import com.mongodb.MongoCommandException;
 import org.apache.commons.lang.StringUtils;
-import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
+import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
 import org.jahia.services.content.JCRTemplate;
@@ -48,9 +48,8 @@ import java.util.Map;
  */
 @Singleton
 public class MongoDB {
-    private static final Logger logger = LoggerFactory.getLogger(MongoDB.class);
     public static final String MAPPING = "mongodb";
-
+    private static final Logger logger = LoggerFactory.getLogger(MongoDB.class);
     private DatabaseConnector databaseConnector;
 
     @Inject
@@ -106,8 +105,8 @@ public class MongoDB {
             } else {
                 String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
                 String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
-                Integer port = connectionParameters.has("port") ? connectionParameters.getInt("port") : null;
-                Boolean isConnected = connectionParameters.has("isConnected") && !StringUtils.isEmpty(connectionParameters.getString("port")) ? connectionParameters.getBoolean("isConnected") : false;
+                Integer port = connectionParameters.has("port") && !StringUtils.isEmpty(connectionParameters.getString("port")) ? connectionParameters.getInt("port") : null;
+                Boolean isConnected = connectionParameters.has("isConnected") && connectionParameters.getBoolean("isConnected");
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
                 String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
@@ -169,7 +168,7 @@ public class MongoDB {
                 String oldId = connectionParameters.has("oldId") ? connectionParameters.getString("oldId") : null;
                 String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
                 Integer port = connectionParameters.has("port") && !StringUtils.isEmpty(connectionParameters.getString("port")) ? connectionParameters.getInt("port") : null;
-                Boolean isConnected = connectionParameters.has("isConnected") ? connectionParameters.getBoolean("isConnected") : false;
+                Boolean isConnected = connectionParameters.has("isConnected") && connectionParameters.getBoolean("isConnected");
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
                 String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
@@ -275,7 +274,7 @@ public class MongoDB {
                 String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
                 String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
                 Integer port = connectionParameters.has("port") && !StringUtils.isEmpty(connectionParameters.getString("port"))  ? connectionParameters.getInt("port") : null;
-                Boolean isConnected = connectionParameters.has("isConnected") ? connectionParameters.getBoolean("isConnected") : false;
+                Boolean isConnected = connectionParameters.has("isConnected") && connectionParameters.getBoolean("isConnected");
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
                 String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
