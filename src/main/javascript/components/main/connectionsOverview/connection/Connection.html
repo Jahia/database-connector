@@ -7,7 +7,13 @@
                <div flex="100">
                    <div layout="row">
                        <div flex="100" class="center-align">
-                           <md-checkbox aria-label="Checkbox" name="{{cc.connection.id}}"  ng-model="cc.connection.export" ng-change="cc.exportValueChanged()" ng-true-value="true" ng-false-value="false" class="md-primary pull-left" >
+                           <md-checkbox aria-label="Checkbox"
+                                        name="{{cc.connection.id}}"
+                                        ng-model="cc.connection.export"
+                                        ng-change="cc.exportValueChanged()"
+                                        ng-true-value="true"
+                                        ng-false-value="false"
+                                        class="md-primary pull-left" >
                            </md-checkbox>
                            <img ng-src="{{cc.imageUrl}}" width="211" height="60">
                        </div>

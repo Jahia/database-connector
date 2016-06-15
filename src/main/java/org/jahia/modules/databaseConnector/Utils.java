@@ -64,9 +64,10 @@ public class Utils {
             switch (DatabaseTypes.valueOf((String)jsonConnectionData.get("databaseType"))) {
                 case MONGO:
                     connection = new MongoConnection(id);
-                    String writeConcern = jsonConnectionData.has("writeConcern") ? jsonConnectionData.getString("writeConcern") : null;
+                    if (jsonConnectionData.has("writeConcern") && !StringUtils.isEmpty(jsonConnectionData.getString("writeConcern"))) {
+                        ((MongoConnection)connection).setWriteConcern(jsonConnectionData.getString("writeConcern"));
+                    }
                     String authDb = jsonConnectionData.has("authDb") ? jsonConnectionData.getString("authDb") : null;
-                    ((MongoConnection)connection).setWriteConcern(writeConcern);
                     ((MongoConnection)connection).setAuthDb(authDb);
                     break;
                 case REDIS:

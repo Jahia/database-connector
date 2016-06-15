@@ -15,7 +15,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +37,9 @@ public class MongoConnection extends AbstractConnection {
 
     public static final String AUTH_DB_KEY = "dc:authDb";
 
-    public static final String WRITE_CONCERN_DEFAULT_VALUE = "SAFE";
+    public static final String WRITE_CONCERN_DEFAULT_VALUE = "ACKNOWLEDGED";
+
+    private static List WRITE_CONCERN_OPTIONS = null;
 
     private static final Integer DEFAULT_PORT = new Integer(27017);
 
@@ -174,7 +175,8 @@ public class MongoConnection extends AbstractConnection {
                 TABU + "host " + DOUBLE_QUOTE + this.host + DOUBLE_QUOTE + NEW_LINE +
                 TABU + "dbName " + DOUBLE_QUOTE + this.dbName + DOUBLE_QUOTE + NEW_LINE +
                 TABU + "identifier " + DOUBLE_QUOTE + this.id + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "isConnected " + DOUBLE_QUOTE + this.isConnected() + DOUBLE_QUOTE + NEW_LINE
+                TABU + "isConnected " + DOUBLE_QUOTE + this.isConnected() + DOUBLE_QUOTE + NEW_LINE +
+                TABU + "writeConcern " + DOUBLE_QUOTE + this.writeConcern + DOUBLE_QUOTE + NEW_LINE
         );
 
         if (this.port != null) {
@@ -267,20 +269,16 @@ public class MongoConnection extends AbstractConnection {
     }
 
     private MongoClientURI buildMongoClientUri(boolean isTest) {
+        MongoClientOptions.Builder builder = MongoClientOptions.builder();
+        //Set the write concern
+        builder.writeConcern(WriteConcern.valueOf(writeConcern));
         if (!StringUtils.isEmpty(options)) {
-            if (isTest) {
-                return new MongoClientURI(buildUri(), buildMongoClientOptions().serverSelectionTimeout(5000));
-            } else {
-                return new MongoClientURI(buildUri(), buildMongoClientOptions());
-            }
-        } else {
-            if (isTest) {
-                return new MongoClientURI(buildUri(), MongoClientOptions.builder().serverSelectionTimeout(5000));
-
-            } else {
-                return new MongoClientURI(buildUri());
-            }
+            builder = buildMongoClientOptions(builder);
         }
+        if (isTest) {
+            builder.serverSelectionTimeout(5000);
+        }
+        return new MongoClientURI(buildUri(), builder);
     }
 
     private String buildUri() {
@@ -335,10 +333,9 @@ public class MongoConnection extends AbstractConnection {
         return uri;
     }
 
-    private MongoClientOptions.Builder buildMongoClientOptions() {
+    private MongoClientOptions.Builder buildMongoClientOptions(MongoClientOptions.Builder builder) {
         try {
             JSONObject jsonOptions = new JSONObject(options);
-            MongoClientOptions.Builder builder = MongoClientOptions.builder();
             //Handle replicate set options
             if (jsonOptions.has("repl")) {
                 JSONObject jsonRepl = jsonOptions.getJSONObject("repl");
@@ -392,5 +389,19 @@ public class MongoConnection extends AbstractConnection {
             return false;
         }
         return true;
+    }
+
+    public static List<String> getWriteConcernOptions() {
+        if (WRITE_CONCERN_OPTIONS == null) {
+            WRITE_CONCERN_OPTIONS = new LinkedList<>();
+            WRITE_CONCERN_OPTIONS.add("ACKNOWLEDGED");
+            WRITE_CONCERN_OPTIONS.add("UNACKNOWLEDGED");
+            WRITE_CONCERN_OPTIONS.add("JOURNALED");
+            WRITE_CONCERN_OPTIONS.add("MAJORITY");
+            WRITE_CONCERN_OPTIONS.add("W1");
+            WRITE_CONCERN_OPTIONS.add("W2");
+            WRITE_CONCERN_OPTIONS.add("W3");
+        }
+        return WRITE_CONCERN_OPTIONS;
     }
 }

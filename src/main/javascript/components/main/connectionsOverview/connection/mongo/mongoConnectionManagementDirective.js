@@ -109,7 +109,16 @@
         init();
 
         function init() {
-
+            var url = contextualData.context + '/modules/databaseconnector/mongodb/writeconcernoptions';
+            dcDataFactory.customRequest({
+                url: url,
+                method: 'GET'
+            }).then(function (response) {
+                cmcc.spinnerOptions.showSpinner = false;
+                cmcc.writeConcernOptions = response;
+            }, function (response) {
+                cmcc.spinnerOptions.showSpinner = false;
+            });
             if (_.isUndefined(cmcc.connection.port) || cmcc.connection.port == null) {
                 cmcc.connection.port = "27017";
             }

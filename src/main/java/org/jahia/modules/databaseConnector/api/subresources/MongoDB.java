@@ -110,7 +110,6 @@ public class MongoDB {
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
                 String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
-                String writeConcern = connectionParameters.has("writeConcern") ? connectionParameters.getString("writeConcern") : null;
                 String authDb = connectionParameters.has("authDb") ? connectionParameters.getString("authDb") : null;
                 String options = connectionParameters.has("options") ? connectionParameters.getString("options") : null;
                 MongoConnection connection = new MongoConnection(id);
@@ -120,7 +119,9 @@ public class MongoDB {
                 connection.setDbName(dbName);
                 connection.setUser(user);
                 connection.setPassword(password);
-                connection.setWriteConcern(writeConcern);
+                if (connectionParameters.has("writeConcern") && !StringUtils.isEmpty(connectionParameters.getString("writeConcern"))) {
+                    connection.setWriteConcern(connectionParameters.getString("writeConcern"));
+                }
                 connection.setAuthDb(authDb);
                 connection.setOptions(options);
                 JSONObject jsonAnswer = new JSONObject();
@@ -172,7 +173,6 @@ public class MongoDB {
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
                 String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
-                String writeConcern = connectionParameters.has("writeConcern") ? connectionParameters.getString("writeConcern") : null;
                 String authDb = connectionParameters.has("authDb") ? connectionParameters.getString("authDb") : null;
                 String options = connectionParameters.has("options") ? connectionParameters.getString("options") : null;
                 MongoConnection connection = new MongoConnection(id);
@@ -183,7 +183,9 @@ public class MongoDB {
                 connection.setDbName(dbName);
                 connection.setUser(user);
                 connection.setPassword(password);
-                connection.setWriteConcern(writeConcern);
+                if (connectionParameters.has("writeConcern") && !StringUtils.isEmpty(connectionParameters.getString("writeConcern"))) {
+                    connection.setWriteConcern(connectionParameters.getString("writeConcern"));
+                }
                 connection.setAuthDb(authDb);
                 connection.setOptions(options);
                 JSONObject jsonAnswer = new JSONObject();
@@ -278,7 +280,6 @@ public class MongoDB {
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
                 String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
-                String writeConcern = connectionParameters.has("writeConcern") ? connectionParameters.getString("writeConcern") : null;
                 String authDb = connectionParameters.has("authDb") ? connectionParameters.getString("authDb") : null;
                 String options = connectionParameters.has("options") ? connectionParameters.getString("options") : null;
                 MongoConnection connection = new MongoConnection(id);
@@ -288,7 +289,9 @@ public class MongoDB {
                 connection.setDbName(dbName);
                 connection.setUser(user);
                 connection.setPassword(password);
-                connection.setWriteConcern(writeConcern);
+                if (connectionParameters.has("writeConcern") && !StringUtils.isEmpty(connectionParameters.getString("writeConcern"))) {
+                    connection.setWriteConcern(connectionParameters.getString("writeConcern"));
+                }
                 connection.setAuthDb(authDb);
                 connection.setOptions(options);
                 boolean connectionTestPassed = databaseConnector.testConnection(connection);
@@ -320,6 +323,18 @@ public class MongoDB {
         } catch(Exception e) {
             logger.error("Failed retrieve Status for MongoDB connection with id: " + connectionId);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"failed\":\"Cannot get database status\"}").build();
+        }
+    }
+
+    @GET
+    @Path("/writeconcernoptions")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getWriteConcernOptions() {
+        try {
+            return Response.status(Response.Status.OK).entity(MongoConnection.getWriteConcernOptions()).build();
+        } catch(Exception e) {
+            logger.error("Failed to retrieve write concern options", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Failed to retrieve write concern options\"}").build();
         }
     }
 }

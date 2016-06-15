@@ -179,7 +179,7 @@
                     </div>
                     <md-divider></md-divider>
 
-                    <md-subheader class="md-no-sticky"><span>Connection Timeouts</span></md-subheader>
+                    <md-subheader class="md-no-sticky"><span>Connection Settings</span></md-subheader>
 
                     <md-input-container class="md-block col-md-offset-2">
                         <label>Connect Timeout (milliseconds)</label>
@@ -205,6 +205,14 @@
                             </div>
                         </div>
 
+                    </md-input-container>
+                    <md-input-container class="md-block col-md-offset-2">
+                        <label>Write Concern</label>
+                        <md-select ng-model="cmcc.connection.writeConcern">
+                            <md-option ng-repeat="writeConcern in cmcc.writeConcernOptions" value="{{writeConcern}}">
+                                {{writeConcern}}
+                            </md-option>
+                        </md-select>
                     </md-input-container>
                     <md-divider></md-divider>
 

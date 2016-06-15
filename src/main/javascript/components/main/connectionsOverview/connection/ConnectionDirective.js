@@ -117,7 +117,11 @@
                 url: url,
                 method: 'DELETE'
             }).then(function(response){
-                cc.connection = response;
+                if (cc.connection.id in cc.exportConnections) {
+                    var exportConnectionsTemp = angular.copy(cc.exportConnections);
+                    delete exportConnectionsTemp[cc.connection.id];
+                    cc.exportConnections = exportConnectionsTemp;
+                }
                 $scope.$emit('connectionSuccessfullyDeleted', null);
                 toaster.pop({
                     type   : 'success',
@@ -171,22 +175,14 @@
         
         function exportValueChanged() {
             if (cc.connection.export) {
-                var exportConnectionsTemp = {};
-                for (var i in cc.exportConnections) {
-                    exportConnectionsTemp[i] = cc.exportConnections[i];
-                }
+                var exportConnectionsTemp = angular.copy(cc.exportConnections);
                 cc.exportConnections = exportConnectionsTemp;
                 cc.exportConnections[cc.connection.id] = cc.connection.databaseType;
             } else {
-                var exportConnectionsTemp2 = {};
-                for (var i in cc.exportConnections) {
-                    if (i != cc.connection.id) {
-                        exportConnectionsTemp2[i] = cc.exportConnections[i];
-                    }
-                }
+                var exportConnectionsTemp = angular.copy(cc.exportConnections);
+                delete exportConnectionsTemp[cc.connection.id];
+                cc.exportConnections = exportConnectionsTemp;
             }
-            cc.exportConnections = exportConnectionsTemp;
-
         }
         
         function goToStatus() {
