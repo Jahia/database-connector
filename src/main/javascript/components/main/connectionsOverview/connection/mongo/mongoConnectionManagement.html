@@ -18,7 +18,8 @@
                     </md-button>
                     <md-input-container class="md-block" flex-gt-sm="1">
                         <label>Host</label>
-                        <input required ng-minlength="4" md-maxlength="15" name="host" ng-model="cmcc.connection.host">
+                        <input title="host" required ng-minlength="4" md-maxlength="15" name="host"
+                               ng-model="cmcc.connection.host">
                         <div ng-messages="mongoForm.host.$error" ng-if="mongoForm.host.$dirty">
                             <div ng-message-exp="validationName"
                                  ng-repeat="(validationName, validationMessage) in cmcc.validations.host">
@@ -29,7 +30,7 @@
 
                     <md-input-container class="md-block">
                         <label>Port</label>
-                        <input md-maxlength="5" ng-pattern="/[0-9]*/" name="port"
+                        <input title="port" md-maxlength="5" ng-pattern="/[0-9]*/" name="port"
                                ng-model="cmcc.connection.port" length-parser length-parser-max="5" range-parser
                                range-max-value="65535">
                         <div ng-messages="mongoForm.port.$error" ng-if="mongoForm.port.$dirty">
@@ -42,7 +43,8 @@
 
                     <md-input-container class="md-block">
                         <label>Connection Name (id)</label>
-                        <input md-maxlength="30" name="id" required ng-pattern="/^[a-zA-Z0-9]+$/"
+                        <input title="Connection Name" md-maxlength="30" name="id" required
+                               ng-pattern="/^[a-zA-Z0-9]+$/"
                                ng-model="cmcc.connection.id" original-value="{{cmcc.connection.oldId}}"
                                connection-id-validator>
                         <div ng-messages="mongoForm.id.$error" ng-if="mongoForm.id.$dirty">
@@ -55,7 +57,8 @@
 
                     <md-input-container class="md-block">
                         <label>Database Name</label>
-                        <input md-maxlength="30" required ng-pattern="/^[a-zA-Z0-9_]+$/" name="dbName"
+                        <input title="Database Name" md-maxlength="30" required ng-pattern="/^[a-zA-Z0-9_]+$/"
+                               name="dbName"
                                ng-model="cmcc.connection.dbName">
                         <div ng-messages="mongoForm.dbName.$error" ng-if="mongoForm.dbName.$dirty">
                             <div ng-message-exp="validationName"
@@ -67,7 +70,8 @@
 
                     <md-input-container class="md-block">
                         <label>User</label>
-                        <input name="user" ng-model="cmcc.connection.user" ng-pattern="/^[a-zA-Z0-9]{4,10}$/"
+                        <input title="User" name="user" ng-model="cmcc.connection.user"
+                               ng-pattern="/^[a-zA-Z0-9]{4,10}$/"
                                ng-change="cmcc.updateIsEmpty('user');">
                         <div ng-messages="mongoForm.user.$error" ng-if="mongoForm.user.$dirty">
                             <div ng-message-exp="validationName"
@@ -79,13 +83,14 @@
 
                     <md-input-container class="md-block" ng-if="!cmcc.isEmpty.user">
                         <label>Password</label>
-                        <input type="password" name="password" ng-model="cmcc.connection.password"
+                        <input title="Password" type="password" name="password" ng-model="cmcc.connection.password"
                                ng-change="cmcc.updateIsEmpty('password');">
                     </md-input-container>
 
                     <md-input-container class="md-block" ng-if="!cmcc.isEmpty.password && !cmcc.isEmpty.user">
                         <label>Authentication Database</label>
-                        <input required name="authDb" ng-model="cmcc.connection.authDb">
+                        <input title="Authentication Database" required name="authDb"
+                               ng-model="cmcc.connection.authDb">
                         <div ng-messages="mongoForm.authDb.$error" ng-if="mongoForm.authDb.$dirty">
                             <div ng-message-exp="validationName"
                                  ng-repeat="(validationName, validationMessage) in cmcc.validations.authDb">
@@ -113,7 +118,7 @@
                     <div ng-if="cmcc.isReplicaSet">
                         <md-input-container class="md-block col-md-offset-2">
                             <label>Name</label>
-                            <input required
+                            <input title="replicaSetName" required
                                    name="replicaSetName"
                                    ng-pattern="/^[a-zA-Z0-9_]+$/"
                                    ng-model="cmcc.connection.options.repl.replicaSet">
@@ -129,7 +134,7 @@
                                           layout-margin layout-padding layout-fill layout-wrap="" class="box-wrap2">
                                 <md-input-container class="md-block" layout="flex">
                                     <label>Host</label>
-                                    <input class="md-primary" required name="replicaSetHost" ng-pattern="/^[a-zA-Z0-9_]+$/"
+                                    <input title="replicaSetHost" class="md-primary" required name="replicaSetHost"
                                            ng-model="member.host">
                                     <div ng-messages="mongoAdvancedForm.replicaSetHost.$error" ng-if="mongoAdvancedForm.replicaSetHost.$dirty">
                                         <div ng-message-exp='validationName'
@@ -141,10 +146,10 @@
                                 :
                                 <md-input-container class="md-block" layout="flex">
                                     <label>Port</label>
-                                    <input class="md-primary"
+                                    <input title="replicaSetPort" class="md-primary"
                                            name="replicaSetPort"
                                            ng-pattern="/^[0-9]*$/"
-                                           ng-model="member.port "length-parser length-parser-max="5" range-parser
+                                           ng-model="member.port " length-parser length-parser-max="5" range-parser
                                            range-max-value="65535">
                                     <div ng-messages="mongoAdvancedForm.replicaSetPort.$error" ng-if="mongoAdvancedForm.replicaSetPort.$dirty">
                                         <div ng-message-exp='validationName'
@@ -154,14 +159,14 @@
                                     </div>
                                 </md-input-container>
                                 <md-icon class="md-secondary"
-                                         aria-label="Delete connection"
+                                         title="Delete connection"
                                          ng-click="cmcc.removeReplicaMember($index)">
                                     <i class="fa fa-trash-o"></i>
                                 </md-icon>
                             </md-list-item>
                             <md-list-item>
                                 <md-icon class="md-secondary"
-                                         aria-label="Create new Mongo connection"
+                                         title="Create new Mongo connection"
                                          ng-click="cmcc.addReplicaMember()">
                                     <i class="fa fa-plus"
                                        title=" Add  Replica member"></i>
@@ -175,7 +180,7 @@
 
                     <md-input-container class="md-block col-md-offset-2">
                         <label>Connect Timeout (milliseconds)</label>
-                        <input name="connectTimeoutMS" range-parser
+                        <input title="Connect Timeout" name="connectTimeoutMS" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.conn.connectTimeoutMS">
                         <div ng-messages="mongoAdvancedForm.connectTimeoutMS.$error" ng-if="mongoAdvancedForm.connectTimeoutMS.$dirty">
@@ -187,7 +192,7 @@
                     </md-input-container>
                     <md-input-container class="md-block col-md-offset-2">
                         <label>Socket Timeout (milliseconds)</label>
-                        <input name="socketTimeoutMS" range-parser
+                        <input title="Socket Timeout" name="socketTimeoutMS" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.conn.socketTimeoutMS">
                         <div ng-messages="mongoAdvancedForm.socketTimeoutMS.$error" ng-if="mongoAdvancedForm.socketTimeoutMS.$dirty">
@@ -205,7 +210,7 @@
 
                     <md-input-container class="md-block col-md-offset-2">
                         <label>Max Pool Size</label>
-                        <input name="maxPoolSize" range-parser
+                        <input title="Max Pool Size" name="maxPoolSize" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.connPool.maxPoolSize">
                         <div ng-messages="mongoAdvancedForm.maxPoolSize.$error" ng-if="mongoAdvancedForm.maxPoolSize.$dirty">
@@ -217,7 +222,7 @@
                     </md-input-container>
                     <md-input-container class="md-block col-md-offset-2">
                         <label>Min Pool Size</label>
-                        <input name="minPoolSize" range-parser
+                        <input title="Min Pool Size" name="minPoolSize" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.connPool.minPoolSize">
                         <div ng-messages="mongoAdvancedForm.minPoolSize.$error" ng-if="mongoAdvancedForm.minPoolSize.$dirty">
@@ -229,7 +234,7 @@
                     </md-input-container>
                     <md-input-container class="md-block col-md-offset-2">
                         <label>Wait Queue Timeout (milliseconds)</label>
-                        <input name="waitQueueTimeoutMS" range-parser
+                        <input title="Wait Queue Timeout" name="waitQueueTimeoutMS" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.connPool.waitQueueTimeoutMS">
                         <div ng-messages="mongoAdvancedForm.waitQueueTimeoutMS.$error" ng-if="mongoAdvancedForm.waitQueueTimeoutMS.$dirty">
