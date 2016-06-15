@@ -4,7 +4,7 @@
         <md-tab label="Settings">
             <form name="mongoForm">
                 <md-content class="md-padding">
-                    <md-checkbox ng-model="cmcc.connection.isConnected" aria-label="Automatic startup after Creation"
+                    <md-checkbox ng-checked="cmcc.connection.isConnected" aria-label="Automatic startup after Creation"
                                  ng-true-value="true" ng-false-value="false"
                                  class="md-warn md-align-top-left" flex>
                         <span class="ipsum">Enable connection</span>
@@ -256,7 +256,9 @@
                ng-click="cmcc.editMongoConnection()" ng-disabled="mongoForm.$invalid || mongoAdvancedForm.$invalid">
         Update
     </md-button>
-    <md-button class="md-raised md-primary pull-right" ng-if="cmcc.mode=='import-edit' "
+    <md-button class="md-raised md-primary pull-right"
+               ng-disabled="mongoForm.$invalid || mongoAdvancedForm.$invalid"
+               ng-if="cmcc.mode=='import-edit' "
                ng-click="cmcc.updateImportedConnection()">
         Ok
     </md-button>

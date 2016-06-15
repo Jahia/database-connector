@@ -1,14 +1,12 @@
 <md-dialog>
-    <form>
         <md-toolbar>
             <div class="md-toolbar-tools">
                 Edit imported connection
             </div>
         </md-toolbar>
-        <md-dialog-content class="md-dialog-content editConnectionContainer">
+        <md-dialog-content class="editConnectionContainer">
             <div ng-switch="eicc.connection.databaseType">
                 <mongo-connection-management ng-switch-when="MONGO" mode="import-edit" connection="eicc.connection"></mongo-connection-management>
             </div>
         </md-dialog-content>
-    </form>
 </md-dialog>

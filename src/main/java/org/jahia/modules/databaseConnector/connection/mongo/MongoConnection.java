@@ -14,6 +14,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -131,8 +133,8 @@ public class MongoConnection extends AbstractConnection {
                 }
                 if (((LinkedHashMap) options.get("replicaSet")).containsKey("members")) {
                     LinkedList formattedMembers = new LinkedList();
-                    List<String> members = (List) ((LinkedHashMap) options.get("replicaSet")).get("members");
-                    for (String member : members) {
+                    if (((LinkedHashMap) options.get("replicaSet")).get("members") instanceof String) {
+                        String member = (String) ((LinkedHashMap) options.get("replicaSet")).get("members");
                         LinkedHashMap formattedMember = new LinkedHashMap();
                         if (member.contains(":")) {
                             formattedMember.put("host", member.substring(0, member.indexOf(":")));
@@ -141,6 +143,18 @@ public class MongoConnection extends AbstractConnection {
                             formattedMember.put("host", member);
                         }
                         formattedMembers.push(formattedMember);
+                    } else if(((LinkedHashMap) options.get("replicaSet")).get("members") instanceof List) {
+                        List<String> members = (List) ((LinkedHashMap) options.get("replicaSet")).get("members");
+                        for (String member : members) {
+                            LinkedHashMap formattedMember = new LinkedHashMap();
+                            if (member.contains(":")) {
+                                formattedMember.put("host", member.substring(0, member.indexOf(":")));
+                                formattedMember.put("port", member.substring(member.indexOf(":") + 1, member.length()));
+                            } else {
+                                formattedMember.put("host", member);
+                            }
+                            formattedMembers.push(formattedMember);
+                        }
                     }
                     repl.put("members", formattedMembers);
                 }

@@ -207,6 +207,11 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                     if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey((String) map.get("identifier"))) {
                         map.put("status", "failed");
                         map.put("statusMessage", "connectionExists");
+                        //Create instance to be able to parse the options of a failed connection.
+                        if (map.containsKey("options")) {
+                            MongoConnection connection = new MongoConnection((String)map.get("identifier"));
+                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+                        }
                     } else {
                         //Create connection object
                         MongoConnection connection = new MongoConnection((String)map.get("identifier"));
@@ -218,7 +223,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         String writeConcern = map.containsKey("writeConcern") ? (String) map.get("writeConcern") : null;
                         String authDb = map.containsKey("authDb") ? (String) map.get("authDb") : null;
                         String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
-
+                        map.put("options", options);
                         String password = (String) map.get("password");
                             if(password != null && password.contains("_ENC")) {
                                 password = password.substring(0,32);
@@ -242,6 +247,15 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                 } catch (Exception ex) {
                     map.put("status", "failed");
                     map.put("statusMessage", "creationFailed");
+                    //try to parse options if the exist otherwise we will just remove them.
+                    try {
+                        if (map.containsKey("options")) {
+                            MongoConnection connection = new MongoConnection((String)map.get("identifier"));
+                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+                        }
+                    } catch (Exception e){
+                        map.remove("options");
+                    }
                     logger.info("Import " + (map.containsKey("identifier") ? "for connection: '" + map.get("identifier") + "'" : "") + " failed", ex.getMessage(), ex);
                 }
                 break;

@@ -59,6 +59,7 @@ public class Utils {
             String dbName = jsonConnectionData.has("dbName") ? jsonConnectionData.getString("dbName") : null;
             String user = jsonConnectionData.has("user") ? jsonConnectionData.getString("user") : null;
             String password = jsonConnectionData.has("password") ? jsonConnectionData.getString("password") : null;
+            String options = jsonConnectionData.has("options") ? jsonConnectionData.getString("options") : null;
             AbstractConnection connection = null;
             switch (DatabaseTypes.valueOf((String)jsonConnectionData.get("databaseType"))) {
                 case MONGO:
@@ -81,7 +82,7 @@ public class Utils {
                 password = EncryptionUtils.passwordBaseDecrypt(password);
             }
             connection.setPassword(password);
-
+            connection.setOptions(options);
             result.put("connectionStatus", "success");
             result.put("connection", connection);
         }
@@ -96,6 +97,7 @@ public class Utils {
         result.put("dbName", connection.getDbName());
         result.put("databaseType", connection.getDatabaseType());
         result.put("user", connection.getUser());
+        result.put("options", connection.getOptions());
         if (!StringUtils.isEmpty(connection.getPassword())) {
             result.put("password", EncryptionUtils.passwordBaseEncrypt(connection.getPassword()) + "_ENC");
         }

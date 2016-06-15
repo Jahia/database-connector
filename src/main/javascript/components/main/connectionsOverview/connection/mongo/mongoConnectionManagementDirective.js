@@ -116,13 +116,15 @@
 
             cmcc.isEmpty.password = updateIsEmpty('password');
             cmcc.isEmpty.user = updateIsEmpty('user');
-            if (cmcc.mode === 'edit' || cmcc.mode === 'import-edit') {
+            if (cmcc.mode === 'import-edit') {
+                cmcc.connection.oldId = null;
+            }
+            if (cmcc.mode === 'edit') {
                 cmcc.connection.oldId = angular.copy(cmcc.connection.id);
             } else {
                 cmcc.connection.isConnected = true;
             }
             if (_.isUndefined(cmcc.connection.options) || cmcc.connection.options == null || _.isString(cmcc.connection.options) && cmcc.connection.options.trim() == '') {
-                console.log("the advanced options are empty! ");
                 cmcc.connection.options = {};
             } else {
                 cmcc.connection.options = JSON.parse(cmcc.connection.options);
@@ -317,6 +319,7 @@
         }
 
         function updateImportedConnection() {
+            console.log('after update', cmcc.connection);
             $scope.$emit('importConnectionClosed', cmcc.connection);
         }
 

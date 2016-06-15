@@ -68,14 +68,16 @@
                 method: 'POST',
                 data: connection
             }).then(function(response) {
-                if (!_.isUndefined(response.connection)) {
+                if (!_.isUndefined(response.success)) {
                     irc.importResults[connection.databaseType].success.push(connection);
                     irc.importResults[connection.databaseType].failed[$index] = null;
                     irc.importResults[connection.databaseType].failed[$index] = connection.ignore = true;
                 }
+                clearSelectedImports();
                 irc.importInProgress = false;
             }, function(response) {
                 irc.importInProgress = false;
+                clearSelectedImports();
             });
         }
 

@@ -187,8 +187,11 @@ public class DCAPI {
                     if (connection.isConnected() && !databaseConnector.testConnection(connection)) {
                         connection.isConnected(false);
                     }
-                    databaseConnector.addEditConnection(connection, false);
-                    jsonAnswer.put("connection", Utils.buildConnectionMap(connection));
+                    if (databaseConnector.addEditConnection(connection, false)) {
+                        jsonAnswer.put("success", Utils.buildConnectionMap(connection));
+                    } else {
+                        jsonAnswer.put("failed", Utils.buildConnectionMap(connection));
+                    }
                 } else {
                     return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"Invalid json object!\"}").build();
                 }
