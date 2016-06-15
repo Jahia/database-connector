@@ -12,7 +12,7 @@
 
                     <md-button class="md-fab md-mini md-success pull-right"
                                ng-click="cmcc.testMongoConnection()"
-                               ng-disabled="mongoForm.$invalid"
+                               ng-disabled="mongoForm.$invalid || mongoAdvancedForm.$invalid"
                                uib-tooltip="Test connection">
                         <i class="fa fa-lg fa-check-circle-o"></i>
                     </md-button>
