@@ -134,9 +134,11 @@
                                           layout-margin layout-padding layout-fill layout-wrap="" class="box-wrap2">
                                 <md-input-container class="md-block" layout="flex">
                                     <label>Host</label>
-                                    <input title="replicaSetHost" class="md-primary" required name="replicaSetHost"
+                                    <input title="replicaSetHost" class="md-primary" required
+                                           name="replicaSetHost_{{$index}}"
                                            ng-model="member.host">
-                                    <div ng-messages="mongoAdvancedForm.replicaSetHost.$error" ng-if="mongoAdvancedForm.replicaSetHost.$dirty">
+                                    <div ng-messages="mongoAdvancedForm['replicaSetHost_' + $index].$error"
+                                         ng-if="mongoAdvancedForm['replicaSetHost_' + $index].$dirty">
                                         <div ng-message-exp='validationName'
                                              ng-repeat="(validationName, validationMessage) in cmcc.validations.members.host">
                                             {{validationMessage}}
@@ -147,11 +149,12 @@
                                 <md-input-container class="md-block" layout="flex">
                                     <label>Port</label>
                                     <input title="replicaSetPort" class="md-primary"
-                                           name="replicaSetPort"
+                                           name="replicaSetPort_{{$index}}"
                                            ng-pattern="/^[0-9]*$/"
                                            ng-model="member.port " length-parser length-parser-max="5" range-parser
                                            range-max-value="65535">
-                                    <div ng-messages="mongoAdvancedForm.replicaSetPort.$error" ng-if="mongoAdvancedForm.replicaSetPort.$dirty">
+                                    <div ng-messages="mongoAdvancedForm['replicaSetPort_'+ $index].$error"
+                                         ng-if="mongoAdvancedForm['replicaSetPort_' + $index].$dirty">
                                         <div ng-message-exp='validationName'
                                              ng-repeat="(validationName, validationMessage) in cmcc.validations.members.port">
                                             {{validationMessage}}
