@@ -70,8 +70,7 @@
                     timeout: 3000
                 });
             });
-        };
-
+        }
         function getConnections() {
             var url = contextualData.context + '/modules/databaseconnector/mongodb/getconnections';
             dcDataFactory.customRequest({
@@ -121,28 +120,22 @@
                 data[coc.exportConnections[i]].push(i);
             }
             var url = contextualData.context + '/modules/databaseconnector/export';
-            return dcDownloadFactory.download(url, 'text/plain', data).$promise.then(function (data) {
-                if (data.response.blob != null) {
-                    saveAs(data.response.blob, data.response.fileName);
-                    coc.exportConnections = {};
-                    $scope.$broadcast('resetExportSelection', null);
-                    getConnections();
-                    toaster.pop({
-                        type: 'success',
-                        title: 'Connection Successfully Exported!',
-                        body: 'Connection Export was successful!',
-                        toastId: 'ce',
-                        timeout: 4000
-                    });
-                } else {
-                    toaster.pop({
-                        type: 'error',
-                        title: 'Export Connection Failed!',
-                        toastId: 'eti',
-                        timeout: 3000
-                    });
-                };
-            });
+            return dcDownloadFactory.download(url, 'text/plain', data).$promise
+                .then(function (data) {
+                    // promise fulfilled
+                    if (data.response.blob != null) {
+                        saveAs(data.response.blob, data.response.fileName);
+                        coc.exportConnections = {};
+                        $scope.$broadcast('resetExportSelection', null);
+                    } else {
+                        toaster.pop({
+                            type: 'error',
+                            title: 'Export Connection Failed!',
+                            toastId: 'eti',
+                            timeout: 3000
+                        });
+                    }
+                });
         }
 
         function isExportDisabled() {
