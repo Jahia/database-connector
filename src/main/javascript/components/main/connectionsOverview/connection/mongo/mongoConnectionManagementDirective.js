@@ -57,7 +57,9 @@
                 'md-maxlength': 'This has to be less than 30 characters.'
             },
             user: {
-                'pattern': 'User should contain alphanumeric characters and consist of 4-10 characters'
+                'pattern': 'User should contain alphanumeric characters (underscore and hyphen permitted)',
+                'minlength': 'This has to be more than 4 characters.',
+                'md-maxlength': 'This has to be less than 30 characters.'
             },
             authDb: {
                 'required': 'Field is required'

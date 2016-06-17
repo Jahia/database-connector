@@ -70,8 +70,9 @@
 
                     <md-input-container class="md-block">
                         <label>User</label>
-                        <input title="User" name="user" ng-model="cmcc.connection.user"
-                               ng-pattern="/^[a-zA-Z0-9]{4,10}$/"
+                        <input title="User" name="user" ng-minlength="4" md-maxlength="30"
+                               ng-model="cmcc.connection.user"
+                               ng-pattern="/^[a-zA-Z0-9_-]*$/"
                                ng-change="cmcc.updateIsEmpty('user');">
                         <div ng-messages="mongoForm.user.$error" ng-if="mongoForm.user.$dirty">
                             <div ng-message-exp="validationName"
