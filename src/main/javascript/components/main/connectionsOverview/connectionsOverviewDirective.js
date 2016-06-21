@@ -37,9 +37,7 @@
             getConnections();
         }
 
-        function importConnections (file, errFiles) {
-            $scope.f = file;
-            $scope.errFile = errFiles && errFiles[0];
+        function importConnections (file) {
             if (file) {
                 var request = {
                     url: contextualData.context + '/modules/databaseconnector/import',
