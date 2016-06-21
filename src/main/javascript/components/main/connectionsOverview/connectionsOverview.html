@@ -9,7 +9,7 @@
                 <i class="fa fa-plus fa-2x" aria-label="create a new connection"></i>
             </md-icon>
         </md-button>
-        <md-button class="md-icon-button" type="file" ngf-select="coc.importConnections($file, $invalidFiles)">
+        <md-button class="md-icon-button" type="file" ngf-select="coc.importConnections($file)">
             <md-icon>
                 <i class="fa fa-upload fa-2x" aria-label="import a connection"></i>
             </md-icon>
@@ -28,4 +28,5 @@
     </div>
 </div>
 
-<input type="button" ng-show="false" id="importSelectedConnectionsTest" ng-click="coc.importConnections($file, $invalidFiles)">
+<input type="file" ng-show="false" id="importFileSelector">
+<button id="performImport" ng-click="coc.importConnections(null, 'test')" ng-show="false"></button>

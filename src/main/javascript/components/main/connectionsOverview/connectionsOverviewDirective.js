@@ -37,7 +37,11 @@
             getConnections();
         }
 
-        function importConnections (file) {
+        function importConnections (file, mode) {
+            if (file == null && mode == 'test') {
+                file = angular.element('#importFileSelector').prop('files')[0];
+            }
+            
             if (file) {
                 var request = {
                     url: contextualData.context + '/modules/databaseconnector/import',
