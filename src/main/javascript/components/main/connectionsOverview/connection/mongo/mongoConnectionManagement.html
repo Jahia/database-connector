@@ -4,7 +4,7 @@
         <md-tab label="Settings">
             <form name="mongoForm">
                 <md-content class="md-padding">
-                    <md-checkbox ng-checked="cmcc.connection.isConnected" aria-label="Automatic startup after Creation"
+                    <md-checkbox ng-model="cmcc.connection.isConnected" aria-label="Automatic startup after Creation"
                                  ng-true-value="true" ng-false-value="false"
                                  class="md-warn md-align-top-left" flex>
                         <span class="ipsum">Enable connection</span>
