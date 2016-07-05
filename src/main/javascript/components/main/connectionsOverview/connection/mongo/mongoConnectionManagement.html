@@ -126,7 +126,7 @@
                             <div ng-messages="mongoAdvancedForm.replicaSetName.$error" ng-if="mongoAdvancedForm.replicaSetName.$dirty">
                                 <div ng-message-exp='validationName'
                                      ng-repeat="(validationName, validationMessage) in cmcc.validations.replicaSet.name"
-                                     ng-init="cmcc.addReplicaMember()">
+                                     ng-init="cmcc.initReplicaMember()">
                                     {{validationMessage}}
                                 </div>
                             </div>

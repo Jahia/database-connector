@@ -104,6 +104,7 @@
         cmcc.cancel = cancel;
         cmcc.updateIsEmpty = updateIsEmpty;
         cmcc.updateImportedConnection = updateImportedConnection;
+        cmcc.initReplicaMember = initReplicaMember;
         cmcc.addReplicaMember = addReplicaMember;
         cmcc.removeReplicaMember = removeReplicaMember;
         cmcc.updateReplicaSetOptions = updateReplicaSetOptions;
@@ -336,6 +337,16 @@
 
         function addReplicaMember() {
             if (!_.isUndefined(cmcc.connection.options.repl.members)) {
+                cmcc.connection.options.repl.members.push({});
+            }
+            else {
+                console.log("repl Members is Undefined !", cmcc.connection.options.repl.members);
+            }
+        }
+
+        function initReplicaMember() {
+            if (!_.isUndefined(cmcc.connection.options.repl.members) && _.isEmpty(cmcc.connection.options.repl.members)) {
+
                 cmcc.connection.options.repl.members.push({});
             }
             else {
