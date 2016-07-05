@@ -125,7 +125,8 @@
                                    ng-model="cmcc.connection.options.repl.replicaSet">
                             <div ng-messages="mongoAdvancedForm.replicaSetName.$error" ng-if="mongoAdvancedForm.replicaSetName.$dirty">
                                 <div ng-message-exp='validationName'
-                                     ng-repeat="(validationName, validationMessage) in cmcc.validations.replicaSet.name">
+                                     ng-repeat="(validationName, validationMessage) in cmcc.validations.replicaSet.name"
+                                     ng-init="cmcc.addReplicaMember()">
                                     {{validationMessage}}
                                 </div>
                             </div>
@@ -171,7 +172,6 @@
                             <md-list-item>
                                 <md-icon class="md-secondary"
                                          title="Create new Mongo connection"
-                                         ng-init="cmcc.addReplicaMember()"
                                          ng-click="cmcc.addReplicaMember()">
                                     <i class="fa fa-plus"
                                        title=" Add  Replica member"></i>
