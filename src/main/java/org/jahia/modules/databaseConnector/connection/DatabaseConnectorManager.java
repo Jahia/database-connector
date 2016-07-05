@@ -1,7 +1,6 @@
 package org.jahia.modules.databaseConnector.connection;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.jahia.modules.databaseConnector.Utils;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
@@ -15,9 +14,12 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import java.io.*;
-import java.util.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.getAllDatabaseTypes;
 
@@ -34,17 +36,11 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
     public static final String DATABASE_CONNECTOR_PATH = "databaseConnector";
 
     public static final String DATABASE_CONNECTOR_NODE_TYPE = "dc:databaseConnector";
-
-    private static DatabaseConnectorManager instance;
-
-    private BundleContext bundleContext;
-
-    private DSLExecutor dslExecutor;
-
-    private Map<String,DSLHandler> dslHandlerMap;
-
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectorManager.class);
-
+    private static DatabaseConnectorManager instance;
+    private BundleContext bundleContext;
+    private DSLExecutor dslExecutor;
+    private Map<String,DSLHandler> dslHandlerMap;
     private Map<DatabaseTypes, DatabaseConnectionRegistry> databaseConnectionRegistries;
 
     private Set<DatabaseTypes> activatedDatabaseTypes = getAllDatabaseTypes();
@@ -86,11 +82,6 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
 
     public <T extends AbstractConnection> Map<String, T> getRegisteredConnections (DatabaseTypes databaseType) {
         return findRegisteredConnections().get(databaseType);
-    }
-
-    @Override
-    public void setBundleContext(BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
     }
 
     public Map<DatabaseTypes, Map> findRegisteredConnections() {
@@ -204,7 +195,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         switch (DatabaseTypes.valueOf((String) map.get("type"))) {
             case MONGO:
                 try {
-                    if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey((String) map.get("identifier"))) {
+                    if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey(map.get("identifier"))) {
                         map.put("status", "failed");
                         map.put("statusMessage", "connectionExists");
                         //Create instance to be able to parse the options of a failed connection.
@@ -217,7 +208,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         MongoConnection connection = new MongoConnection((String)map.get("identifier"));
                         String host = map.containsKey("host") ? (String) map.get("host") : null;
                         Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : null;
-                        Boolean isConnected = map.containsKey("isConnected") ? Boolean.parseBoolean((String) map.get("isConnected")) : false;
+                        Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
                         String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : null;
                         String user = map.containsKey("user") ? (String) map.get("user") : null;
                         String writeConcern = map.containsKey("writeConcern") ? (String) map.get("writeConcern") : null;
@@ -274,6 +265,11 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         return bundleContext;
     }
 
+    @Override
+    public void setBundleContext(BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+    }
+
     public void setDslExecutor(DSLExecutor dslExecutor) {
         this.dslExecutor = dslExecutor;
     }
@@ -284,10 +280,10 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
 
     public File exportConnections (JSONObject connections) throws JSONException {
         File file = null;
+        String exportedConnections = "exportedConnections";
 
         try {
-            file = File.createTempFile("exportedConnections", ".txt");
-
+            file = File.createTempFile(exportedConnections, ".txt");
             Iterator iterator = connections.keys();
             StringBuilder sb = new StringBuilder();
             while (iterator.hasNext()) {
@@ -299,7 +295,6 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                     sb.append(getConnection(connectionId, DatabaseTypes.valueOf(type)).getSerializedExportData());
                     sb.append(Utils.NEW_LINE + "}" + Utils.NEW_LINE);
                 }
-
             }
             FileUtils.writeStringToFile(file, sb.toString(), true);
         } catch (IOException e) {
