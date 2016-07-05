@@ -131,7 +131,7 @@
                             </div>
                         </md-input-container>
                         <md-list>
-                            <md-list-item ng-repeat="member in cmcc.connection.options.repl.members track by $index"
+                            <md-list-item ng-repeat="member in cmcc.connection.options.repl.members track by $index "
                                           layout-margin layout-padding layout-fill layout-wrap="" class="box-wrap2">
                                 <md-input-container class="md-block" layout="flex">
                                     <label>Host</label>
@@ -171,6 +171,7 @@
                             <md-list-item>
                                 <md-icon class="md-secondary"
                                          title="Create new Mongo connection"
+                                         ng-init="cmcc.addReplicaMember()"
                                          ng-click="cmcc.addReplicaMember()">
                                     <i class="fa fa-plus"
                                        title=" Add  Replica member"></i>
