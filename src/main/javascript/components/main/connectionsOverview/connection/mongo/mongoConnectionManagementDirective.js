@@ -136,23 +136,17 @@
             } else {
                 cmcc.connection.isConnected = true;
             }
-            if (_.isUndefined(cmcc.connection.options) || _.isEmpty(cmcc.connection.options) || cmcc.connection.options == null || _.isString(cmcc.connection.options) && cmcc.connection.options.trim() == '') {
+            if (_.isUndefined(cmcc.connection.options) || cmcc.connection.options == null || _.isString(cmcc.connection.options) && cmcc.connection.options.trim() == '') {
                 cmcc.connection.options = {};
-            } else {
-                if (!_.isEmpty(cmcc.connection.options)) {
-                    var temp = JSON.stringify(cmcc.connection.options);
-                    cmcc.connection.options = JSON.parse(temp);
-                    // cmcc.connection.options = JSON.parse(cmcc.connection.options);
-                }
-
+            } else if (_.isString(cmcc.connection.options)){
+                cmcc.connection.options = JSON.parse(cmcc.connection.options);
             }
-            if (cmcc.isReplicaSet = !_.isUndefined(cmcc.connection.options.repl)) {
-                if (_.isUndefined(cmcc.connection.options.conn)) {
-                    cmcc.connection.options.conn = {}
-                }
-                if (_.isUndefined(cmcc.connection.options.connPool)) {
-                    cmcc.connection.options.connPool = {}
-                }
+            cmcc.isReplicaSet = !_.isUndefined(cmcc.connection.options.repl);
+            if (_.isUndefined(cmcc.connection.options.conn)) {
+                cmcc.connection.options.conn = {}
+            }
+            if (_.isUndefined(cmcc.connection.options.connPool)) {
+                cmcc.connection.options.connPool = {}
             }
         }
 
