@@ -36,14 +36,18 @@
                                </div>
                            </div>
                            <div flex="10" layout-padding>
-                               <md-button class="md-icon-button" ng-if="!cc.connection.isConnected" ng-click="cc.updateConnection(true)"><i class="fa fa-plug" aria-label="connect to database"></i></md-button>
-                               <md-button class="md-icon-button" ng-if="cc.connection.isConnected" ng-click="cc.updateConnection(false)"><i class="fa fa-chain-broken" aria-label="disconnect from database"></i></md-button>
-                               <md-button class="md-icon-button" ng-click="cc.editConnection($event)"><i class="fa fa-pencil-square-o" aria-label="edit connections details"></i></md-button>
-                               <md-button class="md-icon-button" ng-disabled="!cc.serverStatusAvailable()" ng-click="cc.goToStatus()"><i class="fa fa-line-chart" aria-label="connection status"></i></md-button>
-                               <md-button class="md-icon-button" ng-click="cc.openDeleteConnectionDialog($event)"><i class="fa fa-trash-o" aria-label="delete connection"></i></md-button>
+                               <md-button class="md-icon-button" ng-if="!cc.connection.isConnected" ng-click="cc.updateConnection(true)"><i class="fa fa-plug" aria-label="connect to database"></i>
+                                   <md-tooltip md-direction="left">Connect</md-tooltip></md-button>
+                               <md-button class="md-icon-button" ng-if="cc.connection.isConnected" ng-click="cc.updateConnection(false)"><i class="fa fa-chain-broken" aria-label="disconnect from database"></i>
+                                   <md-tooltip md-direction="left">Disconnect</md-tooltip></md-button>
+                               <md-button class="md-icon-button" ng-click="cc.editConnection($event)"><i class="fa fa-pencil-square-o" aria-label="edit connections details"></i>
+                                   <md-tooltip md-direction="left">Edit Connection </md-tooltip></md-button>
+                               <md-button class="md-icon-button" ng-disabled="!cc.serverStatusAvailable()" ng-click="cc.goToStatus()"><i class="fa fa-line-chart" aria-label="connection status"></i>
+                                   <md-tooltip md-direction="left">Connection Stats</md-tooltip></md-button>
+                               <md-button class="md-icon-button" ng-click="cc.openDeleteConnectionDialog($event)"><i class="fa fa-trash-o" aria-label="delete connection"></i>
+                                   <md-tooltip md-direction="left">Delete Connection </md-tooltip></md-button>
                            </div>
                        </div>
-
                    </div>
                </div>
            </div>

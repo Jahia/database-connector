@@ -9,11 +9,13 @@
             <md-button class="md-icon-button"
                        ng-click="irc.goToConnections()">
                 <md-icon class="md-secondary"><i class="fa fa-home fa-2x"></i></md-icon>
+                <md-tooltip md-direction="left">Go Back</md-tooltip>
             </md-button>
             <md-button class="md-icon-button"
                        ng-click="irc.reImportConnections()"
                        ng-disabled="irc.isReImportDisabled()">
                 <md-icon class="md-secondary"><i class="fa fa-upload fa-2x"></i></md-icon>
+                <md-tooltip md-direction="bottom">Reimport Connections</md-tooltip>
             </md-button>
         </div>
     </md-toolbar>
@@ -44,11 +46,13 @@
                            aria-label="Edit import connection"
                            ng-click="irc.editConnection($index, databaseType, $event)">
                     <i class="fa fa-pencil"></i>
+                    <md-tooltip md-direction="top">Edit Connection</md-tooltip>
                 </md-icon>
                 <md-icon class="md-secondary"
                            aria-label="Import connection"
                            ng-click="irc.reImportConnection(failedConnection)">
                     <i class="fa fa-upload"></i>
+                    <md-tooltip md-direction="top">Reimport Connection</md-tooltip>
                 </md-icon>
                 <md-divider></md-divider>
             </md-list-item>
