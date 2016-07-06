@@ -45,13 +45,40 @@
                 if ($stateParams.results !== null) {
                     irc.importResults = $stateParams.results;
                     irc.databaseTypes = response;
-                    toaster.pop({
-                        type: $stateParams.status ? 'success' : 'warning',
-                        title: 'Import Successful',
-                        body: $stateParams.status ? 'All connections imported successfully!' : 'Not all connections were imported!',
-                        toastId: 'irc',
-                        timeout: 3000
-                    });
+                    if (_.has($stateParams.results, 'MONGO') && $stateParams.status == true) {
+
+                        toaster.pop({
+                            type: 'success',
+                            title: 'All connections imported successfully!',
+                            toastId: 'irc',
+                            timeout: 3000
+                        });
+                    }
+                    else if (_.has($stateParams.results, 'MONGO') && $stateParams.status == false) {
+
+                        toaster.pop({
+                            type: 'warn',
+                            title: 'Not all connections were imported, Some changes are required!',
+                            toastId: 'irc',
+                            timeout: 3000
+                        });
+                    }
+                    else {
+                        toaster.pop({
+                            type: 'error',
+                            title: 'Imported connections are not in the valid format!',
+                            toastId: 'irc',
+                            timeout: 3000
+                        });
+                    }
+                    //Not working because $stateParams.status was true even when the imported format wasn't valid !
+                    // toaster.pop({
+                    //     type: $stateParams.status ? 'success' : 'error',
+                    //     title: 'Import Status',
+                    //     body: $stateParams.results.report.status ? 'All connections imported successfully!' : 'Not all connections were imported!',
+                    //     toastId: 'irc',
+                    //     timeout: 3000
+                    // });
                 } else {
                     $state.go('connections');
                 }
