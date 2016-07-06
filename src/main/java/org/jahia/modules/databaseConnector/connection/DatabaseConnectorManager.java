@@ -220,7 +220,10 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                                 password = password.substring(0,32);
                                 password = EncryptionUtils.passwordBaseDecrypt(password);
                                 map.put("password",password);
-                             }
+                             } else if (password != null && !password.contains("_ENC")) {
+                                map.put("password", password);
+                            }
+
 
                         connection.setHost(host);
                         connection.setPort(port);
