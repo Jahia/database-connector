@@ -121,10 +121,12 @@ public class DCAPI {
             JSONObject jsonObject = new JSONObject(data);
 
                 if(jsonObject.getJSONArray("MONGO").length() <2) {
+
                         exportName = jsonObject.getString("MONGO").replaceAll("\\[", "").replaceAll("\\]","").replaceAll("\\,", "");
+                        exportName= "DBConnector-"+exportName+"Export";
                     }
                 else {
-                        exportName = "exportedConnections";
+                        exportName = "DBConnectorConnectionsExport";
                     }
             File exportedConnections = databaseConnector.exportConnections(jsonObject);
             Response.ResponseBuilder response;
