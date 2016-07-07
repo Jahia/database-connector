@@ -283,10 +283,9 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
 
     public File exportConnections (JSONObject connections) throws JSONException {
         File file = null;
-        String exportedConnections = "exportedConnections";
 
         try {
-            file = File.createTempFile(exportedConnections, ".txt");
+            file = File.createTempFile("exportedConnections", ".txt");
             Iterator iterator = connections.keys();
             StringBuilder sb = new StringBuilder();
             while (iterator.hasNext()) {

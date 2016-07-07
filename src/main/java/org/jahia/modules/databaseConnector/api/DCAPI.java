@@ -112,12 +112,20 @@ public class DCAPI {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces("text/plain")
     public Response exportConnection(String data) {
+
         try {
+            String exportName=null;
             if (StringUtils.isEmpty(data)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\":\"Missing Data\"}").build();
             }
             JSONObject jsonObject = new JSONObject(data);
-            String exportName=jsonObject.getString("MONGO").replaceAll("\\[", "").replaceAll("\\]","");
+
+                if(jsonObject.getJSONArray("MONGO").length() <2) {
+                        exportName = jsonObject.getString("MONGO").replaceAll("\\[", "").replaceAll("\\]","").replaceAll("\\,", "");
+                    }
+                else {
+                        exportName = "exportedConnections";
+                    }
             File exportedConnections = databaseConnector.exportConnections(jsonObject);
             Response.ResponseBuilder response;
             if (exportedConnections != null){
