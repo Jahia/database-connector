@@ -164,6 +164,10 @@
             } else {
                 data.options = options;
             }
+            if(data.user == null || _.isEmpty(data.user)) {
+                data.authDb="";
+                data.password="";
+            }
             dcDataFactory.customRequest({
                 url: url,
                 method: 'POST',
@@ -198,6 +202,10 @@
             } else {
                 data.options = options;
             }
+            if(data.user == null || _.isEmpty(data.user)) {
+                 data.authDb="";
+                 data.password="";
+            }
             dcDataFactory.customRequest({
                 url: url,
                 method: 'PUT',
@@ -227,6 +235,10 @@
                 delete data.options;
             } else {
                 data.options = options;
+            }
+            if(data.user == null || _.isEmpty(data.user)) {
+                data.authDb="";
+                data.password="";
             }
             dcDataFactory.customRequest({
                 url: url,
@@ -331,7 +343,11 @@
         }
 
         function updateImportedConnection() {
-            console.log('after update', cmcc.connection);
+            if(cmcc.connection.user == null || _.isEmpty(cmcc.connection.user)) {
+                cmcc.connection.authDb="";
+                cmcc.connection.password="";
+                console.log('after update', cmcc.connection);
+            }
             $scope.$emit('importConnectionClosed', cmcc.connection);
         }
 
