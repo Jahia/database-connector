@@ -117,11 +117,12 @@ public class DCAPI {
                 return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\":\"Missing Data\"}").build();
             }
             JSONObject jsonObject = new JSONObject(data);
+            String exportName=jsonObject.getString("MONGO").replaceAll("\\[", "").replaceAll("\\]","");
             File exportedConnections = databaseConnector.exportConnections(jsonObject);
             Response.ResponseBuilder response;
             if (exportedConnections != null){
                 response = Response.ok(exportedConnections);
-                response.type("text/plain").header("Content-Disposition", "attachment; filename=ExportedConnections.txt");
+                response.type("text/plain").header("Content-Disposition", "attachment; filename="+exportName+".txt");
             }
             else {
                 response = Response.serverError();
