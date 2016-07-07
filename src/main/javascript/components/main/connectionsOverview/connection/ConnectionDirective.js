@@ -6,6 +6,7 @@
             restrict        : 'E',
             templateUrl     : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connection/Connection.html',
             scope: {
+                index: '@',
                 connection: '=',
                 exportConnections: '='
             },
