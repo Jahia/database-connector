@@ -25,7 +25,7 @@
                 <h4>Imported {{displayableName}} connections</h4>
             </md-subheader>
             <md-divider></md-divider>
-            <md-list-item ng-repeat="failedConnection in irc.importResults[databaseType].failed | filter:irc.filterFailedConnections track by $index">
+            <md-list-item ng-repeat="failedConnection in irc.importResults[databaseType].failed track by $index">
                 <div class="errorStatusBar"></div>
                 <div>
                     <h3>
