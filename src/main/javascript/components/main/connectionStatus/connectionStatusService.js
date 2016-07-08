@@ -1,9 +1,9 @@
 (function(){
-    var connectionStatusService = function(contextualData, dcDataFactory, $rootScope, $interval) {
+    var connectionStatusService = function(contextualData, dcDataFactory, $rootScope, $interval, toaster) {
 
         var currentConnectionStatus = null;
         var connectionStatusInterval = null;
-        var REQUEST_TIMEOUT = 10000;//time interval is in milliseconds.
+        var REQUEST_TIMEOUT = 1000;//time interval is in milliseconds.
         var connectionId;
         var databaseType;
 
@@ -31,11 +31,21 @@
                currentConnectionStatus = response.success;
                $rootScope.$broadcast('connectionStatusUpdate', currentConnectionStatus);
            }, function() {
+
+               toaster.pop({
+                   type: 'error',
+                   title: 'Connection is currently unavailable',
+                   body: 'Please wait for the server to come back online, and try to load stats again!',
+                   toastId: 'sta',
+                   timeout: 3000
+               });
+                // this stops the GET requests should be stopped if server goes down
+               $interval.cancel(connectionStatusInterval);
            });
         }
     };
 
     angular
         .module('databaseConnector')
-        .service('dcConnectionStatusService', ['contextualData', 'dcDataFactory', '$rootScope', '$interval', connectionStatusService]);
+        .service('dcConnectionStatusService', ['contextualData', 'dcDataFactory', '$rootScope', '$interval', 'toaster', connectionStatusService]);
 })();
