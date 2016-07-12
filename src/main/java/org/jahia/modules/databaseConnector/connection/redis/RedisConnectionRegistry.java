@@ -14,12 +14,15 @@ import javax.jcr.RepositoryException;
 import javax.jcr.query.QueryResult;
 import java.util.Map;
 
-import static org.jahia.modules.databaseConnector.connection.AbstractConnection.*;
 import static org.jahia.modules.databaseConnector.Utils.query;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.DB_NAME_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.HOST_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.ID_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.IS_CONNECTED_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.PASSWORD_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.PORT_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.USER_KEY;
 import static org.jahia.modules.databaseConnector.connection.redis.RedisConnection.*;
-import static org.jahia.modules.databaseConnector.connection.redis.RedisConnection.TIMEOUT_KEY;
-import static org.jahia.modules.databaseConnector.connection.redis.RedisConnection.WEIGHT_KEY;
-import static org.jahia.modules.databaseConnector.connection.redis.RedisConnection.NODE_TYPE;
 
 
 /**

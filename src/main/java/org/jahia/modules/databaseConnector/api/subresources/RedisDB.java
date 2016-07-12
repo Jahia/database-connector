@@ -141,4 +141,63 @@ public class RedisDB {
     }
 
 
+
+    @PUT
+    @Path("/edit")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response editConnection(String data) {
+        try {
+            JSONObject connectionParameters = new JSONObject(data);
+            JSONArray missingParameters = new JSONArray();
+            if (!connectionParameters.has("id") || StringUtils.isEmpty(connectionParameters.getString("id"))) {
+                missingParameters.put("id");
+            }
+            if (!connectionParameters.has("oldId") || StringUtils.isEmpty(connectionParameters.getString("oldId"))) {
+                missingParameters.put("oldId");
+            }
+            if (!connectionParameters.has("host") || StringUtils.isEmpty(connectionParameters.getString("host"))) {
+                missingParameters.put("host");
+            }
+            if (!connectionParameters.has("dbName") || StringUtils.isEmpty(connectionParameters.getString("dbName"))) {
+                missingParameters.put("dbName");
+            }
+            if (missingParameters.length() > 0) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("{\"missingParameters\":" + missingParameters.toString() + "}").build();
+            } else {
+                String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
+                String oldId = connectionParameters.has("oldId") ? connectionParameters.getString("oldId") : null;
+                String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
+                Integer port = connectionParameters.has("port") && !StringUtils.isEmpty(connectionParameters.getString("port")) ? connectionParameters.getInt("port") : null;
+                Boolean isConnected = connectionParameters.has("isConnected") && connectionParameters.getBoolean("isConnected");
+                String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
+                String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
+                String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
+                Integer timeout = connectionParameters.has("timeout") && !StringUtils.isEmpty(connectionParameters.getString("timeout")) ? connectionParameters.getInt("timeout") : null;
+                Integer weight = connectionParameters.has("weight") && !StringUtils.isEmpty(connectionParameters.getString("weight")) ? connectionParameters.getInt("weight") : null;
+
+                RedisConnection connection = new RedisConnection(id);
+
+                connection.setOldId(oldId);
+                connection.setHost(host);
+                connection.setPort(port);
+                connection.isConnected(isConnected);
+                connection.setDbName(dbName);
+                connection.setUser(user);
+                connection.setPassword(password);
+                connection.setTimeout(timeout);
+                connection.setWeight(weight);
+                JSONObject jsonAnswer = new JSONObject();
+                databaseConnector.addEditConnection(connection, true);
+                jsonAnswer.put("success", "RedisDB Connection successfully edited");
+                logger.info("Successfully edited RedisDB connection: " + id);
+                return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
+            }
+        } catch(JSONException e) {
+            logger.error("Cannot parse json data : {}", data);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
+        }
+    }
+
+
   }
