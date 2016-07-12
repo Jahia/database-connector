@@ -28,6 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.Utils;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.api.subresources.MongoDB;
+import org.jahia.modules.databaseConnector.api.subresources.RedisDB;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.services.content.JCRTemplate;
@@ -105,6 +106,11 @@ public class DCAPI {
     @Path(MongoDB.MAPPING)
     public Class<MongoDB> getMongoDbSubResource() {
         return MongoDB.class;
+    }
+
+    @Path(RedisDB.MAPPING)
+    public Class<RedisDB> getRedisDBSubResource() {
+        return RedisDB.class;
     }
 
     @POST

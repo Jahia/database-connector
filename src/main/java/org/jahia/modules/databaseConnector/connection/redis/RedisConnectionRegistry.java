@@ -17,6 +17,10 @@ import java.util.Map;
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.*;
 import static org.jahia.modules.databaseConnector.Utils.query;
 import static org.jahia.modules.databaseConnector.connection.redis.RedisConnection.*;
+import static org.jahia.modules.databaseConnector.connection.redis.RedisConnection.TIMEOUT_KEY;
+import static org.jahia.modules.databaseConnector.connection.redis.RedisConnection.WEIGHT_KEY;
+import static org.jahia.modules.databaseConnector.connection.redis.RedisConnection.NODE_TYPE;
+
 
 /**
  * Date: 11/6/2013
@@ -45,12 +49,21 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                     String host = setStringConnectionProperty(connectionNode, HOST_KEY, true);
                     Integer port = setIntegerConnectionProperty(connectionNode, PORT_KEY, true);
                     Boolean isConnected = setBooleanConnectionProperty(connectionNode, IS_CONNECTED_KEY);
-                    String password = decodePassword(connectionNode, PASSWORD_KEY);
+                    String dbName = setStringConnectionProperty(connectionNode, DB_NAME_KEY, false);
                     String user = setStringConnectionProperty(connectionNode, USER_KEY, false);
+                    String password = decodePassword(connectionNode, PASSWORD_KEY);
                     Integer timeout = setIntegerConnectionProperty(connectionNode, TIMEOUT_KEY, false);
                     Integer weight = setIntegerConnectionProperty(connectionNode, WEIGHT_KEY, false);
-                    RedisConnection storedConnection =
-                            new RedisConnection(id, host, port, isConnected, password, user, null, timeout, weight);
+                    RedisConnection storedConnection = new RedisConnection(id);
+                    storedConnection.setOldId(id);
+                    storedConnection.setHost(host);
+                    storedConnection.setPort(port);
+                    storedConnection.isConnected(isConnected);
+                    storedConnection.setDbName(dbName);
+                    storedConnection.setUser(user);
+                    storedConnection.setPassword(password);
+                    storedConnection.setTimeout(timeout);
+                    storedConnection.setWeight(weight);
                     registry.put(id, storedConnection);
                 }
                 return true;
@@ -68,28 +81,42 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
     public boolean addEditConnection(final AbstractConnection connection, final Boolean isEdition) {
         Assert.hasText(connection.getHost(), "Host must be defined");
         Assert.notNull(connection.getPort(), "Port must be defined");
-        if (isEdition) {
-            ((RedisConnection) registry.get(connection.getOldId())).unregisterAsService();
-        }
+
         RedisConnection redisConnection = (RedisConnection) connection;
-        if (storeConnection(connection, NODE_TYPE, isEdition)) {
+        if (storeConnection(redisConnection, NODE_TYPE, isEdition)) {
             if (isEdition) {
-                if (!connection.getId().equals(connection.getOldId())) {
+                if (registry.get(redisConnection.getOldId()).isConnected()) {
+                    registry.get(connection.getOldId()).unregisterAsService();
+                }
+                if (!redisConnection.getId().equals(connection.getOldId())) {
                     registry.remove(connection.getOldId());
                 }
-                registry.put(connection.getId(), redisConnection);
-            }
-            else {
-                registry.put(connection.getId(), redisConnection);
+                if (redisConnection.isConnected() && redisConnection.testConnectionCreation()) {
+                    redisConnection.registerAsService();
+                } else {
+                    redisConnection.isConnected(false);
+                }
+                registry.put(redisConnection.getId(), redisConnection);
+
+            } else {
+
+                registry.put(redisConnection.getId(), redisConnection);
+                if (redisConnection.isConnected() && redisConnection.testConnectionCreation()) {
+                    redisConnection.registerAsService();
+                } else {
+                    redisConnection.isConnected(false);
+                }
+
             }
             return true;
-        }
-        else {
+
+        } else {
             return false;
         }
     }
 
-    @Override
+
+        @Override
     public boolean importConnection(Map<String, Object> map) {
         return false;
     }
@@ -104,4 +131,6 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
             node.setProperty(WEIGHT_KEY, redisConnection.getWeight());
         }
     }
-}
+
+    }
+

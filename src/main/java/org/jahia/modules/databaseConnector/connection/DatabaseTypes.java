@@ -12,7 +12,7 @@ import java.util.TreeSet;
  */
 public enum DatabaseTypes {
     
-    REDIS("Redis"), MONGO("MongoDB");
+    REDIS("RedisDB"), MONGO("MongoDB");
 
     private final String displayName;
 

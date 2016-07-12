@@ -1,7 +1,10 @@
 package org.jahia.modules.databaseConnector.connection.redis;
 
+import org.apache.commons.httpclient.URI;
+import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Protocol;
 import redis.clients.util.Sharded;
 
@@ -22,17 +25,17 @@ public class RedisConnection extends AbstractConnection {
 
     public static final String WEIGHT_KEY = "dc:weight";
 
+    private Jedis redisClient;
+
+
     private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.REDIS;
 
-    public RedisConnection(String id, String host, Integer port, Boolean isConnected, String dbName,
-                           String user, String password, Integer timeout, Integer weight) {
-        this(id, host, port, isConnected, dbName, null, user, password, timeout, weight);
-    }
 
-    public RedisConnection(String id, String host, Integer port, Boolean isConnected, String dbName, String uri,
-                           String user, String password, Integer timeout, Integer weight) {
-        this.timeout = timeout;
-        this.weight = weight;
+
+    private static final Integer DEFAULT_PORT = new Integer(6379);
+
+    public RedisConnection(String id) {
+        this.id = id;
     }
 
     public void setTimeout(Integer timeout) {
@@ -51,11 +54,11 @@ public class RedisConnection extends AbstractConnection {
         return weight;
     }
 
-    @Override
+//    @Override
     public RedisConnectionData makeConnectionData() {
         RedisConnectionData redisConnectionData = new RedisConnectionData(id);
         redisConnectionData.setHost(host);
-        redisConnectionData.setPort(port);
+        redisConnectionData.setPort(port == null ? DEFAULT_PORT : port);
         redisConnectionData.isConnected(isConnected);
         redisConnectionData.setDbName(dbName);
         redisConnectionData.setUser(user);
@@ -73,12 +76,20 @@ public class RedisConnection extends AbstractConnection {
 
     @Override
     protected Object beforeRegisterAsService() {
-        return null;
+//        redisClient = new Jedis(buildRedisClientUri());
+//        redisClient.get("identifier");
+//                databaseConnection = redisClient.getDB();
+//        return databaseConnection;
+//
+//        String uri = buildRedisClientUri();
+//        redisClient = JedisURIHelper.getDBIndex(URI uri);
+       return null;
     }
+
 
     @Override
     public void beforeUnregisterAsService() {
-
+        redisClient.close();
     }
 
     @Override
@@ -95,5 +106,38 @@ public class RedisConnection extends AbstractConnection {
     @Override
     public String getSerializedExportData() {
         return null;
+    }
+
+
+    private String buildRedisClientUri() {
+        String uri = "redisdb://";
+        if (!StringUtils.isEmpty(user)) {
+            uri += user;
+            if (!StringUtils.isEmpty(password)) {
+                uri += ":" + password;
+            }
+            uri += "@";
+        }
+        uri += host;
+
+        if (port != null) {
+            uri += ":" + port;
+        }
+
+        uri += "/";
+
+        //@TODO add options array check when it is implemented
+        if (!StringUtils.isEmpty(user)) {
+            uri += "?";
+        }
+
+        if (!StringUtils.isEmpty(user)) {
+            uri += (!StringUtils.isEmpty(password) ? "authMechanism=SCRAM-SHA-1" : "authMechanism=GSSAPI");
+        }
+        return uri;
+    }
+
+    public DatabaseTypes getDatabaseType() {
+        return DATABASE_TYPE;
     }
 }

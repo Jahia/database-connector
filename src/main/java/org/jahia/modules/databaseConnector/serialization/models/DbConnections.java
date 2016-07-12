@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jahia.modules.databaseConnector.connection.ConnectionData;
-import org.jahia.modules.databaseConnector.connection.mongo.MongoConnectionData;
 
 import java.util.List;
 

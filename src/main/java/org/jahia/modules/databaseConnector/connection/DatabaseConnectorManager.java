@@ -1,9 +1,11 @@
 package org.jahia.modules.databaseConnector.connection;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.jahia.modules.databaseConnector.Utils;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
+import org.jahia.modules.databaseConnector.connection.redis.RedisConnection;
 import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
 import org.jahia.modules.databaseConnector.dsl.DSLHandler;
 import org.jahia.utils.EncryptionUtils;
@@ -99,7 +101,15 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                     }
                     break;
                 case REDIS:
-                    //@TODO Register REDIS connection
+                    Map<String, RedisConnection> redisRegistry = databaseConnectionRegistries.get(databaseType).getRegistry();
+                    if (!redisRegistry.isEmpty()) {
+                        Map<String, RedisConnection> redisConnectionSet = new HashMap<>();
+                        for (Map.Entry<String, RedisConnection> entry : redisRegistry.entrySet()) {
+                            redisConnectionSet.put(entry.getKey(), entry.getValue());
+                        }
+                        registeredConnections.put(DatabaseTypes.REDIS, redisConnectionSet);
+                    }
+
                     break;
             }
         }
@@ -211,7 +221,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
                         String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : null;
                         String user = map.containsKey("user") ? (String) map.get("user") : null;
-                        String writeConcern = map.containsKey("writeConcern") ? (String) map.get("writeConcern") : null;
+                        String writeConcern = map.containsKey("writeConcern") ? (String) map.get("writeConcern") : "ACKNOWLEDGE";
                         String authDb = map.containsKey("authDb") ? (String) map.get("authDb") : null;
                         String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
                         map.put("options", options);
@@ -223,7 +233,6 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                              } else if (password != null && !password.contains("_ENC")) {
                                 map.put("password", password);
                             }
-
 
                         connection.setHost(host);
                         connection.setPort(port);
@@ -254,9 +263,62 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                 }
                 break;
             case REDIS:
-                //@TODO Implement importing of a redis connection
-                map.put("status", "success");
+                try {
+                    if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey(map.get("identifier"))) {
+                        map.put("statusMessage", "connectionExists");
+
+
+                    } else {
+                        //Create connection object
+                        RedisConnection connection = new RedisConnection((String)map.get("identifier"));
+                        String host = map.containsKey("host") ? (String) map.get("host") : null;
+                        Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : null;
+                        Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
+                        String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : null;
+                        String user = map.containsKey("user") ? (String) map.get("user") : null;
+                        String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
+                        map.put("options", options);
+                        String password = (String) map.get("password");
+                        Integer timeout = map.containsKey("timeout") ? Integer.parseInt((String) map.get("timeout")) : null;
+                        Integer weight = map.containsKey("weight") ? Integer.parseInt((String) map.get("weight")) : null;
+
+                        if(password != null && password.contains("_ENC")) {
+                            password = password.substring(0,32);
+                            password = EncryptionUtils.passwordBaseDecrypt(password);
+                            map.put("password",password);
+                        } else if (password != null && !password.contains("_ENC")) {
+                            map.put("password", password);
+                        }
+
+                        connection.setHost(host);
+                        connection.setPort(port);
+                        connection.isConnected(isConnected);
+                        connection.setDbName(dbName);
+                        connection.setUser(user);
+                        connection.setPassword(password);
+                        connection.setWeight(weight);
+                        connection.setTimeout(timeout);
+
+                        databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).addEditConnection(connection, false);
+                        map.put("status", "success");
+                    }
+
+                } catch (Exception ex) {
+                    map.put("status", "failed");
+                    map.put("statusMessage", "creationFailed");
+                    //try to parse options if the exist otherwise we will just remove them.
+                    try {
+                        if (map.containsKey("options")) {
+                            RedisConnection connection = new RedisConnection((String)map.get("identifier"));
+                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+                        }
+                    } catch (Exception e){
+                        map.remove("options");
+                    }
+                    logger.info("Import " + (map.containsKey("identifier") ? "for connection: '" + map.get("identifier") + "'" : "") + " failed", ex.getMessage(), ex);
+                }
                 break;
+
             default:
                 map.put("status", "failed");
                 map.put("statusMessage", "invalidDatabaseType");

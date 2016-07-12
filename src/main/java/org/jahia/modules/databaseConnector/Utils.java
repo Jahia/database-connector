@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
+import org.jahia.modules.databaseConnector.connection.redis.RedisConnection;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.utils.EncryptionUtils;
 import org.json.JSONArray;
@@ -55,7 +56,7 @@ public class Utils {
             String id = jsonConnectionData.has("id") ? jsonConnectionData.getString("id") : null;
             String host = jsonConnectionData.has("host") ? jsonConnectionData.getString("host") : null;
             Integer port = jsonConnectionData.has("port") && !StringUtils.isEmpty(jsonConnectionData.getString("port")) ? jsonConnectionData.getInt("port") : null;
-            Boolean isConnected = jsonConnectionData.has("isConnected") ? jsonConnectionData.getBoolean("isConnected") : false;
+            Boolean isConnected = jsonConnectionData.has("isConnected") && jsonConnectionData.getBoolean("isConnected");
             String dbName = jsonConnectionData.has("dbName") ? jsonConnectionData.getString("dbName") : null;
             String user = jsonConnectionData.has("user") ? jsonConnectionData.getString("user") : null;
             String password = jsonConnectionData.has("password") ? jsonConnectionData.getString("password") : null;
@@ -71,6 +72,14 @@ public class Utils {
                     ((MongoConnection)connection).setAuthDb(authDb);
                     break;
                 case REDIS:
+                connection = new RedisConnection(id);
+                    if (jsonConnectionData.has("timeout") && !StringUtils.isEmpty(jsonConnectionData.getString("timeout"))){
+                        ((RedisConnection)connection).setTimeout(jsonConnectionData.getInt("timeout"));
+                        if (jsonConnectionData.has("weight") && !StringUtils.isEmpty(jsonConnectionData.getString("weight"))){
+                            ((RedisConnection)connection).setTimeout(jsonConnectionData.getInt("weight"));
+
+                    }
+            }
                     break;
             }
             connection.setHost(host);
@@ -108,6 +117,8 @@ public class Utils {
                 result.put("writeConcern", ((MongoConnection)connection).getWriteConcern());
                 break;
             case REDIS:
+                result.put("timeout",((RedisConnection)connection).getTimeout());
+                result.put("weight",((RedisConnection)connection).getWeight());
                 break;
         }
         return result;
