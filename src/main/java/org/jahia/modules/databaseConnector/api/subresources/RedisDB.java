@@ -141,6 +141,14 @@ public class RedisDB {
     }
 
 
+    @DELETE
+    @Path("/remove/{connectionId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeConnection(@PathParam("connectionId") String connectionId) {
+        databaseConnector.removeConnection(connectionId, DatabaseTypes.REDIS);
+        logger.info("Successfully deleted RedisDB connection: " + connectionId);
+        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully removed RedisDB connection\"}").build();
+    }
 
     @PUT
     @Path("/edit")
