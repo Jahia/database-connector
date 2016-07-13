@@ -1,0 +1,132 @@
+<dc-spinner spinner-mode="rcm.spinnerOptions.mode" show="rcm.spinnerOptions.showSpinner"></dc-spinner>
+<md-content layout-padding>
+    <md-tabs md-dynamic-height md-border-bottom>
+        <md-tab label="Settings">
+            <form name="redisForm">
+                <md-content class="md-padding">
+                    <md-checkbox ng-model="rcm.connection.isConnected" aria-label="Automatic startup after Creation"
+                                 ng-true-value="true" ng-false-value="false"
+                                 class="md-warn md-align-top-left" flex>
+                        <span class="ipsum">Enable connection</span>
+                    </md-checkbox>
+
+                    <!--<md-button class="md-fab md-mini md-success pull-right"-->
+                               <!--ng-click="rcm.testRedisConnection()"-->
+                               <!--ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid"-->
+                               <!--uib-tooltip="Test connection">-->
+                        <!--<i class="fa fa-lg fa-check-circle-o"></i>-->
+                    <!--</md-button>-->
+                    <md-input-container class="md-block" flex-gt-sm="1">
+                        <label>Host</label>
+                        <input title="host" required ng-minlength="4" md-maxlength="15" name="host"
+                               ng-model="rcm.connection.host">
+                        <div ng-messages="redisForm.host.$error" ng-if="redisForm.host.$dirty">
+                            <div ng-message-exp="validationName"
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.host">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
+
+                    <md-input-container class="md-block">
+                        <label>Port</label>
+                        <input title="port" md-maxlength="5" ng-pattern="/[0-9]*/" name="port"
+                               ng-model="rcm.connection.port" length-parser length-parser-max="5" range-parser
+                               range-max-value="65535">
+                        <div ng-messages="redisForm.port.$error" ng-if="redisForm.port.$dirty">
+                            <div ng-message-exp="validationName"
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.port">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
+
+                    <md-input-container class="md-block">
+                        <label>Connection Name (id)</label>
+                        <input title="Connection Name" md-maxlength="30" name="id" required
+                               ng-pattern="/^[a-zA-Z0-9]+$/"
+                               ng-model="rcm.connection.id" original-value="{{rcm.connection.oldId}}"
+                               connection-id-validator>
+                        <div ng-messages="redisForm.id.$error" ng-if="redisForm.id.$dirty">
+                            <div ng-message-exp="validationName"
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.id">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
+
+                    <md-input-container class="md-block">
+                        <label>Database Name</label>
+                        <input title="Database Name" md-maxlength="30" required ng-pattern="/^[a-zA-Z0-9_]+$/"
+                               name="dbName"
+                               ng-model="rcm.connection.dbName">
+                        <div ng-messages="redisForm.dbName.$error" ng-if="redisForm.dbName.$dirty">
+                            <div ng-message-exp="validationName"
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.dbName">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
+
+                    <md-input-container class="md-block">
+                        <label>User</label>
+                        <input title="User" name="user" ng-minlength="4" md-maxlength="30"
+                               ng-model="rcm.connection.user"
+                               ng-pattern="/^[a-zA-Z0-9_-]*$/"
+                               ng-change="rcm.updateIsEmpty('user');">
+                        <div ng-messages="redisForm.user.$error" ng-if="redisForm.user.$dirty">
+                            <div ng-message-exp="validationName"
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.user">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
+
+                    <md-input-container class="md-block" ng-if="!rcm.isEmpty.user">
+                        <label>Password</label>
+                        <input title="Password" type="password" name="password" ng-model="rcm.connection.password"
+                               ng-change="rcm.updateIsEmpty('password');">
+                    </md-input-container>
+
+                    <md-input-container class="md-block" ng-if="!rcm.isEmpty.password && !rcm.isEmpty.user">
+                        <label>Authentication Database</label>
+                        <input title="Authentication Database" required name="authDb"
+                               ng-model="rcm.connection.authDb">
+                        <div ng-messages="redisForm.authDb.$error" ng-if="redisForm.authDb.$dirty">
+                            <div ng-message-exp="validationName"
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.authDb">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
+                </md-content>
+            </form>
+        </md-tab>
+
+        <md-tab label="Advanced Settings">
+            <md-content class="md-padding">
+                <form name="redisAdvancedForm">
+
+                </form>
+            </md-content>
+        </md-tab>
+    </md-tabs>
+    <md-button ng-if="rcm.mode=='create'" class="md-raised md-primary pull-right"
+               ng-click="rcm.createRedisConnection()" ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid">
+        Create
+    </md-button>
+    <md-button ng-if="rcm.mode=='edit'" class="md-raised md-primary pull-right"
+               ng-click="rcm.editRedisConnection()" ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid">
+        Update
+    </md-button>
+    <md-button class="md-raised md-primary pull-right"
+               ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid"
+               ng-if="rcm.mode=='import-edit'"
+               ng-click="rcm.updateImportedConnection()">
+        Ok
+    </md-button>
+    <md-button class="md-raised md-primary pull-right" ng-click="rcm.cancel()">
+        <span ng-if="rcm.mode=='edit' || rcm.mode=='create'">Back</span>
+        <span ng-if="rcm.mode=='import-edit'">Cancel</span>
+    </md-button>
+</md-content>
