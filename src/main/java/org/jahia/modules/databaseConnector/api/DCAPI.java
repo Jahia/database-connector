@@ -46,9 +46,7 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -220,4 +218,17 @@ public class DCAPI {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
         }
     }
+
+    @GET
+    @Path("/getallconnections")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getConnections() {
+        try {
+            return Response.status(Response.Status.OK).entity(databaseConnector.getallConnections()).build();
+        }
+        catch(JSONException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
+        }
+    }
+
 }

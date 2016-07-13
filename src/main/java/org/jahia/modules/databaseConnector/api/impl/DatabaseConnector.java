@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import javax.jcr.RepositoryException;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -74,6 +75,26 @@ public class DatabaseConnector extends AbstractResource {
                 }
                 break;
         }
+        return connections == null ? new JSONArray().toString() : connections;
+    }
+
+    public <T extends ConnectionData> String getallConnections() throws JSONException {
+        String connections = null;
+
+        Map<String, AbstractConnection> allconnections = new HashMap<>();
+
+            Map<String, MongoConnection> mongoConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.MONGO);
+            Map<String, RedisConnection> redisConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.REDIS);
+                allconnections.putAll(mongoConnections);
+                allconnections.putAll(redisConnections);
+
+            List<ConnectionData> ConnectionArray = new ArrayList<>();
+            for (Map.Entry<String, AbstractConnection> entry : allconnections.entrySet()) {
+                ConnectionArray.add(entry.getValue().makeConnectionData());
+                 }
+
+                connections = new DbConnections(ConnectionArray).getJson();
+
         return connections == null ? new JSONArray().toString() : connections;
     }
 
