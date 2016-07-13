@@ -7,6 +7,7 @@
         <md-dialog-content class="databaseSelection">
             <div ng-switch="ecp.connection.databaseType">
                 <mongo-connection-management ng-switch-when="MONGO" mode="edit" connection="ecp.connection"></mongo-connection-management>
+                <redis-connection-management ng-switch-when="REDIS" mode="edit" connection="ecp.connection"></redis-connection-management>
             </div>
         </md-dialog-content>
 </md-dialog>
