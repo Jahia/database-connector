@@ -1,36 +1,41 @@
 package org.jahia.modules.databaseConnector.connection.redis;
 
-import org.apache.commons.httpclient.URI;
+import com.lambdaworks.redis.RedisClient;
+import com.lambdaworks.redis.*;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.Protocol;
-import redis.clients.util.Sharded;
+import org.jahia.utils.EncryptionUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.jahia.modules.databaseConnector.Utils.DOUBLE_QUOTE;
+import static org.jahia.modules.databaseConnector.Utils.NEW_LINE;
+import static org.jahia.modules.databaseConnector.Utils.TABU;
 
 /**
  * @author by stefan on 2016-05-11.
  */
 public class RedisConnection extends AbstractConnection {
 
+    private RedisClient redisClient;
+
     public static final String NODE_TYPE = "dc:redisConnection";
 
-    private Integer timeout = Protocol.DEFAULT_TIMEOUT;
+    private Integer timeout  ;
 
-    private Integer weight = Sharded.DEFAULT_WEIGHT;
+    private Integer weight ;
 
     public static final String TIMEOUT_KEY = "dc:timeout";
 
     public static final String WEIGHT_KEY = "dc:weight";
 
-    private Jedis redisClient;
-
-
     private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.REDIS;
-
-
 
     private static final Integer DEFAULT_PORT = new Integer(6379);
 
@@ -103,10 +108,7 @@ public class RedisConnection extends AbstractConnection {
         return null;
     }
 
-    @Override
-    public String getSerializedExportData() {
-        return null;
-    }
+
 
 
     private String buildRedisClientUri() {
@@ -140,4 +142,39 @@ public class RedisConnection extends AbstractConnection {
     public DatabaseTypes getDatabaseType() {
         return DATABASE_TYPE;
     }
+
+
+    @Override
+    public String getSerializedExportData() {
+        StringBuilder serializedString = new StringBuilder();
+        serializedString.append(
+                TABU + "type " + DOUBLE_QUOTE + DATABASE_TYPE + DOUBLE_QUOTE + NEW_LINE +
+                        TABU + "host " + DOUBLE_QUOTE + this.host + DOUBLE_QUOTE + NEW_LINE +
+                        TABU + "dbName " + DOUBLE_QUOTE + this.dbName + DOUBLE_QUOTE + NEW_LINE +
+                        TABU + "identifier " + DOUBLE_QUOTE + this.id + DOUBLE_QUOTE + NEW_LINE +
+                        TABU + "isConnected " + DOUBLE_QUOTE + this.isConnected() + DOUBLE_QUOTE + NEW_LINE
+        );
+
+        if (this.port != null) {
+            serializedString.append(TABU + "port " + DOUBLE_QUOTE + this.port + DOUBLE_QUOTE + NEW_LINE);
+        }
+
+
+        if (!StringUtils.isEmpty(this.password)) {
+            serializedString.append(TABU + "password " + DOUBLE_QUOTE + EncryptionUtils.passwordBaseEncrypt(this.password) + "_ENC" + DOUBLE_QUOTE + NEW_LINE);
+        }
+
+        if (this.options != null) {
+            try {
+                JSONObject jsonOptions = new JSONObject(this.options);
+
+            } catch (JSONException ex) {
+                logger.error("Failed to parse connection options json", ex.getMessage());
+            }
+        }
+        return serializedString.toString();
+    }
+
+
+
 }
