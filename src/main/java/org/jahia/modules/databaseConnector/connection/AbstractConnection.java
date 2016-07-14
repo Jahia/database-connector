@@ -17,7 +17,7 @@ import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.DATAB
 
 public abstract class AbstractConnection <T extends ConnectionData, E extends Object> implements Serializable {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractConnection.class);
+    public static final Logger logger = LoggerFactory.getLogger(AbstractConnection.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -212,6 +212,7 @@ public abstract class AbstractConnection <T extends ConnectionData, E extends Ob
     public DatabaseTypes getDatabaseType() {
         return databaseType;
     }
+//public abstract DatabaseTypes getDatabaseType();
 
     public void setDatabaseType(DatabaseTypes databaseType) {
         this.databaseType = databaseType;

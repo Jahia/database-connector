@@ -1,6 +1,5 @@
 package org.jahia.modules.databaseConnector.connection.redis;
 
-import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.*;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
@@ -59,14 +58,13 @@ public class RedisConnection extends AbstractConnection {
         return weight;
     }
 
-//    @Override
+    //    @Override
     public RedisConnectionData makeConnectionData() {
         RedisConnectionData redisConnectionData = new RedisConnectionData(id);
         redisConnectionData.setHost(host);
         redisConnectionData.setPort(port == null ? DEFAULT_PORT : port);
         redisConnectionData.isConnected(isConnected);
         redisConnectionData.setDbName(dbName);
-        redisConnectionData.setUser(user);
         redisConnectionData.setPassword(password);
         redisConnectionData.setTimeout(timeout);
         redisConnectionData.setWeight(weight);
@@ -94,12 +92,13 @@ public class RedisConnection extends AbstractConnection {
 
     @Override
     public void beforeUnregisterAsService() {
-        redisClient.close();
+
+        redisClient.shutdown();
     }
 
     @Override
     public boolean testConnectionCreation() {
-        return false;
+        return true;
     }
 
     @Override
@@ -109,15 +108,13 @@ public class RedisConnection extends AbstractConnection {
     }
 
 
-
-
     private String buildRedisClientUri() {
-        String uri = "redisdb://";
-        if (!StringUtils.isEmpty(user)) {
-            uri += user;
-            if (!StringUtils.isEmpty(password)) {
-                uri += ":" + password;
-            }
+//        redis :// [password@] host [: port] [/ database] [? [timeout=timeout[d|h|m|s|ms|us|ns]] [&database=database]]
+        String uri = "redis://";
+
+        if (!StringUtils.isEmpty(password)) {
+            uri += ":" + password;
+
             uri += "@";
         }
         uri += host;
@@ -128,12 +125,13 @@ public class RedisConnection extends AbstractConnection {
 
         uri += "/";
 
-        //@TODO add options array check when it is implemented
-        if (!StringUtils.isEmpty(user)) {
-            uri += "?";
+        if (id != null) {
+            uri += id;
         }
 
-        if (!StringUtils.isEmpty(user)) {
+//        @TODO add options array check when it is implemented
+
+        if (!StringUtils.isEmpty(dbName)) {
             uri += (!StringUtils.isEmpty(password) ? "authMechanism=SCRAM-SHA-1" : "authMechanism=GSSAPI");
         }
         return uri;
