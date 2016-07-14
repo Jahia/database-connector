@@ -101,26 +101,6 @@
             <artifactId>lettuce</artifactId>
             <version>3.4.2.Final</version>
         </dependency>
-        <dependency>
-            <groupId>biz.paluch.redis</groupId>
-            <artifactId>lettuce</artifactId>
-            <version>3.4.2.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>biz.paluch.redis</groupId>
-            <artifactId>lettuce</artifactId>
-            <version>3.4.2.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>biz.paluch.redis</groupId>
-            <artifactId>lettuce</artifactId>
-            <version>3.4.2.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>biz.paluch.redis</groupId>
-            <artifactId>lettuce</artifactId>
-            <version>3.4.2.Final</version>
-        </dependency>
     </dependencies>
     <repositories>
         <repository>
