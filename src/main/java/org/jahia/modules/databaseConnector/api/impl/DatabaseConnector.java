@@ -51,14 +51,14 @@ public class DatabaseConnector extends AbstractResource {
         return connection;
     }
 
-    public <T extends ConnectionData> String getConnections(DatabaseTypes databaseType) throws JSONException{
+    public <T extends ConnectionData> String getConnections(DatabaseTypes databaseType) throws JSONException {
         String connections = null;
         switch (databaseType) {
             case MONGO:
                 Map<String, MongoConnection> mongoConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.MONGO);
                 if (mongoConnections != null) {
                     List<MongoConnectionData> mongoConnectionArray = new ArrayList<>();
-                    for(Map.Entry<String, MongoConnection> entry : mongoConnections.entrySet()) {
+                    for (Map.Entry<String, MongoConnection> entry : mongoConnections.entrySet()) {
                         mongoConnectionArray.add(entry.getValue().makeConnectionData());
                     }
                     connections = new DbConnections(mongoConnectionArray).getJson();
@@ -78,27 +78,31 @@ public class DatabaseConnector extends AbstractResource {
         return connections == null ? new JSONArray().toString() : connections;
     }
 
-    public <T extends ConnectionData> String getallConnections() throws JSONException {
+    public <T extends ConnectionData> String getAllConnections() throws JSONException {
         String connections = null;
 
         Map<String, AbstractConnection> allconnections = new HashMap<>();
 
-            Map<String, MongoConnection> mongoConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.MONGO);
-            Map<String, RedisConnection> redisConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.REDIS);
-                allconnections.putAll(mongoConnections);
-                allconnections.putAll(redisConnections);
+        Map<String, MongoConnection> mongoConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.MONGO);
+        Map<String, RedisConnection> redisConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.REDIS);
 
-            List<ConnectionData> ConnectionArray = new ArrayList<>();
-            for (Map.Entry<String, AbstractConnection> entry : allconnections.entrySet()) {
-                ConnectionArray.add(entry.getValue().makeConnectionData());
-                 }
+        if (mongoConnections != null)
+            allconnections.putAll(mongoConnections);
 
-                connections = new DbConnections(ConnectionArray).getJson();
+        if (redisConnections != null)
+            allconnections.putAll(redisConnections);
+
+        List<ConnectionData> ConnectionArray = new ArrayList<>();
+        for (Map.Entry<String, AbstractConnection> entry : allconnections.entrySet()) {
+            ConnectionArray.add(entry.getValue().makeConnectionData());
+        }
+
+        connections = new DbConnections(ConnectionArray).getJson();
 
         return connections == null ? new JSONArray().toString() : connections;
     }
 
-    public boolean addEditConnection(AbstractConnection connection, Boolean isEdition){
+    public boolean addEditConnection(AbstractConnection connection, Boolean isEdition) {
         return databaseConnectorManager.addEditConnection(connection, isEdition);
     }
 

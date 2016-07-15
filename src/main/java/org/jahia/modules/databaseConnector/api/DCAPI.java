@@ -224,7 +224,7 @@ public class DCAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnections() {
         try {
-            return Response.status(Response.Status.OK).entity(databaseConnector.getallConnections()).build();
+            return Response.status(Response.Status.OK).entity(databaseConnector.getAllConnections()).build();
         }
         catch(JSONException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();

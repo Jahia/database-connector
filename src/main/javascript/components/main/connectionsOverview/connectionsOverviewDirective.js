@@ -23,7 +23,9 @@
 
     var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog, dcDownloadFactory, toaster, $state) {
         var coc = this;
-        coc.getConnections = getConnections;
+        coc.getMongoConnections = getMongoConnections;
+        coc.getAllConnections = getAllConnections;
+        coc.getRedisConnections = getRedisConnections;
         coc.createConnection = createConnection;
         coc.exportConnections = {};
         coc.exportSelectedConnections = exportSelectedConnections;
@@ -34,7 +36,7 @@
 
         function init() {
             getDatabaseTypes();
-            getConnections();
+            getAllConnections();
         }
 
         function importConnections (file, mode) {
@@ -73,7 +75,7 @@
                 });
             });
         }
-        function getConnections() {
+        function getMongoConnections() {
             var url = contextualData.context + '/modules/databaseconnector/mongodb/getconnections';
             dcDataFactory.customRequest({
                 url: url,
@@ -84,7 +86,28 @@
             }, function (response) {
             });
         }
+        function getRedisConnections() {
+            var url = contextualData.context + '/modules/databaseconnector/redisdb/getconnections';
+            dcDataFactory.customRequest({
+                url: url,
+                method: 'GET'
+            }).then(function (response) {
+                coc.connections = response.connections;
+            }, function (response) {
+            });
+        
+    }
+        function getAllConnections() {
+            var url = contextualData.context + '/modules/databaseconnector/getallconnections';
+            dcDataFactory.customRequest({
+                url: url,
+                method: 'GET'
+            }).then(function (response) {
+                coc.connections = response.connections;
+            }, function (response) {
+            });
 
+        }
         function getDatabaseTypes() {
             var url = contextualData.context + '/modules/databaseconnector/databasetypes';
             dcDataFactory.customRequest({
@@ -99,7 +122,7 @@
         function createConnection(ev) {
             $mdDialog.show({
                 locals: {
-                    updateConnections: coc.getConnections
+                    updateConnections: coc.getAllConnections
                 },
                 controller: CreateConnectionPopupController,
                 templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connectionPopups/createConnectionPopup.html',
@@ -108,7 +131,7 @@
                 clickOutsideToClose: true,
                 fullscreen: true
             }).then(function () {
-                getConnections();
+                getAllConnections();
             }, function () {
             });
         }
@@ -145,7 +168,7 @@
         }
 
         $scope.$on('connectionSuccessfullyDeleted', function () {
-            getConnections();
+            getAllConnections();
         });
     };
 

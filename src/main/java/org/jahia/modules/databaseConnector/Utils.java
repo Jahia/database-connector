@@ -58,7 +58,6 @@ public class Utils {
             Integer port = jsonConnectionData.has("port") && !StringUtils.isEmpty(jsonConnectionData.getString("port")) ? jsonConnectionData.getInt("port") : null;
             Boolean isConnected = jsonConnectionData.has("isConnected") && jsonConnectionData.getBoolean("isConnected");
             String dbName = jsonConnectionData.has("dbName") ? jsonConnectionData.getString("dbName") : null;
-            String user = jsonConnectionData.has("user") ? jsonConnectionData.getString("user") : null;
             String password = jsonConnectionData.has("password") ? jsonConnectionData.getString("password") : null;
             String options = jsonConnectionData.has("options") ? jsonConnectionData.getString("options") : null;
             AbstractConnection connection = null;
@@ -86,7 +85,6 @@ public class Utils {
             connection.setPort(port);
             connection.isConnected(isConnected);
             connection.setDbName(dbName);
-            connection.setUser(user);
             if(password != null && password.contains("_ENC")) {
                 password = password.substring(0,32);
                 password = EncryptionUtils.passwordBaseDecrypt(password);
@@ -106,7 +104,6 @@ public class Utils {
         result.put("isConnected", connection.isConnected());
         result.put("dbName", connection.getDbName());
         result.put("databaseType", connection.getDatabaseType());
-        result.put("user", connection.getUser());
         result.put("options", connection.getOptions());
         if (!StringUtils.isEmpty(connection.getPassword())) {
             result.put("password", EncryptionUtils.passwordBaseEncrypt(connection.getPassword()) + "_ENC");

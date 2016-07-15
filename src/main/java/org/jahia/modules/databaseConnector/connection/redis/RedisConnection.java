@@ -5,17 +5,13 @@ import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.utils.EncryptionUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 
-import static org.jahia.modules.databaseConnector.Utils.DOUBLE_QUOTE;
-import static org.jahia.modules.databaseConnector.Utils.NEW_LINE;
-import static org.jahia.modules.databaseConnector.Utils.TABU;
+
+import static org.jahia.modules.databaseConnector.Utils.*;
 
 /**
  * @author by stefan on 2016-05-11.
@@ -26,9 +22,9 @@ public class RedisConnection extends AbstractConnection {
 
     public static final String NODE_TYPE = "dc:redisConnection";
 
-    private Integer timeout  ;
+    private Integer timeout;
 
-    private Integer weight ;
+    private Integer weight;
 
     public static final String TIMEOUT_KEY = "dc:timeout";
 
@@ -79,16 +75,11 @@ public class RedisConnection extends AbstractConnection {
 
     @Override
     protected Object beforeRegisterAsService() {
-//        redisClient = new Jedis(buildRedisClientUri());
-//        redisClient.get("identifier");
-//                databaseConnection = redisClient.getDB();
-//        return databaseConnection;
-//
-//        String uri = buildRedisClientUri();
-//        redisClient = JedisURIHelper.getDBIndex(URI uri);
-       return null;
-    }
 
+        redisClient = RedisClient.create(buildRedisClientUri());
+
+        return redisClient.connect();
+    }
 
     @Override
     public void beforeUnregisterAsService() {
@@ -98,6 +89,14 @@ public class RedisConnection extends AbstractConnection {
 
     @Override
     public boolean testConnectionCreation() {
+        try {
+            RedisClient redisClient = RedisClient.create(buildRedisClientUri());
+
+            RedisStringsConnection<String, String> connection = redisClient.connect();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return false;
+        }
         return true;
     }
 
@@ -108,33 +107,17 @@ public class RedisConnection extends AbstractConnection {
     }
 
 
-    private String buildRedisClientUri() {
+    private RedisURI buildRedisClientUri() {
 //        redis :// [password@] host [: port] [/ database] [? [timeout=timeout[d|h|m|s|ms|us|ns]] [&database=database]]
-        String uri = "redis://";
 
-        if (!StringUtils.isEmpty(password)) {
-            uri += ":" + password;
-
-            uri += "@";
+        RedisURI.Builder builder = RedisURI.Builder.redis(host, port);
+        if (password != null) {
+            builder.withPassword(password);
         }
-        uri += host;
-
-        if (port != null) {
-            uri += ":" + port;
+        if(dbName!=null) {
+            builder.withDatabase(Integer.valueOf(dbName));
         }
-
-        uri += "/";
-
-        if (id != null) {
-            uri += id;
-        }
-
-//        @TODO add options array check when it is implemented
-
-        if (!StringUtils.isEmpty(dbName)) {
-            uri += (!StringUtils.isEmpty(password) ? "authMechanism=SCRAM-SHA-1" : "authMechanism=GSSAPI");
-        }
-        return uri;
+        return builder.build();
     }
 
     public DatabaseTypes getDatabaseType() {
@@ -174,5 +157,13 @@ public class RedisConnection extends AbstractConnection {
     }
 
 
-
+    @Override
+    public void setDbName(String dbName) {
+        try {
+            Integer.valueOf(dbName);
+            super.setDbName(dbName);
+        } catch (NumberFormatException e) {
+            super.setDbName(null);
+        }
+    }
 }

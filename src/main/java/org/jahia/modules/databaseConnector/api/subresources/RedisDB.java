@@ -47,7 +47,7 @@ import java.util.Map;
  */
 @Singleton
 public class RedisDB {
-    public static final String MAPPING = "redisdb";
+    public static final String MAPPING = "redis";
     private static final Logger logger = LoggerFactory.getLogger(RedisDB.class);
     private DatabaseConnector databaseConnector;
 
@@ -107,7 +107,6 @@ public class RedisDB {
                 Integer port = connectionParameters.has("port") && !StringUtils.isEmpty(connectionParameters.getString("port")) ? connectionParameters.getInt("port") : null;
                 Boolean isConnected = connectionParameters.has("isConnected") && connectionParameters.getBoolean("isConnected");
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
-                String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
                 Integer timeout = connectionParameters.has("timeout") && !StringUtils.isEmpty(connectionParameters.getString("timeout")) ? connectionParameters.getInt("timeout") : null;
                 Integer weight = connectionParameters.has("weight") && !StringUtils.isEmpty(connectionParameters.getString("weight")) ? connectionParameters.getInt("weight") : null;
@@ -118,17 +117,16 @@ public class RedisDB {
                 connection.setPort(port);
                 connection.isConnected(isConnected);
                 connection.setDbName(dbName);
-                connection.setUser(user);
                 connection.setPassword(password);
                 connection.setTimeout(timeout);
                 connection.setWeight(weight);
                 JSONObject jsonAnswer = new JSONObject();
-//                if (!databaseConnector.testConnection(connection)) {
-//                    connection.isConnected(false);
-//                    jsonAnswer.put("connectionVerified", false);
-//                } else {
-//                    jsonAnswer.put("connectionVerified", true);
-//                }
+                if (!databaseConnector.testConnection(connection)) {
+                    connection.isConnected(false);
+                    jsonAnswer.put("connectionVerified", false);
+                } else {
+                    jsonAnswer.put("connectionVerified", true);
+                }
                 databaseConnector.addEditConnection(connection, false);
                 jsonAnswer.put("success", "Connection successfully added");
                 logger.info("Successfully created RedisDB connection: " + id);
@@ -179,7 +177,6 @@ public class RedisDB {
                 Integer port = connectionParameters.has("port") && !StringUtils.isEmpty(connectionParameters.getString("port")) ? connectionParameters.getInt("port") : null;
                 Boolean isConnected = connectionParameters.has("isConnected") && connectionParameters.getBoolean("isConnected");
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
-                String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
                 Integer timeout = connectionParameters.has("timeout") && !StringUtils.isEmpty(connectionParameters.getString("timeout")) ? connectionParameters.getInt("timeout") : null;
                 Integer weight = connectionParameters.has("weight") && !StringUtils.isEmpty(connectionParameters.getString("weight")) ? connectionParameters.getInt("weight") : null;
@@ -191,11 +188,16 @@ public class RedisDB {
                 connection.setPort(port);
                 connection.isConnected(isConnected);
                 connection.setDbName(dbName);
-                connection.setUser(user);
                 connection.setPassword(password);
                 connection.setTimeout(timeout);
                 connection.setWeight(weight);
                 JSONObject jsonAnswer = new JSONObject();
+                if (!databaseConnector.testConnection(connection)) {
+                    connection.isConnected(false);
+                    jsonAnswer.put("connectionVerified", false);
+                } else {
+                    jsonAnswer.put("connectionVerified", true);
+                }
                 databaseConnector.addEditConnection(connection, true);
                 jsonAnswer.put("success", "RedisDB Connection successfully edited");
                 logger.info("Successfully edited RedisDB connection: " + id);
@@ -207,5 +209,109 @@ public class RedisDB {
         }
     }
 
+    @PUT
+    @Path("/connect/{connectionId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response connect(@PathParam("connectionId") String connectionId) {
+        JSONObject jsonAnswer = new JSONObject();
+        try {
+            if (databaseConnector.updateConnection(connectionId, DatabaseTypes.REDIS, true)) {
+                jsonAnswer.put("success", "Successfully connected to RedisDB");
+                logger.info("Successfully enabled RedisDB connection, for connection with id: " + connectionId);
+            } else {
+                jsonAnswer.put("failed", "Connection failed to update");
+                logger.info("Failed to establish RedisDB connection, for connection with id: " + connectionId);
+            }
+        } catch (JSONException ex) {
+            logger.error(ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\": \"\"Invalid connection parameter\"}").build();
+        }
+        return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
+    }
 
-  }
+    @PUT
+    @Path("/disconnect/{connectionId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response disconnect(@PathParam("connectionId") String connectionId) {
+        databaseConnector.updateConnection(connectionId, DatabaseTypes.REDIS, false);
+        logger.info("Successfully disconnected RedisDB connection, for connection with id: " + connectionId);
+        return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully disconnected from RedisDB\"}").build();
+    }
+
+    @GET
+    @Path("/isconnectionvalid/{connectionId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response isConnectionIdAvailable(@PathParam("connectionId") String connectionId) {
+        return Response.status(Response.Status.OK).entity(databaseConnector.isConnectionIdAvailable(connectionId, DatabaseTypes.REDIS)).build();
+    }
+
+    @POST
+    @Path("/testconnection")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response testConnection(String data) {
+        try {
+            JSONObject connectionParameters = new JSONObject(data);
+            JSONArray missingParameters = new JSONArray();
+            if (!connectionParameters.has("id") || StringUtils.isEmpty(connectionParameters.getString("id"))) {
+                missingParameters.put("id");
+            }
+            if (!connectionParameters.has("host") || StringUtils.isEmpty(connectionParameters.getString("host"))) {
+                missingParameters.put("host");
+            }
+            if (!connectionParameters.has("dbName") || StringUtils.isEmpty(connectionParameters.getString("dbName"))) {
+                missingParameters.put("dbName");
+            }
+            if (missingParameters.length() > 0) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("{\"missingParameters\":" + missingParameters.toString() + "}").build();
+            } else {
+                String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
+                String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
+                Integer port = connectionParameters.has("port") && !StringUtils.isEmpty(connectionParameters.getString("port")) ? connectionParameters.getInt("port") : null;
+                Boolean isConnected = connectionParameters.has("isConnected") && connectionParameters.getBoolean("isConnected");
+                String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
+                String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
+                Integer timeout = connectionParameters.has("timeout") && !StringUtils.isEmpty(connectionParameters.getString("timeout")) ? connectionParameters.getInt("timeout") : null;
+                Integer weight = connectionParameters.has("weight") && !StringUtils.isEmpty(connectionParameters.getString("weight")) ? connectionParameters.getInt("weight") : null;
+
+                RedisConnection connection = new RedisConnection(id);
+
+                connection.setHost(host);
+                connection.setPort(port);
+                connection.isConnected(isConnected);
+                connection.setDbName(dbName);
+                connection.setPassword(password);
+                connection.setTimeout(timeout);
+                connection.setWeight(weight);
+
+                boolean connectionTestPassed = databaseConnector.testConnection(connection);
+                logger.info(connectionTestPassed ? "Connection test successfully passed" : "Connection test failed" + " for RedisDB with id: " + id);
+                return Response.status(Response.Status.OK).entity("{\"result\": " + connectionTestPassed + "}").build();
+            }
+        } catch (JSONException e) {
+            logger.error("Cannot parse json data : {}", data);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
+        }
+    }
+
+    @GET
+    @Path("/status/{connectionId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getServerStatus(@PathParam("connectionId") String connectionId) {
+        try {
+            Map<String, Object> serverStatus = databaseConnector.getServerStatus(connectionId, DatabaseTypes.REDIS);
+            if (serverStatus.containsKey("failed")) {
+                logger.info("Failed to retrieve Status for RedisDB connection with id: " + connectionId);
+            } else {
+                logger.info("Successfully retrieved Status for RedisDB connection with id: " + connectionId);
+            }
+            return Response.status(Response.Status.OK).entity(serverStatus).build();
+        } catch (Exception e) {
+            logger.error("Failed retrieve Status for RedisDB connection with id: " + connectionId);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"failed\":\"Cannot get database status\"}").build();
+        }
+    }
+
+}

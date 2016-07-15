@@ -41,8 +41,6 @@ public abstract class AbstractConnection <T extends ConnectionData, E extends Ob
 
     protected Boolean isConnected;
 
-    protected DatabaseTypes databaseType;
-
     public final static String ID_KEY = "dc:id";
 
     public final static String HOST_KEY = "dc:host";
@@ -209,17 +207,10 @@ public abstract class AbstractConnection <T extends ConnectionData, E extends Ob
         isConnected = connected;
     }
 
-    public DatabaseTypes getDatabaseType() {
-        return databaseType;
-    }
-//public abstract DatabaseTypes getDatabaseType();
-
-    public void setDatabaseType(DatabaseTypes databaseType) {
-        this.databaseType = databaseType;
-    }
+    public abstract DatabaseTypes getDatabaseType();
 
     public String getDisplayName() {
-        return databaseType.getDisplayName();
+        return getDatabaseType().getDisplayName();
     }
 
     public abstract String getSerializedExportData();

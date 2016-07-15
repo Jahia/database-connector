@@ -3,7 +3,7 @@
 
         var currentConnectionStatus = null;
         var connectionStatusInterval = null;
-        var REQUEST_TIMEOUT = 1000;//time interval is in milliseconds.
+        var REQUEST_TIMEOUT = 10000;//time interval is in milliseconds.
         var connectionId;
         var databaseType;
 

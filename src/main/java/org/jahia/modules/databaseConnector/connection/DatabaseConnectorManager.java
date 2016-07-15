@@ -275,7 +275,6 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : null;
                         Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
                         String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : null;
-                        String user = map.containsKey("user") ? (String) map.get("user") : null;
                         String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
                         map.put("options", options);
                         String password = (String) map.get("password");
@@ -294,7 +293,6 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         connection.setPort(port);
                         connection.isConnected(isConnected);
                         connection.setDbName(dbName);
-                        connection.setUser(user);
                         connection.setPassword(password);
                         connection.setWeight(weight);
                         connection.setTimeout(timeout);

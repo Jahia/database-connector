@@ -21,7 +21,6 @@ import static org.jahia.modules.databaseConnector.connection.AbstractConnection.
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.IS_CONNECTED_KEY;
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.PASSWORD_KEY;
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.PORT_KEY;
-import static org.jahia.modules.databaseConnector.connection.AbstractConnection.USER_KEY;
 import static org.jahia.modules.databaseConnector.connection.redis.RedisConnection.*;
 
 
@@ -53,20 +52,18 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                     Integer port = setIntegerConnectionProperty(connectionNode, PORT_KEY, true);
                     Boolean isConnected = setBooleanConnectionProperty(connectionNode, IS_CONNECTED_KEY);
                     String dbName = setStringConnectionProperty(connectionNode, DB_NAME_KEY, false);
-                    String user = setStringConnectionProperty(connectionNode, USER_KEY, false);
                     String password = decodePassword(connectionNode, PASSWORD_KEY);
-                    Integer timeout = setIntegerConnectionProperty(connectionNode, TIMEOUT_KEY, false);
-                    Integer weight = setIntegerConnectionProperty(connectionNode, WEIGHT_KEY, false);
+//                    Integer timeout = setIntegerConnectionProperty(connectionNode, TIMEOUT_KEY, false);
+//                    Integer weight = setIntegerConnectionProperty(connectionNode, WEIGHT_KEY, false);
                     RedisConnection storedConnection = new RedisConnection(id);
                     storedConnection.setOldId(id);
                     storedConnection.setHost(host);
                     storedConnection.setPort(port);
                     storedConnection.isConnected(isConnected);
                     storedConnection.setDbName(dbName);
-                    storedConnection.setUser(user);
                     storedConnection.setPassword(password);
-                    storedConnection.setTimeout(timeout);
-                    storedConnection.setWeight(weight);
+//                    storedConnection.setTimeout(timeout);
+//                    storedConnection.setWeight(weight);
                     registry.put(id, storedConnection);
                 }
                 return true;

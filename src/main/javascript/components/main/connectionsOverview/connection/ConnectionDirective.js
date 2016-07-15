@@ -201,10 +201,12 @@
                 if (_.isUndefined(response.failed)) {
                     cc.connection.canRetrieveStatus = true;
                     cc.originalConnection.canRetrieveStatus = true;
-                    cc.connection.dbVersion = response.success.version;
-                    cc.originalConnection.dbVersion = cc.connection.dbVersion;
-                    cc.connection.uptime = response.success.uptime;
-                    cc.originalConnection.uptime = cc.connection.uptime;
+                    if(cc.connection.databaseType == "MONGO"){
+                        cc.connection.dbVersion = response.success.version;
+                        cc.connection.uptime = response.success.uptime;
+                        cc.originalConnection.dbVersion = cc.connection.dbVersion;
+                        cc.originalConnection.uptime = cc.connection.uptime;
+                    }
                 } else {
                     cc.connection.canRetrieveStatus = false;
                     cc.originalConnection.canRetrieveStatus = cc.connection.canRetrieveStatus;

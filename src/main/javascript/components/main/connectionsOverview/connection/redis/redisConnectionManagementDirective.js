@@ -56,10 +56,11 @@
                 'pattern': 'It should contain alphanumeric characters only.',
                 'md-maxlength': 'This has to be less than 30 characters.'
             },
-            user: {
-                'pattern': 'User should contain alphanumeric characters (underscore and hyphen permitted)',
-                'minlength': 'This has to be more than 4 characters.',
-                'md-maxlength': 'This has to be less than 30 characters.'
+            redisTimeout: {
+                'pattern' : 'Should be an integer'
+            },
+            redisWeight: {
+                'pattern' : 'Should be an integer'
             }
             
         };
@@ -70,8 +71,21 @@
         rcm.cancel = cancel;
         rcm.updateIsEmpty = updateIsEmpty;
         rcm.updateImportedConnection = updateImportedConnection;
+        rcm.prepareOptions = prepareOptions;
         
         init();
+
+        // function prepareOptions(options) {
+        //     if (_.isEmpty(options.redisTimeout) || options.redisTimeout == null) {
+        //             delete options.redisTimeout;
+        //     }
+        //     if (_.isEmpty(options.redisWeight) || options.redisWeight == null) {
+        //         delete options.redisWeight;
+        //     }
+        //
+        //     return _.isEmpty(options) ? null : JSON.stringify(options);
+        // }
+
 
         function init() {
             if (_.isUndefined(rcm.connection.port) || rcm.connection.port == null) {
@@ -79,7 +93,6 @@
             }
 
             rcm.isEmpty.password = updateIsEmpty('password');
-            rcm.isEmpty.user = updateIsEmpty('user');
             if (rcm.mode === 'import-edit') {
                 rcm.connection.oldId = null;
             }
@@ -89,6 +102,12 @@
                 rcm.connection.isConnected = true;
             }
 
+            // if (_.isUndefined(rcm.connection.options) || rcm.connection.options == null || _.isString(rcm.connection.options) && rcm.connection.options.trim() == '') {
+            //     rcm.connection.options = {};
+            // } else if (_.isString(rcm.connection.options)){
+            //     rcm.connection.options = JSON.parse(rcm.connection.options);
+            // }
+
         }
 
         function createRedisConnection() {
@@ -96,19 +115,16 @@
                 return;
             }
             rcm.spinnerOptions.showSpinner = true;
-            var url = contextualData.context + '/modules/databaseconnector/redisdb/add';
+            var url = contextualData.context + '/modules/databaseconnector/redis/add';
 
             var data = angular.copy(rcm.connection);
+            // var options = prepareOptions(data.options);
             // if (options == null) {
             //     delete data.options;
             // } else {
             //     data.options = options;
             // }
-            console.log("data",data);
-            if(data.user == null || _.isEmpty(data.user)) {
-                data.authDb="";
-                data.password="";
-            }
+
             dcDataFactory.customRequest({
                 url: url,
                 method: 'POST',
@@ -135,17 +151,16 @@
                 return;
             }
             rcm.spinnerOptions.showSpinner = true;
-            var url = contextualData.context + '/modules/databaseconnector/redisdb/edit';
+            var url = contextualData.context + '/modules/databaseconnector/redis/edit';
             var data = angular.copy(rcm.connection);
+
+            // var options = prepareOptions(data.options);
             // if (options == null) {
             //     delete data.options;
             // } else {
             //     data.options = options;
             // }
-            if(data.user == null || _.isEmpty(data.user)) {
-                 data.authDb="";
-                 data.password="";
-            }
+
                 dcDataFactory.customRequest({
                 url: url,
                 method: 'PUT',
@@ -168,17 +183,16 @@
 
         function testRedisConnection() {
             rcm.spinnerOptions.showSpinner = true;
-            var url = contextualData.context + '/modules/databaseconnector/redisdb/testconnection';
+            var url = contextualData.context + '/modules/databaseconnector/redis/testconnection';
             var data = angular.copy(rcm.connection);
+
+            // var options = prepareOptions(data.options);
             // if (options == null) {
             //     delete data.options;
             // } else {
             //     data.options = options;
             // }
-            if(data.user == null || _.isEmpty(data.user)) {
-                data.authDb="";
-                data.password="";
-            }
+
             dcDataFactory.customRequest({
                 url: url,
                 method: 'POST',
@@ -238,13 +252,10 @@
             }
         }
 
-
         function updateImportedConnection() {
-            if(rcm.connection.user == null || _.isEmpty(rcm.connection.user)) {
-                rcm.connection.authDb="";
-                rcm.connection.password="";
+
                 console.log('after update', rcm.connection);
-            }
+
             $scope.$emit('importConnectionClosed', rcm.connection);
         }
 

@@ -9,13 +9,12 @@
                                  class="md-warn md-align-top-left" flex>
                         <span class="ipsum">Enable connection</span>
                     </md-checkbox>
-
-                    <!--<md-button class="md-fab md-mini md-success pull-right"-->
-                               <!--ng-click="rcm.testRedisConnection()"-->
-                               <!--ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid"-->
-                               <!--uib-tooltip="Test connection">-->
-                        <!--<i class="fa fa-lg fa-check-circle-o"></i>-->
-                    <!--</md-button>-->
+                    <md-button class="md-fab md-mini md-success pull-right"
+                               ng-click="rcm.testRedisConnection()"
+                               ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid"
+                               uib-tooltip="Test connection">
+                        <i class="fa fa-lg fa-check-circle-o"></i>
+                    </md-button>
                     <md-input-container class="md-block" flex-gt-sm="1">
                         <label>Host</label>
                         <input title="host" required ng-minlength="4" md-maxlength="15" name="host"
@@ -68,36 +67,10 @@
                         </div>
                     </md-input-container>
 
-                    <md-input-container class="md-block">
-                        <label>User</label>
-                        <input title="User" name="user" ng-minlength="4" md-maxlength="30"
-                               ng-model="rcm.connection.user"
-                               ng-pattern="/^[a-zA-Z0-9_-]*$/"
-                               ng-change="rcm.updateIsEmpty('user');">
-                        <div ng-messages="redisForm.user.$error" ng-if="redisForm.user.$dirty">
-                            <div ng-message-exp="validationName"
-                                 ng-repeat="(validationName, validationMessage) in rcm.validations.user">
-                                {{validationMessage}}
-                            </div>
-                        </div>
-                    </md-input-container>
-
-                    <md-input-container class="md-block" ng-if="!rcm.isEmpty.user">
+                    <md-input-container class="md-block" ng-if="!rcm.isEmpty.dbName">
                         <label>Password</label>
                         <input title="Password" type="password" name="password" ng-model="rcm.connection.password"
                                ng-change="rcm.updateIsEmpty('password');">
-                    </md-input-container>
-
-                    <md-input-container class="md-block" ng-if="!rcm.isEmpty.password && !rcm.isEmpty.user">
-                        <label>Authentication Database</label>
-                        <input title="Authentication Database" required name="authDb"
-                               ng-model="rcm.connection.authDb">
-                        <div ng-messages="redisForm.authDb.$error" ng-if="redisForm.authDb.$dirty">
-                            <div ng-message-exp="validationName"
-                                 ng-repeat="(validationName, validationMessage) in rcm.validations.authDb">
-                                {{validationMessage}}
-                            </div>
-                        </div>
                     </md-input-container>
                 </md-content>
             </form>
@@ -106,7 +79,30 @@
         <md-tab label="Advanced Settings">
             <md-content class="md-padding">
                 <form name="redisAdvancedForm">
-
+                    <md-input-container class="md-block">
+                        <label>Timeout (milliseconds)</label>
+                        <input title="Redis Timeout" name="redisTimeout" range-parser
+                               ng-pattern="/^[0-9]*$/"
+                               ng-model="rcm.connection.options.redisTimeout">
+                        <div ng-messages="redisAdvancedForm.redisTimeout.$error" ng-if="redisAdvancedForm.redisTimeout.$dirty">
+                            <div ng-message-exp='validationName'
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.redisTimeout">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container class="md-block">
+                        <label>Weight</label>
+                        <input title="Redis Weight" name="redisWeight" range-parser
+                               ng-pattern="/^[0-9]*$/"
+                               ng-model="rcm.connection.options.redisWeight">
+                        <div ng-messages="redisAdvancedForm.redisWeight.$error" ng-if="redisAdvancedForm.redisWeight.$dirty">
+                            <div ng-message-exp='validationName'
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.redisWeight">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
                 </form>
             </md-content>
         </md-tab>
