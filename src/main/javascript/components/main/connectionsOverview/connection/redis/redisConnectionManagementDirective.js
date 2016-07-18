@@ -57,7 +57,7 @@
                 'md-maxlength': 'This has to be less than 30 characters.'
             },
             redisTimeout: {
-                'pattern' : 'Should be an integer'
+                'pattern' : 'Should be a Long'
             },
             redisWeight: {
                 'pattern' : 'Should be an integer'
@@ -71,21 +71,8 @@
         rcm.cancel = cancel;
         rcm.updateIsEmpty = updateIsEmpty;
         rcm.updateImportedConnection = updateImportedConnection;
-        rcm.prepareOptions = prepareOptions;
-        
+
         init();
-
-        // function prepareOptions(options) {
-        //     if (_.isEmpty(options.redisTimeout) || options.redisTimeout == null) {
-        //             delete options.redisTimeout;
-        //     }
-        //     if (_.isEmpty(options.redisWeight) || options.redisWeight == null) {
-        //         delete options.redisWeight;
-        //     }
-        //
-        //     return _.isEmpty(options) ? null : JSON.stringify(options);
-        // }
-
 
         function init() {
             if (_.isUndefined(rcm.connection.port) || rcm.connection.port == null) {
@@ -102,11 +89,6 @@
                 rcm.connection.isConnected = true;
             }
 
-            // if (_.isUndefined(rcm.connection.options) || rcm.connection.options == null || _.isString(rcm.connection.options) && rcm.connection.options.trim() == '') {
-            //     rcm.connection.options = {};
-            // } else if (_.isString(rcm.connection.options)){
-            //     rcm.connection.options = JSON.parse(rcm.connection.options);
-            // }
 
         }
 
@@ -116,21 +98,13 @@
             }
             rcm.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/redis/add';
-
             var data = angular.copy(rcm.connection);
-            // var options = prepareOptions(data.options);
-            // if (options == null) {
-            //     delete data.options;
-            // } else {
-            //     data.options = options;
-            // }
 
             dcDataFactory.customRequest({
                 url: url,
                 method: 'POST',
                 data: data
             }).then(function (response) {
-
                 rcm.spinnerOptions.showSpinner = false;
                 $scope.$emit('connectionSuccessfullyCreated', null);
                 showConfirmationToast(response.connectionVerified);
@@ -153,15 +127,10 @@
             rcm.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/redis/edit';
             var data = angular.copy(rcm.connection);
+            console.log("edit data",data);
 
-            // var options = prepareOptions(data.options);
-            // if (options == null) {
-            //     delete data.options;
-            // } else {
-            //     data.options = options;
-            // }
 
-                dcDataFactory.customRequest({
+            dcDataFactory.customRequest({
                 url: url,
                 method: 'PUT',
                 data: data
@@ -185,13 +154,7 @@
             rcm.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/redis/testconnection';
             var data = angular.copy(rcm.connection);
-
-            // var options = prepareOptions(data.options);
-            // if (options == null) {
-            //     delete data.options;
-            // } else {
-            //     data.options = options;
-            // }
+            console.log("data",data);
 
             dcDataFactory.customRequest({
                 url: url,

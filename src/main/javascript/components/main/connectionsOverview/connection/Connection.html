@@ -28,7 +28,7 @@
                                    <p><b>Port:</b> <i>{{cc.connection.port}}</i></p>
                                    <span ng-if="cc.serverStatusAvailable()">
                                        <p><b>Uptime:</b> <i>{{cc.connection.uptime | momentFormatter : 'second' : 'fancy'}}</i></p>
-                                       <p><b>Version:</b> <i>{{cc.connection.dbVersion}}</i></p>
+                                       <p ng-if="cc.connection.dbVersion!=null"><b>Version:</b> <i>{{cc.connection.dbVersion}}</i></p>
                                    </span>
                                    <span ng-if="!cc.serverStatusAvailable()">
                                        <p><b class="statusWarningMessage" md-colors="{color: 'deep-orange-500'}">Server Statistics Unavailable</b></p>

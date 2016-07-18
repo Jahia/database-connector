@@ -67,7 +67,7 @@
                         </div>
                     </md-input-container>
 
-                    <md-input-container class="md-block" ng-if="!rcm.isEmpty.dbName">
+                    <md-input-container class="md-block">
                         <label>Password</label>
                         <input title="Password" type="password" name="password" ng-model="rcm.connection.password"
                                ng-change="rcm.updateIsEmpty('password');">
@@ -83,10 +83,10 @@
                         <label>Timeout (milliseconds)</label>
                         <input title="Redis Timeout" name="redisTimeout" range-parser
                                ng-pattern="/^[0-9]*$/"
-                               ng-model="rcm.connection.options.redisTimeout">
+                               ng-model="rcm.connection.timeout">
                         <div ng-messages="redisAdvancedForm.redisTimeout.$error" ng-if="redisAdvancedForm.redisTimeout.$dirty">
                             <div ng-message-exp='validationName'
-                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.redisTimeout">
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.redisTimeout">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -95,10 +95,10 @@
                         <label>Weight</label>
                         <input title="Redis Weight" name="redisWeight" range-parser
                                ng-pattern="/^[0-9]*$/"
-                               ng-model="rcm.connection.options.redisWeight">
+                               ng-model="rcm.connection.weight">
                         <div ng-messages="redisAdvancedForm.redisWeight.$error" ng-if="redisAdvancedForm.redisWeight.$dirty">
                             <div ng-message-exp='validationName'
-                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.redisWeight">
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.redisWeight">
                                 {{validationMessage}}
                             </div>
                         </div>
