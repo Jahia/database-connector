@@ -141,7 +141,7 @@ public class RedisConnection extends AbstractConnection {
     public String getSerializedExportData() {
         StringBuilder serializedString = new StringBuilder();
         serializedString.append(
-                TABU + "type " + DOUBLE_QUOTE + DATABASE_TYPE + DOUBLE_QUOTE + NEW_LINE +
+                        TABU + "type " + DOUBLE_QUOTE + DATABASE_TYPE + DOUBLE_QUOTE + NEW_LINE +
                         TABU + "host " + DOUBLE_QUOTE + this.host + DOUBLE_QUOTE + NEW_LINE +
                         TABU + "dbName " + DOUBLE_QUOTE + this.dbName + DOUBLE_QUOTE + NEW_LINE +
                         TABU + "identifier " + DOUBLE_QUOTE + this.id + DOUBLE_QUOTE + NEW_LINE +
@@ -152,9 +152,16 @@ public class RedisConnection extends AbstractConnection {
             serializedString.append(TABU + "port " + DOUBLE_QUOTE + this.port + DOUBLE_QUOTE + NEW_LINE);
         }
 
-
         if (!StringUtils.isEmpty(this.password)) {
             serializedString.append(TABU + "password " + DOUBLE_QUOTE + EncryptionUtils.passwordBaseEncrypt(this.password) + "_ENC" + DOUBLE_QUOTE + NEW_LINE);
+        }
+
+        if (this.timeout != null) {
+            serializedString.append(TABU + "timeout " + DOUBLE_QUOTE + this.timeout + DOUBLE_QUOTE + NEW_LINE);
+        }
+
+        if (this.weight != null) {
+            serializedString.append(TABU + "weight " + DOUBLE_QUOTE + this.weight + DOUBLE_QUOTE + NEW_LINE);
         }
 
         if (this.options != null) {

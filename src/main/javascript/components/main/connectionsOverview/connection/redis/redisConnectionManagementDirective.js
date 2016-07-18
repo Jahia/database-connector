@@ -53,8 +53,8 @@
             },
             dbName: {
                 'required': 'Field is required',
-                'pattern': 'It should contain alphanumeric characters only.',
-                'md-maxlength': 'This has to be less than 30 characters.'
+                'pattern': 'It should contain a number ranging from 0 - 15.',
+                'md-maxlength': 'This has to be less than 3 characters.'
             },
             redisTimeout: {
                 'pattern' : 'Should be a Long'

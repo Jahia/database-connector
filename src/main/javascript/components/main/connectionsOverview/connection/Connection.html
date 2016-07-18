@@ -23,7 +23,8 @@
                            <div flex="90" layout-padding>
                                <div class="md-list-item-text">
                                    <p><b>Connection Name:</b> <i>{{cc.connection.id}}</i></p>
-                                   <p><b>Database Name:</b> <i>{{cc.connection.dbName}}</i></p>
+                                   <p ng-if="cc.connection.databaseType=='MONGO'"><b>Database Name:</b> <i>{{cc.connection.dbName}}</i></p>
+                                   <p ng-if="cc.connection.databaseType=='REDIS'"><b>Database Number:</b> <i>{{cc.connection.dbName}}</i></p>
                                    <p><b>Host:</b> <i>{{cc.connection.host}}</i></p>
                                    <p><b>Port:</b> <i>{{cc.connection.port}}</i></p>
                                    <span ng-if="cc.serverStatusAvailable()">

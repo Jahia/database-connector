@@ -55,9 +55,9 @@
                     </md-input-container>
 
                     <md-input-container class="md-block">
-                        <label>Database Name</label>
-                        <input title="Database Name" md-maxlength="30" required ng-pattern="/^[a-zA-Z0-9_]+$/"
-                               name="dbName"
+                        <label>Database Number</label>
+                        <input title="Database Number" md-maxlength="2" name="dbName" required
+                               ng-pattern="/^([0]?[0-9]|1[0-5])$/"
                                ng-model="rcm.connection.dbName">
                         <div ng-messages="redisForm.dbName.$error" ng-if="redisForm.dbName.$dirty">
                             <div ng-message-exp="validationName"
