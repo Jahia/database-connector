@@ -17,7 +17,7 @@ import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.DATAB
 
 public abstract class AbstractConnection <T extends ConnectionData, E extends Object> implements Serializable {
 
-    public static final Logger logger = LoggerFactory.getLogger(AbstractConnection.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractConnection.class);
 
     private static final long serialVersionUID = 1L;
 

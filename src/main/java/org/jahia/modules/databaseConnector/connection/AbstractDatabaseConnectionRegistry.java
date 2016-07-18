@@ -222,7 +222,15 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
     }
 
     protected Integer setIntegerConnectionProperty(JCRNodeWrapper connectionNode, String property, boolean isMandatory) throws RepositoryException {
-        return isMandatory ? (int) connectionNode.getProperty(property).getLong() : connectionNode.hasProperty(property) ? (int) connectionNode.getProperty(property).getLong() : null;
+        if (connectionNode.hasProperty(property))
+            return isMandatory ? (int) connectionNode.getProperty(property).getLong() : (int) connectionNode.getProperty(property).getLong();
+        else return isMandatory ? (int) connectionNode.getProperty(property).getLong() : null;
+    }
+
+    protected Long setLongConnectionProperty(JCRNodeWrapper connectionNode, String property, boolean isMandatory) throws RepositoryException {
+        if (connectionNode.hasProperty(property))
+            return isMandatory ?  connectionNode.getProperty(property).getLong() : connectionNode.getProperty(property).getLong();
+        else return isMandatory ?  connectionNode.getProperty(property).getLong() : null;
     }
 
     public boolean testConnection(AbstractConnection connection) {

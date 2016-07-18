@@ -278,7 +278,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
                         map.put("options", options);
                         String password = (String) map.get("password");
-                        Integer timeout = map.containsKey("timeout") ? Integer.parseInt((String) map.get("timeout")) : null;
+                        Long timeout = map.containsKey("timeout") ? Long.getLong((String) map.get("timeout")) : null;
                         Integer weight = map.containsKey("weight") ? Integer.parseInt((String) map.get("weight")) : null;
 
                         if(password != null && password.contains("_ENC")) {

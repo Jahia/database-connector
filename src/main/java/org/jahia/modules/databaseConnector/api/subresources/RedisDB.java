@@ -108,7 +108,7 @@ public class RedisDB {
                 Boolean isConnected = connectionParameters.has("isConnected") && connectionParameters.getBoolean("isConnected");
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
-                Integer timeout = connectionParameters.has("timeout") && !StringUtils.isEmpty(connectionParameters.getString("timeout")) ? connectionParameters.getInt("timeout") : null;
+                Long timeout = connectionParameters.has("timeout") && !StringUtils.isEmpty(connectionParameters.getString("timeout")) ? connectionParameters.getLong("timeout") : null;
                 Integer weight = connectionParameters.has("weight") && !StringUtils.isEmpty(connectionParameters.getString("weight")) ? connectionParameters.getInt("weight") : null;
 
                 RedisConnection connection = new RedisConnection(id);
@@ -178,7 +178,7 @@ public class RedisDB {
                 Boolean isConnected = connectionParameters.has("isConnected") && connectionParameters.getBoolean("isConnected");
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
-                Integer timeout = connectionParameters.has("timeout") && !StringUtils.isEmpty(connectionParameters.getString("timeout")) ? connectionParameters.getInt("timeout") : null;
+                Long timeout = connectionParameters.has("timeout") && !StringUtils.isEmpty(connectionParameters.getString("timeout")) ? connectionParameters.getLong("timeout") : null;
                 Integer weight = connectionParameters.has("weight") && !StringUtils.isEmpty(connectionParameters.getString("weight")) ? connectionParameters.getInt("weight") : null;
 
                 RedisConnection connection = new RedisConnection(id);
@@ -273,7 +273,7 @@ public class RedisDB {
                 Boolean isConnected = connectionParameters.has("isConnected") && connectionParameters.getBoolean("isConnected");
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
-                Integer timeout = connectionParameters.has("timeout") && !StringUtils.isEmpty(connectionParameters.getString("timeout")) ? connectionParameters.getInt("timeout") : null;
+                Long timeout = connectionParameters.has("timeout") && !StringUtils.isEmpty(connectionParameters.getString("timeout")) ? connectionParameters.getLong("timeout") : null;
                 Integer weight = connectionParameters.has("weight") && !StringUtils.isEmpty(connectionParameters.getString("weight")) ? connectionParameters.getInt("weight") : null;
 
                 RedisConnection connection = new RedisConnection(id);

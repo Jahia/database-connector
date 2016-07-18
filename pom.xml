@@ -21,7 +21,7 @@
     <properties>
         <jahia-module-type>system</jahia-module-type>
         <jahia-depends>default,siteSettings,serverSettings</jahia-depends>
-        <embed-dependency>*;groupId=biz.paluch.redis|io.netty|io.reactivex|org.latencyutils|org.glassfish.jersey|com.google.guava|org.apache.commons|org.mongodb|com.fasterxml.jackson.core|com.fasterxml.jackson.jaxrs|com.fasterxml.jackson.module;scope=compile;
+        <embed-dependency>*;groupId=biz.paluch.redis|org.hdrhistogram|io.netty|io.reactivex|org.latencyutils|org.glassfish.jersey|com.google.guava|org.apache.commons|org.mongodb|com.fasterxml.jackson.core|com.fasterxml.jackson.jaxrs|com.fasterxml.jackson.module;scope=compile;
             type=!pom; inline=false
         </embed-dependency>
         <!--JAX-RS Properties -->
@@ -101,6 +101,12 @@
             <artifactId>lettuce</artifactId>
             <version>3.4.2.Final</version>
         </dependency>
+        <dependency>
+            <groupId>org.hdrhistogram</groupId>
+            <artifactId>HdrHistogram</artifactId>
+            <version>2.1.9</version>
+        </dependency>
+
     </dependencies>
     <repositories>
         <repository>

@@ -72,13 +72,13 @@ public class Utils {
                     break;
                 case REDIS:
                 connection = new RedisConnection(id);
-                    if (jsonConnectionData.has("timeout") && !StringUtils.isEmpty(jsonConnectionData.getString("timeout"))){
-                        ((RedisConnection)connection).setTimeout(jsonConnectionData.getInt("timeout"));
-                        if (jsonConnectionData.has("weight") && !StringUtils.isEmpty(jsonConnectionData.getString("weight"))){
-                            ((RedisConnection)connection).setTimeout(jsonConnectionData.getInt("weight"));
-
+                    if (jsonConnectionData.has("timeout") && !StringUtils.isEmpty(jsonConnectionData.getString("timeout"))) {
+                        ((RedisConnection) connection).setTimeout(jsonConnectionData.getLong("timeout"));
                     }
-            }
+                    if (jsonConnectionData.has("weight") && !StringUtils.isEmpty(jsonConnectionData.getString("weight"))){
+                        ((RedisConnection) connection).setWeight(jsonConnectionData.getInt("weight"));
+                    }
+
                     break;
             }
             connection.setHost(host);

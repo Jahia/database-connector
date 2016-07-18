@@ -13,7 +13,7 @@ import org.jahia.modules.databaseConnector.connection.ConnectionData;
  */
 public class RedisConnectionData extends ConnectionData{
 
-    private Integer timeout;
+    private Long timeout;
 
     private Integer weight;
 
@@ -21,11 +21,11 @@ public class RedisConnectionData extends ConnectionData{
         this.id = id;
     }
 
-    public Integer getTimeout() {
+    public Long getTimeout() {
         return timeout;
     }
 
-    public void setTimeout(Integer timeout) {
+    public void setTimeout(Long timeout) {
         this.timeout = timeout;
     }
 

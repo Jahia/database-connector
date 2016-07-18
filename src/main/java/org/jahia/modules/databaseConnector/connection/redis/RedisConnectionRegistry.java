@@ -53,8 +53,8 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                     Boolean isConnected = setBooleanConnectionProperty(connectionNode, IS_CONNECTED_KEY);
                     String dbName = setStringConnectionProperty(connectionNode, DB_NAME_KEY, false);
                     String password = decodePassword(connectionNode, PASSWORD_KEY);
-//                    Integer timeout = setIntegerConnectionProperty(connectionNode, TIMEOUT_KEY, false);
-//                    Integer weight = setIntegerConnectionProperty(connectionNode, WEIGHT_KEY, false);
+                    Long timeout = setLongConnectionProperty(connectionNode, TIMEOUT_KEY, false);
+                    Integer weight = setIntegerConnectionProperty(connectionNode, WEIGHT_KEY, false);
                     RedisConnection storedConnection = new RedisConnection(id);
                     storedConnection.setOldId(id);
                     storedConnection.setHost(host);
@@ -62,8 +62,8 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                     storedConnection.isConnected(isConnected);
                     storedConnection.setDbName(dbName);
                     storedConnection.setPassword(password);
-//                    storedConnection.setTimeout(timeout);
-//                    storedConnection.setWeight(weight);
+                    storedConnection.setTimeout(timeout);
+                    storedConnection.setWeight(weight);
                     registry.put(id, storedConnection);
                 }
                 return true;

@@ -7,8 +7,11 @@ import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.utils.EncryptionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
+import java.util.concurrent.TimeUnit;
 
 
 import static org.jahia.modules.databaseConnector.Utils.*;
@@ -18,11 +21,13 @@ import static org.jahia.modules.databaseConnector.Utils.*;
  */
 public class RedisConnection extends AbstractConnection {
 
+    private static final Logger logger = LoggerFactory.getLogger(RedisConnection.class);
+
     private RedisClient redisClient;
 
     public static final String NODE_TYPE = "dc:redisConnection";
 
-    private Integer timeout;
+    private Long timeout;
 
     private Integer weight;
 
@@ -38,11 +43,11 @@ public class RedisConnection extends AbstractConnection {
         this.id = id;
     }
 
-    public void setTimeout(Integer timeout) {
+    public void setTimeout(Long timeout) {
         this.timeout = timeout;
     }
 
-    public Integer getTimeout() {
+    public Long getTimeout() {
         return timeout;
     }
 
@@ -54,7 +59,6 @@ public class RedisConnection extends AbstractConnection {
         return weight;
     }
 
-    //    @Override
     public RedisConnectionData makeConnectionData() {
         RedisConnectionData redisConnectionData = new RedisConnectionData(id);
         redisConnectionData.setHost(host);
@@ -69,6 +73,7 @@ public class RedisConnection extends AbstractConnection {
     }
 
     @Override
+    // @TODO mod-1164 retrieve metrics for redis
     public Object getServerStatus() {
         return null;
     }
@@ -91,8 +96,7 @@ public class RedisConnection extends AbstractConnection {
     public boolean testConnectionCreation() {
         try {
             RedisClient redisClient = RedisClient.create(buildRedisClientUri());
-
-            RedisStringsConnection<String, String> connection = redisClient.connect();
+             redisClient.connect();
         } catch (Exception e) {
             logger.error(e.getMessage());
             return false;
@@ -117,6 +121,14 @@ public class RedisConnection extends AbstractConnection {
         if(dbName!=null) {
             builder.withDatabase(Integer.valueOf(dbName));
         }
+        if(timeout!=null) {
+            builder.withTimeout(timeout, TimeUnit.MILLISECONDS );
+        }
+
+        if(weight!=null) {
+            ZStoreArgs.Builder.weights(weight);
+        }
+
         return builder.build();
     }
 
