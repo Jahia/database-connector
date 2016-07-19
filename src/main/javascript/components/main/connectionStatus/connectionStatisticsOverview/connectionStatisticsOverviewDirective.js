@@ -32,6 +32,7 @@
             cso.connectionStatus = dcConnectionStatusService.getCurrentConnectionStatus();
             $scope.$on('connectionStatusUpdate', function(event, connectionStatus) {
                 cso.connectionStatus = connectionStatus;
+                console.log("cso.connectionStatus", cso.connectionStatus);
             });
         }
         

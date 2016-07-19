@@ -127,8 +127,6 @@
             rcm.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/redis/edit';
             var data = angular.copy(rcm.connection);
-            console.log("edit data",data);
-
 
             dcDataFactory.customRequest({
                 url: url,
@@ -154,7 +152,6 @@
             rcm.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/redis/testconnection';
             var data = angular.copy(rcm.connection);
-            console.log("data",data);
 
             dcDataFactory.customRequest({
                 url: url,

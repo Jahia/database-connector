@@ -75,7 +75,15 @@ public class RedisConnection extends AbstractConnection {
     @Override
     // @TODO mod-1164 retrieve metrics for redis
     public Object getServerStatus() {
-        return null;
+
+        // Can be retrieved by specific section as shown below.
+//        redisClient.connect().info("Clients");
+//        redisClient.connect().info("Memory");
+//        redisClient.connect().info("Stats");
+//        redisClient.connect().info("Replication");
+
+        return redisClient.connect().info();
+
     }
 
     @Override
