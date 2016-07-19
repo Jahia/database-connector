@@ -14,25 +14,29 @@
         <dc-connection-statistics-overview></dc-connection-statistics-overview>
 
         <md-divider></md-divider>
-        <div layout style="background-color: #f2f2f2" layout-wrap layout-padding>
+        <div layout style="background-color: #f2f2f2" layout-wrap layout-padding ng-switch="csc.connection.databaseType">
             <div flex="100">
                 <div class="box-wrap">
-                    <connection-memory-usage chart-height="'320px'" chart-width="'100%'"></connection-memory-usage>
+                    <connection-memory-usage chart-height="'320px'" chart-width="'100%'" ng-switch-when="MONGO"></connection-memory-usage>
+                    <redis-connection-memory-usage chart-height="'350px'" chart-width="'100%'" ng-switch-when="REDIS"></redis-connection-memory-usage>
                 </div>
             </div>
             <div flex="50">
                 <div class="box-wrap">
-                    <connection-network-traffic chart-height="'320px'" chart-width="'100%'"></connection-network-traffic>
+                    <connection-network-traffic chart-height="'320px'" chart-width="'100%'" ng-switch-when="MONGO"></connection-network-traffic>
+                    <redis-connection-network-traffic chart-height="'320px'" chart-width="'100%'" ng-switch-when="REDIS"></redis-connection-network-traffic>
                 </div>
             </div>
             <div flex="50">
                 <div class="box-wrap">
-                    <connections-available chart-height="'320px'" chart-width="'100%'"></connections-available>
+                    <connections-available chart-height="'320px'" chart-width="'100%'" ng-switch-when="MONGO"></connections-available>
+                    <redis-connections-available chart-height="'320px'" chart-width="'100%'" ng-switch-when="REDIS"></redis-connections-available>
                 </div>
             </div>
             <div flex="100">
                 <div class="box-wrap">
-                    <connection-operation-counters chart-height="'320px'" chart-width="'100%'"></connection-operation-counters>
+                    <connection-operation-counters chart-height="'320px'" chart-width="'100%'" ng-switch-when="MONGO"></connection-operation-counters>
+                    <redis-cpu-usage chart-height="'320px'" chart-width="'100%'" ng-switch-when="REDIS"></redis-cpu-usage>
                 </div>
             </div>
         </div>

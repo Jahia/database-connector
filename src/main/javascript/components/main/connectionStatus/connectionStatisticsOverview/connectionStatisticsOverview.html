@@ -1,9 +1,9 @@
 <md-content flex layout-padding>
     <div layout="row" layout-padding layout-wrap class="box-wrap">
         <div flex="100" layout-padding>
-            <h2 class="md-title bg-info center-align">Basic Mongo Connections Data  </h2>
+            <h2 class="md-title bg-info center-align" ng-if="cso.connectionStatus.process=='mongod'">Basic Mongo Connections Data  </h2>
         </div>
-        <div flex="50">
+        <div flex="50" ng-if="cso.connectionStatus.process=='mongod'">
             <dl>
                 <dt>Host Name :</dt>
                 <dd>{{cso.connectionStatus.host}}</dd>
@@ -15,7 +15,7 @@
                 <dd>{{cso.connectionStatus.version}}</dd>
             </dl>
         </div>
-        <div flex="50" >
+        <div flex="50" ng-if="cso.connectionStatus.process=='mongod'" >
             <dl>
                 <dt>Storage size :</dt>
                 <dd>{{cso.connectionStatus.mem.virtual}} Mb</dd>
@@ -23,6 +23,38 @@
                 <dd> <time> {{cso.connectionStatus.process}} </time></dd>
                 <dt>Process Id :</dt>
                 <dd>{{cso.connectionStatus.pid}}</dd>
+            </dl>
+        </div>
+        <div flex="50" ng-if="cso.connectionStatus.redis_version!=null" >
+            <dl>
+                <dt>Process Id :</dt>
+                <dd>{{cso.connectionStatus.process_id}}</dd>
+                <dt>Local time :</dt>
+                <dd>{{cso.connectionStatus.localTime | momentFilter: 'MMMM Do YYYY, h:mm:ss a'}} </dd>
+                <dt>Up since :</dt>
+                <dd><time>{{cso.connectionStatus.uptime_in_seconds | momentFormatter : 'second' : 'fancy'}} </time></dd>
+                <dt>Redis Version :</dt>
+                <dd>{{cso.connectionStatus.redis_version}}</dd>
+                <dt>Rejected connections :</dt>
+                <dd>{{cso.connectionStatus.rejected_connections}}</dd>
+                <dt>Number of commands processed per second :</dt>
+                <dd>{{cso.connectionStatus.instantaneous_ops_per_sec}}</dd>
+            </dl>
+        </div>
+        <div flex="50" ng-if="cso.connectionStatus.redis_version!=null" >
+            <dl>
+                <dt>Memory Used :</dt>
+                <dd>{{cso.connectionStatus.used_memory_human}} Mb</dd>
+                <dt>Memory fragmentation ratio :</dt>
+                <dd>{{cso.connectionStatus.mem_fragmentation_ratio}} Mb</dd>
+                <dt>Cluster enabled :</dt>
+                <dd>{{cso.connectionStatus.cluster_enabled}}</dd>
+                <dt>Connected slaves :</dt>
+                <dd> {{cso.connectionStatus.connected_slaves}} </dd>
+                <dt>Connected clients :</dt>
+                <dd> {{cso.connectionStatus.connected_clients}} </dd>
+                <dt>Last save time :</dt>
+                <dd><time>{{cso.connectionStatus.rdb_last_save_time | momentFormatter : 'second' : 'fancy'}} </time></dd>
             </dl>
         </div>
     </div>

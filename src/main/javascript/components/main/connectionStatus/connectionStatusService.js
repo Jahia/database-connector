@@ -29,6 +29,21 @@
                 method: 'GET'
            }).then(function(response) {
                currentConnectionStatus = response.success;
+               if (databaseType=="REDIS"){
+                   var lines = currentConnectionStatus.split( "\r\n" );
+                   var RedisJsonStats = { };
+                   for ( var i = 0, l = currentConnectionStatus.length; i < l; i++ ) {
+                       var line = lines[ i ];
+                       if ( line && line.split ) {
+                           line = line.split( ":" );
+                           if ( line.length > 1 ) {
+                               var key = line.shift( );
+                               RedisJsonStats[ key ] = line.join( ":" );
+                           }
+                       }
+                   }
+                   currentConnectionStatus = RedisJsonStats;
+               }
                $rootScope.$broadcast('connectionStatusUpdate', currentConnectionStatus);
            }, function() {
 
