@@ -57,7 +57,7 @@
                 'md-maxlength': 'This has to be less than 3 characters.'
             },
             redisTimeout: {
-                'pattern' : 'Should be a Long'
+                'pattern' : 'Should be a decimal with a precision of 2'
             },
             redisWeight: {
                 'pattern' : 'Should be an integer'

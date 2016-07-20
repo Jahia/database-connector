@@ -54,7 +54,7 @@
                 <dt>Connected clients :</dt>
                 <dd> {{cso.connectionStatus.connected_clients}} </dd>
                 <dt>Last save time :</dt>
-                <dd><time>{{cso.connectionStatus.rdb_last_save_time | momentFormatter : 'second' : 'fancy'}} </time></dd>
+                <dd><time>{{cso.connectionStatus.rdb_last_save_time.valueOf() | momentFormatter : 'millisecond' : 'fancy'}} </time></dd>
             </dl>
         </div>
     </div>
