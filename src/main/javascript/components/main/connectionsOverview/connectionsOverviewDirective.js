@@ -23,9 +23,7 @@
 
     var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog, dcDownloadFactory, toaster, $state) {
         var coc = this;
-        coc.getMongoConnections = getMongoConnections;
         coc.getAllConnections = getAllConnections;
-        coc.getRedisConnections = getRedisConnections;
         coc.createConnection = createConnection;
         coc.exportConnections = {};
         coc.exportSelectedConnections = exportSelectedConnections;
@@ -75,28 +73,6 @@
                 });
             });
         }
-        function getMongoConnections() {
-            var url = contextualData.context + '/modules/databaseconnector/mongodb/getconnections';
-            dcDataFactory.customRequest({
-                url: url,
-                method: 'GET'
-            }).then(function (response) {
-                coc.connections = {};
-                coc.connections = response.connections;
-            }, function (response) {
-            });
-        }
-        function getRedisConnections() {
-            var url = contextualData.context + '/modules/databaseconnector/redisdb/getconnections';
-            dcDataFactory.customRequest({
-                url: url,
-                method: 'GET'
-            }).then(function (response) {
-                coc.connections = response.connections;
-            }, function (response) {
-            });
-        
-    }
         function getAllConnections() {
             var url = contextualData.context + '/modules/databaseconnector/getallconnections';
             dcDataFactory.customRequest({

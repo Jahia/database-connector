@@ -71,7 +71,7 @@ public class Utils {
                     ((MongoConnection)connection).setAuthDb(authDb);
                     break;
                 case REDIS:
-                connection = new RedisConnection(id);
+                    connection = new RedisConnection(id);
                     if (jsonConnectionData.has("timeout") && !StringUtils.isEmpty(jsonConnectionData.getString("timeout"))) {
                         ((RedisConnection) connection).setTimeout(jsonConnectionData.getLong("timeout"));
                     }

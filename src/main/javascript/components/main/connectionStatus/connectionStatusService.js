@@ -1,5 +1,5 @@
 (function(){
-    var connectionStatusService = function(contextualData, dcDataFactory, $rootScope, $interval, toaster) {
+    var connectionStatusService = function(contextualData, dcDataFactory, $rootScope, $interval, toaster, $timeout) {
 
         var currentConnectionStatus = null;
         var connectionStatusInterval = null;
@@ -10,6 +10,10 @@
         this.enable = function(id, dbType) {
             connectionId = id;
             databaseType = dbType;
+            $timeout(function () {
+                //Run the first request immediately after the digest(This is so that the charts are ready)
+                requestConnectionStatusEvent();
+            });
             connectionStatusInterval = $interval(requestConnectionStatusEvent, REQUEST_TIMEOUT);
         };
 
@@ -28,22 +32,7 @@
                 url: contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[databaseType] + '/status/' + connectionId, 
                 method: 'GET'
            }).then(function(response) {
-               currentConnectionStatus = response.success;
-               if (databaseType=="REDIS"){
-                   var lines = currentConnectionStatus.split( "\r\n" );
-                   var RedisJsonStats = { };
-                   for ( var i = 0, l = currentConnectionStatus.length; i < l; i++ ) {
-                       var line = lines[ i ];
-                       if ( line && line.split ) {
-                           line = line.split( ":" );
-                           if ( line.length > 1 ) {
-                               var key = line.shift( );
-                               RedisJsonStats[ key ] = line.join( ":" );
-                           }
-                       }
-                   }
-                   currentConnectionStatus = RedisJsonStats;
-               }
+               currentConnectionStatus = databaseType == 'REDIS' ? dcDataFactory.parseRedisStatus(response.success) : response.success;
                $rootScope.$broadcast('connectionStatusUpdate', currentConnectionStatus);
            }, function() {
 
@@ -62,5 +51,5 @@
 
     angular
         .module('databaseConnector')
-        .service('dcConnectionStatusService', ['contextualData', 'dcDataFactory', '$rootScope', '$interval', 'toaster', connectionStatusService]);
+        .service('dcConnectionStatusService', ['contextualData', 'dcDataFactory', '$rootScope', '$interval', 'toaster', '$timeout', connectionStatusService]);
 })();

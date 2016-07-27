@@ -206,6 +206,12 @@
                         cc.connection.uptime = response.success.uptime;
                         cc.originalConnection.dbVersion = cc.connection.dbVersion;
                         cc.originalConnection.uptime = cc.connection.uptime;
+                    } else if (cc.connection.databaseType == "REDIS") {
+                        response.success = dcDataFactory.parseRedisStatus(response.success);
+                        cc.connection.dbVersion = response.success.redis_version;
+                        cc.connection.uptime = response.success.uptime_in_seconds;
+                        cc.originalConnection.dbVersion = cc.connection.dbVersion;
+                        cc.originalConnection.uptime = cc.connection.uptime;
                     }
                 } else {
                     cc.connection.canRetrieveStatus = false;

@@ -2,7 +2,8 @@
     var dataFactory = function($http, $log) {
         return {
             getData: getData,
-            customRequest: customRequest
+            customRequest: customRequest,
+            parseRedisStatus: parseRedisStatus
         };
 
         function getData(url) {
@@ -22,6 +23,24 @@
         function getDataFailed(error) {
             $log.error('XHR Failed to execute your request.' + error.data);
             return error.data;
+        }
+
+        function parseRedisStatus(response) {
+            var lines = response.split( "\r\n" );
+            var RedisJsonStats = { };
+            for ( var i = 0, l = response.length; i < l; i++ ) {
+                var line = lines[ i ];
+                if ( line && line.split ) {
+                    line = line.split( ":" );
+                    if ( line.length > 1 ) {
+                        var key = line.shift( );
+                        RedisJsonStats[ key ] = line.join( ":" );
+                    }
+                }
+            }
+            response = RedisJsonStats;
+
+            return response;
         }
     };
 
