@@ -57,7 +57,7 @@
                 'md-maxlength': 'This has to be less than 3 characters.'
             },
             redisTimeout: {
-                'pattern' : 'Should be a decimal with a precision of 2'
+                'pattern' : 'Should be an integer'
             },
             redisWeight: {
                 'pattern' : 'Should be an integer'
@@ -78,7 +78,12 @@
             if (_.isUndefined(rcm.connection.port) || rcm.connection.port == null) {
                 rcm.connection.port = "6379";
             }
-
+            if (rcm.connection.timeout == null) {
+                rcm.connection.timeout = '';
+            }
+            if (rcm.connection.weight == null) {
+                rcm.connection.weight = '';
+            }
             rcm.isEmpty.password = updateIsEmpty('password');
             if (rcm.mode === 'import-edit') {
                 rcm.connection.oldId = null;
@@ -213,9 +218,6 @@
         }
 
         function updateImportedConnection() {
-
-                console.log('after update', rcm.connection);
-
             $scope.$emit('importConnectionClosed', rcm.connection);
         }
 

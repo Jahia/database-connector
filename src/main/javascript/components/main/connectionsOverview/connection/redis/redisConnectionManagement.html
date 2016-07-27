@@ -75,14 +75,13 @@
                 </md-content>
             </form>
         </md-tab>
-
         <md-tab label="Advanced Settings">
             <md-content class="md-padding">
                 <form name="redisAdvancedForm">
                     <md-input-container class="md-block">
                         <label>Timeout (milliseconds)</label>
                         <input title="Redis Timeout" name="redisTimeout"
-                               ng-pattern="/^[0-9]*\.[0-9][0-9]$/"
+                               ng-pattern="/^[0-9]*$/"
                                ng-model="rcm.connection.timeout">
                         <div ng-messages="redisAdvancedForm.redisTimeout.$error" ng-if="redisAdvancedForm.redisTimeout.$dirty">
                             <div ng-message-exp='validationName'
