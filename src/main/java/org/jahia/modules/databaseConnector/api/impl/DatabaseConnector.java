@@ -81,24 +81,19 @@ public class DatabaseConnector extends AbstractResource {
     public <T extends ConnectionData> String getAllConnections() throws JSONException {
         String connections = null;
 
-        Map<String, AbstractConnection> allconnections = new HashMap<>();
+        Map<String, AbstractConnection> allConnections = new HashMap<>();
 
-        Map<String, MongoConnection> mongoConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.MONGO);
-        Map<String, RedisConnection> redisConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.REDIS);
-
-        if (mongoConnections != null)
-            allconnections.putAll(mongoConnections);
-
-        if (redisConnections != null)
-            allconnections.putAll(redisConnections);
-
-        List<ConnectionData> ConnectionArray = new ArrayList<>();
-        for (Map.Entry<String, AbstractConnection> entry : allconnections.entrySet()) {
-            ConnectionArray.add(entry.getValue().makeConnectionData());
+        for (DatabaseTypes databaseType : DatabaseTypes.values()) {
+            Map<String, ? extends AbstractConnection> databaseTypeConnection = databaseConnectorManager.getRegisteredConnections(databaseType);
+            if (databaseTypeConnection != null) {
+                allConnections.putAll(databaseTypeConnection);
+            }
         }
-
-        connections = new DbConnections(ConnectionArray).getJson();
-
+        List<ConnectionData> connectionArray = new ArrayList<>();
+        for (Map.Entry<String, AbstractConnection> entry : allConnections.entrySet()) {
+            connectionArray.add(entry.getValue().makeConnectionData());
+        }
+        connections = new DbConnections(connectionArray).getJson();
         return connections == null ? new JSONArray().toString() : connections;
     }
 

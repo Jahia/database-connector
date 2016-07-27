@@ -221,7 +221,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
                         String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : null;
                         String user = map.containsKey("user") ? (String) map.get("user") : null;
-                        String writeConcern = map.containsKey("writeConcern") ? (String) map.get("writeConcern") : "ACKNOWLEDGE";
+                        String writeConcern = map.containsKey("writeConcern") ? (String) map.get("writeConcern") : "ACKNOWLEDGED";
                         String authDb = map.containsKey("authDb") ? (String) map.get("authDb") : null;
                         String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
                         map.put("options", options);
