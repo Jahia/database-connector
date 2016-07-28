@@ -2,7 +2,7 @@
     var redisConnectionNetworkTraffic = function(contextualData) {
         var directive = {
             restrict    : 'E',
-            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/RedisConnectionStats/redisConnectionNetworkTraffic/redisConnectionNetworkTraffic.html',
+            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/redisConnectionStats/redisConnectionNetworkTraffic/redisConnectionNetworkTraffic.html',
             controller  : RedisConnectionNetworkTrafficController,
             controllerAs: 'rcntc',
             bindToController: true,

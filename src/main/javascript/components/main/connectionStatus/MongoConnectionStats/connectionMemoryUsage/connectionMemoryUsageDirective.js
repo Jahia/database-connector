@@ -2,7 +2,7 @@
     var connectionMemoryUsage = function(contextualData) {
         var directive = {
             restrict    : 'E',
-            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/connectionMemoryUsage/connectionMemoryUsage.html',
+            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/mongoConnectionStats/connectionMemoryUsage/connectionMemoryUsage.html',
             controller  : ConnectionMemoryUsageController,
             controllerAs: 'cmuc',
             bindToController: true,

@@ -2,7 +2,7 @@
     var redisConnectionsAvailable = function(contextualData) {
         var directive = {
             restrict    : 'E',
-            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/RedisConnectionStats/redisConnectionsAvailable/redisConnectionsAvailable.html',
+            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/redisConnectionStats/redisConnectionsAvailable/redisConnectionsAvailable.html',
             controller  : RedisConnectionsAvailableController,
             controllerAs: 'rcac',
             bindToController: true,

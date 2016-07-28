@@ -2,7 +2,7 @@
     var redisConnectionMemoryUsage = function(contextualData) {
         var directive = {
             restrict    : 'E',
-            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/RedisConnectionStats/redisConnectionMemoryUsage/redisConnectionMemoryUsage.html',
+            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/redisConnectionStats/redisConnectionMemoryUsage/redisConnectionMemoryUsage.html',
             controller  : RedisConnectionMemoryUsageController,
             controllerAs: 'rcmuc',
             bindToController: true,
@@ -24,7 +24,7 @@
         .module('databaseConnector')
         .directive('redisConnectionMemoryUsage', ['contextualData', redisConnectionMemoryUsage]);
 
-    var RedisConnectionMemoryUsageController = function($scope, dcConnectionStatusService) {
+    var RedisConnectionMemoryUsageController = function($scope, dcConnectionStatusService, $filter) {
         var rcmuc            = this;
         var DEFAULT_HEIGHT  = '480px';
         var DEFAULT_WIDTH   = '520px';
@@ -122,14 +122,14 @@
         function updateChartEntries(connectionStatus) {
             var entry = angular.copy(CHART_ENTRY_TEMPLATE);
             entry.c[0].v = moment(connectionStatus.localTime).format('HH:mm:ss').toString();
-            entry.c[1].v = connectionStatus.used_memory_human/1000000;
-            entry.c[1].f = connectionStatus.used_memory_human/1000000 + ' MB';
-            entry.c[2].v = connectionStatus.used_memory_peak/1000000;
-            entry.c[2].f = connectionStatus.used_memory_peak/1000000 + ' MB';
-            entry.c[3].v = connectionStatus.used_memory_rss/1000000;
-            entry.c[3].f = connectionStatus.used_memory_rss/1000000 + ' MB';
+            entry.c[1].v = connectionStatus.used_memory/1024/1024;
+            entry.c[1].f = $filter('sizeFormatter')(connectionStatus.used_memory);
+            entry.c[2].v = connectionStatus.used_memory_peak/1024/1024;
+            entry.c[2].f = $filter('sizeFormatter')(connectionStatus.used_memory_peak);
+            entry.c[3].v = connectionStatus.used_memory_rss/1024/1024;
+            entry.c[3].f = $filter('sizeFormatter')(connectionStatus.used_memory_rss);
 
-            rcmuc.memoryUsageChart.options.title = 'Memory Consumed:' + connectionStatus.used_memory_human + 'MB';
+            rcmuc.memoryUsageChart.options.title = 'Memory Consumed:' + $filter('sizeFormatter')(connectionStatus.used_memory);
 
             if (rcmuc.memoryUsageChart.data.rows.length == 10) {
                 rcmuc.memoryUsageChart.data.rows.shift();
@@ -139,5 +139,5 @@
     };
 
 
-    RedisConnectionMemoryUsageController.$inject = ['$scope', 'dcConnectionStatusService'];
+    RedisConnectionMemoryUsageController.$inject = ['$scope', 'dcConnectionStatusService', '$filter'];
 })();

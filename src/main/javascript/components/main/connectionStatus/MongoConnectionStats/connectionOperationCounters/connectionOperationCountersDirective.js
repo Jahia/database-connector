@@ -2,7 +2,7 @@
     var connectionOperationCounters = function(contextualData) {
         var directive = {
             restrict    : 'E',
-            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/connectionOperationCounters/connectionOperationCounters.html',
+            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/mongoConnectionStats/connectionOperationCounters/connectionOperationCounters.html',
             controller  : ConnectionOperationCountersController,
             controllerAs: 'cocc',
             bindToController: true,

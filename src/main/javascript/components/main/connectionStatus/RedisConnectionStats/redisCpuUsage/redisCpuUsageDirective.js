@@ -2,7 +2,7 @@
     var redisCpuUsage= function(contextualData) {
         var directive = {
             restrict    : 'E',
-            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/RedisConnectionStats/redisCpuUsage/redisCpuUsage.html',
+            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/redisConnectionStats/redisCpuUsage/redisCpuUsage.html',
             controller  : RedisCpuUsageController,
             controllerAs: 'rcuc',
             bindToController: true,

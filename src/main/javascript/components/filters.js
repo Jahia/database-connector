@@ -30,8 +30,28 @@
         };
     };
 
+    var sizeFormatter = function() {
+        return function(value) {
+            return value / 1024 >= 1 ? (value / 1024 / 1024 >= 1 ? formatPrecision(value / 1024 / 1024) + ' MB' : formatPrecision(value / 1024) + ' KB') : value + ' B';
+        };
+
+        function formatPrecision (value) {
+            value += '';
+            var decimalPosition = value.indexOf('.');
+            if (decimalPosition != -1) {
+                var decimalValue = value.substring(decimalPosition+1);
+                if (decimalValue.length > 2) {
+                    decimalValue = Math.round(decimalValue.substring(0, 2) + '.' + decimalValue.substring(2, 3));
+                    value = value.substring(0, decimalPosition) + '.' + decimalValue;
+                }
+            }
+            return value;
+        }
+    };
+
     angular.module('databaseConnector')
         .filter('replaceNull', [replaceNull])
         .filter('momentFilter', [momentFilter])
-        .filter('momentFormatter', [momentFormatter]);
+        .filter('momentFormatter', [momentFormatter])
+        .filter('sizeFormatter', [sizeFormatter]);
 })();

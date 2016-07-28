@@ -2,7 +2,7 @@
     var connectionNetworkTraffic = function(contextualData) {
         var directive = {
             restrict    : 'E',
-            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/connectionNetworkTraffic/connectionNetworkTraffic.html',
+            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/mongoConnectionStats/connectionNetworkTraffic/connectionNetworkTraffic.html',
             controller  : ConnectionNetworkTrafficController,
             controllerAs: 'cntc',
             bindToController: true,

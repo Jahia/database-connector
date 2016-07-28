@@ -2,7 +2,7 @@
     var connectionsAvailable = function(contextualData) {
         var directive = {
             restrict    : 'E',
-            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/connectionsAvailable/connectionsAvailable.html',
+            templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/mongoConnectionStats/connectionsAvailable/connectionsAvailable.html',
             controller  : connectionsAvailableController,
             controllerAs: 'cac',
             bindToController: true,
