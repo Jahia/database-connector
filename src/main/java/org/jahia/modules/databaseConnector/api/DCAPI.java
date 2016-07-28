@@ -112,26 +112,27 @@ public class DCAPI {
     }
 
     @POST
-    @Path("/export")
+    @Path("/export/{multipleconnections}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces("text/plain")
-    public Response exportConnection(String data) {
+    public Response exportConnection(String data, @PathParam("multipleconnections") boolean multipleConnections) {
 
         try {
-            String exportName=null;
+            String exportName = null;
             if (StringUtils.isEmpty(data)) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\":\"Missing Data\"}").build();
             }
             JSONObject jsonObject = new JSONObject(data);
-
-                if(jsonObject.getJSONArray("MONGO").length() <2) {
-
-                        exportName = jsonObject.getString("MONGO").replaceAll("\\[", "").replaceAll("\\]","").replaceAll("\\,", "");
-                        exportName= "DBConnector-"+exportName+"Export";
-                    }
-                else {
-                        exportName = "DBConnectorConnectionsExport";
-                    }
+            if (!multipleConnections) {
+                Iterator databaseTypes = jsonObject.keys();
+                while (databaseTypes.hasNext()) {
+                    String databaseType = (String) databaseTypes.next();
+                    JSONArray connections = jsonObject.getJSONArray(databaseType);
+                    exportName = "DBConnector-" + connections.get(0)+ "_" + databaseType + "_Export";
+                }
+            } else {
+                exportName = "DBConnectorConnectionsExport";
+            }
             File exportedConnections = databaseConnector.exportConnections(jsonObject);
             Response.ResponseBuilder response;
             if (exportedConnections != null){

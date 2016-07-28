@@ -114,13 +114,18 @@
 
         function exportSelectedConnections() {
             var data = {};
-            for (var i in coc.exportConnections) {
-                if (_.isUndefined(data[coc.exportConnections[i]])) {
-                    data[coc.exportConnections[i]] = [];
+            var databaseTypes = _.keys(coc.exportConnections);
+            var multipleConnections = false;
+            if (databaseTypes.length == 1 && _.keys(coc.exportConnections[databaseTypes[0]]).length == 1) {
+                data[databaseTypes[0]] = [];
+                data[databaseTypes[0]].push(_.keys(coc.exportConnections[databaseTypes[0]])[0]);
+            } else {
+                multipleConnections = true;
+                for (var i in coc.exportConnections) {
+                    data[i] = _.keys(coc.exportConnections[i]);
                 }
-                data[coc.exportConnections[i]].push(i);
             }
-            var url = contextualData.context + '/modules/databaseconnector/export';
+            var url = contextualData.context + '/modules/databaseconnector/export/' + multipleConnections;
             return dcDownloadFactory.download(url, 'text/plain', data).$promise
                 .then(function (data) {
                     // promise fulfilled

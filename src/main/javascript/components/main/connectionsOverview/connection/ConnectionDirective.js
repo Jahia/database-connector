@@ -178,10 +178,16 @@
             if (cc.connection.export) {
                 var exportConnectionsTemp = angular.copy(cc.exportConnections);
                 cc.exportConnections = exportConnectionsTemp;
-                cc.exportConnections[cc.connection.id] = cc.connection.databaseType;
+                if (!(cc.connection.databaseType in cc.exportConnections)) {
+                    cc.exportConnections[cc.connection.databaseType] = {};
+                }
+                cc.exportConnections[cc.connection.databaseType][cc.connection.id] = true;
             } else {
                 var exportConnectionsTemp = angular.copy(cc.exportConnections);
-                delete exportConnectionsTemp[cc.connection.id];
+                delete exportConnectionsTemp[cc.connection.databaseType][cc.connection.id];
+                if (_.isEmpty(exportConnectionsTemp[cc.connection.databaseType])) {
+                    delete exportConnectionsTemp[cc.connection.databaseType];
+                }
                 cc.exportConnections = exportConnectionsTemp;
             }
         }
