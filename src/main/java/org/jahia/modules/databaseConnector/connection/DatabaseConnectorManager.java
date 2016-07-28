@@ -265,9 +265,8 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
             case REDIS:
                 try {
                     if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey(map.get("identifier"))) {
+                        map.put("status", "failed");
                         map.put("statusMessage", "connectionExists");
-
-
                     } else {
                         //Create connection object
                         RedisConnection connection = new RedisConnection((String)map.get("identifier"));

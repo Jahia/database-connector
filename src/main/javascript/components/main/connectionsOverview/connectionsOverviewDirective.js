@@ -55,14 +55,17 @@
             }
 
             dcDataFactory.customRequest(request).then(function (response) {
-                var allConnectionsImported = true;
-                for (var databaseType in coc.databaseTypes) {
-                    if (!_.isUndefined(response.results[databaseType]) && !_.isEmpty(response.results[databaseType].failed)) {
-                        allConnectionsImported = false;
+                var allImportsSuccessful = true;
+                for (var i in response.results) {
+                    if (i == 'report') {
+                        continue;
+                    }
+                    if (response.results[i].failed.length > 0) {
+                        allImportsSuccessful = false;
                         break;
                     }
                 }
-                $state.go('importResults', {results:response.results, status: allConnectionsImported});
+                $state.go('importResults', {results:response.results, status: allImportsSuccessful});
             }, function (response) {
                 toaster.pop({
                     type: 'error',

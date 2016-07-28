@@ -31,7 +31,6 @@
         irc.reImportConnection = reImportConnection;
         irc.editConnection = editConnection;
         irc.goToConnections = goToConnections;
-        irc.filterFailedConnections = filterFailedConnections;
         irc.isReImportDisabled = isReImportDisabled;
         irc.importInProgress = false;
         init();
@@ -45,40 +44,13 @@
                 if ($stateParams.results !== null) {
                     irc.importResults = $stateParams.results;
                     irc.databaseTypes = response;
-                    if (_.has($stateParams.results, 'MONGO') && $stateParams.status == true) {
-
-                        toaster.pop({
-                            type: 'success',
-                            title: 'All connections imported successfully!',
-                            toastId: 'irc',
-                            timeout: 3000
-                        });
-                    }
-                    else if (_.has($stateParams.results, 'MONGO') && $stateParams.status == false) {
-
-                        toaster.pop({
-                            type: 'warn',
-                            title: 'Not all connections were imported, Some changes are required!',
-                            toastId: 'irc',
-                            timeout: 3000
-                        });
-                    }
-                    else {
-                        toaster.pop({
-                            type: 'error',
-                            title: 'Imported connections are not in the valid format!',
-                            toastId: 'irc',
-                            timeout: 3000
-                        });
-                    }
-                    //Not working because $stateParams.status was true even when the imported format wasn't valid !
-                    // toaster.pop({
-                    //     type: $stateParams.status ? 'success' : 'error',
-                    //     title: 'Import Status',
-                    //     body: $stateParams.results.report.status ? 'All connections imported successfully!' : 'Not all connections were imported!',
-                    //     toastId: 'irc',
-                    //     timeout: 3000
-                    // });
+                    toaster.pop({
+                        type: $stateParams.status ? 'success' : 'error',
+                        title: 'Import Status',
+                        body: $stateParams.status ? 'All connections imported successfully!' : 'Not all connections were imported, Some changes are required!',
+                        toastId: 'irc',
+                        timeout: 3000
+                    });
                 } else {
                     $state.go('connections');
                 }
@@ -97,8 +69,7 @@
             }).then(function(response) {
                 if (!_.isUndefined(response.success)) {
                     irc.importResults[connection.databaseType].success.push(connection);
-                    irc.importResults[connection.databaseType].failed[$index] = null;
-                    irc.importResults[connection.databaseType].failed[$index] = connection.ignore = true;
+                    irc.importResults[connection.databaseType].failed.splice($index, 1);
                 }
                 clearSelectedImports();
                 irc.importInProgress = false;
@@ -125,9 +96,18 @@
                 var results = response.connections;
                 for (var i in results.success) {
                     irc.importResults[results.success[i].connection.databaseType].success.push(results.success[i].connection);
-                    results.success[i].connection.ignore = true;
-                    irc.importResults[results.success[i].connection.databaseType].failed[results.success[i].reImport] = null;
-                    irc.importResults[results.success[i].connection.databaseType].failed[results.success[i].reImport] = results.success[i].connection;
+                    irc.importResults[results.success[i].connection.databaseType].failed[results.success[i].reImport].omit = true;
+                }
+                for (var dataType in irc.importResults) {
+                    var updatedFailedConnections = [];
+                    for (var i in irc.importResults[dataType].failed) {
+                        if (irc.importResults[dataType].failed[i].omit) {
+                            continue;
+                        } else {
+                            updatedFailedConnections.push(irc.importResults[dataType].failed[i]);
+                        }
+                    }
+                    irc.importResults[dataType].failed = updatedFailedConnections;
                 }
                 irc.importInProgress = false;
                 clearSelectedImports();
@@ -177,10 +157,6 @@
         function goToConnections() {
             $state.go('connections');
         }
-        
-        function filterFailedConnections(connection) {
-            return (!connection.ignore);
-        }
 
         function isReImportDisabled() {
             for(var i in irc.selectedImports) {
@@ -192,9 +168,11 @@
         }
 
         function clearSelectedImports() {
-            for (var databaseType in irc.selectedImports) {
-                for (var i in irc.selectedImports[databaseType]) {
-                    irc.importResults[databaseType].failed[irc.selectedImports[databaseType][i]].reImport = null;
+            for (var databaseType in irc.databaseTypes) {
+                if (databaseType in irc.importResults) {
+                    for (var i in irc.importResults[databaseType].failed) {
+                        irc.importResults[databaseType].failed[i].reImport = null;
+                    }
                 }
             }
             irc.selectedImports = {};
