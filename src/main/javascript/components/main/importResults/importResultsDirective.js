@@ -85,7 +85,7 @@
             var connections = [];
             for (var databaseType in irc.selectedImports) {
                 for(var i in irc.selectedImports[databaseType]) {
-                    connections.push(irc.importResults[databaseType].failed[irc.selectedImports[databaseType][i]]);
+                    connections.push(irc.importResults[databaseType].failed[i]);
                 }
             }
             dcDataFactory.customRequest({
@@ -123,11 +123,11 @@
 
         function updateSelectedImports(index, databaseType) {
             if (irc.importResults[databaseType].failed[index].reImport !== null) {
-                var tempSelectedImports = _.isUndefined(irc.selectedImports[databaseType]) ? [] : angular.copy(irc.selectedImports[databaseType]);
-                tempSelectedImports.push(irc.importResults[databaseType].failed[index].reImport);
+                var tempSelectedImports = _.isUndefined(irc.selectedImports[databaseType]) ? {} : angular.copy(irc.selectedImports[databaseType]);
+                tempSelectedImports[irc.importResults[databaseType].failed[index].reImport] = true;
                 irc.selectedImports[databaseType] = tempSelectedImports;
             } else {
-                irc.selectedImports[databaseType].splice(index, 1);
+                delete irc.selectedImports[databaseType][index];
             }
         }
 

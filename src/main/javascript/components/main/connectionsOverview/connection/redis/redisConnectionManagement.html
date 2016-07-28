@@ -11,9 +11,9 @@
                     </md-checkbox>
                     <md-button class="md-fab md-mini md-success pull-right"
                                ng-click="rcm.testRedisConnection()"
-                               ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid"
-                               uib-tooltip="Test connection">
+                               ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid">
                         <i class="fa fa-lg fa-check-circle-o"></i>
+                        <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500">Reimport Connections</md-tooltip>
                     </md-button>
                     <md-input-container class="md-block" flex-gt-sm="1">
                         <label>Host</label>
