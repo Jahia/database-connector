@@ -55,6 +55,7 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                     String password = decodePassword(connectionNode, PASSWORD_KEY);
                     Long timeout = setLongConnectionProperty(connectionNode, TIMEOUT_KEY, false);
                     Integer weight = setIntegerConnectionProperty(connectionNode, WEIGHT_KEY, false);
+                    String options = setStringConnectionProperty(connectionNode, OPTIONS_KEY, false);
                     RedisConnection storedConnection = new RedisConnection(id);
                     storedConnection.setOldId(id);
                     storedConnection.setHost(host);
@@ -64,6 +65,7 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                     storedConnection.setPassword(password);
                     storedConnection.setTimeout(timeout);
                     storedConnection.setWeight(weight);
+                    storedConnection.setOptions(options);
                     registry.put(id, storedConnection);
                 }
                 return true;

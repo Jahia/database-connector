@@ -1,6 +1,8 @@
 package org.jahia.modules.databaseConnector.connection.redis;
 
 import com.lambdaworks.redis.*;
+import com.lambdaworks.redis.cluster.ClusterClientOptions;
+import com.lambdaworks.redis.cluster.RedisClusterClient;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
@@ -24,6 +26,8 @@ public class RedisConnection extends AbstractConnection {
     private static final Logger logger = LoggerFactory.getLogger(RedisConnection.class);
 
     private RedisClient redisClient;
+
+    private RedisClusterClient redisClusterClient;
 
     public static final String NODE_TYPE = "dc:redisConnection";
 
@@ -69,58 +73,120 @@ public class RedisConnection extends AbstractConnection {
         redisConnectionData.setTimeout(timeout);
         redisConnectionData.setWeight(weight);
         redisConnectionData.setDatabaseType(DATABASE_TYPE);
+        redisConnectionData.setOptions(options);
         return redisConnectionData;
     }
 
     @Override
-    // @TODO mod-1164 retrieve metrics for redis
     public Object getServerStatus() {
+        if (redisClusterClient != null) {
+            return redisClusterClient.connectCluster().info();
+        }
 
-        return redisClient.connect().info();
-
+        if (redisClient != null) {
+            return redisClient.connect().info();
+        }
+        return null;
     }
 
     @Override
     protected Object beforeRegisterAsService() {
+        if (!StringUtils.isEmpty(options)) {
+            try {
+                JSONObject jsonOptions = new JSONObject(options);
+                if (jsonOptions.has("cluster")) {
+                    redisClusterClient = RedisClusterClient.create(buildRedisClientUri(true));
+                        if (jsonOptions.getJSONObject("cluster").has("refreshClusterView") && Boolean.valueOf((jsonOptions.getJSONObject("cluster")).getBoolean("refreshClusterView"))) {
+                            redisClusterClient.setOptions(new ClusterClientOptions.Builder()
+                                    .refreshClusterView(true)
+                                    .refreshPeriod(jsonOptions.getJSONObject("cluster").getInt("refreshPeriod"), TimeUnit.SECONDS).build()
+                            );
+                        }
+                        return redisClusterClient.connectCluster();
 
-        redisClient = RedisClient.create(buildRedisClientUri());
+                }
+            } catch(JSONException ex) {
+                logger.error("Invalid JSON object", ex.getMessage());
+            }
+        }
+
+        redisClient = RedisClient.create(buildRedisClientUri(false));
 
         return redisClient.connect();
     }
 
     @Override
     public void beforeUnregisterAsService() {
+        if (redisClient != null) {
+            redisClient.shutdown();
+        }
+        if (redisClusterClient != null) {
+            redisClusterClient.shutdown();
+        }
 
-        redisClient.shutdown();
     }
 
     @Override
     public boolean testConnectionCreation() {
         try {
-            RedisClient redisClient = RedisClient.create(buildRedisClientUri());
-             redisClient.connect();
+            if (!StringUtils.isEmpty(options)) {
+                JSONObject jsonOptions = new JSONObject(options);
+                if (jsonOptions.has("cluster")) {
+                    RedisClusterClient redisClusterClient = RedisClusterClient.create(buildRedisClientUri(true));
+                    try {
+                        if (jsonOptions.getJSONObject("cluster").has("refreshClusterView") && Boolean.valueOf((jsonOptions.getJSONObject("cluster")).getBoolean("refreshClusterView"))) {
+                            redisClusterClient.setOptions(new ClusterClientOptions.Builder()
+                                    .refreshClusterView(true)
+                                    .refreshPeriod(jsonOptions.getJSONObject("cluster").getInt("refreshPeriod"), TimeUnit.SECONDS).build()
+                            );
+                        }
+                        redisClusterClient.connectCluster();
+                        return true;
+                    } catch(JSONException ex) {
+                        logger.error("Invalid JSON object", ex.getMessage());
+                    }
+                }
+            }
+
+            RedisClient redisClient = RedisClient.create(buildRedisClientUri(false));
+
+            redisClient.connect();
+            return true;
         } catch (Exception e) {
             logger.error(e.getMessage());
             return false;
         }
-        return true;
     }
 
     @Override
     public String parseOptions(LinkedHashMap options) {
-        //@TODO Implement the parsing of options.
-        return null;
+        JSONObject formattedOptions = new JSONObject();
+        try {
+            if (options.containsKey("clusterSettings")) {
+                JSONObject jsonCluster = new JSONObject();
+                if (((LinkedHashMap)options.get("clusterSettings")).containsKey("refreshPeriod") && Integer.parseInt((String)(((LinkedHashMap)options.get("clusterSettings")).get("refreshPeriod"))) > 0) {
+                    jsonCluster.put("refreshClusterView", true);
+                    jsonCluster.put("refreshPeriod", ((LinkedHashMap)options.get("clusterSettings")).get("refreshPeriod"));
+                } else {
+                    jsonCluster.put("refreshClusterView", false);
+                }
+                formattedOptions.put("cluster", jsonCluster);
+            }
+        } catch(JSONException ex) {
+            logger.error("Failed to serialize imported connection options", ex.getMessage());
+        }
+        return formattedOptions.toString();
     }
 
 
-    private RedisURI buildRedisClientUri() {
+    private RedisURI buildRedisClientUri(boolean isCluster) {
 //        redis :// [password@] host [: port] [/ database] [? [timeout=timeout[d|h|m|s|ms|us|ns]] [&database=database]]
 
         RedisURI.Builder builder = RedisURI.Builder.redis(host, port);
         if (password != null) {
             builder.withPassword(password);
         }
-        if(dbName!=null) {
+        if(dbName!=null && !isCluster) {
             builder.withDatabase(Integer.valueOf(dbName));
         }
         if(timeout!=null) {
@@ -130,7 +196,6 @@ public class RedisConnection extends AbstractConnection {
         if(weight!=null) {
             ZStoreArgs.Builder.weights(weight);
         }
-
         return builder.build();
     }
 
@@ -169,7 +234,19 @@ public class RedisConnection extends AbstractConnection {
         if (this.options != null) {
             try {
                 JSONObject jsonOptions = new JSONObject(this.options);
-
+                serializedString.append(TABU + "options {");
+                //Handle cluster settings
+                if (jsonOptions.has("cluster")) {
+                    JSONObject jsonCluster = jsonOptions.getJSONObject("cluster");
+                    serializedString.append(NEW_LINE + TABU + TABU + "clusterSettings {");
+                    if (jsonCluster.has("refreshClusterView") && !StringUtils.isEmpty(jsonCluster.getString("refreshClusterView"))) {
+                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "refreshPeriod " + DOUBLE_QUOTE + jsonCluster.getString("refreshPeriod") + DOUBLE_QUOTE);
+                    } else {
+                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "refreshPeriod " + DOUBLE_QUOTE + 0 + DOUBLE_QUOTE);
+                    }
+                    serializedString.append(NEW_LINE + TABU + TABU + "}");
+                }
+                serializedString.append(NEW_LINE + TABU + "}");
             } catch (JSONException ex) {
                 logger.error("Failed to parse connection options json", ex.getMessage());
             }

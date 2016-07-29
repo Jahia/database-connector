@@ -243,6 +243,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         connection.setWriteConcern(writeConcern);
                         connection.setAuthDb(authDb);
                         connection.setOptions(options);
+
                         databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).addEditConnection(connection, false);
                         map.put("status", "success");
                     }
@@ -295,6 +296,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         connection.setPassword(password);
                         connection.setWeight(weight);
                         connection.setTimeout(timeout);
+                        connection.setOptions(options);
 
                         databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).addEditConnection(connection, false);
                         map.put("status", "success");

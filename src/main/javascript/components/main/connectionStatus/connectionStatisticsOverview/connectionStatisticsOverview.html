@@ -48,7 +48,7 @@
                 <dt>Memory fragmentation ratio :</dt>
                 <dd>{{cso.connectionStatus.mem_fragmentation_ratio}} Mb</dd>
                 <dt>Cluster enabled :</dt>
-                <dd>{{cso.connectionStatus.cluster_enabled}}</dd>
+                <dd>{{cso.connectionStatus.cluster_enabled == 1 ? 'Yes' : 'No'}}</dd>
                 <dt>Connected slaves :</dt>
                 <dd> {{cso.connectionStatus.connected_slaves}} </dd>
                 <dt>Connected clients :</dt>

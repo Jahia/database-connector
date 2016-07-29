@@ -55,8 +55,11 @@
                     </md-input-container>
 
                     <md-input-container class="md-block">
-                        <label>Database Number</label>
+                        <label>Database Number
+                            <b ng-if="rcm.isCluster" style="font-size:.9em" class="statusWarningMessage" md-colors="{color: 'deep-orange-500'}">(Cannot select database number in cluster mode)</b>
+                        </label>
                         <input title="Database Number" md-maxlength="2" name="dbName" required
+                               ng-disabled="rcm.isCluster"
                                ng-pattern="/^([0]?[0-9]|1[0-5])$/"
                                ng-model="rcm.connection.dbName">
                         <div ng-messages="redisForm.dbName.$error" ng-if="redisForm.dbName.$dirty">
@@ -78,7 +81,41 @@
         <md-tab label="Advanced Settings">
             <md-content class="md-padding">
                 <form name="redisAdvancedForm">
-                    <md-input-container class="md-block">
+                    <md-subheader class=" md-no-sticky">
+                        <span>Cluster</span>
+                        <md-checkbox class="pull-right"
+                                     ng-model="rcm.isCluster"
+                                     ng-true-value="true"
+                                     ng-false-value="false"
+                                     ng-change="rcm.updateClusterOptions('cluster')">
+                        </md-checkbox>
+                    </md-subheader>
+                    <div ng-if="rcm.isCluster"
+                         class="md-block col-md-offset-2">
+                        <md-checkbox ng-model="rcm.connection.options.cluster.refreshClusterView"
+                                     ng-true-value="true"
+                                     ng-false-value="false"
+                                     ng-change="rcm.updateClusterOptions('refreshClusterView')">
+                            <span>Refresh cluster view</span>
+                        </md-checkbox>
+                    </div>
+                    <md-input-container ng-if="rcm.isCluster && rcm.connection.options.cluster.refreshClusterView" class="md-block col-md-offset-3">
+                        <label>Refresh period(seconds)</label>
+                        <input title="Refresh period" name="refreshPeriod"
+                               ng-pattern="/^[0-9]+$/"
+                               ng-model="rcm.connection.options.cluster.refreshPeriod">
+                        <div ng-messages="redisAdvancedForm.refreshPeriod.$error" ng-if="redisAdvancedForm.refreshPeriod.$dirty">
+                            <div ng-message-exp='validationName'
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.refreshPeriod">
+                                {{validationMessage}}
+                            </div>
+                        </div>
+                    </md-input-container>
+                    <md-divider></md-divider>
+                    <md-subheader class=" md-no-sticky">
+                        <span>Connection Settings</span>
+                    </md-subheader>
+                    <md-input-container class="md-block col-md-offset-2">
                         <label>Timeout (milliseconds)</label>
                         <input title="Redis Timeout" name="redisTimeout"
                                ng-pattern="/^[0-9]*$/"
@@ -90,7 +127,7 @@
                             </div>
                         </div>
                     </md-input-container>
-                    <md-input-container class="md-block">
+                    <md-input-container class="md-block col-md-offset-2">
                         <label>Weight</label>
                         <input title="Redis Weight" name="redisWeight" range-parser
                                ng-pattern="/^[0-9]*$/"

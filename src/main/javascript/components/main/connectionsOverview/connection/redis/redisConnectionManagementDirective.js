@@ -61,17 +61,20 @@
             },
             redisWeight: {
                 'pattern' : 'Should be an integer'
+            },
+            refreshPeriod: {
+                'pattern' : 'Shoulder be an integer'
             }
             
         };
 
-        rcm.createRedisConnection = createRedisConnection;
-        rcm.editRedisConnection = editRedisConnection;
-        rcm.testRedisConnection = testRedisConnection;
-        rcm.cancel = cancel;
-        rcm.updateIsEmpty = updateIsEmpty;
+        rcm.createRedisConnection    = createRedisConnection;
+        rcm.editRedisConnection      = editRedisConnection;
+        rcm.testRedisConnection      = testRedisConnection;
+        rcm.cancel                   = cancel;
+        rcm.updateIsEmpty            = updateIsEmpty;
         rcm.updateImportedConnection = updateImportedConnection;
-
+        rcm.updateClusterOptions     = updateClusterOptions;
         init();
 
         function init() {
@@ -94,6 +97,12 @@
                 rcm.connection.isConnected = true;
             }
 
+            if (_.isUndefined(rcm.connection.options) || rcm.connection.options == null || _.isString(rcm.connection.options) && rcm.connection.options.trim() == '') {
+                rcm.connection.options = {};
+            } else if (_.isString(rcm.connection.options)){
+                rcm.connection.options = JSON.parse(rcm.connection.options);
+                rcm.isCluster = !_.isUndefined(rcm.connection.options.cluster);
+            }
 
         }
 
@@ -104,7 +113,12 @@
             rcm.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/redis/add';
             var data = angular.copy(rcm.connection);
-
+            var options = prepareOptions(data.options);
+            if (options == null) {
+                delete data.options;
+            } else {
+                data.options = options;
+            }
             dcDataFactory.customRequest({
                 url: url,
                 method: 'POST',
@@ -115,7 +129,6 @@
                 showConfirmationToast(response.connectionVerified);
             }, function (response) {
                 rcm.spinnerOptions.showSpinner = false;
-                console.log('error', response);
                 toaster.pop({
                     type: 'error',
                     title: 'Connection is invalid!',
@@ -132,7 +145,12 @@
             rcm.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/redis/edit';
             var data = angular.copy(rcm.connection);
-
+            var options = prepareOptions(data.options);
+            if (options == null) {
+                delete data.options;
+            } else {
+                data.options = options;
+            }
             dcDataFactory.customRequest({
                 url: url,
                 method: 'PUT',
@@ -143,7 +161,6 @@
                 showConfirmationToast(response.connectionVerified);
             }, function (response) {
                 rcm.spinnerOptions.showSpinner = false;
-                console.log('error', response);
                 toaster.pop({
                     type: 'error',
                     title: 'Connection is invalid!',
@@ -157,7 +174,12 @@
             rcm.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/redis/testconnection';
             var data = angular.copy(rcm.connection);
-
+            var options = prepareOptions(data.options);
+            if (options == null) {
+                delete data.options;
+            } else {
+                data.options = options;
+            }
             dcDataFactory.customRequest({
                 url: url,
                 method: 'POST',
@@ -180,7 +202,6 @@
                 }
                 rcm.spinnerOptions.showSpinner = false;
             }, function (response) {
-                console.log('error', response);
                 rcm.spinnerOptions.showSpinner = false;
             });
         }
@@ -221,6 +242,35 @@
             $scope.$emit('importConnectionClosed', rcm.connection);
         }
 
+        function updateClusterOptions(option) {
+            switch(option) {
+                case 'cluster' :
+                    if (rcm.isCluster) {
+                        rcm.connection.options.cluster = {
+                            refreshClusterView  : true,
+                            refreshPeriod       : 60
+                        }
+                    } else {
+                        delete rcm.connection.options.cluster;
+                    }
+                    break;
+                case 'refreshClusterView' :
+                    if (rcm.connection.options.cluster.refreshClusterView) {
+                        rcm.connection.options.cluster.refreshPeriod = 60
+                    } else {
+                        delete rcm.connection.options.cluster.refreshClusterView;
+                    }
+                    break;
+            }
+        }
+
+        function prepareOptions(options) {
+            //Check if cluster is enabled
+            if (!rcm.isCluster) {
+                delete options.cluster
+            }
+            return _.isEmpty(options) ? null : JSON.stringify(options);
+        }
     };
 
     redisConnectionManagementController.$inject = ['$scope', 'contextualData', 'dcDataFactory', 'toaster'];

@@ -110,6 +110,7 @@ public class RedisDB {
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
                 Long timeout = connectionParameters.has("timeout") && !StringUtils.isEmpty(connectionParameters.getString("timeout")) ? connectionParameters.getLong("timeout") : null;
                 Integer weight = connectionParameters.has("weight") && !StringUtils.isEmpty(connectionParameters.getString("weight")) ? connectionParameters.getInt("weight") : null;
+                String options = connectionParameters.has("options") ? connectionParameters.getString("options") : null;
 
                 RedisConnection connection = new RedisConnection(id);
 
@@ -120,6 +121,8 @@ public class RedisDB {
                 connection.setPassword(password);
                 connection.setTimeout(timeout);
                 connection.setWeight(weight);
+                connection.setOptions(options);
+
                 JSONObject jsonAnswer = new JSONObject();
                 if (!databaseConnector.testConnection(connection)) {
                     connection.isConnected(false);
@@ -180,6 +183,7 @@ public class RedisDB {
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
                 Long timeout = connectionParameters.has("timeout") && !StringUtils.isEmpty(connectionParameters.getString("timeout")) ? connectionParameters.getLong("timeout") : null;
                 Integer weight = connectionParameters.has("weight") && !StringUtils.isEmpty(connectionParameters.getString("weight")) ? connectionParameters.getInt("weight") : null;
+                String options = connectionParameters.has("options") ? connectionParameters.getString("options") : null;
 
                 RedisConnection connection = new RedisConnection(id);
 
@@ -191,6 +195,8 @@ public class RedisDB {
                 connection.setPassword(password);
                 connection.setTimeout(timeout);
                 connection.setWeight(weight);
+                connection.setOptions(options);
+
                 JSONObject jsonAnswer = new JSONObject();
                 if (!databaseConnector.testConnection(connection)) {
                     connection.isConnected(false);
@@ -275,6 +281,7 @@ public class RedisDB {
                 String password = connectionParameters.has("password") ? connectionParameters.getString("password") : null;
                 Long timeout = connectionParameters.has("timeout") && !StringUtils.isEmpty(connectionParameters.getString("timeout")) ? connectionParameters.getLong("timeout") : null;
                 Integer weight = connectionParameters.has("weight") && !StringUtils.isEmpty(connectionParameters.getString("weight")) ? connectionParameters.getInt("weight") : null;
+                String options = connectionParameters.has("options") ? connectionParameters.getString("options") : null;
 
                 RedisConnection connection = new RedisConnection(id);
 
@@ -285,6 +292,7 @@ public class RedisDB {
                 connection.setPassword(password);
                 connection.setTimeout(timeout);
                 connection.setWeight(weight);
+                connection.setOptions(options);
 
                 boolean connectionTestPassed = databaseConnector.testConnection(connection);
                 logger.info(connectionTestPassed ? "Connection test successfully passed" : "Connection test failed" + " for RedisDB with id: " + id);
