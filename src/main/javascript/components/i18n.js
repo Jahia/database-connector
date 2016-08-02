@@ -32,8 +32,8 @@
     angular.module('i18n', [])
         .service('i18nService', function() {
             this.message = function(key, fallback) {
-                if (ffi18n && ffi18n[key]) {
-                    return ffi18n[key];
+                if (dci18n && dci18n[key]) {
+                    return dci18n[key];
                 } else if (angular.isDefined(fallback)) {
                     return fallback;
                 } else {
@@ -49,8 +49,8 @@
                 };
 
                 if (params) {
-                    if (ffi18n && ffi18n[key]) {
-                        return ffi18n[key].replace(/\{(\w+)\}/g, replacer(params.split('|')));
+                    if (dci18n && dci18n[key]) {
+                        return dci18n[key].replace(/\{(\w+)\}/g, replacer(params.split('|')));
                     } else {
                         return '???' + key + '???';
                     }
