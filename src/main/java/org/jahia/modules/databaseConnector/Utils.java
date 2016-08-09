@@ -61,21 +61,21 @@ public class Utils {
             String password = jsonConnectionData.has("password") ? jsonConnectionData.getString("password") : null;
             String options = jsonConnectionData.has("options") ? jsonConnectionData.getString("options") : null;
             AbstractConnection connection = null;
-            switch (DatabaseTypes.valueOf((String)jsonConnectionData.get("databaseType"))) {
+            switch (DatabaseTypes.valueOf((String) jsonConnectionData.get("databaseType"))) {
                 case MONGO:
                     connection = new MongoConnection(id);
                     if (jsonConnectionData.has("writeConcern") && !StringUtils.isEmpty(jsonConnectionData.getString("writeConcern"))) {
-                        ((MongoConnection)connection).setWriteConcern(jsonConnectionData.getString("writeConcern"));
+                        ((MongoConnection) connection).setWriteConcern(jsonConnectionData.getString("writeConcern"));
                     }
                     String authDb = jsonConnectionData.has("authDb") ? jsonConnectionData.getString("authDb") : null;
-                    ((MongoConnection)connection).setAuthDb(authDb);
+                    ((MongoConnection) connection).setAuthDb(authDb);
                     break;
                 case REDIS:
                     connection = new RedisConnection(id);
                     if (jsonConnectionData.has("timeout") && !StringUtils.isEmpty(jsonConnectionData.getString("timeout"))) {
                         ((RedisConnection) connection).setTimeout(jsonConnectionData.getLong("timeout"));
                     }
-                    if (jsonConnectionData.has("weight") && !StringUtils.isEmpty(jsonConnectionData.getString("weight"))){
+                    if (jsonConnectionData.has("weight") && !StringUtils.isEmpty(jsonConnectionData.getString("weight"))) {
                         ((RedisConnection) connection).setWeight(jsonConnectionData.getInt("weight"));
                     }
 
@@ -85,8 +85,8 @@ public class Utils {
             connection.setPort(port);
             connection.isConnected(isConnected);
             connection.setDbName(dbName);
-            if(password != null && password.contains("_ENC")) {
-                password = password.substring(0,32);
+            if (password != null && password.contains("_ENC")) {
+                password = password.substring(0, 32);
                 password = EncryptionUtils.passwordBaseDecrypt(password);
             }
             connection.setPassword(password);
@@ -97,7 +97,7 @@ public class Utils {
         return result;
     }
 
-    public static Map<String, Object> buildConnectionMap(AbstractConnection connection) throws JSONException{
+    public static Map<String, Object> buildConnectionMap(AbstractConnection connection) throws JSONException {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("id", connection.getId());
         result.put("host", connection.getHost());
@@ -110,12 +110,12 @@ public class Utils {
         }
         switch (connection.getDatabaseType()) {
             case MONGO:
-                result.put("authDb", ((MongoConnection)connection).getAuthDb());
-                result.put("writeConcern", ((MongoConnection)connection).getWriteConcern());
+                result.put("authDb", ((MongoConnection) connection).getAuthDb());
+                result.put("writeConcern", ((MongoConnection) connection).getWriteConcern());
                 break;
             case REDIS:
-                result.put("timeout",((RedisConnection)connection).getTimeout());
-                result.put("weight",((RedisConnection)connection).getWeight());
+                result.put("timeout", ((RedisConnection) connection).getTimeout());
+                result.put("weight", ((RedisConnection) connection).getWeight());
                 break;
         }
         return result;

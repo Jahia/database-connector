@@ -5,7 +5,6 @@ import com.mongodb.client.MongoDatabase;
 import org.apache.commons.lang.StringUtils;
 import org.bson.BsonDocument;
 import org.bson.BsonInt32;
-import org.bson.Document;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.utils.EncryptionUtils;
@@ -29,22 +28,14 @@ import static org.jahia.modules.databaseConnector.Utils.*;
  */
 public class MongoConnection extends AbstractConnection {
 
-    private static final Logger logger = LoggerFactory.getLogger(MongoConnection.class);
-
     public static final String NODE_TYPE = "dc:mongoConnection";
-
     public static final String WRITE_CONCERN_KEY = "dc:writeConcern";
-
     public static final String AUTH_DB_KEY = "dc:authDb";
-
     public static final String WRITE_CONCERN_DEFAULT_VALUE = "ACKNOWLEDGED";
-
-    private static List WRITE_CONCERN_OPTIONS = null;
-
-    private static final Integer DEFAULT_PORT = new Integer(27017);
-
+    private static final Logger logger = LoggerFactory.getLogger(MongoConnection.class);
+    private static final Integer DEFAULT_PORT = 27017;
     private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.MONGO;
-
+    private static List WRITE_CONCERN_OPTIONS = null;
     private MongoDatabase databaseConnection;
 
     private MongoClient mongoClient;
@@ -56,6 +47,20 @@ public class MongoConnection extends AbstractConnection {
     public MongoConnection(String id) {
         this.id = id;
         this.writeConcern = WRITE_CONCERN_DEFAULT_VALUE;
+    }
+
+    public static List<String> getWriteConcernOptions() {
+        if (WRITE_CONCERN_OPTIONS == null) {
+            WRITE_CONCERN_OPTIONS = new LinkedList<>();
+            WRITE_CONCERN_OPTIONS.add("ACKNOWLEDGED");
+            WRITE_CONCERN_OPTIONS.add("UNACKNOWLEDGED");
+            WRITE_CONCERN_OPTIONS.add("JOURNALED");
+            WRITE_CONCERN_OPTIONS.add("MAJORITY");
+            WRITE_CONCERN_OPTIONS.add("W1");
+            WRITE_CONCERN_OPTIONS.add("W2");
+            WRITE_CONCERN_OPTIONS.add("W3");
+        }
+        return WRITE_CONCERN_OPTIONS;
     }
 
     public MongoConnectionData makeConnectionData() {
@@ -94,9 +99,8 @@ public class MongoConnection extends AbstractConnection {
             }
         }
         serverStatusCommand.append("repl", new BsonInt32(0));
-        Document serverStatus = this.databaseConnection.runCommand(serverStatusCommand);
 
-        return serverStatus;
+        return this.databaseConnection.runCommand(serverStatusCommand);
     }
 
     @Override
@@ -113,7 +117,7 @@ public class MongoConnection extends AbstractConnection {
     public DatabaseTypes getDatabaseType() {
         return DATABASE_TYPE;
     }
-    
+
     @Override
     public String parseOptions(LinkedHashMap options) {
         JSONObject formattedOptions = new JSONObject();
@@ -144,7 +148,7 @@ public class MongoConnection extends AbstractConnection {
                             formattedMember.put("host", member);
                         }
                         formattedMembers.push(formattedMember);
-                    } else if(((LinkedHashMap) options.get("replicaSet")).get("members") instanceof List) {
+                    } else if (((LinkedHashMap) options.get("replicaSet")).get("members") instanceof List) {
                         List<String> members = (List) ((LinkedHashMap) options.get("replicaSet")).get("members");
                         for (String member : members) {
                             LinkedHashMap formattedMember = new LinkedHashMap();
@@ -161,7 +165,7 @@ public class MongoConnection extends AbstractConnection {
                 }
                 formattedOptions.put("repl", repl);
             }
-        } catch(JSONException ex) {
+        } catch (JSONException ex) {
             logger.error("Failed to serialize imported connection options", ex.getMessage());
         }
         return formattedOptions.toString();
@@ -170,29 +174,27 @@ public class MongoConnection extends AbstractConnection {
     @Override
     public String getSerializedExportData() {
         StringBuilder serializedString = new StringBuilder();
-        serializedString.append(
-                TABU + "type " + DOUBLE_QUOTE + DATABASE_TYPE + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "host " + DOUBLE_QUOTE + this.host + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "dbName " + DOUBLE_QUOTE + this.dbName + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "identifier " + DOUBLE_QUOTE + this.id + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "isConnected " + DOUBLE_QUOTE + this.isConnected() + DOUBLE_QUOTE + NEW_LINE +
-                TABU + "writeConcern " + DOUBLE_QUOTE + this.writeConcern + DOUBLE_QUOTE + NEW_LINE
-        );
+        serializedString.append(TABU).append("type ").append(DOUBLE_QUOTE).append(DATABASE_TYPE).append(DOUBLE_QUOTE).append(NEW_LINE);
+        serializedString.append(TABU).append("host ").append(DOUBLE_QUOTE).append(this.host).append(DOUBLE_QUOTE).append(NEW_LINE);
+        serializedString.append(TABU).append("dbName ").append(DOUBLE_QUOTE).append(this.dbName).append(DOUBLE_QUOTE).append(NEW_LINE);
+        serializedString.append(TABU).append("identifier ").append(DOUBLE_QUOTE).append(this.id).append(DOUBLE_QUOTE).append(NEW_LINE);
+        serializedString.append(TABU).append("isConnected ").append(DOUBLE_QUOTE).append(this.isConnected()).append(DOUBLE_QUOTE).append(NEW_LINE);
+        serializedString.append(TABU).append("writeConcern ").append(DOUBLE_QUOTE).append(this.writeConcern).append(DOUBLE_QUOTE).append(NEW_LINE);
 
         if (this.port != null) {
-            serializedString.append(TABU + "port " + DOUBLE_QUOTE + this.port + DOUBLE_QUOTE + NEW_LINE);
+            serializedString.append(TABU + "port " + DOUBLE_QUOTE).append(this.port).append(DOUBLE_QUOTE).append(NEW_LINE);
         }
 
         if (!StringUtils.isEmpty(this.authDb)) {
-            serializedString.append(TABU + "authDb " + DOUBLE_QUOTE + this.authDb + DOUBLE_QUOTE + NEW_LINE);
+            serializedString.append(TABU + "authDb " + DOUBLE_QUOTE).append(this.authDb).append(DOUBLE_QUOTE).append(NEW_LINE);
         }
 
         if (!StringUtils.isEmpty(this.user)) {
-            serializedString.append(TABU + "user " + DOUBLE_QUOTE + this.user + DOUBLE_QUOTE + NEW_LINE);
+            serializedString.append(TABU + "user " + DOUBLE_QUOTE).append(this.user).append(DOUBLE_QUOTE).append(NEW_LINE);
         }
 
         if (!StringUtils.isEmpty(this.password)) {
-            serializedString.append(TABU + "password " + DOUBLE_QUOTE + EncryptionUtils.passwordBaseEncrypt(this.password) + "_ENC" + DOUBLE_QUOTE + NEW_LINE);
+            serializedString.append(TABU + "password " + DOUBLE_QUOTE).append(EncryptionUtils.passwordBaseEncrypt(this.password)).append("_ENC").append(DOUBLE_QUOTE).append(NEW_LINE);
         }
 
         if (this.options != null) {
@@ -202,49 +204,49 @@ public class MongoConnection extends AbstractConnection {
                 //Handle connection pool settings
                 if (jsonOptions.has("connPool")) {
                     JSONObject jsonConnPool = jsonOptions.getJSONObject("connPool");
-                    serializedString.append(NEW_LINE + TABU + TABU + "connPoolSettings {");
+                    serializedString.append(NEW_LINE).append(TABU).append(TABU).append("connPoolSettings {");
                     if (jsonConnPool.has("minPoolSize") && !StringUtils.isEmpty(jsonConnPool.getString("minPoolSize"))) {
-                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "minPoolSize " + DOUBLE_QUOTE + jsonConnPool.getString("minPoolSize") + DOUBLE_QUOTE);
+                        serializedString.append(NEW_LINE).append(TABU).append(TABU).append(TABU).append("minPoolSize ").append(DOUBLE_QUOTE).append(jsonConnPool.getString("minPoolSize")).append(DOUBLE_QUOTE);
                     }
                     if (jsonConnPool.has("maxPoolSize") && !StringUtils.isEmpty(jsonConnPool.getString("maxPoolSize"))) {
-                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "maxPoolSize " + DOUBLE_QUOTE + jsonConnPool.getString("maxPoolSize") + DOUBLE_QUOTE);
+                        serializedString.append(NEW_LINE).append(TABU).append(TABU).append(TABU).append("maxPoolSize ").append(DOUBLE_QUOTE).append(jsonConnPool.getString("maxPoolSize")).append(DOUBLE_QUOTE);
                     }
                     if (jsonConnPool.has("waitQueueTimeoutMS") && !StringUtils.isEmpty(jsonConnPool.getString("waitQueueTimeoutMS"))) {
-                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "waitQueueTimeoutMS " + DOUBLE_QUOTE + jsonConnPool.getString("waitQueueTimeoutMS") + DOUBLE_QUOTE);
+                        serializedString.append(NEW_LINE).append(TABU).append(TABU).append(TABU).append("waitQueueTimeoutMS ").append(DOUBLE_QUOTE).append(jsonConnPool.getString("waitQueueTimeoutMS")).append(DOUBLE_QUOTE);
                     }
-                    serializedString.append(NEW_LINE + TABU + TABU + "}");
+                    serializedString.append(NEW_LINE).append(TABU).append(TABU).append("}");
                 }
                 //Handle connection settings
                 if (jsonOptions.has("conn")) {
                     JSONObject jsonConn = jsonOptions.getJSONObject("conn");
-                    serializedString.append(NEW_LINE + TABU + TABU + "connSettings {");
+                    serializedString.append(NEW_LINE).append(TABU).append(TABU).append("connSettings {");
                     if (jsonConn.has("connectTimeoutMS") && !StringUtils.isEmpty(jsonConn.getString("connectTimeoutMS"))) {
-                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "connectTimeoutMS " + DOUBLE_QUOTE + jsonConn.getInt("connectTimeoutMS") + DOUBLE_QUOTE);
+                        serializedString.append(NEW_LINE).append(TABU).append(TABU).append(TABU).append("connectTimeoutMS ").append(DOUBLE_QUOTE).append(jsonConn.getInt("connectTimeoutMS")).append(DOUBLE_QUOTE);
                     }
                     if (jsonConn.has("socketTimeoutMS") && !StringUtils.isEmpty(jsonConn.getString("socketTimeoutMS"))) {
-                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "socketTimeoutMS " + DOUBLE_QUOTE + jsonConn.getInt("socketTimeoutMS") + DOUBLE_QUOTE);
+                        serializedString.append(NEW_LINE).append(TABU).append(TABU).append(TABU).append("socketTimeoutMS ").append(DOUBLE_QUOTE).append(jsonConn.getInt("socketTimeoutMS")).append(DOUBLE_QUOTE);
                     }
-                    serializedString.append(NEW_LINE + TABU + TABU + "}");
+                    serializedString.append(NEW_LINE).append(TABU).append(TABU).append("}");
                 }
                 //Handle replicate set options
                 if (jsonOptions.has("repl")) {
                     JSONObject jsonRepl = jsonOptions.getJSONObject("repl");
-                    serializedString.append(NEW_LINE + TABU + TABU + "replicaSet {");
+                    serializedString.append(NEW_LINE).append(TABU).append(TABU).append("replicaSet {");
                     if (jsonRepl.has("replicaSet") && !StringUtils.isEmpty(jsonRepl.getString("replicaSet"))) {
-                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "name " + DOUBLE_QUOTE + jsonRepl.getString("replicaSet") + DOUBLE_QUOTE);
+                        serializedString.append(NEW_LINE).append(TABU).append(TABU).append(TABU).append("name ").append(DOUBLE_QUOTE).append(jsonRepl.getString("replicaSet")).append(DOUBLE_QUOTE);
                     }
                     JSONArray members = jsonRepl.getJSONArray("members");
-                    serializedString.append(NEW_LINE + TABU + TABU + TABU + "members ");
+                    serializedString.append(NEW_LINE).append(TABU).append(TABU).append(TABU).append("members ");
                     for (int i = 0; i < members.length(); i++) {
                         if (i != 0) {
                             serializedString.append(", ");
                         }
                         JSONObject member = members.getJSONObject(i);
-                        serializedString.append(DOUBLE_QUOTE + member.getString("host") + (member.has("port") && !StringUtils.isEmpty(member.getString("port")) ? ":" + member.getString("port"): "") + DOUBLE_QUOTE);
+                        serializedString.append(DOUBLE_QUOTE).append(member.getString("host")).append(member.has("port") && !StringUtils.isEmpty(member.getString("port")) ? ":" + member.getString("port") : "").append(DOUBLE_QUOTE);
                     }
-                    serializedString.append(NEW_LINE + TABU + TABU + "}");
+                    serializedString.append(NEW_LINE).append(TABU).append(TABU).append("}");
                 }
-                serializedString.append(NEW_LINE + TABU + "}");
+                serializedString.append(NEW_LINE).append(TABU).append("}");
             } catch (JSONException ex) {
                 logger.error("Failed to parse connection options json", ex.getMessage());
             }
@@ -256,12 +258,12 @@ public class MongoConnection extends AbstractConnection {
         return writeConcern;
     }
 
-    public String getAuthDb() {
-        return this.authDb;
-    }
-
     public void setWriteConcern(String writeConcern) {
         this.writeConcern = writeConcern;
+    }
+
+    public String getAuthDb() {
+        return this.authDb;
     }
 
     public void setAuthDb(String authDb) {
@@ -339,7 +341,7 @@ public class MongoConnection extends AbstractConnection {
             //Handle replicate set options
             if (jsonOptions.has("repl")) {
                 JSONObject jsonRepl = jsonOptions.getJSONObject("repl");
-                if(jsonRepl.has("replicaSet") && !StringUtils.isEmpty(jsonRepl.getString("replicaSet"))) {
+                if (jsonRepl.has("replicaSet") && !StringUtils.isEmpty(jsonRepl.getString("replicaSet"))) {
                     builder.requiredReplicaSetName(jsonRepl.getString("replicaSet"));
                 } else {
                     //If there is no replica set name then we throw an exception.
@@ -389,19 +391,5 @@ public class MongoConnection extends AbstractConnection {
             return false;
         }
         return true;
-    }
-
-    public static List<String> getWriteConcernOptions() {
-        if (WRITE_CONCERN_OPTIONS == null) {
-            WRITE_CONCERN_OPTIONS = new LinkedList<>();
-            WRITE_CONCERN_OPTIONS.add("ACKNOWLEDGED");
-            WRITE_CONCERN_OPTIONS.add("UNACKNOWLEDGED");
-            WRITE_CONCERN_OPTIONS.add("JOURNALED");
-            WRITE_CONCERN_OPTIONS.add("MAJORITY");
-            WRITE_CONCERN_OPTIONS.add("W1");
-            WRITE_CONCERN_OPTIONS.add("W2");
-            WRITE_CONCERN_OPTIONS.add("W3");
-        }
-        return WRITE_CONCERN_OPTIONS;
     }
 }

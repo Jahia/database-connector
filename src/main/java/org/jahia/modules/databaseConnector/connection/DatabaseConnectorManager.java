@@ -1,7 +1,6 @@
 package org.jahia.modules.databaseConnector.connection;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.jahia.modules.databaseConnector.Utils;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
@@ -32,7 +31,7 @@ import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.getAl
  * @version 1.0
  */
 public class DatabaseConnectorManager implements BundleContextAware, InitializingBean {
-    
+
     public static final String DATABASE_CONNECTOR_ROOT_PATH = "/settings/";
 
     public static final String DATABASE_CONNECTOR_PATH = "databaseConnector";
@@ -42,13 +41,13 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
     private static DatabaseConnectorManager instance;
     private BundleContext bundleContext;
     private DSLExecutor dslExecutor;
-    private Map<String,DSLHandler> dslHandlerMap;
+    private Map<String, DSLHandler> dslHandlerMap;
     private Map<DatabaseTypes, DatabaseConnectionRegistry> databaseConnectionRegistries;
 
     private Set<DatabaseTypes> activatedDatabaseTypes = getAllDatabaseTypes();
 
     public DatabaseConnectorManager() {
-        databaseConnectionRegistries = new TreeMap<DatabaseTypes, DatabaseConnectionRegistry>();
+        databaseConnectionRegistries = new TreeMap<>();
     }
 
     public static DatabaseConnectorManager getInstance() {
@@ -76,13 +75,13 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         ((AbstractConnection) registry.get(connectionId)).registerAsService();
                     }
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    public <T extends AbstractConnection> Map<String, T> getRegisteredConnections (DatabaseTypes databaseType) {
+    public <T extends AbstractConnection> Map<String, T> getRegisteredConnections(DatabaseTypes databaseType) {
         return findRegisteredConnections().get(databaseType);
     }
 
@@ -116,7 +115,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         return registeredConnections;
     }
 
-    public  <T extends AbstractConnection> T getConnection(String connectionId, DatabaseTypes databaseType) {
+    public <T extends AbstractConnection> T getConnection(String connectionId, DatabaseTypes databaseType) {
         try {
             Map<String, T> databaseConnection = getRegisteredConnections(databaseType);
             return databaseConnection.get(connectionId);
@@ -127,9 +126,9 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
     }
 
     public Map<DatabaseTypes, Map<String, Object>> findAllDatabaseTypes() {
-        Map<DatabaseTypes, Map<String, Object>> map = new LinkedHashMap<DatabaseTypes, Map<String, Object>>();
+        Map<DatabaseTypes, Map<String, Object>> map = new LinkedHashMap<>();
         for (DatabaseTypes databaseType : databaseConnectionRegistries.keySet()) {
-            Map<String, Object> submap = new HashMap<String, Object>();
+            Map<String, Object> submap = new HashMap<>();
             submap.put("connectedDatabases", databaseConnectionRegistries.get(databaseType).getRegistry().size());
             submap.put("displayName", databaseType.getDisplayName());
             map.put(databaseType, submap);
@@ -200,7 +199,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         return importedConnectionsResults;
     }
 
-    public Map <String, Object> importConnection(Map<String, Object> map) {
+    public Map<String, Object> importConnection(Map<String, Object> map) {
         logger.info("Importing connection " + map);
         switch (DatabaseTypes.valueOf((String) map.get("type"))) {
             case MONGO:
@@ -210,12 +209,12 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         map.put("statusMessage", "connectionExists");
                         //Create instance to be able to parse the options of a failed connection.
                         if (map.containsKey("options")) {
-                            MongoConnection connection = new MongoConnection((String)map.get("identifier"));
+                            MongoConnection connection = new MongoConnection((String) map.get("identifier"));
                             map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
                         }
                     } else {
                         //Create connection object
-                        MongoConnection connection = new MongoConnection((String)map.get("identifier"));
+                        MongoConnection connection = new MongoConnection((String) map.get("identifier"));
                         String host = map.containsKey("host") ? (String) map.get("host") : null;
                         Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : null;
                         Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
@@ -226,13 +225,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
                         map.put("options", options);
                         String password = (String) map.get("password");
-                            if(password != null && password.contains("_ENC")) {
-                                password = password.substring(0,32);
-                                password = EncryptionUtils.passwordBaseDecrypt(password);
-                                map.put("password",password);
-                             } else if (password != null && !password.contains("_ENC")) {
-                                map.put("password", password);
-                            }
+                        password = setPassword(map, password);
 
                         connection.setHost(host);
                         connection.setPort(port);
@@ -254,10 +247,10 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                     //try to parse options if the exist otherwise we will just remove them.
                     try {
                         if (map.containsKey("options")) {
-                            MongoConnection connection = new MongoConnection((String)map.get("identifier"));
+                            MongoConnection connection = new MongoConnection((String) map.get("identifier"));
                             map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
                         }
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         map.remove("options");
                     }
                     logger.info("Import " + (map.containsKey("identifier") ? "for connection: '" + map.get("identifier") + "'" : "") + " failed", ex.getMessage(), ex);
@@ -270,7 +263,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         map.put("statusMessage", "connectionExists");
                     } else {
                         //Create connection object
-                        RedisConnection connection = new RedisConnection((String)map.get("identifier"));
+                        RedisConnection connection = new RedisConnection((String) map.get("identifier"));
                         String host = map.containsKey("host") ? (String) map.get("host") : null;
                         Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : null;
                         Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
@@ -281,13 +274,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         Long timeout = map.containsKey("timeout") ? Long.parseLong((String) map.get("timeout")) : null;
                         Integer weight = map.containsKey("weight") ? Integer.parseInt((String) map.get("weight")) : null;
 
-                        if(password != null && password.contains("_ENC")) {
-                            password = password.substring(0,32);
-                            password = EncryptionUtils.passwordBaseDecrypt(password);
-                            map.put("password",password);
-                        } else if (password != null && !password.contains("_ENC")) {
-                            map.put("password", password);
-                        }
+                        password = setPassword(map, password);
 
                         connection.setHost(host);
                         connection.setPort(port);
@@ -308,10 +295,10 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                     //try to parse options if the exist otherwise we will just remove them.
                     try {
                         if (map.containsKey("options")) {
-                            RedisConnection connection = new RedisConnection((String)map.get("identifier"));
+                            RedisConnection connection = new RedisConnection((String) map.get("identifier"));
                             map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
                         }
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         map.remove("options");
                     }
                     logger.info("Import " + (map.containsKey("identifier") ? "for connection: '" + map.get("identifier") + "'" : "") + " failed", ex.getMessage(), ex);
@@ -323,6 +310,17 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                 map.put("statusMessage", "invalidDatabaseType");
         }
         return map;
+    }
+
+    private String setPassword(Map<String, Object> map, String password) {
+        if (password != null && password.contains("_ENC")) {
+            password = password.substring(0, 32);
+            password = EncryptionUtils.passwordBaseDecrypt(password);
+            map.put("password", password);
+        } else if (password != null && !password.contains("_ENC")) {
+            map.put("password", password);
+        }
+        return password;
     }
 
     protected BundleContext getBundleContext() {
@@ -342,7 +340,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         this.dslHandlerMap = dslHandlerMap;
     }
 
-    public File exportConnections (JSONObject connections) throws JSONException {
+    public File exportConnections(JSONObject connections) throws JSONException {
         File file = null;
 
         try {
@@ -354,9 +352,9 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                 JSONArray connectionsArray = (JSONArray) connections.get(type);
                 for (int i = 0; i < connectionsArray.length(); i++) {
                     String connectionId = connectionsArray.getString(i);
-                    sb.append("connection {" + Utils.NEW_LINE);
+                    sb.append("connection {").append(Utils.NEW_LINE);
                     sb.append(getConnection(connectionId, DatabaseTypes.valueOf(type)).getSerializedExportData());
-                    sb.append(Utils.NEW_LINE + "}" + Utils.NEW_LINE);
+                    sb.append(Utils.NEW_LINE).append("}").append(Utils.NEW_LINE);
                 }
             }
             FileUtils.writeStringToFile(file, sb.toString(), true);
@@ -366,7 +364,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         return file;
     }
 
-    public Map<String, Object> getServerStatus(String connectionId, DatabaseTypes databaseType ) {
+    public Map<String, Object> getServerStatus(String connectionId, DatabaseTypes databaseType) {
         AbstractConnection connection = getConnection(connectionId, databaseType);
         Map<String, Object> serverStatus = new LinkedHashMap<>();
         if (!connection.isConnected()) {

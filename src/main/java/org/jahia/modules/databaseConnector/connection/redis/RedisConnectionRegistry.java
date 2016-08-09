@@ -22,6 +22,7 @@ import static org.jahia.modules.databaseConnector.connection.AbstractConnection.
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.PASSWORD_KEY;
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.PORT_KEY;
 import static org.jahia.modules.databaseConnector.connection.redis.RedisConnection.*;
+import static org.jahia.modules.databaseConnector.connection.redis.RedisConnection.OPTIONS_KEY;
 
 
 /**
@@ -43,7 +44,7 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
-                QueryResult queryResult = query("SELECT * FROM ["+ NODE_TYPE +"]", session);
+                QueryResult queryResult = query("SELECT * FROM [" + NODE_TYPE + "]", session);
                 NodeIterator it = queryResult.getNodes();
                 while (it.hasNext()) {
                     JCRNodeWrapper connectionNode = (JCRNodeWrapper) it.next();
@@ -118,7 +119,7 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
     }
 
 
-        @Override
+    @Override
     public boolean importConnection(Map<String, Object> map) {
         return false;
     }
@@ -134,5 +135,5 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
         }
     }
 
-    }
+}
 

@@ -14,10 +14,15 @@ import javax.jcr.query.QueryResult;
 import java.util.Map;
 
 import static org.jahia.modules.databaseConnector.Utils.query;
-import static org.jahia.modules.databaseConnector.connection.AbstractConnection.*;
-import static org.jahia.modules.databaseConnector.connection.mongo.MongoConnection.AUTH_DB_KEY;
-import static org.jahia.modules.databaseConnector.connection.mongo.MongoConnection.WRITE_CONCERN_KEY;
-import static org.jahia.modules.databaseConnector.connection.mongo.MongoConnection.NODE_TYPE;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.DB_NAME_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.HOST_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.ID_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.IS_CONNECTED_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.OPTIONS_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.PASSWORD_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.PORT_KEY;
+import static org.jahia.modules.databaseConnector.connection.AbstractConnection.USER_KEY;
+import static org.jahia.modules.databaseConnector.connection.mongo.MongoConnection.*;
 
 /**
  * Date: 11/6/2013
@@ -38,7 +43,7 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
-                QueryResult queryResult = query("SELECT * FROM ["+ NODE_TYPE +"]", session);
+                QueryResult queryResult = query("SELECT * FROM [" + NODE_TYPE + "]", session);
                 NodeIterator it = queryResult.getNodes();
                 while (it.hasNext()) {
                     JCRNodeWrapper connectionNode = (JCRNodeWrapper) it.next();
@@ -88,7 +93,7 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                 }
                 if (mongoConnection.isConnected() && mongoConnection.testConnectionCreation()) {
                     mongoConnection.registerAsService();
-                }else {
+                } else {
                     mongoConnection.isConnected(false);
                 }
                 registry.put(mongoConnection.getId(), mongoConnection);
@@ -102,8 +107,7 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
                 }
             }
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }

@@ -11,7 +11,7 @@ import org.jahia.modules.databaseConnector.connection.ConnectionData;
  * @author Frédéric Pierre
  * @version 1.0
  */
-public class RedisConnectionData extends ConnectionData{
+public class RedisConnectionData extends ConnectionData {
 
     private Long timeout;
 

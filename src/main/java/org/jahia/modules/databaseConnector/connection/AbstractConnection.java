@@ -1,4 +1,5 @@
 package org.jahia.modules.databaseConnector.connection;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -7,7 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.DATABASE_TYPE_KEY;
 
@@ -15,53 +19,39 @@ import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.DATAB
  * @author stefan on 2016-05-10.
  */
 
-public abstract class AbstractConnection <T extends ConnectionData, E extends Object> implements Serializable {
-
-    private static final Logger logger = LoggerFactory.getLogger(AbstractConnection.class);
-
-    private static final long serialVersionUID = 1L;
-
-    protected String id;
-
-    protected String oldId;
-
-    protected String host;
-
-    protected Integer port;
-
-    protected String dbName;
-
-    protected String uri;
-
-    protected String user;
-
-    protected String password;
-
-    protected String options;
-
-    protected Boolean isConnected;
+public abstract class AbstractConnection<T extends ConnectionData, E extends Object> implements Serializable {
 
     public final static String ID_KEY = "dc:id";
-
     public final static String HOST_KEY = "dc:host";
-
     public final static String PORT_KEY = "dc:port";
-
     public final static String DB_NAME_KEY = "dc:dbName";
-
     public final static String URI_KEY = "dc:uri";
-
     public final static String USER_KEY = "dc:user";
-
     public final static String PASSWORD_KEY = "dc:password";
-
     public final static String IS_CONNECTED_KEY = "dc:isConnected";
-
-    private final static String DATABASE_ID_KEY = "databaseId";
-
     public final static String OPTIONS_KEY = "dc:options";
-
+    private static final Logger logger = LoggerFactory.getLogger(AbstractConnection.class);
+    private static final long serialVersionUID = 1L;
+    private final static String DATABASE_ID_KEY = "databaseId";
     private final List<ServiceRegistration> serviceRegistrations = new LinkedList<>();
+    protected String id;
+    protected String oldId;
+    protected String host;
+    protected Integer port;
+    protected String dbName;
+    protected String uri;
+    protected String user;
+    protected String password;
+    protected String options;
+    protected Boolean isConnected;
+
+    public static String createFilter(DatabaseTypes databaseType, String databaseId) {
+        return "(&(" + DATABASE_TYPE_KEY + "=" + databaseType.name() + ")(" + DATABASE_ID_KEY + "=" + databaseId + "))";
+    }
+
+    public static String createSingleFilter(DatabaseTypes databaseType) {
+        return "(" + DATABASE_TYPE_KEY + "=" + databaseType.name() + ")";
+    }
 
     protected abstract Object beforeRegisterAsService();
 
@@ -112,16 +102,8 @@ public abstract class AbstractConnection <T extends ConnectionData, E extends Ob
         return true;
     }
 
-    public static String createFilter(DatabaseTypes databaseType, String databaseId) {
-        return "(&(" + DATABASE_TYPE_KEY + "=" + databaseType.name() + ")(" + DATABASE_ID_KEY + "=" + databaseId + "))";
-    }
-
-    public static String createSingleFilter(DatabaseTypes databaseType) {
-        return "(" + DATABASE_TYPE_KEY + "=" + databaseType.name() + ")";
-    }
-
     private Hashtable<String, String> createProperties(DatabaseTypes databaseType, String databaseId) {
-        Hashtable<String, String> properties = new Hashtable<String, String>();
+        Hashtable<String, String> properties = new Hashtable<>();
         properties.put(DATABASE_TYPE_KEY, databaseType.name());
         properties.put(DATABASE_ID_KEY, databaseId);
         return properties;
@@ -135,6 +117,7 @@ public abstract class AbstractConnection <T extends ConnectionData, E extends Ob
         }
         return interfacesNames;
     }
+
     public String getId() {
         return id;
     }

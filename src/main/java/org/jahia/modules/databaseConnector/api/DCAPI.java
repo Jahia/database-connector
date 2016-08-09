@@ -2,23 +2,23 @@
  * ==========================================================================================
  * =                            JAHIA'S ENTERPRISE DISTRIBUTION                             =
  * ==========================================================================================
- *
- *                                  http://www.jahia.com
- *
+ * <p>
+ * http://www.jahia.com
+ * <p>
  * JAHIA'S ENTERPRISE DISTRIBUTIONS LICENSING - IMPORTANT INFORMATION
  * ==========================================================================================
- *
- *     Copyright (C) 2002-2016 Jahia Solutions Group. All rights reserved.
- *
- *     This file is part of a Jahia's Enterprise Distribution.
- *
- *     Jahia's Enterprise Distributions must be used in accordance with the terms
- *     contained in the Jahia Solutions Group Terms & Conditions as well as
- *     the Jahia Sustainable Enterprise License (JSEL).
- *
- *     For questions regarding licensing, support, production usage...
- *     please contact our team at sales@jahia.com or go to http://www.jahia.com/license.
- *
+ * <p>
+ * Copyright (C) 2002-2016 Jahia Solutions Group. All rights reserved.
+ * <p>
+ * This file is part of a Jahia's Enterprise Distribution.
+ * <p>
+ * Jahia's Enterprise Distributions must be used in accordance with the terms
+ * contained in the Jahia Solutions Group Terms & Conditions as well as
+ * the Jahia Sustainable Enterprise License (JSEL).
+ * <p>
+ * For questions regarding licensing, support, production usage...
+ * please contact our team at sales@jahia.com or go to http://www.jahia.com/license.
+ * <p>
  * ==========================================================================================
  */
 package org.jahia.modules.databaseConnector.api;
@@ -37,16 +37,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
+
 import javax.inject.Inject;
 import javax.jcr.RepositoryException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -62,7 +65,7 @@ public class DCAPI {
 
     @Inject
     public DCAPI(JCRTemplate jcrTemplate, DatabaseConnectorManager databaseConnectorManager) {
-        databaseConnector = new DatabaseConnector(jcrTemplate, databaseConnectorManager, logger);
+        databaseConnector = new DatabaseConnector(databaseConnectorManager);
     }
 
     //@TODO Remove when production ready
@@ -89,7 +92,7 @@ public class DCAPI {
     @Path("/import")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
-    public Response importTest(InputStream source){
+    public Response importTest(InputStream source) {
         JSONObject jsonAnswer = new JSONObject();
         try {
             jsonAnswer.put("results", databaseConnector.importConnections(source));
@@ -128,29 +131,30 @@ public class DCAPI {
                 while (databaseTypes.hasNext()) {
                     String databaseType = (String) databaseTypes.next();
                     JSONArray connections = jsonObject.getJSONArray(databaseType);
-                    exportName = "DBConnector-" + connections.get(0)+ "_" + databaseType + "_Export";
+                    exportName = "DBConnector-" + connections.get(0) + "_" + databaseType + "_Export";
                 }
             } else {
                 exportName = "DBConnectorConnectionsExport";
             }
             File exportedConnections = databaseConnector.exportConnections(jsonObject);
             Response.ResponseBuilder response;
-            if (exportedConnections != null){
+            if (exportedConnections != null) {
                 response = Response.ok(exportedConnections);
-                response.type("text/plain").header("Content-Disposition", "attachment; filename="+exportName+".txt");
-            }
-            else {
+                response.type("text/plain").header("Content-Disposition", "attachment; filename=" + exportName + ".txt");
+            } else {
                 response = Response.serverError();
             }
             try {
                 return response.build();
             } finally {
-                FileUtils.forceDeleteOnExit(exportedConnections);
+                if(exportedConnections!=null) {
+                    FileUtils.forceDeleteOnExit(exportedConnections);
+                }
             }
-        } catch(JSONException ex) {
+        } catch (JSONException ex) {
             logger.error(ex.getMessage(), ex);
             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\":\"Invalid JSON object\"}").build();
-        } catch(RepositoryException ex) {
+        } catch (RepositoryException ex) {
             logger.error(ex.getMessage(), ex);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Could not perform connection export\"}").build();
         } catch (IOException ex) {
@@ -178,7 +182,7 @@ public class DCAPI {
                 for (int i = 0; i < connectionsToImport.length(); i++) {
                     Map<String, Object> result = Utils.buildConnection(connectionsToImport.getJSONObject(i));
                     if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
-                        AbstractConnection connection = ((AbstractConnection)result.get("connection"));
+                        AbstractConnection connection = ((AbstractConnection) result.get("connection"));
                         if (connection.isConnected() && !databaseConnector.testConnection(connection)) {
                             connection.isConnected(false);
                         }
@@ -197,9 +201,9 @@ public class DCAPI {
                 importResults.put("success", success);
                 jsonAnswer.put("connections", importResults);
             } else {
-                Map<String, Object> result = Utils.buildConnection( new JSONObject(data));
+                Map<String, Object> result = Utils.buildConnection(new JSONObject(data));
                 if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
-                    AbstractConnection connection = (AbstractConnection)result.get("connection");
+                    AbstractConnection connection = (AbstractConnection) result.get("connection");
                     if (connection.isConnected() && !databaseConnector.testConnection(connection)) {
                         connection.isConnected(false);
                     }
@@ -214,7 +218,7 @@ public class DCAPI {
             }
             return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
 
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             logger.error("Cannot parse json data : {}", data);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
         }
@@ -226,8 +230,7 @@ public class DCAPI {
     public Response getConnections() {
         try {
             return Response.status(Response.Status.OK).entity(databaseConnector.getAllConnections()).build();
-        }
-        catch(JSONException e) {
+        } catch (JSONException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
         }
     }

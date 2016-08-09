@@ -2,23 +2,23 @@
  * ==========================================================================================
  * =                            JAHIA'S ENTERPRISE DISTRIBUTION                             =
  * ==========================================================================================
- *
- *                                  http://www.jahia.com
- *
+ * <p>
+ * http://www.jahia.com
+ * <p>
  * JAHIA'S ENTERPRISE DISTRIBUTIONS LICENSING - IMPORTANT INFORMATION
  * ==========================================================================================
- *
- *     Copyright (C) 2002-2016 Jahia Solutions Group. All rights reserved.
- *
- *     This file is part of a Jahia's Enterprise Distribution.
- *
- *     Jahia's Enterprise Distributions must be used in accordance with the terms
- *     contained in the Jahia Solutions Group Terms & Conditions as well as
- *     the Jahia Sustainable Enterprise License (JSEL).
- *
- *     For questions regarding licensing, support, production usage...
- *     please contact our team at sales@jahia.com or go to http://www.jahia.com/license.
- *
+ * <p>
+ * Copyright (C) 2002-2016 Jahia Solutions Group. All rights reserved.
+ * <p>
+ * This file is part of a Jahia's Enterprise Distribution.
+ * <p>
+ * Jahia's Enterprise Distributions must be used in accordance with the terms
+ * contained in the Jahia Solutions Group Terms & Conditions as well as
+ * the Jahia Sustainable Enterprise License (JSEL).
+ * <p>
+ * For questions regarding licensing, support, production usage...
+ * please contact our team at sales@jahia.com or go to http://www.jahia.com/license.
+ * <p>
  * ==========================================================================================
  */
 package org.jahia.modules.databaseConnector.api.subresources;
@@ -53,16 +53,8 @@ public class MongoDB {
     private DatabaseConnector databaseConnector;
 
     @Inject
-    public MongoDB(JCRTemplate jcrTemplate, DatabaseConnectorManager databaseConnectorManager) {
-        databaseConnector = new DatabaseConnector(jcrTemplate, databaseConnectorManager, logger);
-    }
-
-    //@TODO Remove when production ready
-    @GET
-    @Path("/test/{testParam}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getJcrFormForPreview(@PathParam("testParam") String testParam) {
-        return Response.status(Response.Status.OK).entity("{\"success\": \"We received your parameter: ' " + testParam.toString() + "'\"}").build();
+    public MongoDB(DatabaseConnectorManager databaseConnectorManager) {
+        databaseConnector = new DatabaseConnector(databaseConnectorManager);
     }
 
     @GET
@@ -78,7 +70,7 @@ public class MongoDB {
     public Response getConnections() {
         try {
             return Response.status(Response.Status.OK).entity(databaseConnector.getConnections(DatabaseTypes.MONGO)).build();
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
         }
     }
@@ -136,7 +128,7 @@ public class MongoDB {
                 logger.info("Successfully created MongoDB connection: " + id);
                 return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
             }
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             logger.error("Cannot parse json data : {}", data);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
         }
@@ -200,7 +192,7 @@ public class MongoDB {
                 logger.info("Successfully edited MongoDB connection: " + id);
                 return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
             }
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             logger.error("Cannot parse json data : {}", data);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
         }
@@ -275,7 +267,7 @@ public class MongoDB {
             } else {
                 String id = connectionParameters.has("id") ? connectionParameters.getString("id") : null;
                 String host = connectionParameters.has("host") ? connectionParameters.getString("host") : null;
-                Integer port = connectionParameters.has("port") && !StringUtils.isEmpty(connectionParameters.getString("port"))  ? connectionParameters.getInt("port") : null;
+                Integer port = connectionParameters.has("port") && !StringUtils.isEmpty(connectionParameters.getString("port")) ? connectionParameters.getInt("port") : null;
                 Boolean isConnected = connectionParameters.has("isConnected") && connectionParameters.getBoolean("isConnected");
                 String dbName = connectionParameters.has("dbName") ? connectionParameters.getString("dbName") : null;
                 String user = connectionParameters.has("user") ? connectionParameters.getString("user") : null;
@@ -298,7 +290,7 @@ public class MongoDB {
                 logger.info(connectionTestPassed ? "Connection test successfully passed" : "Connection test failed" + " for MongoDB with id: " + id);
                 return Response.status(Response.Status.OK).entity("{\"result\": " + connectionTestPassed + "}").build();
             }
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             logger.error("Cannot parse json data : {}", data);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
         }
@@ -317,10 +309,10 @@ public class MongoDB {
                 logger.info("Successfully retrieved Status for MongoDB connection with id: " + connectionId);
             }
             return Response.status(Response.Status.OK).entity(serverStatus).build();
-        } catch(MongoCommandException e) {
+        } catch (MongoCommandException e) {
             logger.info("Authorization failed for status request, MongoDB connection with id: " + connectionId);
             return Response.status(Response.Status.OK).entity("{\"failed\":\"Access Denied\"}").build();
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.error("Failed retrieve Status for MongoDB connection with id: " + connectionId);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"failed\":\"Cannot get database status\"}").build();
         }
@@ -332,7 +324,7 @@ public class MongoDB {
     public Response getWriteConcernOptions() {
         try {
             return Response.status(Response.Status.OK).entity(MongoConnection.getWriteConcernOptions()).build();
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.error("Failed to retrieve write concern options", e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Failed to retrieve write concern options\"}").build();
         }

@@ -2,23 +2,23 @@
  * ==========================================================================================
  * =                            JAHIA'S ENTERPRISE DISTRIBUTION                             =
  * ==========================================================================================
- *
- *                                  http://www.jahia.com
- *
+ * <p>
+ * http://www.jahia.com
+ * <p>
  * JAHIA'S ENTERPRISE DISTRIBUTIONS LICENSING - IMPORTANT INFORMATION
  * ==========================================================================================
- *
- *     Copyright (C) 2002-2016 Jahia Solutions Group. All rights reserved.
- *
- *     This file is part of a Jahia's Enterprise Distribution.
- *
- *     Jahia's Enterprise Distributions must be used in accordance with the terms
- *     contained in the Jahia Solutions Group Terms & Conditions as well as
- *     the Jahia Sustainable Enterprise License (JSEL).
- *
- *     For questions regarding licensing, support, production usage...
- *     please contact our team at sales@jahia.com or go to http://www.jahia.com/license.
- *
+ * <p>
+ * Copyright (C) 2002-2016 Jahia Solutions Group. All rights reserved.
+ * <p>
+ * This file is part of a Jahia's Enterprise Distribution.
+ * <p>
+ * Jahia's Enterprise Distributions must be used in accordance with the terms
+ * contained in the Jahia Solutions Group Terms & Conditions as well as
+ * the Jahia Sustainable Enterprise License (JSEL).
+ * <p>
+ * For questions regarding licensing, support, production usage...
+ * please contact our team at sales@jahia.com or go to http://www.jahia.com/license.
+ * <p>
  * ==========================================================================================
  */
 package org.jahia.modules.databaseConnector.api.subresources;
@@ -53,15 +53,7 @@ public class RedisDB {
 
     @Inject
     public RedisDB(JCRTemplate jcrTemplate, DatabaseConnectorManager databaseConnectorManager) {
-        databaseConnector = new DatabaseConnector(jcrTemplate, databaseConnectorManager, logger);
-    }
-
-    //@TODO Remove when production ready
-    @GET
-    @Path("/test/{testParam}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getJcrFormForPreview(@PathParam("testParam") String testParam) {
-        return Response.status(Response.Status.OK).entity("{\"success\": \"We received your parameter: ' " + testParam.toString() + "'\"}").build();
+        databaseConnector = new DatabaseConnector(databaseConnectorManager);
     }
 
     @GET
@@ -77,7 +69,7 @@ public class RedisDB {
     public Response getConnections() {
         try {
             return Response.status(Response.Status.OK).entity(databaseConnector.getConnections(DatabaseTypes.REDIS)).build();
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
         }
     }
@@ -135,7 +127,7 @@ public class RedisDB {
                 logger.info("Successfully created RedisDB connection: " + id);
                 return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
             }
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             logger.error("Cannot parse json data : {}", data);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
         }
@@ -209,7 +201,7 @@ public class RedisDB {
                 logger.info("Successfully edited RedisDB connection: " + id);
                 return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
             }
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             logger.error("Cannot parse json data : {}", data);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
         }

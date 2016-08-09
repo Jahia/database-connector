@@ -12,9 +12,9 @@ import javax.jcr.RepositoryException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static org.jahia.modules.databaseConnector.Utils.query;
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.*;
 import static org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager.*;
-import static org.jahia.modules.databaseConnector.Utils.query;
 
 /**
  * Date: 11/6/2013
@@ -22,7 +22,7 @@ import static org.jahia.modules.databaseConnector.Utils.query;
  * @author Frédéric Pierre
  * @version 1.0
  */
-public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseConnectionRegistry<T>{
+public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseConnectionRegistry<T> {
 
     private final static String NODE_TYPE = "dcmix:databaseConnection";
 
@@ -34,7 +34,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
 
     public AbstractDatabaseConnectionRegistry() {
         this.jcrTemplate = JCRTemplate.getInstance();
-        this.registry = new TreeMap<String, T>();
+        this.registry = new TreeMap<>();
     }
 
 
@@ -58,8 +58,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
                     Assert.isTrue(connectionNode.getPrimaryNodeTypeName().equals(nodeType), "Stored node's primary type not equal " + nodeType);
                     session.checkout(connectionNode);
 
-                }
-                else {
+                } else {
                     // As is the id of a database connection is editable, if you need it to be final uncomment
                     // the next line and put the setProperty(ID_KEY, connection.getId()) inside the else statement.
                     // You will also need to add the attribute 'disabled="${isEdition}"' in the form input field
@@ -109,7 +108,8 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
         }
     }
 
-    protected void storeAdvancedConfig(AbstractConnection connection, JCRNodeWrapper node) throws RepositoryException {}
+    protected void storeAdvancedConfig(AbstractConnection connection, JCRNodeWrapper node) throws RepositoryException {
+    }
 
     public boolean removeConnection(final String databaseConnectionId) {
         Assert.isTrue(registry.containsKey(databaseConnectionId), "No database connection with ID: " + databaseConnectionId);
@@ -184,12 +184,12 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
         String statement = "SELECT * FROM [" + NODE_TYPE + "] WHERE [" + ID_KEY + "] = '" + databaseConnectionId + "'";
         NodeIterator nodes = query(statement, session).getNodes();
         if (!nodes.hasNext()) {
-            throw new IllegalArgumentException("No database connection with ID '"+databaseConnectionId+"' stored in the JCR");
+            throw new IllegalArgumentException("No database connection with ID '" + databaseConnectionId + "' stored in the JCR");
         }
         return nodes.nextNode();
     }
 
-    private boolean isConnectionIdAvailable(String databaseConnectionId, JCRSessionWrapper session) throws RepositoryException{
+    private boolean isConnectionIdAvailable(String databaseConnectionId, JCRSessionWrapper session) throws RepositoryException {
         String statement = "SELECT * FROM [" + NODE_TYPE + "] WHERE [" + ID_KEY + "] = '" + databaseConnectionId + "'";
         NodeIterator nodes = query(statement, session).getNodes();
         return !nodes.hasNext();
@@ -199,8 +199,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
         JCRNodeWrapper settings = session.getNode(DATABASE_CONNECTOR_ROOT_PATH);
         if (settings.hasNode(DATABASE_CONNECTOR_PATH)) {
             return settings.getNode(DATABASE_CONNECTOR_PATH);
-        }
-        else {
+        } else {
             return settings.addNode(DATABASE_CONNECTOR_PATH, DATABASE_CONNECTOR_NODE_TYPE);
         }
     }
@@ -209,7 +208,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
         return EncryptionUtils.passwordBaseEncrypt(password);
     }
 
-    protected String decodePassword(JCRNodeWrapper connectionNode, String property) throws RepositoryException{
+    protected String decodePassword(JCRNodeWrapper connectionNode, String property) throws RepositoryException {
         return connectionNode.hasProperty(property) ? EncryptionUtils.passwordBaseDecrypt(connectionNode.getProperty(property).getString()) : null;
     }
 
@@ -230,9 +229,9 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
 
     protected Long setLongConnectionProperty(JCRNodeWrapper connectionNode, String property, boolean isMandatory) throws RepositoryException {
         if (connectionNode.hasProperty(property))
-            return isMandatory ?  connectionNode.getProperty(property).getLong() : connectionNode.getProperty(property).getLong();
+            return isMandatory ? connectionNode.getProperty(property).getLong() : connectionNode.getProperty(property).getLong();
         else
-            return isMandatory ?  connectionNode.getProperty(property).getLong() : null;
+            return isMandatory ? connectionNode.getProperty(property).getLong() : null;
     }
 
     public boolean testConnection(AbstractConnection connection) {

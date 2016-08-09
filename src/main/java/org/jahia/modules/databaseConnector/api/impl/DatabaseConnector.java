@@ -1,5 +1,6 @@
 package org.jahia.modules.databaseConnector.api.impl;
 
+import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.ConnectionData;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
@@ -8,8 +9,6 @@ import org.jahia.modules.databaseConnector.connection.mongo.MongoConnectionData;
 import org.jahia.modules.databaseConnector.connection.redis.RedisConnection;
 import org.jahia.modules.databaseConnector.connection.redis.RedisConnectionData;
 import org.jahia.modules.databaseConnector.serialization.models.DbConnections;
-import org.jahia.modules.databaseConnector.connection.AbstractConnection;
-import org.jahia.services.content.JCRTemplate;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,7 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.RepositoryException;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,13 +27,12 @@ import java.util.Map;
 /**
  * @author donnylam on 2016-05-04.
  */
-public class DatabaseConnector extends AbstractResource {
+public class DatabaseConnector {
     private final static Logger logger = LoggerFactory.getLogger(DatabaseConnector.class);
 
     private transient DatabaseConnectorManager databaseConnectorManager;
 
-    public DatabaseConnector(JCRTemplate jcrTemplate, DatabaseConnectorManager databaseConnectorManager, Logger logger) {
-        super(jcrTemplate, logger);
+    public DatabaseConnector(DatabaseConnectorManager databaseConnectorManager) {
         this.databaseConnectorManager = databaseConnectorManager;
     }
 
@@ -79,7 +79,7 @@ public class DatabaseConnector extends AbstractResource {
     }
 
     public <T extends ConnectionData> String getAllConnections() throws JSONException {
-        String connections = null;
+        String connections;
 
         Map<String, AbstractConnection> allConnections = new HashMap<>();
 
@@ -113,9 +113,9 @@ public class DatabaseConnector extends AbstractResource {
         return databaseConnectorManager.updateConnection(connectionId, databaseType, connect);
     }
 
-    public String getDatabaseTypes() throws JSONException{
+    public String getDatabaseTypes() throws JSONException {
         JSONObject databaseTypes = new JSONObject();
-        for (DatabaseTypes databaseType: DatabaseTypes.getAllDatabaseTypes()) {
+        for (DatabaseTypes databaseType : DatabaseTypes.getAllDatabaseTypes()) {
             databaseTypes.put(databaseType.name(), databaseType.getDisplayName());
         }
         return databaseTypes.toString();
@@ -143,7 +143,7 @@ public class DatabaseConnector extends AbstractResource {
         return databaseConnectorManager.executeConnectionImportHandler(source);
     }
 
-    public Map<String, Object> getServerStatus(String connectionId, DatabaseTypes databaseType ) {
-        return databaseConnectorManager.getServerStatus(connectionId,databaseType);
+    public Map<String, Object> getServerStatus(String connectionId, DatabaseTypes databaseType) {
+        return databaseConnectorManager.getServerStatus(connectionId, databaseType);
     }
 }

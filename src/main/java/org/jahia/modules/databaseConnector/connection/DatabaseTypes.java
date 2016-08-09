@@ -11,22 +11,21 @@ import java.util.TreeSet;
  * @version 1.0
  */
 public enum DatabaseTypes {
-    
+
     REDIS("RedisDB"), MONGO("MongoDB");
 
-    private final String displayName;
-
     public final static String DATABASE_TYPE_KEY = "databaseType";
+    private final String displayName;
 
     DatabaseTypes(String displayName) {
         this.displayName = displayName;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
     public static Set<DatabaseTypes> getAllDatabaseTypes() {
         return new TreeSet<>(Arrays.asList(values()));
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 }

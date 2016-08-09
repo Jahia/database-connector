@@ -18,7 +18,7 @@ public class DbConnections<T extends ConnectionData> {
 
     }
 
-    public DbConnections(List <T> connections) {
+    public DbConnections(List<T> connections) {
         this.connections = connections;
     }
 

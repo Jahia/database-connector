@@ -1,6 +1,8 @@
 package org.jahia.modules.databaseConnector.connection.redis;
 
-import com.lambdaworks.redis.*;
+import com.lambdaworks.redis.RedisClient;
+import com.lambdaworks.redis.RedisURI;
+import com.lambdaworks.redis.ZStoreArgs;
 import com.lambdaworks.redis.cluster.ClusterClientOptions;
 import com.lambdaworks.redis.cluster.RedisClusterClient;
 import org.apache.commons.lang.StringUtils;
@@ -15,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedHashMap;
 import java.util.concurrent.TimeUnit;
 
-
 import static org.jahia.modules.databaseConnector.Utils.*;
 
 /**
@@ -23,44 +24,35 @@ import static org.jahia.modules.databaseConnector.Utils.*;
  */
 public class RedisConnection extends AbstractConnection {
 
-    private static final Logger logger = LoggerFactory.getLogger(RedisConnection.class);
-
-    private RedisClient redisClient;
-
-    private RedisClusterClient redisClusterClient;
-
     public static final String NODE_TYPE = "dc:redisConnection";
-
-    private Long timeout;
-
-    private Integer weight;
-
     public static final String TIMEOUT_KEY = "dc:timeout";
-
     public static final String WEIGHT_KEY = "dc:weight";
-
+    private static final Logger logger = LoggerFactory.getLogger(RedisConnection.class);
     private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.REDIS;
-
-    private static final Integer DEFAULT_PORT = new Integer(6379);
+    private static final Integer DEFAULT_PORT = 6379;
+    private RedisClient redisClient;
+    private RedisClusterClient redisClusterClient;
+    private Long timeout;
+    private Integer weight;
 
     public RedisConnection(String id) {
         this.id = id;
-    }
-
-    public void setTimeout(Long timeout) {
-        this.timeout = timeout;
     }
 
     public Long getTimeout() {
         return timeout;
     }
 
-    public void setWeight(Integer weight) {
-        this.weight = weight;
+    public void setTimeout(Long timeout) {
+        this.timeout = timeout;
     }
 
     public Integer getWeight() {
         return weight;
+    }
+
+    public void setWeight(Integer weight) {
+        this.weight = weight;
     }
 
     public RedisConnectionData makeConnectionData() {
@@ -96,16 +88,16 @@ public class RedisConnection extends AbstractConnection {
                 JSONObject jsonOptions = new JSONObject(options);
                 if (jsonOptions.has("cluster")) {
                     redisClusterClient = RedisClusterClient.create(buildRedisClientUri(true));
-                        if (jsonOptions.getJSONObject("cluster").has("refreshClusterView") && Boolean.valueOf((jsonOptions.getJSONObject("cluster")).getBoolean("refreshClusterView"))) {
-                            redisClusterClient.setOptions(new ClusterClientOptions.Builder()
-                                    .refreshClusterView(true)
-                                    .refreshPeriod(jsonOptions.getJSONObject("cluster").getInt("refreshPeriod"), TimeUnit.SECONDS).build()
-                            );
-                        }
-                        return redisClusterClient.connectCluster();
+                    if (jsonOptions.getJSONObject("cluster").has("refreshClusterView") && (jsonOptions.getJSONObject("cluster")).getBoolean("refreshClusterView")) {
+                        redisClusterClient.setOptions(new ClusterClientOptions.Builder()
+                                .refreshClusterView(true)
+                                .refreshPeriod(jsonOptions.getJSONObject("cluster").getInt("refreshPeriod"), TimeUnit.SECONDS).build()
+                        );
+                    }
+                    return redisClusterClient.connectCluster();
 
                 }
-            } catch(JSONException ex) {
+            } catch (JSONException ex) {
                 logger.error("Invalid JSON object", ex.getMessage());
             }
         }
@@ -134,7 +126,7 @@ public class RedisConnection extends AbstractConnection {
                 if (jsonOptions.has("cluster")) {
                     RedisClusterClient redisClusterClient = RedisClusterClient.create(buildRedisClientUri(true));
                     try {
-                        if (jsonOptions.getJSONObject("cluster").has("refreshClusterView") && Boolean.valueOf((jsonOptions.getJSONObject("cluster")).getBoolean("refreshClusterView"))) {
+                        if (jsonOptions.getJSONObject("cluster").has("refreshClusterView") && (jsonOptions.getJSONObject("cluster")).getBoolean("refreshClusterView")) {
                             redisClusterClient.setOptions(new ClusterClientOptions.Builder()
                                     .refreshClusterView(true)
                                     .refreshPeriod(jsonOptions.getJSONObject("cluster").getInt("refreshPeriod"), TimeUnit.SECONDS).build()
@@ -142,7 +134,7 @@ public class RedisConnection extends AbstractConnection {
                         }
                         redisClusterClient.connectCluster();
                         return true;
-                    } catch(JSONException ex) {
+                    } catch (JSONException ex) {
                         logger.error("Invalid JSON object", ex.getMessage());
                     }
                 }
@@ -164,15 +156,15 @@ public class RedisConnection extends AbstractConnection {
         try {
             if (options.containsKey("clusterSettings")) {
                 JSONObject jsonCluster = new JSONObject();
-                if (((LinkedHashMap)options.get("clusterSettings")).containsKey("refreshPeriod") && Integer.parseInt((String)(((LinkedHashMap)options.get("clusterSettings")).get("refreshPeriod"))) > 0) {
+                if (((LinkedHashMap) options.get("clusterSettings")).containsKey("refreshPeriod") && Integer.parseInt((String) (((LinkedHashMap) options.get("clusterSettings")).get("refreshPeriod"))) > 0) {
                     jsonCluster.put("refreshClusterView", true);
-                    jsonCluster.put("refreshPeriod", ((LinkedHashMap)options.get("clusterSettings")).get("refreshPeriod"));
+                    jsonCluster.put("refreshPeriod", ((LinkedHashMap) options.get("clusterSettings")).get("refreshPeriod"));
                 } else {
                     jsonCluster.put("refreshClusterView", false);
                 }
                 formattedOptions.put("cluster", jsonCluster);
             }
-        } catch(JSONException ex) {
+        } catch (JSONException ex) {
             logger.error("Failed to serialize imported connection options", ex.getMessage());
         }
         return formattedOptions.toString();
@@ -186,14 +178,14 @@ public class RedisConnection extends AbstractConnection {
         if (password != null) {
             builder.withPassword(password);
         }
-        if(dbName!=null && !isCluster) {
+        if (dbName != null && !isCluster) {
             builder.withDatabase(Integer.valueOf(dbName));
         }
-        if(timeout!=null) {
-            builder.withTimeout(timeout, TimeUnit.MILLISECONDS );
+        if (timeout != null) {
+            builder.withTimeout(timeout, TimeUnit.MILLISECONDS);
         }
 
-        if(weight!=null) {
+        if (weight != null) {
             ZStoreArgs.Builder.weights(weight);
         }
         return builder.build();
@@ -207,28 +199,26 @@ public class RedisConnection extends AbstractConnection {
     @Override
     public String getSerializedExportData() {
         StringBuilder serializedString = new StringBuilder();
-        serializedString.append(
-                        TABU + "type " + DOUBLE_QUOTE + DATABASE_TYPE + DOUBLE_QUOTE + NEW_LINE +
-                        TABU + "host " + DOUBLE_QUOTE + this.host + DOUBLE_QUOTE + NEW_LINE +
-                        TABU + "dbName " + DOUBLE_QUOTE + this.dbName + DOUBLE_QUOTE + NEW_LINE +
-                        TABU + "identifier " + DOUBLE_QUOTE + this.id + DOUBLE_QUOTE + NEW_LINE +
-                        TABU + "isConnected " + DOUBLE_QUOTE + this.isConnected() + DOUBLE_QUOTE + NEW_LINE
-        );
+        serializedString.append(TABU).append("type ").append(DOUBLE_QUOTE).append(DATABASE_TYPE).append(DOUBLE_QUOTE).append(NEW_LINE);
+        serializedString.append(TABU).append("host ").append(DOUBLE_QUOTE).append(this.host).append(DOUBLE_QUOTE).append(NEW_LINE);
+        serializedString.append(TABU).append("dbName ").append(DOUBLE_QUOTE).append(this.dbName).append(DOUBLE_QUOTE).append(NEW_LINE);
+        serializedString.append(TABU).append("identifier ").append(DOUBLE_QUOTE).append(this.id).append(DOUBLE_QUOTE).append(NEW_LINE);
+        serializedString.append(TABU).append("isConnected ").append(DOUBLE_QUOTE).append(this.isConnected()).append(DOUBLE_QUOTE).append(NEW_LINE);
 
         if (this.port != null) {
-            serializedString.append(TABU + "port " + DOUBLE_QUOTE + this.port + DOUBLE_QUOTE + NEW_LINE);
+            serializedString.append(TABU + "port " + DOUBLE_QUOTE).append(this.port).append(DOUBLE_QUOTE).append(NEW_LINE);
         }
 
         if (!StringUtils.isEmpty(this.password)) {
-            serializedString.append(TABU + "password " + DOUBLE_QUOTE + EncryptionUtils.passwordBaseEncrypt(this.password) + "_ENC" + DOUBLE_QUOTE + NEW_LINE);
+            serializedString.append(TABU + "password " + DOUBLE_QUOTE).append(EncryptionUtils.passwordBaseEncrypt(this.password)).append("_ENC").append(DOUBLE_QUOTE).append(NEW_LINE);
         }
 
         if (this.timeout != null) {
-            serializedString.append(TABU + "timeout " + DOUBLE_QUOTE + this.timeout + DOUBLE_QUOTE + NEW_LINE);
+            serializedString.append(TABU + "timeout " + DOUBLE_QUOTE).append(this.timeout).append(DOUBLE_QUOTE).append(NEW_LINE);
         }
 
         if (this.weight != null) {
-            serializedString.append(TABU + "weight " + DOUBLE_QUOTE + this.weight + DOUBLE_QUOTE + NEW_LINE);
+            serializedString.append(TABU + "weight " + DOUBLE_QUOTE).append(this.weight).append(DOUBLE_QUOTE).append(NEW_LINE);
         }
 
         if (this.options != null) {
@@ -238,15 +228,15 @@ public class RedisConnection extends AbstractConnection {
                 //Handle cluster settings
                 if (jsonOptions.has("cluster")) {
                     JSONObject jsonCluster = jsonOptions.getJSONObject("cluster");
-                    serializedString.append(NEW_LINE + TABU + TABU + "clusterSettings {");
+                    serializedString.append(NEW_LINE).append(TABU).append(TABU).append("clusterSettings {");
                     if (jsonCluster.has("refreshClusterView") && !StringUtils.isEmpty(jsonCluster.getString("refreshClusterView"))) {
-                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "refreshPeriod " + DOUBLE_QUOTE + jsonCluster.getString("refreshPeriod") + DOUBLE_QUOTE);
+                        serializedString.append(NEW_LINE).append(TABU).append(TABU).append(TABU).append("refreshPeriod ").append(DOUBLE_QUOTE).append(jsonCluster.getString("refreshPeriod")).append(DOUBLE_QUOTE);
                     } else {
-                        serializedString.append(NEW_LINE + TABU + TABU + TABU + "refreshPeriod " + DOUBLE_QUOTE + 0 + DOUBLE_QUOTE);
+                        serializedString.append(NEW_LINE).append(TABU).append(TABU).append(TABU).append("refreshPeriod ").append(DOUBLE_QUOTE).append(0).append(DOUBLE_QUOTE);
                     }
-                    serializedString.append(NEW_LINE + TABU + TABU + "}");
+                    serializedString.append(NEW_LINE).append(TABU).append(TABU).append("}");
                 }
-                serializedString.append(NEW_LINE + TABU + "}");
+                serializedString.append(NEW_LINE).append(TABU).append("}");
             } catch (JSONException ex) {
                 logger.error("Failed to parse connection options json", ex.getMessage());
             }
