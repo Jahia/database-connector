@@ -1,9 +1,10 @@
 (function() {
-    var dataFactory = function($http, $log) {
+    var dataFactory = function($http, $log, contextualData) {
         return {
             getData: getData,
             customRequest: customRequest,
-            parseRedisStatus: parseRedisStatus
+            parseRedisStatus: parseRedisStatus,
+            getDatabaseTypes: getDatabaseTypes
         };
 
         function getData(url) {
@@ -42,9 +43,16 @@
 
             return response;
         }
+
+        function getDatabaseTypes() {
+            return customRequest({
+                url: contextualData.context + '/modules/databaseconnector/databasetypes',
+                method: 'GET'
+            });
+        }
     };
 
-    dataFactory.$inject = ['$http', '$log'];
+    dataFactory.$inject = ['$http', '$log', 'contextualData'];
 
     angular
         .module('databaseConnector.dataFactory', [])

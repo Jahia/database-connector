@@ -1,23 +1,23 @@
 <dc-spinner spinner-mode="cmcc.spinnerOptions.mode" show="cmcc.spinnerOptions.showSpinner"></dc-spinner>
 <md-content layout-padding>
     <md-tabs md-dynamic-height md-border-bottom>
-        <md-tab label="Settings">
+        <md-tab label="{{cmcc.getMessage('dc_databaseConnector.label.settings')}}">
             <form name="mongoForm">
                 <md-content class="md-padding">
                     <md-checkbox ng-model="cmcc.connection.isConnected" aria-label="Automatic startup after Creation"
                                  ng-true-value="true" ng-false-value="false"
                                  class="md-warn md-align-top-left" flex>
-                        <span class="ipsum">Enable connection</span>
+                        <span class="ipsum" message-key="dc_databaseConnector.label.connection.enableConnection"></span>
                     </md-checkbox>
 
                     <md-button class="md-fab md-mini md-success pull-right"
                                ng-click="cmcc.testMongoConnection()"
                                ng-disabled="mongoForm.$invalid || mongoAdvancedForm.$invalid">
                         <i class="fa fa-lg fa-check-circle-o"></i>
-                        <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500">Reimport Connections</md-tooltip>
+                        <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500" message-key="dc_databaseConnector.label.modal.reimportConnections"></md-tooltip>
                     </md-button>
                     <md-input-container class="md-block" flex-gt-sm="1">
-                        <label>Host</label>
+                        <label message-key="dc_databaseConnector.label.host"></label>
                         <input title="host" required ng-minlength="4" md-maxlength="15" name="host"
                                ng-model="cmcc.connection.host">
                         <div ng-messages="mongoForm.host.$error" ng-if="mongoForm.host.$dirty">
@@ -29,7 +29,7 @@
                     </md-input-container>
 
                     <md-input-container class="md-block">
-                        <label>Port</label>
+                        <label message-key="dc_databaseConnector.label.port"></label>
                         <input title="port" md-maxlength="5" ng-pattern="/[0-9]*/" name="port"
                                ng-model="cmcc.connection.port" length-parser length-parser-max="5" range-parser
                                range-max-value="65535">
@@ -42,7 +42,7 @@
                     </md-input-container>
 
                     <md-input-container class="md-block">
-                        <label>Connection Name (id)</label>
+                        <label message-key="dc_databaseConnector.label.connection.id"></label>
                         <input title="Connection Name" md-maxlength="30" name="id" required
                                ng-pattern="/^[a-zA-Z0-9]+$/"
                                ng-model="cmcc.connection.id" original-value="{{cmcc.connection.oldId}}"
@@ -56,7 +56,7 @@
                     </md-input-container>
 
                     <md-input-container class="md-block">
-                        <label>Database Name</label>
+                        <label message-key="dc_databaseConnector.label.connection.dbName"></label>
                         <input title="Database Name" md-maxlength="30" required ng-pattern="/^[a-zA-Z0-9_]+$/"
                                name="dbName"
                                ng-model="cmcc.connection.dbName">
@@ -69,7 +69,7 @@
                     </md-input-container>
 
                     <md-input-container class="md-block">
-                        <label>User</label>
+                        <label message-key="dc_databaseConnector.label.user"></label>
                         <input title="User" name="user" ng-minlength="4" md-maxlength="30"
                                ng-model="cmcc.connection.user"
                                ng-pattern="/^[a-zA-Z0-9_-]*$/"
@@ -83,13 +83,13 @@
                     </md-input-container>
 
                     <md-input-container class="md-block" ng-if="!cmcc.isEmpty.user">
-                        <label>Password</label>
+                        <label message-key="dc_databaseConnector.label.password"></label>
                         <input title="Password" type="password" name="password" ng-model="cmcc.connection.password"
                                ng-change="cmcc.updateIsEmpty('password');">
                     </md-input-container>
 
                     <md-input-container class="md-block" ng-if="!cmcc.isEmpty.password && !cmcc.isEmpty.user">
-                        <label>Authentication Database</label>
+                        <label message-key="dc_databaseConnector.label.modal.mongo.authenticationDatabase"></label>
                         <input title="Authentication Database" required name="authDb"
                                ng-model="cmcc.connection.authDb">
                         <div ng-messages="mongoForm.authDb.$error" ng-if="mongoForm.authDb.$dirty">
@@ -103,12 +103,12 @@
             </form>
         </md-tab>
 
-        <md-tab label="Advanced Settings">
+        <md-tab label="{{cmcc.getMessage('dc_databaseConnector.label.advancedSettings')}}">
             <md-content class="md-padding">
                 <form name="mongoAdvancedForm">
 
                     <md-subheader class=" md-no-sticky">
-                        <span>Replica Set</span>
+                        <span message-key="dc_databaseConnector.label.modal.mongo.replicaSet"></span>
                         <md-checkbox class="pull-right"
                                      ng-model="cmcc.isReplicaSet"
                                      ng-true-value="true"
@@ -135,7 +135,7 @@
                             <md-list-item ng-repeat="member in cmcc.connection.options.repl.members track by $index "
                                           layout-margin layout-padding layout-fill layout-wrap="" class="box-wrap2">
                                 <md-input-container class="md-block" layout="flex">
-                                    <label>Host</label>
+                                    <label message-key="dc_databaseConnector.label.host"></label>
                                     <input title="replicaSetHost" class="md-primary" required
                                            name="replicaSetHost_{{$index}}"
                                            ng-model="member.host">
@@ -149,7 +149,7 @@
                                 </md-input-container>
                                 :
                                 <md-input-container class="md-block" layout="flex">
-                                    <label>Port</label>
+                                    <label message-key="dc_databaseConnector.label.port"></label>
                                     <input title="replicaSetPort" class="md-primary"
                                            name="replicaSetPort_{{$index}}"
                                            ng-pattern="/^[0-9]*$/"
@@ -181,10 +181,10 @@
                     </div>
                     <md-divider></md-divider>
 
-                    <md-subheader class="md-no-sticky"><span>Connection Settings</span></md-subheader>
+                    <md-subheader class="md-no-sticky" message-key="dc_databaseConnector.label.modal.connectionSettings"></md-subheader>
 
                     <md-input-container class="md-block col-md-offset-2">
-                        <label>Connect Timeout (milliseconds)</label>
+                        <label message-key="dc_databaseConnector.label.modal.mongo.connectTimeout"></label>
                         <input title="Connect Timeout" name="connectTimeoutMS" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.conn.connectTimeoutMS">
@@ -196,7 +196,7 @@
                         </div>
                     </md-input-container>
                     <md-input-container class="md-block col-md-offset-2">
-                        <label>Socket Timeout (milliseconds)</label>
+                        <label message-key="dc_databaseConnector.label.modal.mongo.socketTimeout"></label>
                         <input title="Socket Timeout" name="socketTimeoutMS" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.conn.socketTimeoutMS">
@@ -209,7 +209,7 @@
 
                     </md-input-container>
                     <md-input-container class="md-block col-md-offset-2">
-                        <label>Write Concern</label>
+                        <label message-key="dc_databaseConnector.label.modal.mongo.writeConcern"></label>
                         <md-select ng-model="cmcc.connection.writeConcern">
                             <md-option ng-repeat="writeConcern in cmcc.writeConcernOptions" value="{{writeConcern}}">
                                 {{writeConcern}}
@@ -218,11 +218,11 @@
                     </md-input-container>
                     <md-divider></md-divider>
 
-                    <md-subheader class="md-no-sticky"><span>Connection Pool Settings</span>
+                    <md-subheader class="md-no-sticky"><span message-key="dc_databaseConnector.label.modal.mongo.connectionPoolSettings"></span>
                     </md-subheader>
 
                     <md-input-container class="md-block col-md-offset-2">
-                        <label>Max Pool Size</label>
+                        <label message-key="dc_databaseConnector.label.modal.mongo.maxPoolSize"></label>
                         <input title="Max Pool Size" name="maxPoolSize" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.connPool.maxPoolSize">
@@ -234,7 +234,7 @@
                         </div>
                     </md-input-container>
                     <md-input-container class="md-block col-md-offset-2">
-                        <label>Min Pool Size</label>
+                        <label message-key="dc_databaseConnector.label.modal.mongo.minPoolSize"></label>
                         <input title="Min Pool Size" name="minPoolSize" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.connPool.minPoolSize">
@@ -246,7 +246,7 @@
                         </div>
                     </md-input-container>
                     <md-input-container class="md-block col-md-offset-2">
-                        <label>Wait Queue Timeout (milliseconds)</label>
+                        <label message-key="dc_databaseConnector.label.modal.mongo.waitQueueTimeout"></label>
                         <input title="Wait Queue Timeout" name="waitQueueTimeoutMS" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.connPool.waitQueueTimeoutMS">
@@ -261,22 +261,29 @@
             </md-content>
         </md-tab>
     </md-tabs>
-    <md-button ng-if="cmcc.mode=='create'" class="md-raised md-primary pull-right"
-               ng-click="cmcc.createMongoConnection()" ng-disabled="mongoForm.$invalid || mongoAdvancedForm.$invalid">
-        Create
+    <md-button ng-if="cmcc.mode=='create'"
+               class="md-raised md-primary pull-right"
+               ng-click="cmcc.createMongoConnection()"
+               ng-disabled="mongoForm.$invalid || mongoAdvancedForm.$invalid"
+               message-key="dc_databaseConnector.label.create">
     </md-button>
-    <md-button ng-if="cmcc.mode=='edit'" class="md-raised md-primary pull-right"
-               ng-click="cmcc.editMongoConnection()" ng-disabled="mongoForm.$invalid || mongoAdvancedForm.$invalid">
-        Update
+    <md-button ng-if="cmcc.mode=='edit'"
+               class="md-raised md-primary pull-right"
+               ng-click="cmcc.editMongoConnection()"
+               ng-disabled="mongoForm.$invalid || mongoAdvancedForm.$invalid"
+               message-key="dc_databaseConnector.label.update">
     </md-button>
     <md-button class="md-raised md-primary pull-right"
                ng-disabled="mongoForm.$invalid || mongoAdvancedForm.$invalid"
                ng-if="cmcc.mode=='import-edit'"
-               ng-click="cmcc.updateImportedConnection()">
-        Ok
+               ng-click="cmcc.updateImportedConnection()"
+               message-key="dc_databaseConnector.label.ok">
     </md-button>
-    <md-button class="md-raised md-primary pull-right" ng-click="cmcc.cancel()">
-        <span ng-if="cmcc.mode=='edit' || cmcc.mode=='create'">Back</span>
-        <span ng-if="cmcc.mode=='import-edit'">Cancel</span>
+    <md-button class="md-raised md-primary pull-right"
+               ng-click="cmcc.cancel()">
+        <span ng-if="cmcc.mode=='edit' || cmcc.mode=='create'"
+              message-key="dc_databaseConnector.label.back"></span>
+        <span ng-if="cmcc.mode=='import-edit'"
+              message-key="dc_databaseConnector.label.cancel"></span>
     </md-button>
 </md-content>

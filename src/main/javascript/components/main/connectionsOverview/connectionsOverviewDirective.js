@@ -21,7 +21,7 @@
         .module('databaseConnector')
         .directive('dcConnectionsOverview', ['$log', 'contextualData', connectionsOverview]);
 
-    var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog, dcDownloadFactory, toaster, $state) {
+    var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog, dcDownloadFactory, toaster, $state, i18n) {
         var coc = this;
         coc.getAllConnections = getAllConnections;
         coc.createConnection = createConnection;
@@ -69,8 +69,8 @@
             }, function (response) {
                 toaster.pop({
                     type: 'error',
-                    title: 'Import Failed',
-                    body: 'Failed to perform import!',
+                    title: i18n.message('dc_databaseConnector.toast.title.importFailed'),
+                    body: i18n.message('dc_databaseConnector.toast.message.importFailed'),
                     toastId: 'ims',
                     timeout: 3000
                 });
@@ -88,13 +88,8 @@
 
         }
         function getDatabaseTypes() {
-            var url = contextualData.context + '/modules/databaseconnector/databasetypes';
-            dcDataFactory.customRequest({
-                url: url,
-                method: 'GET'
-            }).then(function (response) {
+            dcDataFactory.getDatabaseTypes().then(function(response){
                 coc.databaseTypes = response;
-            }, function (response) {
             });
         }
 
@@ -139,7 +134,7 @@
                     } else {
                         toaster.pop({
                             type: 'error',
-                            title: 'Export Connection Failed!',
+                            title: i18n.message('dc_databaseConnector.toast.title.exportImport'),
                             toastId: 'eti',
                             timeout: 3000
                         });
@@ -207,5 +202,5 @@
     
     }
     
-    CreateConnectionPopupController.$inject = ['$scope', '$mdDialog', 'contextualData', 'dcDataFactory', 'updateConnections'];
+    CreateConnectionPopupController.$inject = ['$scope', '$mdDialog', 'contextualData', 'dcDataFactory', 'updateConnections', 'i18nService'];
 })();

@@ -8,6 +8,9 @@
             controller      : ConnectionStatisticsOverviewController,
             controllerAs    : 'cso',
             bindToController: true,
+            scope           : {
+                databaseType : '='
+            },
             link            : linkFunc
         };
 
@@ -21,13 +24,15 @@
         .module('databaseConnector')
         .directive('dcConnectionStatisticsOverview', ['$log', 'contextualData', connectionStatisticsOverview]);
 
-    function ConnectionStatisticsOverviewController($scope, contextualData, dcConnectionStatusService) {
+    function ConnectionStatisticsOverviewController($scope, dcConnectionStatusService, i18n, $filter) {
         
         var cso = this;
         cso.goToConnections = goToConnections;
+        cso.getMessage = i18n.message;
         init();
 
         function init() {
+            cso.title = i18n.format('dc_databaseConnector.label.statistics.databaseOverview', $filter('fLUpperCase')(cso.databaseType));
 
             cso.connectionStatus = dcConnectionStatusService.getCurrentConnectionStatus();
             $scope.$on('connectionStatusUpdate', function(event, connectionStatus) {
@@ -41,5 +46,5 @@
 
     }
 
-    connectionStatisticsOverview.$inject = ['$scope', 'contextualData', 'dcConnectionStatusService'];
+    ConnectionStatisticsOverviewController.$inject = ['$scope', 'dcConnectionStatusService', 'i18nService', '$filter'];
 })();

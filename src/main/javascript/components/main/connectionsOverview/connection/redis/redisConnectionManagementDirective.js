@@ -26,7 +26,7 @@
         .module('databaseConnector')
         .directive('redisConnectionManagement', ['$log', 'contextualData', redisConnectionManagement]);
 
-    var redisConnectionManagementController = function ($scope, contextualData, dcDataFactory, toaster) {
+    var redisConnectionManagementController = function ($scope, contextualData, dcDataFactory, toaster, i18n) {
         var rcm = this;
         rcm.imageUrl = contextualData.context + '/modules/database-connector/images/' + rcm.connection.databaseType + '/logo_60.png';
         rcm.isEmpty = {};
@@ -37,33 +37,33 @@
 
         rcm.validations = {
             host: {
-                'required': 'Field is required',
-                'md-maxlength': 'This has to be less than 15 characters.',
-                'minlength': 'This has to be more than 4 characters.'
+                'required': i18n.message('dc_databaseConnector.label.validation.required'),
+                'md-maxlength': i18n.format('dc_databaseConnector.label.validation.maxLength', '15'),
+                'minlength': i18n.format('dc_databaseConnector.label.validation.minLength', '4')
             },
             port: {
-                'pattern': 'This should consist of a number ranging from 1 - 65535'
+                'pattern': i18n.format('dc_databaseConnector.label.validation.range', '1|65535'),
             },
             id: {
-                'required': 'Field is required',
-                'connection-id-validator': 'This connection Id is already being used',
-                'pattern': 'It should contain alphanumeric characters only.',
-                'md-maxlength': 'This has to be less than 30 characters.'
+                'required': i18n.message('dc_databaseConnector.label.validation.required'),
+                'connection-id-validator': i18n.message('dc_databaseConnector.label.validation.connectionIdInUse'),
+                'pattern': i18n.message('dc_databaseConnector.label.validation.alphanumeric'),
+                'md-maxlength': i18n.format('dc_databaseConnector.label.validation.maxLength', '30')
 
             },
             dbName: {
-                'required': 'Field is required',
-                'pattern': 'It should contain a number ranging from 0 - 15.',
-                'md-maxlength': 'This has to be less than 3 characters.'
+                'required': i18n.message('dc_databaseConnector.label.validation.required'),
+                'pattern': i18n.format('dc_databaseConnector.label.validation.range', '0|15'),
+                'md-maxlength': i18n.format('dc_databaseConnector.label.validation.maxLength', '3')
             },
             redisTimeout: {
-                'pattern' : 'Should be an integer'
+                'pattern' : i18n.message('dc_databaseConnector.label.validation.integer')
             },
             redisWeight: {
-                'pattern' : 'Should be an integer'
+                'pattern' : i18n.message('dc_databaseConnector.label.validation.integer')
             },
             refreshPeriod: {
-                'pattern' : 'Shoulder be an integer'
+                'pattern' : i18n.message('dc_databaseConnector.label.validation.integer')
             }
             
         };
@@ -75,6 +75,8 @@
         rcm.updateIsEmpty            = updateIsEmpty;
         rcm.updateImportedConnection = updateImportedConnection;
         rcm.updateClusterOptions     = updateClusterOptions;
+        rcm.getMessage               = i18n.message;
+        
         init();
 
         function init() {
@@ -131,7 +133,7 @@
                 rcm.spinnerOptions.showSpinner = false;
                 toaster.pop({
                     type: 'error',
-                    title: 'Connection is invalid!',
+                    title: i18n.message('dc_databaseConnector.toast.title.connectionInvalid'),
                     toastId: 'cti',
                     timeout: 3000
                 });
@@ -163,7 +165,7 @@
                 rcm.spinnerOptions.showSpinner = false;
                 toaster.pop({
                     type: 'error',
-                    title: 'Connection is invalid!',
+                    title: i18n.message('dc_databaseConnector.toast.title.connectionInvalid'),
                     toastId: 'cti',
                     timeout: 3000
                 });
@@ -188,14 +190,14 @@
                 if (response.result) {
                     toaster.pop({
                         type: 'success',
-                        title: 'Connection is valid!',
+                        title: i18n.message('dc_databaseConnector.toast.title.connectionValid'),
                         toastId: 'ctv',
                         timeout: 3000
                     });
                 } else {
                     toaster.pop({
                         type: 'error',
-                        title: 'Connection is invalid!',
+                        title: i18n.message('dc_databaseConnector.toast.title.connectionInvalid'),
                         toastId: 'cti',
                         timeout: 3000
                     });
@@ -222,16 +224,16 @@
             if (verified) {
                 toaster.pop({
                     type: 'success',
-                    title: 'Connection Successfully Saved!',
-                    body: 'Connection verification was successful!',
+                    title: i18n.message('dc_databaseConnector.toast.title.connectionSavedSuccessfully'),
+                    body: i18n.message('dc_databaseConnector.toast.message.connectionVerificationSuccessful'),
                     toastId: 'cm',
                     timeout: 4000
                 });
             } else {
                 toaster.pop({
                     type: 'warning',
-                    title: 'Connection Successfully Saved!',
-                    body: 'Connection verification failed!',
+                    title: i18n.message('dc_databaseConnector.toast.title.connectionSavedSuccessfully'),
+                    body: i18n.message('dc_databaseConnector.toast.message.connectionVerificationFailed'),
                     toastId: 'cm',
                     timeout: 4000
                 });
@@ -273,6 +275,6 @@
         }
     };
 
-    redisConnectionManagementController.$inject = ['$scope', 'contextualData', 'dcDataFactory', 'toaster'];
+    redisConnectionManagementController.$inject = ['$scope', 'contextualData', 'dcDataFactory', 'toaster', 'i18nService'];
 
 })();

@@ -252,20 +252,20 @@
 
     EditConnectionPopupController.$inject = ['$scope', '$mdDialog', 'connection'];
     
-    function DeleteConnectionPopupController($scope, $mdDialog) {
+    function DeleteConnectionPopupController($scope, $mdDialog, $sce, i18n) {
         $scope.dcp = this;
         $scope.dcp.cancel = cancel;
         $scope.dcp.deleteConnection = deleteConnection;
-
+        $scope.dcp.deleteConnectionMessage = $sce.trustAsHtml(i18n.message('dc_databaseConnector.label.modal.message.deleteConnection'));
         function cancel() {
             $mdDialog.cancel();
-        }
+        };
 
         function deleteConnection() {
             $mdDialog.hide();
         }
     }
 
-    DeleteConnectionPopupController.$inject = ['$scope', '$mdDialog'];
+    DeleteConnectionPopupController.$inject = ['$scope', '$mdDialog', '$sce', 'i18nService'];
     
 })();

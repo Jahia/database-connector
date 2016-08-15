@@ -1,22 +1,22 @@
 <dc-spinner spinner-mode="rcm.spinnerOptions.mode" show="rcm.spinnerOptions.showSpinner"></dc-spinner>
 <md-content layout-padding>
     <md-tabs md-dynamic-height md-border-bottom>
-        <md-tab label="Settings">
+        <md-tab label="{{rcm.getMessage('dc_databaseConnector.label.settings')}}">
             <form name="redisForm">
                 <md-content class="md-padding">
                     <md-checkbox ng-model="rcm.connection.isConnected" aria-label="Automatic startup after Creation"
                                  ng-true-value="true" ng-false-value="false"
                                  class="md-warn md-align-top-left" flex>
-                        <span class="ipsum">Enable connection</span>
+                        <span class="ipsum" message-key="dc_databaseConnector.label.connection.enableConnection"></span>
                     </md-checkbox>
                     <md-button class="md-fab md-mini md-success pull-right"
                                ng-click="rcm.testRedisConnection()"
                                ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid">
                         <i class="fa fa-lg fa-check-circle-o"></i>
-                        <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500">Reimport Connections</md-tooltip>
+                        <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500" message-key="dc_databaseConnector.label.modal.reimportConnections"></md-tooltip>
                     </md-button>
                     <md-input-container class="md-block" flex-gt-sm="1">
-                        <label>Host</label>
+                        <label message-key="dc_databaseConnector.label.host"></label>
                         <input title="host" required ng-minlength="4" md-maxlength="15" name="host"
                                ng-model="rcm.connection.host">
                         <div ng-messages="redisForm.host.$error" ng-if="redisForm.host.$dirty">
@@ -28,7 +28,7 @@
                     </md-input-container>
 
                     <md-input-container class="md-block">
-                        <label>Port</label>
+                        <label message-key="dc_databaseConnector.label.port"></label>
                         <input title="port" md-maxlength="5" ng-pattern="/[0-9]*/" name="port"
                                ng-model="rcm.connection.port" length-parser length-parser-max="5" range-parser
                                range-max-value="65535">
@@ -41,7 +41,7 @@
                     </md-input-container>
 
                     <md-input-container class="md-block">
-                        <label>Connection Name (id)</label>
+                        <label message-key="dc_databaseConnector.label.connection.id"></label>
                         <input title="Connection Name" md-maxlength="30" name="id" required
                                ng-pattern="/^[a-zA-Z0-9]+$/"
                                ng-model="rcm.connection.id" original-value="{{rcm.connection.oldId}}"
@@ -55,8 +55,8 @@
                     </md-input-container>
 
                     <md-input-container class="md-block">
-                        <label>Database Number
-                            <b ng-if="rcm.isCluster" style="font-size:.9em" class="statusWarningMessage" md-colors="{color: 'deep-orange-500'}">(Cannot select database number in cluster mode)</b>
+                        <label message-key="dc_databaseConnector.label.connection.dbNumber">
+                            <b ng-if="rcm.isCluster" style="font-size:.9em" class="statusWarningMessage" md-colors="{color: 'deep-orange-500'}" message-key="dc_databaseConnector.label.modal.redis.clusterDbNumberWarning"></b>
                         </label>
                         <input title="Database Number" md-maxlength="2" name="dbName" required
                                ng-disabled="rcm.isCluster"
@@ -71,18 +71,18 @@
                     </md-input-container>
 
                     <md-input-container class="md-block">
-                        <label>Password</label>
+                        <label message-key="dc_databaseConnector.label.password"></label>
                         <input title="Password" type="password" name="password" ng-model="rcm.connection.password"
                                ng-change="rcm.updateIsEmpty('password');">
                     </md-input-container>
                 </md-content>
             </form>
         </md-tab>
-        <md-tab label="Advanced Settings">
+        <md-tab label="{{rcm.getMessage('dc_databaseConnector.label.advancedSettings')}}">
             <md-content class="md-padding">
                 <form name="redisAdvancedForm">
                     <md-subheader class=" md-no-sticky">
-                        <span>Cluster</span>
+                        <span message-key="dc_databaseConnector.label.cluster"></span>
                         <md-checkbox class="pull-right"
                                      ng-model="rcm.isCluster"
                                      ng-true-value="true"
@@ -96,11 +96,11 @@
                                      ng-true-value="true"
                                      ng-false-value="false"
                                      ng-change="rcm.updateClusterOptions('refreshClusterView')">
-                            <span>Refresh cluster view</span>
+                            <span message-key="dc_databaseConnector.label.modal.redis.refreshClusterView"></span>
                         </md-checkbox>
                     </div>
                     <md-input-container ng-if="rcm.isCluster && rcm.connection.options.cluster.refreshClusterView" class="md-block col-md-offset-3">
-                        <label>Refresh period(seconds)</label>
+                        <label message-key="dc_databaseConnector.label.modal.redis.refreshPeriod"></label>
                         <input title="Refresh period" name="refreshPeriod"
                                ng-pattern="/^[0-9]+$/"
                                ng-model="rcm.connection.options.cluster.refreshPeriod">
@@ -112,11 +112,10 @@
                         </div>
                     </md-input-container>
                     <md-divider></md-divider>
-                    <md-subheader class=" md-no-sticky">
-                        <span>Connection Settings</span>
+                    <md-subheader class=" md-no-sticky" message-key="dc_databaseConnector.label.modal.connectionSettings">
                     </md-subheader>
                     <md-input-container class="md-block col-md-offset-2">
-                        <label>Timeout (milliseconds)</label>
+                        <label message-key="dc_databaseConnector.label.modal.redis.timeoutMs"></label>
                         <input title="Redis Timeout" name="redisTimeout"
                                ng-pattern="/^[0-9]*$/"
                                ng-model="rcm.connection.timeout">
@@ -128,7 +127,7 @@
                         </div>
                     </md-input-container>
                     <md-input-container class="md-block col-md-offset-2">
-                        <label>Weight</label>
+                        <label message-key="dc_databaseConnector.label.modal.redis.weight"></label>
                         <input title="Redis Weight" name="redisWeight" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="rcm.connection.weight">
@@ -143,22 +142,30 @@
             </md-content>
         </md-tab>
     </md-tabs>
-    <md-button ng-if="rcm.mode=='create'" class="md-raised md-primary pull-right"
-               ng-click="rcm.createRedisConnection()" ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid">
-        Create
+    <md-button ng-if="rcm.mode=='create'"
+               class="md-raised md-primary pull-right"
+               ng-click="rcm.createRedisConnection()"
+               ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid"
+               message-key="dc_databaseConnector.label.create">
     </md-button>
-    <md-button ng-if="rcm.mode=='edit'" class="md-raised md-primary pull-right"
-               ng-click="rcm.editRedisConnection()" ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid">
-        Update
+    <md-button ng-if="rcm.mode=='edit'"
+               class="md-raised md-primary pull-right"
+               ng-click="rcm.editRedisConnection()"
+               ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid"
+               message-key="dc_databaseConnector.label.update">
     </md-button>
     <md-button class="md-raised md-primary pull-right"
                ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid"
                ng-if="rcm.mode=='import-edit'"
-               ng-click="rcm.updateImportedConnection()">
-        Ok
+               ng-click="rcm.updateImportedConnection()"
+               message-key="dc_databaseConnector.label.ok">
     </md-button>
     <md-button class="md-raised md-primary pull-right" ng-click="rcm.cancel()">
-        <span ng-if="rcm.mode=='edit' || rcm.mode=='create'">Back</span>
-        <span ng-if="rcm.mode=='import-edit'">Cancel</span>
+        <span ng-if="rcm.mode=='edit' || rcm.mode=='create'"
+              message-key="dc_databaseConnector.label.back">
+        </span>
+        <span ng-if="rcm.mode=='import-edit'"
+              message-key="dc_databaseConnector.label.cancel">
+        </span>
     </md-button>
 </md-content>

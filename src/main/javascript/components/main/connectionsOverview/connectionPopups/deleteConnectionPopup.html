@@ -1,17 +1,10 @@
-
 <md-dialog>
         <md-toolbar>
-            <div class="md-toolbar-tools">
-                Delete  Connection
-            </div>
+            <div class="md-toolbar-tools" message-key="dc_databaseConnector.label.modal.deleteConnection"></div>
         </md-toolbar>
         <md-dialog-content>
-            <div class="md-dialog-content">
-                <span>You are about to delete a connection, this cannot be undone!</span>
-                <br/>
-                <span>Do you wish to to continue?</span>
-            </div>
-            <md-button class="md-button md-warn pull-right" ng-click="dcp.deleteConnection()">Delete</md-button>
-            <md-button class="md-button md-primary pull-right" ng-click="dcp.cancel()">Cancel</md-button>
+            <div class="md-dialog-content" ng-bind-html="dcp.deleteConnectionMessage"></div>
+            <md-button class="md-button md-warn pull-right" ng-click="dcp.deleteConnection()" message-key="dc_databaseConnector.label.delete"></md-button>
+            <md-button class="md-button md-primary pull-right" ng-click="dcp.cancel()" message-key="dc_databaseConnector.label.cancel"></md-button>
         </md-dialog-content>
 </md-dialog>

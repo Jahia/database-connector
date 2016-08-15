@@ -48,10 +48,19 @@
             return value;
         }
     };
+    /*
+    Uppercase first letter of value.
+     */
+    var fLUpperCase = function() {
+        return function(value) {
+            return _.isString(value) ? value.toUpperCase().slice(0,1) + value.toLowerCase().slice(1,value.length) : value;
+        }
+    };
 
     angular.module('databaseConnector')
         .filter('replaceNull', [replaceNull])
         .filter('momentFilter', [momentFilter])
         .filter('momentFormatter', [momentFormatter])
-        .filter('sizeFormatter', [sizeFormatter]);
+        .filter('sizeFormatter', [sizeFormatter])
+        .filter('fLUpperCase', [fLUpperCase]);
 })();

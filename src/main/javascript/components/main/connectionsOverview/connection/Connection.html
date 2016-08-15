@@ -25,11 +25,11 @@
                                    <p><b><span message-key="dc_databaseConnector.label.connection.connectionName"></span>:</b> <i>{{cc.connection.id}}</i></p>
                                    <p ng-if="cc.connection.databaseType=='MONGO'"><b><span message-key="dc_databaseConnector.label.connection.dbName"></span>:</b> <i>{{cc.connection.dbName}}</i></p>
                                    <p ng-if="cc.connection.databaseType=='REDIS'"><b><span message-key="dc_databaseConnector.label.connection.dbName"></span>:</b> <i>{{cc.connection.dbName}}</i></p>
-                                   <p><b><span message-key="dc_databaseConnector.label.connection.host"></span>:</b> <i>{{cc.connection.host}}</i></p>
-                                   <p><b><span message-key="dc_databaseConnector.label.connection.port"></span>:</b> <i>{{cc.connection.port}}</i></p>
+                                   <p><b><span message-key="dc_databaseConnector.label.host"></span>:</b> <i>{{cc.connection.host}}</i></p>
+                                   <p><b><span message-key="dc_databaseConnector.label.port"></span>:</b> <i>{{cc.connection.port}}</i></p>
                                    <span ng-if="cc.serverStatusAvailable()">
-                                       <p><b><span message-key="dc_databaseConnector.label.connection.uptime"></span>:</b> <i>{{cc.connection.uptime | momentFormatter : 'second' : 'fancy'}}</i></p>
-                                       <p ng-if="cc.connection.dbVersion!=null"><b><span message-key="dc_databaseConnector.label.connection.version"></span>:</b> <i>{{cc.connection.dbVersion}}</i></p>
+                                       <p><b><span message-key="dc_databaseConnector.label.uptime"></span>:</b> <i>{{cc.connection.uptime | momentFormatter : 'second' : 'fancy'}}</i></p>
+                                       <p ng-if="cc.connection.dbVersion!=null"><b><span message-key="dc_databaseConnector.label.version"></span>:</b> <i>{{cc.connection.dbVersion}}</i></p>
                                    </span>
                                    <span ng-if="!cc.serverStatusAvailable()">
                                        <p><b message-key="dc_databaseConnector.label.connection.statusWarningMessage" class="statusWarningMessage" md-colors="{color: 'deep-orange-500'}"></b></p>
@@ -41,21 +41,21 @@
                                    <md-tooltip class="noToolTipAnimation"
                                                md-direction="right"
                                                md-delay="500">
-                                       <span message-key="dc_databaseConnector.tooltip.connect"></span>
+                                       <span message-key="dc_databaseConnector.label.connect"></span>
                                    </md-tooltip>
                                </md-button>
                                <md-button class="md-icon-button" ng-if="cc.connection.isConnected" ng-click="cc.updateConnection(false)"><i class="fa fa-chain-broken" aria-label="disconnect from database"></i>
                                    <md-tooltip class="noToolTipAnimation"
                                                md-direction="right"
                                                md-delay="500">
-                                       <span message-key="dc_databaseConnector.tooltip.disconnect"></span>
+                                       <span message-key="dc_databaseConnector.label.disconnect"></span>
                                    </md-tooltip>
                                </md-button>
                                <md-button class="md-icon-button" ng-click="cc.editConnection($event)"><i class="fa fa-pencil-square-o" aria-label="edit connections details"></i>
                                    <md-tooltip class="noToolTipAnimation"
                                                md-direction="right"
                                                md-delay="500">
-                                       <span message-key="dc_databaseConnector.tooltip.editConnection"></span>
+                                       <span message-key="dc_databaseConnector.label.edit"></span>
                                    </md-tooltip>
                                </md-button>
                                <md-button class="md-icon-button" ng-disabled="!cc.serverStatusAvailable()" ng-click="cc.goToStatus()"><i class="fa fa-line-chart" aria-label="connection status"></i>
@@ -69,7 +69,7 @@
                                    <md-tooltip class="noToolTipAnimation"
                                                md-direction="right"
                                                md-delay="500">
-                                       <span message-key="dc_databaseConnector.tooltip.delete"></span>
+                                       <span message-key="dc_databaseConnector.label.delete"></span>
                                    </md-tooltip>
                                </md-button>
                            </div>

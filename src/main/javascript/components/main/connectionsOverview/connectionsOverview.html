@@ -2,25 +2,25 @@
         toaster-options="{'time-out': 6000, 'close-button':true, 'animation-class': 'toast-top-right', 'prevent-duplicates': true}"></toaster-container>
 <md-toolbar layout-padding>
     <div class="md-toolbar-tools">
-        <h2><span>Connections</span></h2>
+        <h2 message-key="dc_databaseConnector.label.connections"></h2>
         <span flex></span>
         <md-button class="md-icon-button" ng-click="coc.createConnection($event)">
             <md-icon>
                 <i class="fa fa-plus fa-2x" aria-label="create a new connection"></i>
             </md-icon>
-            <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500">Create Connection</md-tooltip>
+            <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500"><span message-key="dc_databaseConnector.label.create"></span></md-tooltip>
         </md-button>
         <md-button class="md-icon-button" type="file" ngf-select="coc.importConnections($file)">
             <md-icon>
                 <i class="fa fa-upload fa-2x" aria-label="import a connection"></i>
             </md-icon>
-            <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500">Import Connection</md-tooltip>
+            <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500"><span message-key="dc_databaseConnector.label.import"></span></md-tooltip>
         </md-button>
         <md-button class="md-icon-button" ng-click="coc.exportSelectedConnections()" ng-disabled="coc.isExportDisabled()">
             <md-icon>
                 <i class="fa fa-download fa-2x" aria-label="export a connection"></i>
             </md-icon>
-            <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500">Export Connection</md-tooltip>
+            <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500"><span message-key="dc_databaseConnector.label.export"></span></md-tooltip>
         </md-button>
     </div>
 </md-toolbar>
