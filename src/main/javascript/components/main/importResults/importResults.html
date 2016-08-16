@@ -4,25 +4,33 @@
 <md-content>
     <md-toolbar layout-padding>
         <div class="md-toolbar-tools">
-            <h2><span>Import Results</span></h2>
+            <h2 message-key="dc_databaseConnector.label.modal.importResults"></h2>
             <span flex></span>
             <md-button class="md-icon-button"
                        ng-click="irc.goToConnections()">
                 <md-icon class="md-secondary"><i class="fa fa-home fa-2x"></i></md-icon>
-                <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500">Go Back</md-tooltip>
+                <md-tooltip class="noToolTipAnimation"
+                            md-direction="top"
+                            md-delay="500">
+                    <span  message-key="dc_databaseConnector.label.goBack"
+                </md-tooltip>
             </md-button>
             <md-button class="md-icon-button"
                        ng-click="irc.reImportConnections()"
                        ng-disabled="irc.isReImportDisabled()">
                 <md-icon class="md-secondary"><i class="fa fa-upload fa-2x"></i></md-icon>
-                <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500">Reimport Connections</md-tooltip>
+                <md-tooltip class="noToolTipAnimation"
+                            md-direction="top"
+                            md-delay="500">
+                    <span message-key="dc_databaseConnector.label.modal.reimportConnections"></span>
+                </md-tooltip>
             </md-button>
         </div>
     </md-toolbar>
     <md-list>
         <div ng-if="irc.hasResults(databaseType)" ng-repeat="(databaseType, displayableName) in irc.databaseTypes">
             <md-subheader>
-                <h4>Imported {{displayableName}} connections</h4>
+                <h4>{{irc.getFormattedImportHeader(displayableName)}}</h4>
             </md-subheader>
             <md-divider></md-divider>
             <md-list-item ng-repeat="failedConnection in irc.importResults[databaseType].failed track by $index">
@@ -32,7 +40,7 @@
                         {{failedConnection.id}}
                     </h3>
                     <span>
-                        {{failedConnection.statusMessage}}
+                        {{irc.getMessage('dc_databaseConnector.importResultsDirective.message.' + failedConnection.statusMessage)}}
                     </span>
                 </div>
                 <md-checkbox class="green md-secondary"
@@ -46,13 +54,21 @@
                            aria-label="Edit import connection"
                            ng-click="irc.editConnection($index, databaseType, $event)">
                     <i class="fa fa-pencil"></i>
-                    <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500">Edit Connection</md-tooltip>
+                    <md-tooltip class="noToolTipAnimation"
+                                md-direction="top"
+                                md-delay="500">
+                        <span message-key="dc_databaseConnector.label.edit"></span>
+                    </md-tooltip>
                 </md-icon>
                 <md-icon class="md-secondary"
                            aria-label="Import connection"
                            ng-click="irc.reImportConnection(failedConnection, $index)">
                     <i class="fa fa-upload"></i>
-                    <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500">Reimport Connection</md-tooltip>
+                    <md-tooltip class="noToolTipAnimation"
+                                md-direction="top"
+                                md-delay="500">
+                        <span message-key="dc_databaseConnector.label.modal.reimportConnection"></span>
+                    </md-tooltip>
                 </md-icon>
                 <md-divider></md-divider>
             </md-list-item>
@@ -63,9 +79,7 @@
                     <h3>
                         {{successConnection.id}}
                     </h3>
-                    <span>
-                        Successfully imported
-                    </span>
+                    <span message-key="dc_databaseConnector.label.modal.successfullyImported"></span>
                 </div>
                 <md-divider></md-divider>
             </md-list-item>

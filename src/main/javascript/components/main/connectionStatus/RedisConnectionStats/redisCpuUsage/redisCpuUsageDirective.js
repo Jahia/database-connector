@@ -24,7 +24,7 @@
         .module('databaseConnector')
         .directive('redisCpuUsage', ['contextualData', redisCpuUsage]);
 
-    var RedisCpuUsageController = function($scope, dcConnectionStatusService) {
+    var RedisCpuUsageController = function($scope, dcConnectionStatusService, i18n) {
         var rcuc            = this;
         var DEFAULT_HEIGHT  = '480px';
         var DEFAULT_WIDTH   = '640px';
@@ -84,20 +84,20 @@
                         },
                         {
                             id      : 'used_cpu_sys',
-                            label   : 'System CPU consumed by the Redis server',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.redis.systemConsumedCPU'),
                             type    : 'number',
                             p       : {}
                         },
                         {
                             id      : 'used_cpu_user',
-                            label   : 'User CPU consumed by the Redis server',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.redis.userConsumedCPU'),
                             type    : 'number',
                             p       : {}
 
                         },
                         {
                             id      : 'used_cpu_sys_children',
-                            label   : 'System CPU consumed by the background processes',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.redis.systemConsumedBackgroundCPU'),
                             type    : 'number',
                             p       : {}
 
@@ -107,7 +107,6 @@
                     ]
                 },
                 options: {
-                    title               : "CPU usage",
                     colors              : ['#009900', '#3366ff', '#cc66ff'],
                     fill                : 20,
                     displayExactValues  : true,
@@ -136,8 +135,9 @@
              *
              *   HitRate = keyspace_hits/(keyspace_hits+keyspace_misses)
              */
-
-            rcuc.operationCountersChart.options.title = 'Hit Rate: ' + connectionStatus.keyspace_hits/(connectionStatus.keyspace_hits + connectionStatus.keyspace_misses);
+            var hits = parseInt(connectionStatus.keyspace_hits)/(parseInt(connectionStatus.keyspace_hits) + parseInt(connectionStatus.keyspace_misses));
+            console.log(hits);
+            rcuc.operationCountersChart.options.title = i18n.format('dc_databaseConnector.label.statistics.redis.hitRate', isNaN(hits) ? '0' : hits + '');
 
             if (rcuc.operationCountersChart.data.rows.length == 10) {
                 rcuc.operationCountersChart.data.rows.shift();
@@ -147,5 +147,5 @@
 
     };
 
-    RedisCpuUsageController.$inject = ['$scope', 'dcConnectionStatusService'];
+    RedisCpuUsageController.$inject = ['$scope', 'dcConnectionStatusService', 'i18nService'];
 })();

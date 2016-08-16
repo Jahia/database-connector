@@ -24,7 +24,7 @@
         .module('databaseConnector')
         .directive('connectionNetworkTraffic', ['contextualData', connectionNetworkTraffic]);
 
-    var ConnectionNetworkTrafficController = function($scope, dcConnectionStatusService) {
+    var ConnectionNetworkTrafficController = function($scope, dcConnectionStatusService, i18n) {
         var cntc            = this;
         var DEFAULT_HEIGHT  = '480px';
         var DEFAULT_WIDTH   = '640px';
@@ -83,13 +83,13 @@
                         },
                         {
                             id      : 'incoming_mb',
-                            label   : 'Incoming MB',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.incomingMb'),
                             type    : 'number',
                             p       : {}
                         },
                         {
                             id      : 'outgoing_mb',
-                            label   : 'Outgoing MB',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.incomingMb'),
                             type    : 'number',
                             p       : {}
                         }
@@ -98,7 +98,6 @@
                     ]
                 },
                 options: {
-                    title               : "Network Traffic: ",
                     fill                : 20,
                     displayExactValues  : true,
                     pointSize: cntc.pointSize,
@@ -116,7 +115,7 @@
             entry.c[0].v = moment(connectionStatus.localTime).format('HH:mm:ss').toString();
             entry.c[1].v = Math.round(connectionStatus.network.bytesIn / 1024 / 1024);
             entry.c[2].v = Math.round(connectionStatus.network.bytesOut / 1024 / 1024);
-            cntc.networkTrafficChart.options.title = 'Network Traffic (Requests, ' + connectionStatus.network.numRequests + ')' ;
+            cntc.networkTrafficChart.options.title = i18n.format('dc_databaseConnector.label.statistics.mongo.networkTraffic', connectionStatus.network.numRequests + '');
 
             if (cntc.networkTrafficChart.data.rows.length == 10) {
                 cntc.networkTrafficChart.data.rows.shift();
@@ -125,5 +124,5 @@
         }
     };
 
-    ConnectionNetworkTrafficController.$inject = ['$scope', 'dcConnectionStatusService'];
+    ConnectionNetworkTrafficController.$inject = ['$scope', 'dcConnectionStatusService', 'i18nService'];
 })();

@@ -14,7 +14,11 @@
                                ng-click="cmcc.testMongoConnection()"
                                ng-disabled="mongoForm.$invalid || mongoAdvancedForm.$invalid">
                         <i class="fa fa-lg fa-check-circle-o"></i>
-                        <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500" message-key="dc_databaseConnector.label.modal.reimportConnections"></md-tooltip>
+                        <md-tooltip class="noToolTipAnimation"
+                                    md-direction="top"
+                                    md-delay="500">
+                            <span message-key="dc_databaseConnector.label.connection.testConnection"></span>
+                        </md-tooltip>
                     </md-button>
                     <md-input-container class="md-block" flex-gt-sm="1">
                         <label message-key="dc_databaseConnector.label.host"></label>
@@ -118,7 +122,7 @@
                     </md-subheader>
                     <div ng-if="cmcc.isReplicaSet">
                         <md-input-container class="md-block col-md-offset-2">
-                            <label>Name</label>
+                            <label message-key="dc_databaseConnector.label.name"></label>
                             <input title="replicaSetName" required
                                    name="replicaSetName"
                                    ng-pattern="/^[a-zA-Z0-9_]+$/"
@@ -181,7 +185,9 @@
                     </div>
                     <md-divider></md-divider>
 
-                    <md-subheader class="md-no-sticky" message-key="dc_databaseConnector.label.modal.connectionSettings"></md-subheader>
+                    <md-subheader class="md-no-sticky">
+                        <span message-key="dc_databaseConnector.label.modal.connectionSettings"></span>
+                    </md-subheader>
 
                     <md-input-container class="md-block col-md-offset-2">
                         <label message-key="dc_databaseConnector.label.modal.mongo.connectTimeout"></label>

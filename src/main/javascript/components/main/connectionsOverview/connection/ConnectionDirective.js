@@ -25,7 +25,7 @@
         .module('databaseConnector')
         .directive('dcConnection', ['$log', 'contextualData', Connection]);
 
-    var ConnectionController = function($scope, contextualData, dcDataFactory, $mdDialog, $filter, toaster, $state) {
+    var ConnectionController = function($scope, contextualData, dcDataFactory, $mdDialog, $filter, toaster, $state, i18n) {
         var cc = this;
         cc.imageUrl = contextualData.context + '/modules/database-connector/images/' + cc.connection.databaseType.toLowerCase() + '/logo_60.png';
         cc.originalConnection = angular.copy(cc.connection);
@@ -71,14 +71,14 @@
                     }
                     toaster.pop({
                         type   : 'success',
-                        title: 'Connection status successfully updated!',
+                        title: i18n.message('dc_databaseConnector.toast.title.connectionSuccessfullyUpdated'),
                         toastId: 'cu',
                         timeout: 3000
                     });
                 } else {
                     toaster.pop({
                         type   : 'error',
-                        title: 'Connection status update failed!',
+                        title: i18n.message('dc_databaseConnector.toast.title.connectionUpdateFailed'),
                         toastId: 'cu',
                         timeout: 3000
                     });
@@ -97,7 +97,6 @@
             $mdDialog.show({
                 locals: {
                     connection: cc.connection
-                    
                 },
                 controller: DeleteConnectionPopupController,
                 templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connectionPopups/deleteConnectionPopup.html',
@@ -105,7 +104,6 @@
                 targetEvent: ev1,
                 clickOutsideToClose:true,
                 fullscreen: false
-
             }).then(function(){
                 deleteConnection();
                 getUpdatedConnection();
@@ -126,7 +124,7 @@
                 $scope.$emit('connectionSuccessfullyDeleted', null);
                 toaster.pop({
                     type   : 'success',
-                    title: 'Successfully deleted connection!',
+                    title: i18n.message('dc_databaseConnector.toast.title.connectionSuccessfullyDeleted'),
                     toastId: 'cd',
                     timeout: 3000
                 });
@@ -136,7 +134,7 @@
                 cc.spinnerOptions.showSpinner = false;
                 toaster.pop({
                     type   : 'error',
-                    title: 'Failed to delete connection',
+                    title: i18n.message('dc_databaseConnector.toast.title.connectionDeletionFailed'),
                     toastId: 'cd',
                     timeout: 3000
                 });
@@ -235,7 +233,7 @@
         }
     };
 
-    ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', '$filter', 'toaster', '$state'];
+    ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', '$filter', 'toaster', '$state', 'i18nService'];
     
     function EditConnectionPopupController($scope, $mdDialog, connection) {
         $scope.ecp = this;

@@ -24,7 +24,7 @@
         .module('databaseConnector')
         .directive('redisConnectionMemoryUsage', ['contextualData', redisConnectionMemoryUsage]);
 
-    var RedisConnectionMemoryUsageController = function($scope, dcConnectionStatusService, $filter) {
+    var RedisConnectionMemoryUsageController = function($scope, dcConnectionStatusService, $filter, i18n) {
         var rcmuc            = this;
         var DEFAULT_HEIGHT  = '480px';
         var DEFAULT_WIDTH   = '520px';
@@ -83,19 +83,19 @@
                         },
                         {
                             id      : 'used_memory_human',
-                            label   : 'Total memory allocated',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.redis.totalMemoryAllocated'),
                             type    : 'number',
                             p       : {}
                         },
                         {
                             id      : 'used_memory_peak',
-                            label   : 'Peak memory consumed',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.redis.peakMemoryConsumed'),
                             type    : 'number',
                             p       : {}
                         },
                         {
                             id      : 'used_memory_rss',
-                            label   : '(resident set size) Number of bytes that Redis was allocated by the operating system',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.redis.residentSetSize'),
                             type    : 'number',
                             p       : {}
                         }
@@ -104,7 +104,7 @@
                     ]
                 },
                 options: {
-                    title               : "Memory Usage",
+                    title               : i18n.message('dc_databaseConnector.label.statistics.memoryUsage'),
                     colors              : ['#009900', '#3366ff', '#cc66ff'],
                     fill                : 20,
                     displayExactValues  : true,
@@ -139,5 +139,5 @@
     };
 
 
-    RedisConnectionMemoryUsageController.$inject = ['$scope', 'dcConnectionStatusService', '$filter'];
+    RedisConnectionMemoryUsageController.$inject = ['$scope', 'dcConnectionStatusService', '$filter', 'i18nService'];
 })();

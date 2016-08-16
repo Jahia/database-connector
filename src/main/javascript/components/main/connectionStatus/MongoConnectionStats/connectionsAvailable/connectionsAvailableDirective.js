@@ -24,7 +24,7 @@
         .module('databaseConnector')
         .directive('connectionsAvailable', ['contextualData', connectionsAvailable]);
 
-    var connectionsAvailableController = function($scope, dcConnectionStatusService) {
+    var connectionsAvailableController = function($scope, dcConnectionStatusService, i18n) {
         var cac            = this;
         var DEFAULT_HEIGHT  = '480px';
         var DEFAULT_WIDTH   = '640px';
@@ -80,13 +80,13 @@
                         },
                         {
                             id      : 'current',
-                            label   : 'Currently Active',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.mongo.currentlyActive'),
                             type    : 'number',
                             p       : {}
                         },
                         {
                             id      : 'available',
-                            label   : 'Available',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.mongo.available'),
                             type    : 'number',
                             p       : {}
                         }
@@ -95,7 +95,6 @@
                     ]
                 },
                 options: {
-                    title               : "Connections Created: ",
                     colors              : ['#009900', '#3366ff'],
                     fill                : 20,
                     displayExactValues  : true,
@@ -114,7 +113,7 @@
             entry.c[0].v = moment(connectionStatus.localTime).format('HH:mm:ss').toString();
             entry.c[1].v = connectionStatus.connections.current;
             entry.c[2].v = connectionStatus.connections.available;
-            cac.connectionsChart.options.title = 'Connections Created: ' + connectionStatus.connections.totalCreated;
+            cac.connectionsChart.options.title = i18n.format('dc_databaseConnector.label.statistics.mongo.connectionsCreated', connectionStatus.connections.totalCreated + '');
             if (cac.connectionsChart.data.rows.length == 10) {
                 cac.connectionsChart.data.rows.shift();
             }
@@ -122,5 +121,5 @@
         }
     };
 
-    connectionsAvailableController.$inject = ['$scope', 'dcConnectionStatusService'];
+    connectionsAvailableController.$inject = ['$scope', 'dcConnectionStatusService', 'i18nService'];
 })();

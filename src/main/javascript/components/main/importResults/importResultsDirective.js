@@ -21,10 +21,12 @@
         .module('databaseConnector')
         .directive('dcImportResults', ['$log', 'contextualData', importResults]);
 
-    function ImportResultsController($scope, contextualData, dcDataFactory, $state, $stateParams, toaster, $mdDialog) {
+    function ImportResultsController($scope, contextualData, dcDataFactory, $state, $stateParams, toaster, $mdDialog, i18n) {
         var irc = this;
         irc.importResults = {};
         irc.selectedImports = {};
+        irc.importInProgress = false;
+        
         irc.hasResults = hasResults;
         irc.updateSelectedImports = updateSelectedImports;
         irc.reImportConnections = reImportConnections;
@@ -32,7 +34,9 @@
         irc.editConnection = editConnection;
         irc.goToConnections = goToConnections;
         irc.isReImportDisabled = isReImportDisabled;
-        irc.importInProgress = false;
+        irc.getFormattedImportHeader = getFormattedImportHeader;
+        irc.getMessage = i18n.message;
+        
         init();
 
         function init() {
@@ -46,8 +50,8 @@
                     irc.databaseTypes = response;
                     toaster.pop({
                         type: $stateParams.status ? 'success' : 'error',
-                        title: 'Import Status',
-                        body: $stateParams.status ? 'All connections imported successfully!' : 'Not all connections were imported, Some changes are required!',
+                        title: i18n.message('dc_databaseConnector.toast.title.importStatus'),
+                        body: $stateParams.status ? i18n.message('dc_databaseConnector.toast.message.connectionsImportedSuccessfully') : i18n.message('dc_databaseConnector.toast.message.connectionsImportIncomplete'),
                         toastId: 'irc',
                         timeout: 3000
                     });
@@ -177,9 +181,13 @@
             }
             irc.selectedImports = {};
         }
+
+        function getFormattedImportHeader(displayableName) {
+           return i18n.format('dc_databaseConnector.label.modal.importDisplayableName', displayableName);
+        }
     }
 
-    ImportResultsController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$state', '$stateParams', 'toaster', '$mdDialog'];
+    ImportResultsController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$state', '$stateParams', 'toaster', '$mdDialog', 'i18nService'];
 
     function EditImportedConnectionPopupController($scope, $mdDialog, connection) {
         $scope.eicc = this;

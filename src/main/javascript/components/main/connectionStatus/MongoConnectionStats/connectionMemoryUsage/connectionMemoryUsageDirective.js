@@ -24,7 +24,7 @@
         .module('databaseConnector')
         .directive('connectionMemoryUsage', ['contextualData', connectionMemoryUsage]);
 
-    var ConnectionMemoryUsageController = function($scope, dcConnectionStatusService) {
+    var ConnectionMemoryUsageController = function($scope, dcConnectionStatusService, i18n) {
         var cmuc            = this;
         var DEFAULT_HEIGHT  = '480px';
         var DEFAULT_WIDTH   = '640px';
@@ -83,19 +83,19 @@
                         },
                         {
                             id      : 'mapped',
-                            label   : 'Mapped',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.mongo.mapped'),
                             type    : 'number',
                             p       : {}
                         },
                         {
                             id      : 'used',
-                            label   : 'Used',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.mongo.used'),
                             type    : 'number',
                             p       : {}
                         },
                         {
                             id      : 'virtual',
-                            label   : 'Virtual',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.mongo.virtual'),
                             type    : 'number',
                             p       : {}
                         }
@@ -104,13 +104,13 @@
                     ]
                 },
                 options: {
-                    title               : "Memory Usage",
+                    title               : i18n.message('dc_databaseConnector.label.statistics.memoryUsage'),
                     colors              : ['#009900', '#3366ff', '#cc66ff'],
                     fill                : 20,
                     displayExactValues  : true,
                     pointSize: cmuc.pointSize,
                     vAxis               : {
-                        title: "Megabytes",
+                        title: i18n.message('dc_databaseConnector.label.megabytes'),
                         gridlines: {
                             count: 10
                         }
@@ -136,5 +136,5 @@
         }
     };
 
-    ConnectionMemoryUsageController.$inject = ['$scope', 'dcConnectionStatusService'];
+    ConnectionMemoryUsageController.$inject = ['$scope', 'dcConnectionStatusService', 'i18nService'];
 })();

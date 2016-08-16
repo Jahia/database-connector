@@ -24,7 +24,7 @@
         .module('databaseConnector')
         .directive('redisConnectionsAvailable', ['contextualData', redisConnectionsAvailable]);
 
-    var RedisConnectionsAvailableController = function($scope, dcConnectionStatusService) {
+    var RedisConnectionsAvailableController = function($scope, dcConnectionStatusService, i18n) {
         var rcac            = this;
         var DEFAULT_HEIGHT  = '480px';
         var DEFAULT_WIDTH   = '640px';
@@ -80,13 +80,13 @@
                         },
                         {
                             id      : 'blocked_clients',
-                            label   : 'Blocked Clients',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.redis.blockedClients'),
                             type    : 'number',
                             p       : {}
                         },
                         {
                             id      : 'connected_clients',
-                            label   : 'Connected Clients',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.redis.connectedClients'),
                             type    : 'number',
                             p       : {}
                         }
@@ -95,7 +95,6 @@
                     ]
                 },
                 options: {
-                    title               : "Clients: ",
                     colors              : ['#009900', '#3366ff'],
                     fill                : 20,
                     displayExactValues  : true,
@@ -114,7 +113,7 @@
             entry.c[0].v = moment(connectionStatus.localTime).format('HH:mm:ss').toString();
             entry.c[1].v = connectionStatus.blocked_clients;
             entry.c[2].v = connectionStatus.connected_clients;
-            rcac.connectionsChart.options.title = 'Total Commands Processed: ' + connectionStatus.total_commands_processed;
+            rcac.connectionsChart.options.title = i18n.format('dc_databaseConnector.label.statistics.redis.totalCommandsProcessed', connectionStatus.total_commands_processed + '');
             if (rcac.connectionsChart.data.rows.length == 10) {
                 rcac.connectionsChart.data.rows.shift();
             }
@@ -122,5 +121,5 @@
         }
     };
 
-    RedisConnectionsAvailableController.$inject = ['$scope', 'dcConnectionStatusService'];
+    RedisConnectionsAvailableController.$inject = ['$scope', 'dcConnectionStatusService', 'i18nService'];
 })();

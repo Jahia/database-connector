@@ -1,18 +1,20 @@
 <md-content>
     <md-toolbar layout-padding>
         <div class="md-toolbar-tools">
-            <h2><span>Connection Status </span></h2>
-
+            <h2 message-key="dc_databaseConnector.label.statistics.connectionStatus"></h2>
             <span flex></span>
             <md-button class="md-icon-button" ng-click="csc.goToConnections()">
-                <md-icon class="md-secondary"><i class="fa fa-home fa-2x"> </i></md-icon>
-                <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500">Go back</md-tooltip>
+                <md-icon class="md-secondary"><i class="fa fa-home fa-2x"></i></md-icon>
+                <md-tooltip class="noToolTipAnimation"
+                            md-direction="top"
+                            md-delay="500">
+                    <span message-key="dc_databaseConnector.label.goBack"></span>
+                </md-tooltip>
             </md-button>
         </div>
     </md-toolbar>
     <div class="statusContainer">
         <dc-connection-statistics-overview database-type="csc.connection.databaseType"></dc-connection-statistics-overview>
-
         <md-divider></md-divider>
         <div layout style="background-color: #f2f2f2" layout-wrap layout-padding ng-switch="csc.connection.databaseType">
             <div flex="100">

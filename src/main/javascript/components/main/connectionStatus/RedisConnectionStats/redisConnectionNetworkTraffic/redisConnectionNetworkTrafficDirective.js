@@ -24,7 +24,7 @@
         .module('databaseConnector')
         .directive('redisConnectionNetworkTraffic', ['contextualData', redisConnectionNetworkTraffic]);
 
-    var RedisConnectionNetworkTrafficController = function($scope, dcConnectionStatusService) {
+    var RedisConnectionNetworkTrafficController = function($scope, dcConnectionStatusService, i18n) {
         var rcntc            = this;
         var DEFAULT_HEIGHT  = '480px';
         var DEFAULT_WIDTH   = '640px';
@@ -83,13 +83,13 @@
                         },
                         {
                             id      : 'total_net_input_bytes',
-                            label   : 'Incoming MB',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.incomingMb'),
                             type    : 'number',
                             p       : {}
                         },
                         {
                             id      : 'total_net_output_bytes',
-                            label   : 'Outgoing MB',
+                            label   : i18n.message('dc_databaseConnector.label.statistics.outgoingMb'),
                             type    : 'number',
                             p       : {}
                         }
@@ -98,7 +98,6 @@
                     ]
                 },
                 options: {
-                    title               : "Network Traffic: ",
                     fill                : 20,
                     displayExactValues  : true,
                     pointSize: rcntc.pointSize,
@@ -116,7 +115,7 @@
             entry.c[0].v = moment(connectionStatus.localTime).format('HH:mm:ss').toString();
             entry.c[1].v = Math.round(connectionStatus.total_net_input_bytes / 1024 / 1024);
             entry.c[2].v = Math.round(connectionStatus.total_net_output_bytes / 1024 / 1024);
-            rcntc.networkTrafficChart.options.title = 'Network Traffic (Total connections Received, ' + connectionStatus.total_connections_received + ')' ;
+            rcntc.networkTrafficChart.options.title = i18n.format('dc_databaseConnector.label.statistics.redis.networkTraffic', connectionStatus.total_connections_received + '');
 
             if (rcntc.networkTrafficChart.data.rows.length == 10) {
                 rcntc.networkTrafficChart.data.rows.shift();
@@ -125,5 +124,5 @@
         }
     };
 
-    RedisConnectionNetworkTrafficController.$inject = ['$scope', 'dcConnectionStatusService'];
+    RedisConnectionNetworkTrafficController.$inject = ['$scope', 'dcConnectionStatusService', 'i18nService'];
 })();

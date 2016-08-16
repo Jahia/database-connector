@@ -24,7 +24,7 @@
         .module('databaseConnector')
         .directive('connectionOperationCounters', ['contextualData', connectionOperationCounters]);
 
-    var ConnectionOperationCountersController = function($scope, dcConnectionStatusService) {
+    var ConnectionOperationCountersController = function($scope, dcConnectionStatusService, i18n) {
         var cocc            = this;
         var DEFAULT_HEIGHT  = '480px';
         var DEFAULT_WIDTH   = '640px';
@@ -65,7 +65,7 @@
                         },
                         {
                             id      : 'value',
-                            label   : 'Value',
+                            label   : i18n.message('dc_databaseConnector.label.value'),
                             type    : 'number'
 
                         }
@@ -74,7 +74,7 @@
                         {
                             "c": [
                                 {
-                                    v: 'Insert'
+                                    v: i18n.message('dc_databaseConnector.label.statistics.mongo.insert')
                                 },
                                 {
                                     v: 0
@@ -84,7 +84,7 @@
                         {
                             "c": [
                                 {
-                                    v: 'Update'
+                                    v: i18n.message('dc_databaseConnector.label.update')
                                 },
                                 {
                                     v: 0
@@ -94,7 +94,7 @@
                         {
                             "c": [
                                 {
-                                    v: 'Query'
+                                    v: i18n.message('dc_databaseConnector.label.statistics.mongo.query')
                                 },
                                 {
                                     v: 0
@@ -105,7 +105,7 @@
                         {
                             "c": [
                                 {
-                                    v: 'Delete'
+                                    v: i18n.message('dc_databaseConnector.label.delete')
                                 },
                                 {
                                     v: 0
@@ -115,7 +115,7 @@
                         {
                             "c": [
                                 {
-                                    v: 'Getmore'
+                                    v: i18n.message('dc_databaseConnector.label.statistics.mongo.getmore')
                                 },
                                 {
                                     v: 0
@@ -125,7 +125,7 @@
                     ]
                 },
                 options: {
-                    title               : "Operation Counters",
+                    title               : i18n.message('dc_databaseConnector.label.statistics.mongo.operationCounters'),
                     colors              : ['#00ff00'],
                     isStacked           : true,
                     fill                : 20,
@@ -151,5 +151,5 @@
         }
     };
 
-    ConnectionOperationCountersController.$inject = ['$scope', 'dcConnectionStatusService'];
+    ConnectionOperationCountersController.$inject = ['$scope', 'dcConnectionStatusService', 'i18nService'];
 })();

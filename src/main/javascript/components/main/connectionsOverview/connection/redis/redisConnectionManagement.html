@@ -13,7 +13,11 @@
                                ng-click="rcm.testRedisConnection()"
                                ng-disabled="redisForm.$invalid || redisAdvancedForm.$invalid">
                         <i class="fa fa-lg fa-check-circle-o"></i>
-                        <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500" message-key="dc_databaseConnector.label.modal.reimportConnections"></md-tooltip>
+                        <md-tooltip class="noToolTipAnimation"
+                                    md-direction="top"
+                                    md-delay="500">
+                            <span message-key="dc_databaseConnector.label.connection.testConnection"></span>
+                        </md-tooltip>
                     </md-button>
                     <md-input-container class="md-block" flex-gt-sm="1">
                         <label message-key="dc_databaseConnector.label.host"></label>
@@ -112,7 +116,8 @@
                         </div>
                     </md-input-container>
                     <md-divider></md-divider>
-                    <md-subheader class=" md-no-sticky" message-key="dc_databaseConnector.label.modal.connectionSettings">
+                    <md-subheader class="md-no-sticky">
+                        <span message-key="dc_databaseConnector.label.modal.connectionSettings"></span>
                     </md-subheader>
                     <md-input-container class="md-block col-md-offset-2">
                         <label message-key="dc_databaseConnector.label.modal.redis.timeoutMs"></label>
