@@ -23,9 +23,10 @@
                         <label message-key="dc_databaseConnector.label.host"></label>
                         <input title="host" required ng-minlength="4" md-maxlength="15" name="host"
                                ng-model="rcm.connection.host">
-                        <div ng-messages="redisForm.host.$error" ng-if="redisForm.host.$dirty">
+                        <div ng-messages="redisForm.host.$error">
                             <div ng-message-exp="validationName"
-                                 ng-repeat="(validationName, validationMessage) in rcm.validations.host">
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.host"
+                                 ng-class="{'showErrorMessages': redisForm.host.$invalid && redisForm.host.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -36,9 +37,10 @@
                         <input title="port" md-maxlength="5" ng-pattern="/[0-9]*/" name="port"
                                ng-model="rcm.connection.port" length-parser length-parser-max="5" range-parser
                                range-max-value="65535">
-                        <div ng-messages="redisForm.port.$error" ng-if="redisForm.port.$dirty">
+                        <div ng-messages="redisForm.port.$error">
                             <div ng-message-exp="validationName"
-                                 ng-repeat="(validationName, validationMessage) in rcm.validations.port">
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.port"
+                                 ng-class="{'showErrorMessages': redisForm.port.$invalid && redisForm.port.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -50,9 +52,10 @@
                                ng-pattern="/^[a-zA-Z0-9]+$/"
                                ng-model="rcm.connection.id" original-value="{{rcm.connection.oldId}}"
                                connection-id-validator>
-                        <div ng-messages="redisForm.id.$error" ng-if="redisForm.id.$dirty">
+                        <div ng-messages="redisForm.id.$error">
                             <div ng-message-exp="validationName"
-                                 ng-repeat="(validationName, validationMessage) in rcm.validations.id">
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.id"
+                                 ng-class="{'showErrorMessages': redisForm.id.$invalid && redisForm.id.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -62,13 +65,14 @@
                         <label message-key="dc_databaseConnector.label.connection.dbNumber">
                             <b ng-if="rcm.isCluster" style="font-size:.9em" class="statusWarningMessage" md-colors="{color: 'deep-orange-500'}" message-key="dc_databaseConnector.label.modal.redis.clusterDbNumberWarning"></b>
                         </label>
-                        <input title="Database Number" md-maxlength="2" name="dbName" required
+                        <input title="Database Number" name="dbName" required
                                ng-disabled="rcm.isCluster"
-                               ng-pattern="/^([0]?[0-9]|1[0-5])$/"
+                               ng-pattern="/^[0-9]+$/"
                                ng-model="rcm.connection.dbName">
-                        <div ng-messages="redisForm.dbName.$error" ng-if="redisForm.dbName.$dirty">
-                            <div ng-message-exp="validationName"
-                                 ng-repeat="(validationName, validationMessage) in rcm.validations.dbName">
+                        <div ng-messages="redisForm.dbName.$error">
+                            <div ng-message-exp="validationName" multiple
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.dbName"
+                                 ng-class="{'showErrorMessages': redisForm.dbName.$invalid && redisForm.dbName.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -108,9 +112,10 @@
                         <input title="Refresh period" name="refreshPeriod"
                                ng-pattern="/^[0-9]+$/"
                                ng-model="rcm.connection.options.cluster.refreshPeriod">
-                        <div ng-messages="redisAdvancedForm.refreshPeriod.$error" ng-if="redisAdvancedForm.refreshPeriod.$dirty">
+                        <div ng-messages="redisAdvancedForm.refreshPeriod.$error">
                             <div ng-message-exp='validationName'
-                                 ng-repeat="(validationName, validationMessage) in rcm.validations.refreshPeriod">
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.refreshPeriod"
+                                 ng-class="{'showErrorMessages': redisAdvancedForm.refreshPeriod.$invalid && redisAdvancedForm.refreshPeriod.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -124,9 +129,10 @@
                         <input title="Redis Timeout" name="redisTimeout"
                                ng-pattern="/^[0-9]*$/"
                                ng-model="rcm.connection.timeout">
-                        <div ng-messages="redisAdvancedForm.redisTimeout.$error" ng-if="redisAdvancedForm.redisTimeout.$dirty">
+                        <div ng-messages="redisAdvancedForm.redisTimeout.$error">
                             <div ng-message-exp='validationName'
-                                 ng-repeat="(validationName, validationMessage) in rcm.validations.redisTimeout">
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.redisTimeout"
+                                 ng-class="{'showErrorMessages': redisAdvancedForm.redisTimeout.$invalid && redisAdvancedForm.redisTimeout.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -136,9 +142,10 @@
                         <input title="Redis Weight" name="redisWeight" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="rcm.connection.weight">
-                        <div ng-messages="redisAdvancedForm.redisWeight.$error" ng-if="redisAdvancedForm.redisWeight.$dirty">
+                        <div ng-messages="redisAdvancedForm.redisWeight.$error">
                             <div ng-message-exp='validationName'
-                                 ng-repeat="(validationName, validationMessage) in rcm.validations.redisWeight">
+                                 ng-repeat="(validationName, validationMessage) in rcm.validations.redisWeight"
+                                 ng-class="{'showErrorMessages': redisAdvancedForm.redisWeight.$invalid && redisAdvancedForm.redisWeight.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>

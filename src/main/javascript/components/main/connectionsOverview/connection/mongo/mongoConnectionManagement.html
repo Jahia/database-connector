@@ -24,9 +24,10 @@
                         <label message-key="dc_databaseConnector.label.host"></label>
                         <input title="host" required ng-minlength="4" md-maxlength="15" name="host"
                                ng-model="cmcc.connection.host">
-                        <div ng-messages="mongoForm.host.$error" ng-if="mongoForm.host.$dirty">
+                        <div ng-messages="mongoForm.host.$error">
                             <div ng-message-exp="validationName"
-                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.host">
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.host"
+                                 ng-class="{'showErrorMessages': mongoForm.host.$invalid && mongoForm.host.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -37,9 +38,10 @@
                         <input title="port" md-maxlength="5" ng-pattern="/[0-9]*/" name="port"
                                ng-model="cmcc.connection.port" length-parser length-parser-max="5" range-parser
                                range-max-value="65535">
-                        <div ng-messages="mongoForm.port.$error" ng-if="mongoForm.port.$dirty">
+                        <div ng-messages="mongoForm.port.$error">
                             <div ng-message-exp="validationName"
-                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.port">
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.port"
+                                 ng-class="{'showErrorMessages': mongoForm.port.$invalid && mongoForm.port.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -51,9 +53,10 @@
                                ng-pattern="/^[a-zA-Z0-9]+$/"
                                ng-model="cmcc.connection.id" original-value="{{cmcc.connection.oldId}}"
                                connection-id-validator>
-                        <div ng-messages="mongoForm.id.$error" ng-if="mongoForm.id.$dirty">
+                        <div ng-messages="mongoForm.id.$error">
                             <div ng-message-exp="validationName"
-                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.id">
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.id"
+                                 ng-class="{'showErrorMessages': mongoForm.id.$invalid && mongoForm.id.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -64,9 +67,10 @@
                         <input title="Database Name" md-maxlength="30" required ng-pattern="/^[a-zA-Z0-9_]+$/"
                                name="dbName"
                                ng-model="cmcc.connection.dbName">
-                        <div ng-messages="mongoForm.dbName.$error" ng-if="mongoForm.dbName.$dirty">
+                        <div ng-messages="mongoForm.dbName.$error">
                             <div ng-message-exp="validationName"
-                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.dbName">
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.dbName"
+                                 ng-class="{'showErrorMessages': mongoForm.dbName.$invalid && mongoForm.dbName.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -78,9 +82,10 @@
                                ng-model="cmcc.connection.user"
                                ng-pattern="/^[a-zA-Z0-9_-]*$/"
                                ng-change="cmcc.updateIsEmpty('user');">
-                        <div ng-messages="mongoForm.user.$error" ng-if="mongoForm.user.$dirty">
+                        <div ng-messages="mongoForm.user.$error">
                             <div ng-message-exp="validationName"
-                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.user">
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.user"
+                                 ng-class="{'showErrorMessages': mongoForm.user.$invalid && mongoForm.user.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -96,9 +101,10 @@
                         <label message-key="dc_databaseConnector.label.modal.mongo.authenticationDatabase"></label>
                         <input title="Authentication Database" required name="authDb"
                                ng-model="cmcc.connection.authDb">
-                        <div ng-messages="mongoForm.authDb.$error" ng-if="mongoForm.authDb.$dirty">
+                        <div ng-messages="mongoForm.authDb.$error">
                             <div ng-message-exp="validationName"
-                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.authDb">
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.authDb"
+                                 ng-class="{'showErrorMessages': mongoForm.authDb.$invalid && mongoForm.authDb.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -127,9 +133,10 @@
                                    name="replicaSetName"
                                    ng-pattern="/^[a-zA-Z0-9_]+$/"
                                    ng-model="cmcc.connection.options.repl.replicaSet">
-                            <div ng-messages="mongoAdvancedForm.replicaSetName.$error" ng-if="mongoAdvancedForm.replicaSetName.$dirty">
+                            <div ng-messages="mongoAdvancedForm.replicaSetName.$error">
                                 <div ng-message-exp='validationName'
                                      ng-repeat="(validationName, validationMessage) in cmcc.validations.replicaSet.name"
+                                     ng-class="{'showErrorMessages': mongoAdvancedForm.replicaSetName.$invalid && mongoAdvancedForm.replicaSetName.$touched}"
                                      ng-init="cmcc.initReplicaMember()">
                                     {{validationMessage}}
                                 </div>
@@ -143,10 +150,10 @@
                                     <input title="replicaSetHost" class="md-primary" required
                                            name="replicaSetHost_{{$index}}"
                                            ng-model="member.host">
-                                    <div ng-messages="mongoAdvancedForm['replicaSetHost_' + $index].$error"
-                                         ng-if="mongoAdvancedForm['replicaSetHost_' + $index].$dirty">
+                                    <div ng-messages="mongoAdvancedForm['replicaSetHost_' + $index].$error">
                                         <div ng-message-exp='validationName'
-                                             ng-repeat="(validationName, validationMessage) in cmcc.validations.members.host">
+                                             ng-repeat="(validationName, validationMessage) in cmcc.validations.members.host"
+                                             ng-class="{'showErrorMessages': mongoAdvancedForm['replicaSetHost_' + $index].$invalid && mongoAdvancedForm['replicaSetHost_' + $index].$touched}">
                                             {{validationMessage}}
                                         </div>
                                     </div>
@@ -159,10 +166,10 @@
                                            ng-pattern="/^[0-9]*$/"
                                            ng-model="member.port " length-parser length-parser-max="5" range-parser
                                            range-max-value="65535">
-                                    <div ng-messages="mongoAdvancedForm['replicaSetPort_'+ $index].$error"
-                                         ng-if="mongoAdvancedForm['replicaSetPort_' + $index].$dirty">
+                                    <div ng-messages="mongoAdvancedForm['replicaSetPort_'+ $index].$error">
                                         <div ng-message-exp='validationName'
-                                             ng-repeat="(validationName, validationMessage) in cmcc.validations.members.port">
+                                             ng-repeat="(validationName, validationMessage) in cmcc.validations.members.port"
+                                             ng-class="{'showErrorMessages': mongoAdvancedForm['replicaSetPort_' + $index].$invalid && mongoAdvancedForm['replicaSetHost_' + $index].$touched}">
                                             {{validationMessage}}
                                         </div>
                                     </div>
@@ -194,9 +201,10 @@
                         <input title="Connect Timeout" name="connectTimeoutMS" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.conn.connectTimeoutMS">
-                        <div ng-messages="mongoAdvancedForm.connectTimeoutMS.$error" ng-if="mongoAdvancedForm.connectTimeoutMS.$dirty">
+                        <div ng-messages="mongoAdvancedForm.connectTimeoutMS.$error">
                             <div ng-message-exp='validationName'
-                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.connectTimeoutMS">
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.connectTimeoutMS"
+                                 ng-class="{'showErrorMessages': mongoAdvancedForm.connectTimeoutMS.$invalid && mongoAdvancedForm.connectTimeoutMS.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -206,9 +214,10 @@
                         <input title="Socket Timeout" name="socketTimeoutMS" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.conn.socketTimeoutMS">
-                        <div ng-messages="mongoAdvancedForm.socketTimeoutMS.$error" ng-if="mongoAdvancedForm.socketTimeoutMS.$dirty">
+                        <div ng-messages="mongoAdvancedForm.socketTimeoutMS.$error">
                             <div ng-message-exp='validationName'
-                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.socketTimeoutMS">
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.socketTimeoutMS"
+                                 ng-class="{'showErrorMessages': mongoAdvancedForm.socketTimeoutMS.$invalid && mongoAdvancedForm.socketTimeoutMS.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -232,9 +241,10 @@
                         <input title="Max Pool Size" name="maxPoolSize" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.connPool.maxPoolSize">
-                        <div ng-messages="mongoAdvancedForm.maxPoolSize.$error" ng-if="mongoAdvancedForm.maxPoolSize.$dirty">
+                        <div ng-messages="mongoAdvancedForm.maxPoolSize.$error">
                             <div ng-message-exp='validationName'
-                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.maxPoolSize">
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.maxPoolSize"
+                                 ng-class="{'showErrorMessages': mongoAdvancedForm.maxPoolSize.$invalid && mongoAdvancedForm.maxPoolSize.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -244,9 +254,10 @@
                         <input title="Min Pool Size" name="minPoolSize" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.connPool.minPoolSize">
-                        <div ng-messages="mongoAdvancedForm.minPoolSize.$error" ng-if="mongoAdvancedForm.minPoolSize.$dirty">
+                        <div ng-messages="mongoAdvancedForm.minPoolSize.$error">
                             <div ng-message-exp='validationName'
-                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.minPoolSize">
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.minPoolSize"
+                                 ng-class="{'showErrorMessages': mongoAdvancedForm.minPoolSize.$invalid && mongoAdvancedForm.minPoolSize.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>
@@ -256,9 +267,10 @@
                         <input title="Wait Queue Timeout" name="waitQueueTimeoutMS" range-parser
                                ng-pattern="/^[0-9]*$/"
                                ng-model="cmcc.connection.options.connPool.waitQueueTimeoutMS">
-                        <div ng-messages="mongoAdvancedForm.waitQueueTimeoutMS.$error" ng-if="mongoAdvancedForm.waitQueueTimeoutMS.$dirty">
+                        <div ng-messages="mongoAdvancedForm.waitQueueTimeoutMS.$error">
                             <div ng-message-exp='validationName'
-                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.waitQueueTimeoutMS">
+                                 ng-repeat="(validationName, validationMessage) in cmcc.validations.waitQueueTimeoutMS"
+                                 ng-class="{'showErrorMessages': mongoAdvancedForm.waitQueueTimeoutMS.$invalid && mongoAdvancedForm.waitQueueTimeoutMS.$touched}">
                                 {{validationMessage}}
                             </div>
                         </div>

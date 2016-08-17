@@ -42,7 +42,7 @@
                 'minlength': i18n.format('dc_databaseConnector.label.validation.minLength', '4')
             },
             port: {
-                'pattern': i18n.format('dc_databaseConnector.label.validation.range', '1|65535'),
+                'pattern': i18n.format('dc_databaseConnector.label.validation.range', '1|65535')
             },
             id: {
                 'required': i18n.message('dc_databaseConnector.label.validation.required'),
@@ -53,8 +53,7 @@
             },
             dbName: {
                 'required': i18n.message('dc_databaseConnector.label.validation.required'),
-                'pattern': i18n.format('dc_databaseConnector.label.validation.range', '0|15'),
-                'md-maxlength': i18n.format('dc_databaseConnector.label.validation.maxLength', '3')
+                'pattern': i18n.message('dc_databaseConnector.label.validation.positiveNumber')
             },
             redisTimeout: {
                 'pattern' : i18n.message('dc_databaseConnector.label.validation.integer')
@@ -65,7 +64,6 @@
             refreshPeriod: {
                 'pattern' : i18n.message('dc_databaseConnector.label.validation.integer')
             }
-            
         };
 
         rcm.createRedisConnection    = createRedisConnection;
