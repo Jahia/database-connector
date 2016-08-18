@@ -178,6 +178,7 @@ form legend {
 .statusWarningMessage {
     font-size: 0.75em;
     font-style: italic;
+    color: #f74d20;
 }
 
 .noToolTipAnimation {
