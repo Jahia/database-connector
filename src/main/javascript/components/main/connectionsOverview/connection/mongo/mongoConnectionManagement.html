@@ -169,7 +169,7 @@
                                     <div ng-messages="mongoAdvancedForm['replicaSetPort_'+ $index].$error">
                                         <div ng-message-exp='validationName'
                                              ng-repeat="(validationName, validationMessage) in cmcc.validations.members.port"
-                                             ng-class="{'showErrorMessages': mongoAdvancedForm['replicaSetPort_' + $index].$invalid && mongoAdvancedForm['replicaSetHost_' + $index].$touched}">
+                                             ng-class="{'showErrorMessages': mongoAdvancedForm['replicaSetPort_' + $index].$invalid && mongoAdvancedForm['replicaSetPort_' + $index].$touched}">
                                             {{validationMessage}}
                                         </div>
                                     </div>
