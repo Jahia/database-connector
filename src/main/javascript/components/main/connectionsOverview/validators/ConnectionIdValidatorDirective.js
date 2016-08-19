@@ -12,13 +12,13 @@
 
         function linkFunc(scope, el, attr, ctrls) {
             var model = ctrls[0];
+            var databaseType = attr.connectionIdValidator;
             model.$asyncValidators['connection-id-validator'] = function(modelValue, viewValue) {
                 if (!viewValue || viewValue === attr.originalValue) {
                     return $q.when(true);
                 }
                 var deferred = $q.defer();
-
-                var url = contextualData.context + '/modules/databaseconnector/mongodb/isconnectionvalid/' + viewValue;
+                var url = contextualData.context + '/modules/databaseconnector/' + databaseType + '/isconnectionvalid/' + viewValue;
                 dcDataFactory.customRequest({
                     url: url,
                     method: 'GET'

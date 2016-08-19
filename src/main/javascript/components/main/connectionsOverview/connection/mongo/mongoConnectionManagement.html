@@ -52,7 +52,7 @@
                         <input title="Connection Name" md-maxlength="30" name="id" required
                                ng-pattern="/^[a-zA-Z0-9]+$/"
                                ng-model="cmcc.connection.id" original-value="{{cmcc.connection.oldId}}"
-                               connection-id-validator>
+                               connection-id-validator="mongo">
                         <div ng-messages="mongoForm.id.$error">
                             <div ng-message-exp="validationName"
                                  ng-repeat="(validationName, validationMessage) in cmcc.validations.id"
