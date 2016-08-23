@@ -47,7 +47,7 @@ public class Utils {
         if (!jsonConnectionData.has("host") || StringUtils.isEmpty(jsonConnectionData.getString("host"))) {
             missingParameters.put("host");
         }
-        if (!jsonConnectionData.has("dbName") || StringUtils.isEmpty(jsonConnectionData.getString("dbName"))) {
+        if ((!jsonConnectionData.has("dbName") || StringUtils.isEmpty(jsonConnectionData.getString("dbName")) && DatabaseTypes.valueOf((String) jsonConnectionData.get("databaseType")) == DatabaseTypes.MONGO)) {
             missingParameters.put("dbName");
         }
         if (missingParameters.length() > 0) {

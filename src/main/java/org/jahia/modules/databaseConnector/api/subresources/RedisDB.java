@@ -88,9 +88,6 @@ public class RedisDB {
             if (!connectionParameters.has("host") || StringUtils.isEmpty(connectionParameters.getString("host"))) {
                 missingParameters.put("host");
             }
-            if (!connectionParameters.has("dbName") || StringUtils.isEmpty(connectionParameters.getString("dbName"))) {
-                missingParameters.put("dbName");
-            }
             if (missingParameters.length() > 0) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("{\"missingParameters\":" + missingParameters.toString() + "}").build();
             } else {
@@ -159,9 +156,6 @@ public class RedisDB {
             }
             if (!connectionParameters.has("host") || StringUtils.isEmpty(connectionParameters.getString("host"))) {
                 missingParameters.put("host");
-            }
-            if (!connectionParameters.has("dbName") || StringUtils.isEmpty(connectionParameters.getString("dbName"))) {
-                missingParameters.put("dbName");
             }
             if (missingParameters.length() > 0) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("{\"missingParameters\":" + missingParameters.toString() + "}").build();
@@ -258,9 +252,6 @@ public class RedisDB {
             }
             if (!connectionParameters.has("host") || StringUtils.isEmpty(connectionParameters.getString("host"))) {
                 missingParameters.put("host");
-            }
-            if (!connectionParameters.has("dbName") || StringUtils.isEmpty(connectionParameters.getString("dbName"))) {
-                missingParameters.put("dbName");
             }
             if (missingParameters.length() > 0) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("{\"missingParameters\":" + missingParameters.toString() + "}").build();

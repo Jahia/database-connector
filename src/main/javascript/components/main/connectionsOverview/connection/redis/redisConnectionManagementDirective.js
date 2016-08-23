@@ -52,8 +52,7 @@
 
             },
             dbName: {
-                'required': i18n.message('dc_databaseConnector.label.validation.required'),
-                'pattern': i18n.message('dc_databaseConnector.label.validation.positiveNumber')
+                'pattern': i18n.format('dc_databaseConnector.label.validation.range', '0|15')
             },
             redisTimeout: {
                 'pattern' : i18n.message('dc_databaseConnector.label.validation.integer')

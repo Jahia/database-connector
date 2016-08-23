@@ -216,7 +216,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         //Create connection object
                         MongoConnection connection = new MongoConnection((String) map.get("identifier"));
                         String host = map.containsKey("host") ? (String) map.get("host") : null;
-                        Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : null;
+                        Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : MongoConnection.DEFAULT_PORT;
                         Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
                         String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : null;
                         String user = map.containsKey("user") ? (String) map.get("user") : null;
@@ -265,9 +265,9 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                         //Create connection object
                         RedisConnection connection = new RedisConnection((String) map.get("identifier"));
                         String host = map.containsKey("host") ? (String) map.get("host") : null;
-                        Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : null;
+                        Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : RedisConnection.DEFAULT_PORT;
                         Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
-                        String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : null;
+                        String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : RedisConnection.DEFAULT_DATABASE_NUMBER;
                         String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
                         map.put("options", options);
                         String password = (String) map.get("password");

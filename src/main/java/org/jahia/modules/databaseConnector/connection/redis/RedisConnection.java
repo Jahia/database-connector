@@ -27,9 +27,11 @@ public class RedisConnection extends AbstractConnection {
     public static final String NODE_TYPE = "dc:redisConnection";
     public static final String TIMEOUT_KEY = "dc:timeout";
     public static final String WEIGHT_KEY = "dc:weight";
+    public static final Integer DEFAULT_PORT = 6379;
+    public static final String DEFAULT_DATABASE_NUMBER = "0";
+
     private static final Logger logger = LoggerFactory.getLogger(RedisConnection.class);
     private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.REDIS;
-    private static final Integer DEFAULT_PORT = 6379;
     private RedisClient redisClient;
     private RedisClusterClient redisClusterClient;
     private Long timeout;
@@ -60,7 +62,7 @@ public class RedisConnection extends AbstractConnection {
         redisConnectionData.setHost(host);
         redisConnectionData.setPort(port == null ? DEFAULT_PORT : port);
         redisConnectionData.isConnected(isConnected);
-        redisConnectionData.setDbName(dbName);
+        redisConnectionData.setDbName(dbName == null ? DEFAULT_DATABASE_NUMBER : dbName);
         redisConnectionData.setPassword(password);
         redisConnectionData.setTimeout(timeout);
         redisConnectionData.setWeight(weight);
@@ -177,9 +179,9 @@ public class RedisConnection extends AbstractConnection {
         if (password != null) {
             builder.withPassword(password);
         }
-        if (dbName != null && !isCluster) {
-            builder.withDatabase(Integer.valueOf(dbName));
-        }
+        //If Default database number is ever changed to anything but 0, cluster database number must be set to 0
+        builder.withDatabase(isCluster || dbName == null ? Integer.valueOf(DEFAULT_DATABASE_NUMBER) : Integer.valueOf(dbName));
+
         if (timeout != null) {
             builder.withTimeout(timeout, TimeUnit.MILLISECONDS);
         }
@@ -200,13 +202,10 @@ public class RedisConnection extends AbstractConnection {
         StringBuilder serializedString = new StringBuilder();
         serializedString.append(TABU).append("type ").append(DOUBLE_QUOTE).append(DATABASE_TYPE).append(DOUBLE_QUOTE).append(NEW_LINE);
         serializedString.append(TABU).append("host ").append(DOUBLE_QUOTE).append(this.host).append(DOUBLE_QUOTE).append(NEW_LINE);
-        serializedString.append(TABU).append("dbName ").append(DOUBLE_QUOTE).append(this.dbName).append(DOUBLE_QUOTE).append(NEW_LINE);
+        serializedString.append(TABU).append("dbName ").append(DOUBLE_QUOTE).append(this.dbName != null ? this.dbName : DEFAULT_DATABASE_NUMBER).append(DOUBLE_QUOTE).append(NEW_LINE);
         serializedString.append(TABU).append("identifier ").append(DOUBLE_QUOTE).append(this.id).append(DOUBLE_QUOTE).append(NEW_LINE);
         serializedString.append(TABU).append("isConnected ").append(DOUBLE_QUOTE).append(this.isConnected()).append(DOUBLE_QUOTE).append(NEW_LINE);
-
-        if (this.port != null) {
-            serializedString.append(TABU + "port " + DOUBLE_QUOTE).append(this.port).append(DOUBLE_QUOTE).append(NEW_LINE);
-        }
+        serializedString.append(TABU + "port " + DOUBLE_QUOTE).append(this.port != null ? this.port : DEFAULT_PORT).append(DOUBLE_QUOTE).append(NEW_LINE);
 
         if (!StringUtils.isEmpty(this.password)) {
             serializedString.append(TABU + "password " + DOUBLE_QUOTE).append(EncryptionUtils.passwordBaseEncrypt(this.password)).append("_ENC").append(DOUBLE_QUOTE).append(NEW_LINE);

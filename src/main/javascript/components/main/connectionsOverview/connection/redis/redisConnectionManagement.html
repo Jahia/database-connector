@@ -65,9 +65,9 @@
                         <label message-key="dc_databaseConnector.label.connection.dbNumber">
                             <b ng-if="rcm.isCluster" style="font-size:.9em" class="statusWarningMessage" md-colors="{color: 'deep-orange-500'}" message-key="dc_databaseConnector.label.modal.redis.clusterDbNumberWarning"></b>
                         </label>
-                        <input title="Database Number" name="dbName" required
+                        <input title="Database Number" name="dbName"
                                ng-disabled="rcm.isCluster"
-                               ng-pattern="/^[0-9]+$/"
+                               ng-pattern="/^([0]?[0-9]|1[0-5])$/"
                                ng-model="rcm.connection.dbName">
                         <div ng-messages="redisForm.dbName.$error">
                             <div ng-message-exp="validationName" multiple

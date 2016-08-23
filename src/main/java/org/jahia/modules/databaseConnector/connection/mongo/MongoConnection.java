@@ -32,8 +32,9 @@ public class MongoConnection extends AbstractConnection {
     public static final String WRITE_CONCERN_KEY = "dc:writeConcern";
     public static final String AUTH_DB_KEY = "dc:authDb";
     public static final String WRITE_CONCERN_DEFAULT_VALUE = "ACKNOWLEDGED";
+    public static final Integer DEFAULT_PORT = 27017;
+
     private static final Logger logger = LoggerFactory.getLogger(MongoConnection.class);
-    private static final Integer DEFAULT_PORT = 27017;
     private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.MONGO;
     private static List WRITE_CONCERN_OPTIONS = null;
     private MongoDatabase databaseConnection;
@@ -180,10 +181,7 @@ public class MongoConnection extends AbstractConnection {
         serializedString.append(TABU).append("identifier ").append(DOUBLE_QUOTE).append(this.id).append(DOUBLE_QUOTE).append(NEW_LINE);
         serializedString.append(TABU).append("isConnected ").append(DOUBLE_QUOTE).append(this.isConnected()).append(DOUBLE_QUOTE).append(NEW_LINE);
         serializedString.append(TABU).append("writeConcern ").append(DOUBLE_QUOTE).append(this.writeConcern).append(DOUBLE_QUOTE).append(NEW_LINE);
-
-        if (this.port != null) {
-            serializedString.append(TABU + "port " + DOUBLE_QUOTE).append(this.port).append(DOUBLE_QUOTE).append(NEW_LINE);
-        }
+        serializedString.append(TABU + "port " + DOUBLE_QUOTE).append(this.port != null ? this.port : DEFAULT_PORT).append(DOUBLE_QUOTE).append(NEW_LINE);
 
         if (!StringUtils.isEmpty(this.authDb)) {
             serializedString.append(TABU + "authDb " + DOUBLE_QUOTE).append(this.authDb).append(DOUBLE_QUOTE).append(NEW_LINE);
