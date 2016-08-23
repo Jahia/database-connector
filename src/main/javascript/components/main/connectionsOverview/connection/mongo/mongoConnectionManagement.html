@@ -1,7 +1,7 @@
 <dc-spinner spinner-mode="cmcc.spinnerOptions.mode" show="cmcc.spinnerOptions.showSpinner"></dc-spinner>
 <md-content layout-padding>
     <md-tabs md-dynamic-height md-border-bottom>
-        <md-tab label="{{cmcc.getMessage('dc_databaseConnector.label.settings')}}">
+        <md-tab label="{{cmcc.tabLabels.settings}}">
             <form name="mongoForm">
                 <md-content class="md-padding">
                     <md-checkbox ng-model="cmcc.connection.isConnected" aria-label="Automatic startup after Creation"
@@ -113,7 +113,7 @@
             </form>
         </md-tab>
 
-        <md-tab label="{{cmcc.getMessage('dc_databaseConnector.label.advancedSettings')}}">
+        <md-tab label="{{cmcc.tabLabels.advancedSettings}}">
             <md-content class="md-padding">
                 <form name="mongoAdvancedForm">
 

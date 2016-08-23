@@ -24,7 +24,7 @@
                                <div class="md-list-item-text">
                                    <p><b><span message-key="dc_databaseConnector.label.connection.connectionName"></span>:</b> <i>{{cc.connection.id}}</i></p>
                                    <p ng-if="cc.connection.databaseType=='MONGO'"><b><span message-key="dc_databaseConnector.label.connection.dbName"></span>:</b> <i>{{cc.connection.dbName}}</i></p>
-                                   <p ng-if="cc.connection.databaseType=='REDIS'"><b><span message-key="dc_databaseConnector.label.connection.dbName"></span>:</b> <i>{{cc.connection.dbName}}</i></p>
+                                   <p ng-if="cc.connection.databaseType=='REDIS'"><b><span message-key="dc_databaseConnector.label.connection.dbNumber"></span>:</b> <i>{{cc.connection.dbName}}</i></p>
                                    <p><b><span message-key="dc_databaseConnector.label.host"></span>:</b> <i>{{cc.connection.host}}</i></p>
                                    <p><b><span message-key="dc_databaseConnector.label.port"></span>:</b> <i>{{cc.connection.port}}</i></p>
                                    <span ng-if="cc.serverStatusAvailable()">

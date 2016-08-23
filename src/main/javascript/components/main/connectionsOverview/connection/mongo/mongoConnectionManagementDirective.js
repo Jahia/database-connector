@@ -34,7 +34,10 @@
             showSpinner: false,
             mode: 'indeterminate'
         };
-
+        cmcc.tabLabels = {
+            settings: i18n.message('dc_databaseConnector.label.settings'),
+            advancedSettings: i18n.message('dc_databaseConnector.label.advancedSettings')
+        };
         cmcc.validations = {
             host: {
                 'required': i18n.message('dc_databaseConnector.label.validation.required'),
@@ -49,7 +52,6 @@
                 'connection-id-validator': i18n.message('dc_databaseConnector.label.validation.connectionIdInUse'),
                 'pattern': i18n.message('dc_databaseConnector.label.validation.alphanumeric'),
                 'md-maxlength': i18n.format('dc_databaseConnector.label.validation.minLength', '30')
-
             },
             dbName: {
                 'required': i18n.message('dc_databaseConnector.label.validation.required'),
@@ -82,7 +84,6 @@
             },
             socketTimeoutMS: {
                 'pattern' : i18n.message('dc_databaseConnector.label.validation.integer')
-
             },
             maxPoolSize: {
                 'pattern' : i18n.message('dc_databaseConnector.label.validation.integer')
@@ -95,7 +96,6 @@
             waitQueueTimeoutMS: {
                 'pattern' : i18n.message('dc_databaseConnector.label.validation.integer')
             }
-            
         };
 
         cmcc.createMongoConnection = createMongoConnection;
