@@ -83,7 +83,6 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
     @Override
     public boolean addEditConnection(final AbstractConnection connection, final Boolean isEdition) {
         Assert.hasText(connection.getHost(), "Host must be defined");
-        Assert.notNull(connection.getPort(), "Port must be defined");
 
         RedisConnection redisConnection = (RedisConnection) connection;
         if (storeConnection(redisConnection, NODE_TYPE, isEdition)) {

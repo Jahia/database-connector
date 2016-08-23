@@ -173,8 +173,7 @@ public class RedisConnection extends AbstractConnection {
 
     private RedisURI buildRedisClientUri(boolean isCluster) {
 //        redis :// [password@] host [: port] [/ database] [? [timeout=timeout[d|h|m|s|ms|us|ns]] [&database=database]]
-
-        RedisURI.Builder builder = RedisURI.Builder.redis(host, port);
+        RedisURI.Builder builder = RedisURI.Builder.redis(host, port != null ? port : DEFAULT_PORT);
         if (password != null) {
             builder.withPassword(password);
         }
