@@ -95,8 +95,9 @@ public class DCAPI {
     public Response importTest(InputStream source) {
         JSONObject jsonAnswer = new JSONObject();
         try {
-            jsonAnswer.put("results", databaseConnector.importConnections(source));
-            return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();
+            Map results = databaseConnector.importConnections(source);
+            jsonAnswer.put("results", results);
+            return Response.status(((Map)results.get("report")).get("status").toString().equals("success") ? Response.Status.OK : Response.Status.BAD_REQUEST).entity(jsonAnswer.toString()).build();
         } catch (JSONException ex) {
             logger.error("Failed to perform import", ex.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Failed to perform import\"}").build();

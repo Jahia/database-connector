@@ -1,6 +1,7 @@
 package org.jahia.modules.databaseConnector.connection;
 
 import org.apache.commons.io.FileUtils;
+import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.jahia.modules.databaseConnector.Utils;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
@@ -172,13 +173,32 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
 
     public Map executeConnectionImportHandler(InputStream source) {
         File file = null;
-        Map<String, Map> importedConnectionsResults = new LinkedHashMap<>();
+        Map<String, Map> parsedConnections = new LinkedHashMap<>();
+        Map<String, Map> importedConnections = new LinkedHashMap<>();
         Map<String, String> report = new LinkedHashMap<>();
         try {
             file = File.createTempFile("temporaryImportFile", ".wzd");
             FileUtils.copyInputStreamToFile(source, file);
-            dslExecutor.execute(file.toURI().toURL(), dslHandlerMap.get("importConnection"), importedConnectionsResults);
-            logger.info("Done importing connections" + importedConnectionsResults);
+            dslExecutor.execute(file.toURI().toURL(), dslHandlerMap.get("importConnection"), parsedConnections);
+            for (String databaseType: DatabaseTypes.getValuesAsString()) {
+                if (parsedConnections.containsKey(databaseType)) {
+                    Map<String, List> results = new LinkedHashMap<>();
+                    List<Map> validConnections = new LinkedList();
+                    List<Map> failedConnections = new LinkedList();
+                    for (Map connectionConfiguration: (LinkedList<Map>)parsedConnections.get(databaseType)) {
+                        connectionConfiguration = importConnection(connectionConfiguration);
+                        if (connectionConfiguration.get("status").equals("success")) {
+                            validConnections.add(connectionConfiguration);
+                        } else {
+                            failedConnections.add(connectionConfiguration);
+                        }
+                    }
+                    results.put("success", validConnections);
+                    results.put("failed", failedConnections);
+                    importedConnections.put(databaseType, results);
+                }
+            }
+            logger.info("Done importing connections" + parsedConnections);
             report.put("status", "success");
         } catch (FileNotFoundException ex) {
             report.put("status", "error");
@@ -188,6 +208,10 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
             report.put("status", "error");
             report.put("reason", "io");
             logger.error(ex.getMessage(), ex);
+        } catch (MultipleCompilationErrorsException ex) {
+            report.put("status", "error");
+            report.put("reason", "fileParseFailed");
+            logger.error(ex.getMessage(), ex);
         } catch (Exception ex) {
             report.put("status", "error");
             report.put("reason", "other");
@@ -195,8 +219,8 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         } finally {
             FileUtils.deleteQuietly(file);
         }
-        importedConnectionsResults.put("report", report);
-        return importedConnectionsResults;
+        importedConnections.put("report", report);
+        return importedConnections;
     }
 
     public Map<String, Object> importConnection(Map<String, Object> map) {

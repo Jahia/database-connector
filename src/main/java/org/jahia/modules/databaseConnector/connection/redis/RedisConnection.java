@@ -32,6 +32,7 @@ public class RedisConnection extends AbstractConnection {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisConnection.class);
     private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.REDIS;
+    private static final int TEST_CONNECTION_TIMEOUT = 5000;
     private RedisClient redisClient;
     private RedisClusterClient redisClusterClient;
     private Long timeout;
@@ -89,7 +90,7 @@ public class RedisConnection extends AbstractConnection {
             try {
                 JSONObject jsonOptions = new JSONObject(options);
                 if (jsonOptions.has("cluster")) {
-                    redisClusterClient = RedisClusterClient.create(buildRedisClientUri(true));
+                    redisClusterClient = RedisClusterClient.create(buildRedisClientUri(true, false));
                     if (jsonOptions.getJSONObject("cluster").has("refreshClusterView") && (jsonOptions.getJSONObject("cluster")).getBoolean("refreshClusterView")) {
                         redisClusterClient.setOptions(new ClusterClientOptions.Builder()
                                 .refreshClusterView(true)
@@ -104,7 +105,7 @@ public class RedisConnection extends AbstractConnection {
             }
         }
 
-        redisClient = RedisClient.create(buildRedisClientUri(false));
+        redisClient = RedisClient.create(buildRedisClientUri(false, false));
 
         return redisClient.connect();
     }
@@ -126,7 +127,7 @@ public class RedisConnection extends AbstractConnection {
             if (!StringUtils.isEmpty(options)) {
                 JSONObject jsonOptions = new JSONObject(options);
                 if (jsonOptions.has("cluster")) {
-                    RedisClusterClient redisClusterClient = RedisClusterClient.create(buildRedisClientUri(true));
+                    RedisClusterClient redisClusterClient = RedisClusterClient.create(buildRedisClientUri(true, true));
                     try {
                         if (jsonOptions.getJSONObject("cluster").has("refreshClusterView") && (jsonOptions.getJSONObject("cluster")).getBoolean("refreshClusterView")) {
                             redisClusterClient.setOptions(new ClusterClientOptions.Builder()
@@ -142,7 +143,7 @@ public class RedisConnection extends AbstractConnection {
                 }
             }
 
-            RedisClient redisClient = RedisClient.create(buildRedisClientUri(false));
+            RedisClient redisClient = RedisClient.create(buildRedisClientUri(false, true));
 
             redisClient.connect();
             return true;
@@ -173,7 +174,7 @@ public class RedisConnection extends AbstractConnection {
     }
 
 
-    private RedisURI buildRedisClientUri(boolean isCluster) {
+    private RedisURI buildRedisClientUri(boolean isCluster, boolean isTest) {
 //        redis :// [password@] host [: port] [/ database] [? [timeout=timeout[d|h|m|s|ms|us|ns]] [&database=database]]
         RedisURI.Builder builder = RedisURI.Builder.redis(host, port != null ? port : DEFAULT_PORT);
         if (password != null) {
@@ -182,7 +183,9 @@ public class RedisConnection extends AbstractConnection {
         //If Default database number is ever changed to anything but 0, cluster database number must be set to 0
         builder.withDatabase(isCluster || dbName == null ? Integer.valueOf(DEFAULT_DATABASE_NUMBER) : Integer.valueOf(dbName));
 
-        if (timeout != null) {
+        if (isTest) {
+            builder.withTimeout(TEST_CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS);
+        } else if (timeout != null) {
             builder.withTimeout(timeout, TimeUnit.MILLISECONDS);
         }
 

@@ -51,30 +51,36 @@
                     },
                     data: file
                 };
+                
+                coc.spinnerOn = true;
 
-            }
-
-            dcDataFactory.customRequest(request).then(function (response) {
-                var allImportsSuccessful = true;
-                for (var i in response.results) {
-                    if (i == 'report') {
-                        continue;
+                dcDataFactory.customRequest(request).then(function (response) {
+                    var allImportsSuccessful = true;
+                    for (var i in response.results) {
+                        if (i == 'report') {
+                            continue;
+                        }
+                        if (response.results[i].failed.length > 0) {
+                            allImportsSuccessful = false;
+                            break;
+                        }
                     }
-                    if (response.results[i].failed.length > 0) {
-                        allImportsSuccessful = false;
-                        break;
+                    coc.spinnerOn = false;
+                    $state.go('importResults', {results:response.results, status: allImportsSuccessful});
+                }, function (response) {
+                    var errorToast = {
+                        type: 'error',
+                        title: i18n.message('dc_databaseConnector.toast.title.importFailed'),
+                        toastId: 'ims',
+                        timeout: 3000
+                    };
+                    if (response.data.results !== undefined && response.data.results.report !== undefined) {
+                        errorToast.body = i18n.message('dc_databaseConnector.toast.message.' + response.data.results.report.reason);
                     }
-                }
-                $state.go('importResults', {results:response.results, status: allImportsSuccessful});
-            }, function (response) {
-                toaster.pop({
-                    type: 'error',
-                    title: i18n.message('dc_databaseConnector.toast.title.importFailed'),
-                    body: i18n.message('dc_databaseConnector.toast.message.importFailed'),
-                    toastId: 'ims',
-                    timeout: 3000
+                    coc.spinnerOn = false;
+                    toaster.pop(errorToast);
                 });
-            });
+            }
         }
         function getAllConnections() {
             var url = contextualData.context + '/modules/databaseconnector/getallconnections';
@@ -151,7 +157,7 @@
         });
     };
 
-    connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', 'dcDownloadFactory', 'toaster', '$state'];
+    connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', 'dcDownloadFactory', 'toaster', '$state', 'i18nService'];
 
 
     function CreateConnectionPopupController($scope, $mdDialog, contextualData, dcDataFactory) {
