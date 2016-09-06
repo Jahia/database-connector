@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.getAllDatabaseTypes;
 
@@ -38,6 +39,8 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
     public static final String DATABASE_CONNECTOR_PATH = "databaseConnector";
 
     public static final String DATABASE_CONNECTOR_NODE_TYPE = "dc:databaseConnector";
+
+    private static final Pattern ALPHA_NUMERIC_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectorManager.class);
     private static DatabaseConnectorManager instance;
     private BundleContext bundleContext;
@@ -228,7 +231,15 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         switch (DatabaseTypes.valueOf((String) map.get("type"))) {
             case MONGO:
                 try {
-                    if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey(map.get("identifier"))) {
+                    if (!ALPHA_NUMERIC_PATTERN.matcher((String)map.get("identifier")).matches()) {
+                        map.put("status", "failed");
+                        map.put("statusMessage", "invalidIdentifier");
+                        //Create instance to be able to parse the options of a failed connection.
+                        if (map.containsKey("options")) {
+                            MongoConnection connection = new MongoConnection((String) map.get("identifier"));
+                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+                        }
+                    } else if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey(map.get("identifier"))) {
                         map.put("status", "failed");
                         map.put("statusMessage", "connectionExists");
                         //Create instance to be able to parse the options of a failed connection.
@@ -282,9 +293,22 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                 break;
             case REDIS:
                 try {
-                    if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey(map.get("identifier"))) {
+                    if (!ALPHA_NUMERIC_PATTERN.matcher((String)map.get("identifier")).matches()) {
+                        map.put("status", "failed");
+                        map.put("statusMessage", "invalidIdentifier");
+                        //Create instance to be able to parse the options of a failed connection.
+                        if (map.containsKey("options")) {
+                            RedisConnection connection = new RedisConnection((String) map.get("identifier"));
+                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+                        }
+                    } else if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey(map.get("identifier"))) {
                         map.put("status", "failed");
                         map.put("statusMessage", "connectionExists");
+                        //Create instance to be able to parse the options of a failed connection.
+                        if (map.containsKey("options")) {
+                            RedisConnection connection = new RedisConnection((String) map.get("identifier"));
+                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+                        }
                     } else {
                         //Create connection object
                         RedisConnection connection = new RedisConnection((String) map.get("identifier"));
