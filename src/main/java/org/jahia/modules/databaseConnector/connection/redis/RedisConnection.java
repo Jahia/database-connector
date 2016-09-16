@@ -5,6 +5,8 @@ import com.lambdaworks.redis.RedisURI;
 import com.lambdaworks.redis.ZStoreArgs;
 import com.lambdaworks.redis.cluster.ClusterClientOptions;
 import com.lambdaworks.redis.cluster.RedisClusterClient;
+import com.lambdaworks.redis.resource.ClientResources;
+import com.lambdaworks.redis.resource.DefaultClientResources;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
@@ -37,6 +39,7 @@ public class RedisConnection extends AbstractConnection {
     private RedisClusterClient redisClusterClient;
     private Long timeout;
     private Integer weight;
+    private static ClientResources clientResources = new DefaultClientResources.Builder().ioThreadPoolSize(16).computationThreadPoolSize(16).build();
 
     public RedisConnection(String id) {
         this.id = id;
@@ -90,7 +93,7 @@ public class RedisConnection extends AbstractConnection {
             try {
                 JSONObject jsonOptions = new JSONObject(options);
                 if (jsonOptions.has("cluster")) {
-                    redisClusterClient = RedisClusterClient.create(buildRedisClientUri(true, false));
+                    redisClusterClient = RedisClusterClient.create(clientResources, buildRedisClientUri(true, false));
                     if (jsonOptions.getJSONObject("cluster").has("refreshClusterView") && (jsonOptions.getJSONObject("cluster")).getBoolean("refreshClusterView")) {
                         redisClusterClient.setOptions(new ClusterClientOptions.Builder()
                                 .refreshClusterView(true)
@@ -105,7 +108,7 @@ public class RedisConnection extends AbstractConnection {
             }
         }
 
-        redisClient = RedisClient.create(buildRedisClientUri(false, false));
+        redisClient = RedisClient.create(clientResources, buildRedisClientUri(false, false));
 
         return redisClient.connect();
     }
@@ -123,19 +126,21 @@ public class RedisConnection extends AbstractConnection {
 
     @Override
     public boolean testConnectionCreation() {
+        RedisClient redisClientTest = null;
+        RedisClusterClient redisClusterClientTest = null;
         try {
             if (!StringUtils.isEmpty(options)) {
                 JSONObject jsonOptions = new JSONObject(options);
                 if (jsonOptions.has("cluster")) {
-                    RedisClusterClient redisClusterClient = RedisClusterClient.create(buildRedisClientUri(true, true));
+                    redisClusterClientTest = RedisClusterClient.create(clientResources, buildRedisClientUri(true, true));
                     try {
                         if (jsonOptions.getJSONObject("cluster").has("refreshClusterView") && (jsonOptions.getJSONObject("cluster")).getBoolean("refreshClusterView")) {
-                            redisClusterClient.setOptions(new ClusterClientOptions.Builder()
+                            redisClusterClientTest.setOptions(new ClusterClientOptions.Builder()
                                     .refreshClusterView(true)
                                     .refreshPeriod(jsonOptions.getJSONObject("cluster").getInt("refreshPeriod"), TimeUnit.SECONDS).build()
                             );
                         }
-                        redisClusterClient.connectCluster();
+                        redisClusterClientTest.connectCluster();
                         return true;
                     } catch (JSONException ex) {
                         logger.error("Invalid JSON object", ex.getMessage());
@@ -143,13 +148,21 @@ public class RedisConnection extends AbstractConnection {
                 }
             }
 
-            RedisClient redisClient = RedisClient.create(buildRedisClientUri(false, true));
 
-            redisClient.connect();
+            redisClientTest = RedisClient.create(clientResources, buildRedisClientUri(false, true));
+
+            redisClientTest.connect();
             return true;
         } catch (Exception e) {
             logger.error(e.getMessage());
             return false;
+        } finally {
+            if(redisClientTest != null) {
+                redisClientTest.shutdown();
+            }
+            if(redisClusterClientTest != null) {
+                redisClusterClientTest.shutdown();
+            }
         }
     }
 
