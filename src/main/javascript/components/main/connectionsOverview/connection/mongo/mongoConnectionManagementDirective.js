@@ -6,12 +6,12 @@
             restrict: 'E',
             templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connection/mongo/mongoConnectionManagement.html',
             controller: mongoConnectionManagementController,
-            scope: {
+            controllerAs: 'cmcc',
+            bindToController: {
                 mode: '@',
                 connection: '='
             },
-            controllerAs: 'cmcc',
-            bindToController: true,
+
             link: linkFunc
         };
 
@@ -28,7 +28,7 @@
 
     var mongoConnectionManagementController = function ($scope, contextualData, dcDataFactory, toaster, i18n) {
         var cmcc = this;
-        cmcc.imageUrl = contextualData.context + '/modules/database-connector/images/' + cmcc.connection.databaseType + '/logo_60.png';
+
         cmcc.isEmpty = {};
         cmcc.spinnerOptions = {
             showSpinner: false,
@@ -109,10 +109,8 @@
         cmcc.removeReplicaMember = removeReplicaMember;
         cmcc.updateReplicaSetOptions = updateReplicaSetOptions;
         cmcc.getMessage = i18n.message;
-        
-        init();
 
-        function init() {
+        cmcc.$onInit = function init() {
             var url = contextualData.context + '/modules/databaseconnector/mongodb/writeconcernoptions';
             dcDataFactory.customRequest({
                 url: url,
@@ -123,7 +121,7 @@
             }, function (response) {
                 cmcc.spinnerOptions.showSpinner = false;
             });
-            if (_.isUndefined(cmcc.connection.port) || cmcc.connection.port == null) {
+            if (_.isUndefined($scope.connection.port) || cmcc.connection.port == null) {
                 cmcc.connection.port = "27017";
             }
 
