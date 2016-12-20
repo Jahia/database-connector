@@ -4,9 +4,8 @@
             restrict    : 'E',
             templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/mongoConnectionStats/connectionMemoryUsage/connectionMemoryUsage.html',
             controller  : ConnectionMemoryUsageController,
-            controllerAs: 'cmuc',
-            bindToController: true,
-            scope       : {
+            controllerAs : 'cmuc',
+            bindToController : {
                 chartHeight : '=',
                 chartWidth  : '=',
                 pointSize   : '=?'
@@ -49,7 +48,9 @@
         cmuc.getHeight = getHeight;
         cmuc.getWidth  = getWidth;
 
-        init();
+        cmuc.$onInit = function() {
+            init();
+        };
 
         function init() {
             cmuc.connectionStatus = dcConnectionStatusService.getCurrentConnectionStatus();

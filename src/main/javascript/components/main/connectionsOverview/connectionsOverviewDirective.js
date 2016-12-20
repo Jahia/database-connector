@@ -7,7 +7,6 @@
             templateUrl     : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connectionsOverview.html',
             controller      : connectionsOverviewController,
             controllerAs    : 'coc',
-            bindToController: true,
             link            : linkFunc
         };
 
@@ -29,8 +28,10 @@
         coc.exportSelectedConnections = exportSelectedConnections;
         coc.isExportDisabled = isExportDisabled;
         coc.importConnections = importConnections;
-        
-        init();
+
+        coc.$onInit = function() {
+            init();
+        };
 
         function init() {
             getDatabaseTypes();

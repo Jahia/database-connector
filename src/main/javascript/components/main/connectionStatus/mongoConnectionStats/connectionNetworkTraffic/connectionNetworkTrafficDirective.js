@@ -4,9 +4,8 @@
             restrict    : 'E',
             templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/mongoConnectionStats/connectionNetworkTraffic/connectionNetworkTraffic.html',
             controller  : ConnectionNetworkTrafficController,
-            controllerAs: 'cntc',
-            bindToController: true,
-            scope       : {
+            controllerAs : 'cntc',
+            bindToController : {
                 chartHeight : '=',
                 chartWidth  : '=',
                 pointSize   : '=?'
@@ -49,7 +48,9 @@
         cntc.getHeight = getHeight;
         cntc.getWidth  = getWidth;
 
-        init();
+        cntc.$onInit = function() {
+            init();
+        };
 
         function init() {
             cntc.connectionStatus = dcConnectionStatusService.getCurrentConnectionStatus();

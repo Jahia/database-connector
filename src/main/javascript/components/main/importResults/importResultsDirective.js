@@ -7,7 +7,6 @@
             templateUrl     : contextualData.context + '/modules/database-connector/javascript/angular/components/main/importResults/importResults.html',
             controller      : ImportResultsController,
             controllerAs    : 'irc',
-            bindToController: true,
             link            : linkFunc
         };
 
@@ -36,8 +35,10 @@
         irc.isReImportDisabled = isReImportDisabled;
         irc.getFormattedImportHeader = getFormattedImportHeader;
         irc.getMessage = i18n.message;
-        
-        init();
+
+        irc.$onInit = function() {
+          init();
+        };
 
         function init() {
             var url = contextualData.context + '/modules/databaseconnector/databasetypes';

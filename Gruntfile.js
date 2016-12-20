@@ -41,20 +41,10 @@ module.exports = function(grunt) {
                 cssDest     : 'src/main/resources/css/lib/_dc.css',
                 exclude     : [
                     'jquery',
-                    'modernizr',
-                    'bootstrap',
-                    'bootswatch-dist',
-                    'datatables'
+                    'modernizr'
                 ],
                 mainFiles   : {
-                    'datatables-plugins': ['sorting/datetime-moment.js'],
                     'moment'            : ['min/moment-with-locales.js']
-                },
-                dependencies: {
-                    'datatables-plugins': ['datatables.net', 'moment'],
-                    'datatables.net-buttons': ['datatables.net', 'pdfmake', 'jszip'],
-                    'angular-datatables': ['datatables.net'],
-                    'underscore': ['pdfmake']
                 },
                 bowerOptions: {
                     relative: false

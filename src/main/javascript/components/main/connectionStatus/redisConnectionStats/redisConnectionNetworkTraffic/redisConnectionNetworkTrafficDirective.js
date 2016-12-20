@@ -4,9 +4,8 @@
             restrict    : 'E',
             templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/redisConnectionStats/redisConnectionNetworkTraffic/redisConnectionNetworkTraffic.html',
             controller  : RedisConnectionNetworkTrafficController,
-            controllerAs: 'rcntc',
-            bindToController: true,
-            scope       : {
+            controllerAs : 'rcntc',
+            bindToController : {
                 chartHeight : '=',
                 chartWidth  : '=',
                 pointSize   : '=?'
@@ -49,7 +48,9 @@
         rcntc.getHeight = getHeight;
         rcntc.getWidth  = getWidth;
 
-        init();
+        rcntc.$onInit = function() {
+            init();
+        };
 
         function init() {
             rcntc.connectionStatus = dcConnectionStatusService.getCurrentConnectionStatus();

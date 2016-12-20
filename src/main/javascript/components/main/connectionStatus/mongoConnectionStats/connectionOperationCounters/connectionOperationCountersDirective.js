@@ -4,9 +4,8 @@
             restrict    : 'E',
             templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/mongoConnectionStats/connectionOperationCounters/connectionOperationCounters.html',
             controller  : ConnectionOperationCountersController,
-            controllerAs: 'cocc',
-            bindToController: true,
-            scope       : {
+            controllerAs : 'cocc',
+            bindToController : {
                 chartHeight : '=',
                 chartWidth  : '=',
                 pointSize   : '=?'
@@ -32,7 +31,9 @@
         cocc.getHeight = getHeight;
         cocc.getWidth  = getWidth;
 
-        init();
+        cocc.$onInit = function() {
+            init();
+        };
 
         function init() {
             cocc.connectionStatus = dcConnectionStatusService.getCurrentConnectionStatus();

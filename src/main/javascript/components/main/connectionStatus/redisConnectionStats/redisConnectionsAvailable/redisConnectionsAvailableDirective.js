@@ -4,9 +4,8 @@
             restrict    : 'E',
             templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/redisConnectionStats/redisConnectionsAvailable/redisConnectionsAvailable.html',
             controller  : RedisConnectionsAvailableController,
-            controllerAs: 'rcac',
-            bindToController: true,
-            scope       : {
+            controllerAs : 'rcac',
+            bindToController : {
                 chartHeight : '=',
                 chartWidth  : '=',
                 pointSize   : '=?'
@@ -46,7 +45,9 @@
         rcac.getHeight = getHeight;
         rcac.getWidth  = getWidth;
 
-        init();
+        rcac.$onInit = function() {
+            init();
+        };
 
         function init() {
             rcac.connectionStatus = dcConnectionStatusService.getCurrentConnectionStatus();

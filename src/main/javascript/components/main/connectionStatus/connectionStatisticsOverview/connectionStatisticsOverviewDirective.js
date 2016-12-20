@@ -7,8 +7,7 @@
             templateUrl     : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/connectionStatisticsOverview/connectionStatisticsOverview.html',
             controller      : ConnectionStatisticsOverviewController,
             controllerAs    : 'cso',
-            bindToController: true,
-            scope           : {
+            bindToController: {
                 databaseType : '='
             },
             link            : linkFunc
@@ -25,11 +24,12 @@
         .directive('dcConnectionStatisticsOverview', ['$log', 'contextualData', connectionStatisticsOverview]);
 
     function ConnectionStatisticsOverviewController($scope, dcConnectionStatusService, i18n, $filter) {
-        
         var cso = this;
         cso.goToConnections = goToConnections;
         cso.getMessage = i18n.message;
-        init();
+        cso.$onInit = function() {
+            init();
+        };
 
         function init() {
             cso.title = i18n.format('dc_databaseConnector.label.statistics.databaseOverview', $filter('fLUpperCase')(cso.databaseType));

@@ -5,14 +5,13 @@
         var directive = {
             restrict        : 'E',
             templateUrl     : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connection/Connection.html',
-            scope: {
+            controller      : ConnectionController,
+            controllerAs    : 'cc',
+            bindToController: {
                 index: '@',
                 connection: '=',
                 exportConnections: '='
             },
-            controller      : ConnectionController,
-            controllerAs    : 'cc',
-            bindToController: true,
             link            : linkFunc
         };
 
@@ -27,8 +26,10 @@
 
     var ConnectionController = function($scope, contextualData, dcDataFactory, $mdDialog, $filter, toaster, $state, i18n) {
         var cc = this;
-        cc.imageUrl = contextualData.context + '/modules/database-connector/images/' + cc.connection.databaseType.toLowerCase() + '/logo_60.png';
-        cc.originalConnection = angular.copy(cc.connection);
+        cc.spinnerOptions = {
+            mode: 'indeterminate',
+            showSpinner: false
+        };
         cc.updateConnection = updateConnection;
         cc.openDeleteConnectionDialog = openDeleteConnectionDialog;
         cc.editConnection = editConnection;
@@ -36,15 +37,17 @@
         cc.goToStatus = goToStatus;
         cc.serverStatusAvailable = serverStatusAvailable;
 
-        cc.spinnerOptions = {
-            mode: 'indeterminate',
-            showSpinner: false
-        };
-        init();
+        cc.$onInit = function() {
+            cc.imageUrl = contextualData.context + '/modules/database-connector/images/' + cc.connection.databaseType.toLowerCase() + '/logo_60.png';
+            cc.originalConnection = angular.copy(cc.connection);
 
-        $scope.$on('resetExportSelection', function(){
-           cc.connection.export = false;
-        });
+            $scope.$on('resetExportSelection', function(){
+                cc.connection.export = false;
+            });
+
+            init();
+        };
+
         function init() {
             //Replace any null values, so they dont show up.
             for (var i in cc.connection) {
@@ -53,6 +56,7 @@
             cc.originalConnection = angular.copy(cc.connection);
             verifyServerStatus();
         }
+
         function updateConnection(connect) {
             cc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[cc.connection.databaseType] + '/' + (connect ? 'connect' : 'disconnect') + '/' + cc.connection.id;
@@ -109,6 +113,7 @@
                 getUpdatedConnection();
             }, function(){});
         }
+
         function deleteConnection() {
             cc.spinnerOptions.showSpinner = true;
             var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[cc.connection.databaseType] + '/' +'remove'+ '/' + cc.connection.id;
@@ -257,7 +262,7 @@
         $scope.dcp.deleteConnectionMessage = $sce.trustAsHtml(i18n.message('dc_databaseConnector.label.modal.message.deleteConnection'));
         function cancel() {
             $mdDialog.cancel();
-        };
+        }
 
         function deleteConnection() {
             $mdDialog.hide();

@@ -6,12 +6,11 @@
             restrict: 'E',
             templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connection/redis/redisConnectionManagement.html',
             controller: redisConnectionManagementController,
-            scope: {
+            controllerAs: 'rcm',
+            bindToController: {
                 mode: '@',
                 connection: '='
             },
-            controllerAs: 'rcm',
-            bindToController: true,
             link: linkFunc
         };
 
@@ -28,13 +27,11 @@
 
     var redisConnectionManagementController = function ($scope, contextualData, dcDataFactory, toaster, i18n) {
         var rcm = this;
-        rcm.imageUrl = contextualData.context + '/modules/database-connector/images/' + rcm.connection.databaseType + '/logo_60.png';
         rcm.isEmpty = {};
         rcm.spinnerOptions = {
             showSpinner: false,
             mode: 'indeterminate'
         };
-
         rcm.validations = {
             host: {
                 'required': i18n.message('dc_databaseConnector.label.validation.required'),
@@ -73,8 +70,10 @@
         rcm.updateImportedConnection = updateImportedConnection;
         rcm.updateClusterOptions     = updateClusterOptions;
         rcm.getMessage               = i18n.message;
-        
-        init();
+
+        rcm.$onInit = function() {
+            init();
+        };
 
         function init() {
             if (_.isUndefined(rcm.connection.port) || rcm.connection.port == null) {

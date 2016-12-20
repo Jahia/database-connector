@@ -11,7 +11,6 @@
                 mode: '@',
                 connection: '='
             },
-
             link: linkFunc
         };
 
@@ -121,7 +120,7 @@
             }, function (response) {
                 cmcc.spinnerOptions.showSpinner = false;
             });
-            if (_.isUndefined($scope.connection.port) || cmcc.connection.port == null) {
+            if (_.isUndefined(cmcc.connection.port) || cmcc.connection.port == null) {
                 cmcc.connection.port = "27017";
             }
 
@@ -147,7 +146,7 @@
             if (_.isUndefined(cmcc.connection.options.connPool)) {
                 cmcc.connection.options.connPool = {}
             }
-        }
+        };
 
         function createMongoConnection() {
             if (cmcc.mode === 'import-edit') {

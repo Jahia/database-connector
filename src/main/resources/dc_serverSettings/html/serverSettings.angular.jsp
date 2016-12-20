@@ -15,15 +15,15 @@
 <%--@elvariable id="scriptInfo" type="java.lang.String"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <%--@elvariable id="workspace" type="java.lang.String"--%>
-<template:addResources type="css" resources="jasny-bootstrap.fileinput.css"/>
 <template:addResources type="css" resources="lib/font-awesome/css/font-awesome.css"/>
-<template:addResources type="css" resources="side-panel.css"/>
-<template:addResources type="css" resources="toggle.css"/>
 <template:addResources type="css" resources="database-connector.css"/>
 <template:addResources type="css" resources="spinner.css"/>
 
 <template:addResources type="javascript" resources="lib/_dc.min.js"/>
-<template:addResources type="javascript" resources="lib/_dc-main.min.js"/>
+<%--<template:addResources type="javascript" resources="lib/_dc-main.min.js"/>--%>
+<%--<template:addResources type="javascript" resources="lib/_dc.min.js"/>--%>
+<template:addResources type="javascript" resources="angular/components/dc-main.js"/>
+<template:addResources type="javascript" resources="angular/components/dc-core.js"/>
 <template:addResources type="javascript" resources="lib/jasny-bootstrap.fileinput.js"/>
 <template:addResources type="javascript" resources="angular/components/i18n.js"/>
 

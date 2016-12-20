@@ -4,9 +4,8 @@
             restrict    : 'E',
             templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/redisConnectionStats/redisCpuUsage/redisCpuUsage.html',
             controller  : RedisCpuUsageController,
-            controllerAs: 'rcuc',
-            bindToController: true,
-            scope       : {
+            controllerAs : 'rcuc',
+            bindToController : {
                 chartHeight : '=',
                 chartWidth  : '=',
                 pointSize   : '=?'
@@ -50,7 +49,9 @@
         rcuc.getHeight = getHeight;
         rcuc.getWidth  = getWidth;
 
-        init();
+        rcuc.$onInit = function() {
+            init();
+        };
 
         function init() {
             rcuc.connectionStatus = dcConnectionStatusService.getCurrentConnectionStatus();

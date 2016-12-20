@@ -4,9 +4,8 @@
             restrict    : 'E',
             templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/mongoConnectionStats/connectionsAvailable/connectionsAvailable.html',
             controller  : connectionsAvailableController,
-            controllerAs: 'cac',
-            bindToController: true,
-            scope       : {
+            controllerAs : 'cac',
+            bindToController : {
                 chartHeight : '=',
                 chartWidth  : '=',
                 pointSize   : '=?'
@@ -46,7 +45,9 @@
         cac.getHeight = getHeight;
         cac.getWidth  = getWidth;
 
-        init();
+        cac.$onInit = function() {
+            init();
+        };
 
         function init() {
             cac.connectionStatus = dcConnectionStatusService.getCurrentConnectionStatus();

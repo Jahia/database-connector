@@ -4,9 +4,8 @@
             restrict    : 'E',
             templateUrl : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/redisConnectionStats/redisConnectionMemoryUsage/redisConnectionMemoryUsage.html',
             controller  : RedisConnectionMemoryUsageController,
-            controllerAs: 'rcmuc',
-            bindToController: true,
-            scope       : {
+            controllerAs : 'rcmuc',
+            bindToController: {
                 chartHeight : '=',
                 chartWidth  : '=',
                 pointSize   : '=?'
@@ -49,7 +48,9 @@
         rcmuc.getHeight = getHeight;
         rcmuc.getWidth  = getWidth;
 
-        init();
+        rcmuc.$onInit = function() {
+            init();
+        };
 
         function init() {
             rcmuc.connectionStatus = dcConnectionStatusService.getCurrentConnectionStatus();

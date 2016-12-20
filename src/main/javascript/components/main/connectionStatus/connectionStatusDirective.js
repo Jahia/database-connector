@@ -7,7 +7,6 @@
             templateUrl     : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionStatus/connectionStatus.html',
             controller      : ConnectionStatusController,
             controllerAs    : 'csc',
-            bindToController: true,
             link            : linkFunc
         };
 
@@ -31,7 +30,9 @@
             dcConnectionStatusService.disable();
         });
 
-        init();
+        csc.$onInit = function() {
+            init();
+        };
 
         function init() {
             if (!$stateParams.connection) {

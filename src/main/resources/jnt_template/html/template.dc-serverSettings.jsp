@@ -25,7 +25,6 @@
     <title>${fn:escapeXml(renderContext.mainResource.node.displayableName)}</title>
 </head>
 <template:addResources type="javascript" resources="jquery.min.js"/>
-<template:addResources type="javascript" resources="lib/packages/dist/js/bootstrap.min.js"/>
 <template:addResources type="css" resources="fontRoboto.css"/>
 <template:addResources type="css" resources="bootstrap.min.css"/>
 <template:addResources type="javascript" resources="lib/_dc.min.js"/>
