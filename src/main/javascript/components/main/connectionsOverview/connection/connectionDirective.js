@@ -4,7 +4,7 @@
 
         var directive = {
             restrict        : 'E',
-            templateUrl     : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connection/Connection.html',
+            templateUrl     : contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connection/connection.html',
             controller      : ConnectionController,
             controllerAs    : 'cc',
             bindToController: {
