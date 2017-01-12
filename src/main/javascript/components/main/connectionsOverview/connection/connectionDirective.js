@@ -36,7 +36,6 @@
         cc.exportValueChanged = exportValueChanged;
         cc.goToStatus = goToStatus;
         cc.serverStatusAvailable = serverStatusAvailable;
-
         cc.$onInit = function() {
             cc.imageUrl = contextualData.context + '/modules/database-connector/images/' + cc.connection.databaseType.toLowerCase() + '/logo_60.png';
             cc.originalConnection = angular.copy(cc.connection);
@@ -44,14 +43,16 @@
             $scope.$on('resetExportSelection', function(){
                 cc.connection.export = false;
             });
-
+            $scope.$on('refreshConnectionStatus', function(){
+                verifyServerStatus();
+            });
             init();
         };
 
         function init() {
             //Replace any null values, so they dont show up.
             for (var i in cc.connection) {
-               cc.connection[i] = $filter('replaceNull')(cc.connection[i]);
+                cc.connection[i] = $filter('replaceNull')(cc.connection[i]);
             }
             cc.originalConnection = angular.copy(cc.connection);
             verifyServerStatus();
@@ -126,7 +127,7 @@
                     delete exportConnectionsTemp[cc.connection.id];
                     cc.exportConnections = exportConnectionsTemp;
                 }
-                $scope.$emit('connectionSuccessfullyDeleted', null);
+                $scope.$emit('notifyRefreshConnectionStatus', null);
                 toaster.pop({
                     type   : 'success',
                     title: i18n.message('dc_databaseConnector.toast.title.connectionSuccessfullyDeleted'),
@@ -147,6 +148,9 @@
         }
         
         function editConnection(ev) {
+            for (var i in cc.connection) {
+                cc.connection[i] = $filter('replaceNull')(cc.connection[i]);
+            }
             $mdDialog.show({
                 locals: {
                     connection: cc.connection
@@ -173,7 +177,7 @@
             }).then(function(response) {
                 cc.connection = response;
                 cc.originalConnection = angular.copy(response);
-                verifyServerStatus();
+                $scope.$emit('notifyRefreshConnectionStatus', null);
             }, function(response) {});
         }
         

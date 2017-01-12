@@ -20,7 +20,8 @@
         .module('databaseConnector')
         .directive('dcConnectionsOverview', ['$log', 'contextualData', connectionsOverview]);
 
-    var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog, dcDownloadFactory, toaster, $state, i18n) {
+    var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog,
+                                                 dcDownloadFactory, toaster, $state, i18n, $q, $timeout) {
         var coc = this;
         coc.getAllConnections = getAllConnections;
         coc.createConnection = createConnection;
@@ -84,15 +85,18 @@
             }
         }
         function getAllConnections() {
-            var url = contextualData.context + '/modules/databaseconnector/getallconnections';
-            dcDataFactory.customRequest({
-                url: url,
-                method: 'GET'
-            }).then(function (response) {
-                coc.connections = response.connections;
-            }, function (response) {
+            return $q(function(resolve, reject){
+                var url = contextualData.context + '/modules/databaseconnector/getallconnections';
+                dcDataFactory.customRequest({
+                    url: url,
+                    method: 'GET'
+                }).then(function (response) {
+                    coc.connections = response.connections;
+                    resolve();
+                }, function (response) {
+                    reject();
+                });
             });
-
         }
         function getDatabaseTypes() {
             dcDataFactory.getDatabaseTypes().then(function(response){
@@ -112,7 +116,11 @@
                 clickOutsideToClose: true,
                 fullscreen: true
             }).then(function () {
-                getAllConnections();
+                getAllConnections().then(function(){
+                    $timeout(function(){
+                        $scope.$broadcast('refreshConnectionStatus', null);
+                    });
+                });
             }, function () {
             });
         }
@@ -153,12 +161,17 @@
             return _.isEmpty(coc.exportConnections);
         }
 
-        $scope.$on('connectionSuccessfullyDeleted', function () {
-            getAllConnections();
+        $scope.$on('notifyRefreshConnectionStatus', function () {
+            getAllConnections().then(function(){
+                $timeout(function(){
+                    $scope.$broadcast('refreshConnectionStatus', null);
+                });
+            });
         });
     };
 
-    connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', 'dcDownloadFactory', 'toaster', '$state', 'i18nService'];
+    connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog',
+        'dcDownloadFactory', 'toaster', '$state', 'i18nService', '$q', '$timeout'];
 
 
     function CreateConnectionPopupController($scope, $mdDialog, contextualData, dcDataFactory) {
