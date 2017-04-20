@@ -1,5 +1,7 @@
 package org.jahia.modules.databaseConnector.connection;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -8,12 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Hashtable;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-
-import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.DATABASE_TYPE_KEY;
+import java.util.*;
 
 /**
  * @author stefan on 2016-05-10.
@@ -33,6 +30,7 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
     private static final Logger logger = LoggerFactory.getLogger(AbstractConnection.class);
     private static final long serialVersionUID = 1L;
     private final static String DATABASE_ID_KEY = "databaseId";
+    public final static String DATABASE_TYPE_KEY = "databaseType";
     private final List<ServiceRegistration> serviceRegistrations = new LinkedList<>();
     protected String id;
     protected String oldId;
@@ -49,8 +47,8 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
         return "(&(" + DATABASE_TYPE_KEY + "=" + databaseType + ")(" + DATABASE_ID_KEY + "=" + databaseId + "))";
     }
 
-    public static String createSingleFilter(DatabaseTypes databaseType) {
-        return "(" + DATABASE_TYPE_KEY + "=" + databaseType.name() + ")";
+    public static String createSingleFilter(String databaseType) {
+        return "(" + DATABASE_TYPE_KEY + "=" + databaseType + ")";
     }
 
     protected abstract Object beforeRegisterAsService();

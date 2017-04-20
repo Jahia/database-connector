@@ -1,5 +1,8 @@
 package org.jahia.modules.databaseConnector.connection;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Map;
 
 /**
@@ -29,4 +32,8 @@ public interface DatabaseConnectionRegistry<T> {
     String getConnectionType();
 
     String getConnectionDisplayName();
+
+    Map<String, Object> prepareConnectionMapFromJSON(Map<String, Object> result, JSONObject jsonConnectionData) throws JSONException;
+
+    Map<String, Object> prepareConnectionMapFromConnection (AbstractConnection connection);
 }

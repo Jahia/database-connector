@@ -72,6 +72,9 @@ public class DatabaseConnector implements DatabaseConnectorService {
         return databaseConnectorManager.executeConnectionImportHandler(source);
     }
 
+    public DatabaseConnectionRegistry getConnectionRegistryClassInstance(String databaseType) {
+        return databaseConnectorManager.getConnectionRegistryClassInstance(databaseType);
+    }
     @Override
     public <T extends AbstractConnection> T getConnection(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException{
         return databaseConnectorManager.getConnection(connectionId, databaseType);
@@ -113,12 +116,12 @@ public class DatabaseConnector implements DatabaseConnectorService {
     }
 
     @Override
-    public boolean removeConnection(String connectionId, DatabaseTypes databaseType) {
+    public boolean removeConnection(String connectionId, String databaseType) {
         return databaseConnectorManager.removeConnection(connectionId, databaseType);
     }
 
     @Override
-    public boolean updateConnection(String connectionId, DatabaseTypes databaseType, boolean connect) {
+    public boolean updateConnection(String connectionId, String databaseType, boolean connect) {
         return databaseConnectorManager.updateConnection(connectionId, databaseType, connect);
     }
 

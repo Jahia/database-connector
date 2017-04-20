@@ -25,18 +25,18 @@ package org.jahia.modules.databaseConnector.api;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
+import org.jahia.modules.databaseConnector.connection.AbstractDatabaseConnectionRegistry;
+import org.jahia.modules.databaseConnector.connection.DatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;
 import org.jahia.modules.databaseConnector.util.Utils;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
-import org.jahia.modules.databaseConnector.api.subresources.MongoDB;
 import org.jahia.modules.databaseConnector.api.subresources.RedisDB;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
+
 import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 
@@ -111,10 +111,6 @@ public class DCApi {
     }
 
     //SUBRESOURCES MAPPINGS
-    @Path(MongoDB.MAPPING)
-    public Class<MongoDB> getMongoDbSubResource() {
-        return MongoDB.class;
-    }
 
     @Path(RedisDB.MAPPING)
     public Class<RedisDB> getRedisDBSubResource() {
@@ -187,20 +183,29 @@ public class DCApi {
                 LinkedList success = new LinkedList();
                 JSONArray connectionsToImport = new JSONArray(data);
                 for (int i = 0; i < connectionsToImport.length(); i++) {
-                    Map<String, Object> result = Utils.buildConnection(connectionsToImport.getJSONObject(i));
-                    if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
-                        AbstractConnection connection = ((AbstractConnection) result.get("connection"));
-                        if (connection.isConnected() && !databaseConnector.testConnection(connection)) {
-                            connection.isConnected(false);
-                        }
-                        if (databaseConnector.addEditConnection(connection, false)) {
-                            result.put("connection", Utils.buildConnectionMap(connection));
-                            success.push(result);
+                    JSONObject connectionJsonObject = connectionsToImport.getJSONObject(i);
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    if (connectionJsonObject.has("databaseType")) {
+                        String databaseType = connectionJsonObject.getString("databaseType");
+                        AbstractDatabaseConnectionRegistry databaseConnectionRegistry = (AbstractDatabaseConnectionRegistry) databaseConnector.getConnectionRegistryClassInstance(databaseType);
+                        databaseConnectionRegistry.buildConnectionMapFromJSON(result, connectionJsonObject);
+                        if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
+                            AbstractConnection connection = ((AbstractConnection) result.get("connection"));
+                            if (connection.isConnected() && !databaseConnector.testConnection(connection)) {
+                                connection.isConnected(false);
+                            }
+                            if (databaseConnector.addEditConnection(connection, false)) {
+                                result.put("connection", databaseConnectionRegistry.buildConnectionMapFromConnection(connection));
+                                success.push(result);
+                            } else {
+                                result.put("connection", databaseConnectionRegistry.buildConnectionMapFromConnection(connection));
+                                failed.push(result);
+                            }
                         } else {
-                            result.put("connection", Utils.buildConnectionMap(connection));
                             failed.push(result);
                         }
                     } else {
+                        result.put("connectionStatus", "failed");
                         failed.push(result);
                     }
                 }
@@ -208,19 +213,28 @@ public class DCApi {
                 importResults.put("success", success);
                 jsonAnswer.put("connections", importResults);
             } else {
-                Map<String, Object> result = Utils.buildConnection(new JSONObject(data));
-                if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
-                    AbstractConnection connection = (AbstractConnection) result.get("connection");
-                    if (connection.isConnected() && !databaseConnector.testConnection(connection)) {
-                        connection.isConnected(false);
-                    }
-                    if (databaseConnector.addEditConnection(connection, false)) {
-                        jsonAnswer.put("success", Utils.buildConnectionMap(connection));
+                JSONObject connectionJsonObject = new JSONObject(data);
+                Map<String, Object> result = new LinkedHashMap<>();
+                if (connectionJsonObject.has("databaseType")) {
+                    String databaseType = connectionJsonObject.getString("databaseType");
+                    AbstractDatabaseConnectionRegistry databaseConnectionRegistry = (AbstractDatabaseConnectionRegistry) databaseConnector.getConnectionRegistryClassInstance(databaseType);
+                    databaseConnectionRegistry.buildConnectionMapFromJSON(result, connectionJsonObject);
+                    if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
+                        AbstractConnection connection = (AbstractConnection) result.get("connection");
+                        if (connection.isConnected() && !databaseConnector.testConnection(connection)) {
+                            connection.isConnected(false);
+                        }
+                        if (databaseConnector.addEditConnection(connection, false)) {
+                            jsonAnswer.put("success", databaseConnectionRegistry.buildConnectionMapFromConnection(connection));
+                        } else {
+                            jsonAnswer.put("failed", databaseConnectionRegistry.buildConnectionMapFromConnection(connection));
+                        }
                     } else {
-                        jsonAnswer.put("failed", Utils.buildConnectionMap(connection));
+                        return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"Invalid json object!\"}").build();
                     }
                 } else {
-                    return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"Invalid json object!\"}").build();
+                    result.put("connectionStatus", "failed");
+                    jsonAnswer.put("failed", result);
                 }
             }
             return Response.status(Response.Status.OK).entity(jsonAnswer.toString()).build();

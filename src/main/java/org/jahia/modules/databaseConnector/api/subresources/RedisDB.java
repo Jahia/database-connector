@@ -26,7 +26,6 @@ package org.jahia.modules.databaseConnector.api.subresources;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
-import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.modules.databaseConnector.connection.redis.RedisConnection;
 import org.jahia.services.content.JCRTemplate;
 import org.json.JSONArray;
@@ -147,7 +146,7 @@ public class RedisDB {
     @Path("/remove/{connectionId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response removeConnection(@PathParam("connectionId") String connectionId) {
-        databaseConnector.removeConnection(connectionId, DatabaseTypes.REDIS);
+        databaseConnector.removeConnection(connectionId, RedisConnection.DATABASE_TYPE);
         logger.info("Successfully deleted RedisDB connection: " + connectionId);
         return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully removed RedisDB connection\"}").build();
     }
@@ -220,7 +219,7 @@ public class RedisDB {
     public Response connect(@PathParam("connectionId") String connectionId) {
         JSONObject jsonAnswer = new JSONObject();
         try {
-            if (databaseConnector.updateConnection(connectionId, DatabaseTypes.REDIS, true)) {
+            if (databaseConnector.updateConnection(connectionId, RedisConnection.DATABASE_TYPE, true)) {
                 jsonAnswer.put("success", "Successfully connected to RedisDB");
                 logger.info("Successfully enabled RedisDB connection, for connection with id: " + connectionId);
             } else {
@@ -239,7 +238,7 @@ public class RedisDB {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response disconnect(@PathParam("connectionId") String connectionId) {
-        databaseConnector.updateConnection(connectionId, DatabaseTypes.REDIS, false);
+        databaseConnector.updateConnection(connectionId, RedisConnection.DATABASE_TYPE, false);
         logger.info("Successfully disconnected RedisDB connection, for connection with id: " + connectionId);
         return Response.status(Response.Status.OK).entity("{\"success\": \"Successfully disconnected from RedisDB\"}").build();
     }

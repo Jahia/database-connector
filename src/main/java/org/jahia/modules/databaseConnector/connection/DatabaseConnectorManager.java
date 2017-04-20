@@ -3,7 +3,6 @@ package org.jahia.modules.databaseConnector.connection;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.jahia.modules.databaseConnector.util.Utils;
-import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
 import org.jahia.modules.databaseConnector.connection.redis.RedisConnection;
 import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
 import org.jahia.modules.databaseConnector.dsl.DSLHandler;
@@ -99,11 +98,11 @@ public class DatabaseConnectorManager {
         return databaseConnectionRegistries.get(connection.getDatabaseType()).addEditConnection(connection, isEdition);
     }
 
-    public boolean removeConnection(String connectionId, DatabaseTypes databaseType) {
+    public boolean removeConnection(String connectionId, String databaseType) {
         return databaseConnectionRegistries.get(databaseType).removeConnection(connectionId);
     }
 
-    public boolean updateConnection(String connectionId, DatabaseTypes databaseType, boolean connect) {
+    public boolean updateConnection(String connectionId, String databaseType, boolean connect) {
         if (connect) {
             if (((AbstractConnection) databaseConnectionRegistries.get(databaseType).getRegistry().get((connectionId))).testConnectionCreation()) {
                 databaseConnectionRegistries.get(databaseType).connect(connectionId);
@@ -129,7 +128,8 @@ public class DatabaseConnectorManager {
             file = File.createTempFile("temporaryImportFile", ".wzd");
             FileUtils.copyInputStreamToFile(source, file);
             dslExecutor.execute(file.toURI().toURL(), dslHandlerMap.get("importConnection"), parsedConnections);
-            for (String databaseType: DatabaseTypes.getValuesAsString()) {
+            for (Map.Entry<String, String> entry: this.availableDatabaseTypes.entrySet()) {
+                String databaseType = entry.getKey();
                 if (parsedConnections.containsKey(databaseType)) {
                     Map<String, List> results = new LinkedHashMap<>();
                     List<Map> validConnections = new LinkedList();
@@ -174,135 +174,135 @@ public class DatabaseConnectorManager {
 
     public Map<String, Object> importConnection(Map<String, Object> map) {
         logger.info("Importing connection " + map);
-        switch (DatabaseTypes.valueOf((String) map.get("type"))) {
-            case MONGO:
-                try {
-                    if (!ALPHA_NUMERIC_PATTERN.matcher((String)map.get("identifier")).matches()) {
-                        map.put("status", "failed");
-                        map.put("statusMessage", "invalidIdentifier");
-                        //Create instance to be able to parse the options of a failed connection.
-                        if (map.containsKey("options")) {
-                            MongoConnection connection = new MongoConnection((String) map.get("identifier"));
-                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
-                        }
-                    } else if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey(map.get("identifier"))) {
-                        map.put("status", "failed");
-                        map.put("statusMessage", "connectionExists");
-                        //Create instance to be able to parse the options of a failed connection.
-                        if (map.containsKey("options")) {
-                            MongoConnection connection = new MongoConnection((String) map.get("identifier"));
-                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
-                        }
-                    } else {
-                        //Create connection object
-                        MongoConnection connection = new MongoConnection((String) map.get("identifier"));
-                        String host = map.containsKey("host") ? (String) map.get("host") : null;
-                        Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : MongoConnection.DEFAULT_PORT;
-                        Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
-                        String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : null;
-                        String user = map.containsKey("user") ? (String) map.get("user") : null;
-                        String writeConcern = map.containsKey("writeConcern") ? (String) map.get("writeConcern") : "ACKNOWLEDGED";
-                        String authDb = map.containsKey("authDb") ? (String) map.get("authDb") : null;
-                        String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
-                        map.put("options", options);
-                        String password = (String) map.get("password");
-                        password = setPassword(map, password);
-
-                        connection.setHost(host);
-                        connection.setPort(port);
-                        connection.isConnected(isConnected);
-                        connection.setDbName(dbName);
-                        connection.setUser(user);
-                        connection.setPassword(password);
-                        connection.setWriteConcern(writeConcern);
-                        connection.setAuthDb(authDb);
-                        connection.setOptions(options);
-
-                        databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).addEditConnection(connection, false);
-                        map.put("status", "success");
-                    }
-
-                } catch (Exception ex) {
-                    map.put("status", "failed");
-                    map.put("statusMessage", "creationFailed");
-                    //try to parse options if the exist otherwise we will just remove them.
-                    try {
-                        if (map.containsKey("options")) {
-                            MongoConnection connection = new MongoConnection((String) map.get("identifier"));
-                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
-                        }
-                    } catch (Exception e) {
-                        map.remove("options");
-                    }
-                    logger.info("Import " + (map.containsKey("identifier") ? "for connection: '" + map.get("identifier") + "'" : "") + " failed", ex.getMessage(), ex);
-                }
-                break;
-            case REDIS:
-                try {
-                    if (!ALPHA_NUMERIC_PATTERN.matcher((String)map.get("identifier")).matches()) {
-                        map.put("status", "failed");
-                        map.put("statusMessage", "invalidIdentifier");
-                        //Create instance to be able to parse the options of a failed connection.
-                        if (map.containsKey("options")) {
-                            RedisConnection connection = new RedisConnection((String) map.get("identifier"));
-                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
-                        }
-                    } else if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey(map.get("identifier"))) {
-                        map.put("status", "failed");
-                        map.put("statusMessage", "connectionExists");
-                        //Create instance to be able to parse the options of a failed connection.
-                        if (map.containsKey("options")) {
-                            RedisConnection connection = new RedisConnection((String) map.get("identifier"));
-                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
-                        }
-                    } else {
-                        //Create connection object
-                        RedisConnection connection = new RedisConnection((String) map.get("identifier"));
-                        String host = map.containsKey("host") ? (String) map.get("host") : null;
-                        Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : RedisConnection.DEFAULT_PORT;
-                        Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
-                        String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : RedisConnection.DEFAULT_DATABASE_NUMBER;
-                        String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
-                        map.put("options", options);
-                        String password = (String) map.get("password");
-                        Long timeout = map.containsKey("timeout") ? Long.parseLong((String) map.get("timeout")) : null;
-                        Integer weight = map.containsKey("weight") ? Integer.parseInt((String) map.get("weight")) : null;
-
-                        password = setPassword(map, password);
-
-                        connection.setHost(host);
-                        connection.setPort(port);
-                        connection.isConnected(isConnected);
-                        connection.setDbName(dbName);
-                        connection.setPassword(password);
-                        connection.setWeight(weight);
-                        connection.setTimeout(timeout);
-                        connection.setOptions(options);
-
-                        databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).addEditConnection(connection, false);
-                        map.put("status", "success");
-                    }
-
-                } catch (Exception ex) {
-                    map.put("status", "failed");
-                    map.put("statusMessage", "creationFailed");
-                    //try to parse options if the exist otherwise we will just remove them.
-                    try {
-                        if (map.containsKey("options")) {
-                            RedisConnection connection = new RedisConnection((String) map.get("identifier"));
-                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
-                        }
-                    } catch (Exception e) {
-                        map.remove("options");
-                    }
-                    logger.info("Import " + (map.containsKey("identifier") ? "for connection: '" + map.get("identifier") + "'" : "") + " failed", ex.getMessage(), ex);
-                }
-                break;
-
-            default:
-                map.put("status", "failed");
-                map.put("statusMessage", "invalidDatabaseType");
-        }
+//        switch (DatabaseTypes.valueOf((String) map.get("type"))) {
+//            case MONGO:
+//                try {
+//                    if (!ALPHA_NUMERIC_PATTERN.matcher((String)map.get("identifier")).matches()) {
+//                        map.put("status", "failed");
+//                        map.put("statusMessage", "invalidIdentifier");
+//                        //Create instance to be able to parse the options of a failed connection.
+//                        if (map.containsKey("options")) {
+//                            MongoConnection connection = new MongoConnection((String) map.get("identifier"));
+//                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+//                        }
+//                    } else if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey(map.get("identifier"))) {
+//                        map.put("status", "failed");
+//                        map.put("statusMessage", "connectionExists");
+//                        //Create instance to be able to parse the options of a failed connection.
+//                        if (map.containsKey("options")) {
+//                            MongoConnection connection = new MongoConnection((String) map.get("identifier"));
+//                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+//                        }
+//                    } else {
+//                        //Create connection object
+//                        MongoConnection connection = new MongoConnection((String) map.get("identifier"));
+//                        String host = map.containsKey("host") ? (String) map.get("host") : null;
+//                        Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : MongoConnection.DEFAULT_PORT;
+//                        Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
+//                        String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : null;
+//                        String user = map.containsKey("user") ? (String) map.get("user") : null;
+//                        String writeConcern = map.containsKey("writeConcern") ? (String) map.get("writeConcern") : "ACKNOWLEDGED";
+//                        String authDb = map.containsKey("authDb") ? (String) map.get("authDb") : null;
+//                        String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
+//                        map.put("options", options);
+//                        String password = (String) map.get("password");
+//                        password = setPassword(map, password);
+//
+//                        connection.setHost(host);
+//                        connection.setPort(port);
+//                        connection.isConnected(isConnected);
+//                        connection.setDbName(dbName);
+//                        connection.setUser(user);
+//                        connection.setPassword(password);
+//                        connection.setWriteConcern(writeConcern);
+//                        connection.setAuthDb(authDb);
+//                        connection.setOptions(options);
+//
+//                        databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).addEditConnection(connection, false);
+//                        map.put("status", "success");
+//                    }
+//
+//                } catch (Exception ex) {
+//                    map.put("status", "failed");
+//                    map.put("statusMessage", "creationFailed");
+//                    //try to parse options if the exist otherwise we will just remove them.
+//                    try {
+//                        if (map.containsKey("options")) {
+//                            MongoConnection connection = new MongoConnection((String) map.get("identifier"));
+//                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+//                        }
+//                    } catch (Exception e) {
+//                        map.remove("options");
+//                    }
+//                    logger.info("Import " + (map.containsKey("identifier") ? "for connection: '" + map.get("identifier") + "'" : "") + " failed", ex.getMessage(), ex);
+//                }
+//                break;
+//            case REDIS:
+//                try {
+//                    if (!ALPHA_NUMERIC_PATTERN.matcher((String)map.get("identifier")).matches()) {
+//                        map.put("status", "failed");
+//                        map.put("statusMessage", "invalidIdentifier");
+//                        //Create instance to be able to parse the options of a failed connection.
+//                        if (map.containsKey("options")) {
+//                            RedisConnection connection = new RedisConnection((String) map.get("identifier"));
+//                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+//                        }
+//                    } else if (databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).getRegistry().containsKey(map.get("identifier"))) {
+//                        map.put("status", "failed");
+//                        map.put("statusMessage", "connectionExists");
+//                        //Create instance to be able to parse the options of a failed connection.
+//                        if (map.containsKey("options")) {
+//                            RedisConnection connection = new RedisConnection((String) map.get("identifier"));
+//                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+//                        }
+//                    } else {
+//                        //Create connection object
+//                        RedisConnection connection = new RedisConnection((String) map.get("identifier"));
+//                        String host = map.containsKey("host") ? (String) map.get("host") : null;
+//                        Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : RedisConnection.DEFAULT_PORT;
+//                        Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
+//                        String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : RedisConnection.DEFAULT_DATABASE_NUMBER;
+//                        String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
+//                        map.put("options", options);
+//                        String password = (String) map.get("password");
+//                        Long timeout = map.containsKey("timeout") ? Long.parseLong((String) map.get("timeout")) : null;
+//                        Integer weight = map.containsKey("weight") ? Integer.parseInt((String) map.get("weight")) : null;
+//
+//                        password = setPassword(map, password);
+//
+//                        connection.setHost(host);
+//                        connection.setPort(port);
+//                        connection.isConnected(isConnected);
+//                        connection.setDbName(dbName);
+//                        connection.setPassword(password);
+//                        connection.setWeight(weight);
+//                        connection.setTimeout(timeout);
+//                        connection.setOptions(options);
+//
+//                        databaseConnectionRegistries.get(DatabaseTypes.valueOf((String) map.get("type"))).addEditConnection(connection, false);
+//                        map.put("status", "success");
+//                    }
+//
+//                } catch (Exception ex) {
+//                    map.put("status", "failed");
+//                    map.put("statusMessage", "creationFailed");
+//                    //try to parse options if the exist otherwise we will just remove them.
+//                    try {
+//                        if (map.containsKey("options")) {
+//                            RedisConnection connection = new RedisConnection((String) map.get("identifier"));
+//                            map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+//                        }
+//                    } catch (Exception e) {
+//                        map.remove("options");
+//                    }
+//                    logger.info("Import " + (map.containsKey("identifier") ? "for connection: '" + map.get("identifier") + "'" : "") + " failed", ex.getMessage(), ex);
+//                }
+//                break;
+//
+//            default:
+//                map.put("status", "failed");
+//                map.put("statusMessage", "invalidDatabaseType");
+//        }
         return map;
     }
 
@@ -387,5 +387,9 @@ public class DatabaseConnectorManager {
 
     public BundleContext getBundleContext() {
         return this.context;
+    }
+
+    public DatabaseConnectionRegistry getConnectionRegistryClassInstance(String databaseType) {
+        return databaseConnectionRegistries.get(databaseType);
     }
 }

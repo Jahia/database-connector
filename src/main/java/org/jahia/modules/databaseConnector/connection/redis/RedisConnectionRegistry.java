@@ -1,10 +1,15 @@
 package org.jahia.modules.databaseConnector.connection.redis;
 
+import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.AbstractDatabaseConnectionRegistry;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
+import org.jahia.utils.EncryptionUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -12,6 +17,7 @@ import org.springframework.util.Assert;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.query.QueryResult;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.jahia.modules.databaseConnector.util.Utils.query;
@@ -144,5 +150,72 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
         return null;
     }
 
+    @Override
+    public Map<String, Object> prepareConnectionMapFromJSON(Map<String, Object> result, JSONObject jsonConnectionData) throws JSONException {
+        JSONArray missingParameters = new JSONArray();
+        if (jsonConnectionData.has("reImport")) {
+            result.put("reImport", jsonConnectionData.getString("reImport"));
+        }
+        if (!jsonConnectionData.has("id") || StringUtils.isEmpty(jsonConnectionData.getString("id"))) {
+            missingParameters.put("id");
+        }
+        if (!jsonConnectionData.has("host") || StringUtils.isEmpty(jsonConnectionData.getString("host"))) {
+            missingParameters.put("host");
+        }
+        if ((!jsonConnectionData.has("dbName") || StringUtils.isEmpty(jsonConnectionData.getString("dbName")))) {
+            missingParameters.put("dbName");
+        }
+        if (missingParameters.length() > 0) {
+            result.put("connectionStatus", "failed");
+        } else {
+            String id = jsonConnectionData.getString("id");
+            String host = jsonConnectionData.getString("host");
+            Integer port = jsonConnectionData.has("port") && !StringUtils.isEmpty(jsonConnectionData.getString("port")) ? jsonConnectionData.getInt("port") : null;
+            Boolean isConnected = jsonConnectionData.has("isConnected") && jsonConnectionData.getBoolean("isConnected");
+            String dbName = jsonConnectionData.has("dbName") ? jsonConnectionData.getString("dbName") : null;
+            String password = jsonConnectionData.has("password") ? jsonConnectionData.getString("password") : null;
+            String options = jsonConnectionData.has("options") ? jsonConnectionData.getString("options") : null;
+
+            RedisConnection connection = new RedisConnection(id);
+            if (jsonConnectionData.has("timeout") && !StringUtils.isEmpty(jsonConnectionData.getString("timeout"))) {
+                connection.setTimeout(jsonConnectionData.getLong("timeout"));
+            }
+            if (jsonConnectionData.has("weight") && !StringUtils.isEmpty(jsonConnectionData.getString("weight"))) {
+                connection.setWeight(jsonConnectionData.getInt("weight"));
+            }
+
+            connection.setHost(host);
+            connection.setPort(port);
+            connection.isConnected(isConnected);
+            connection.setDbName(dbName);
+            if (password != null && password.contains("_ENC")) {
+                password = password.substring(0, 32);
+                password = EncryptionUtils.passwordBaseDecrypt(password);
+            }
+            connection.setPassword(password);
+            connection.setOptions(options);
+            result.put("connectionStatus", "success");
+            result.put("connection", connection);
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> prepareConnectionMapFromConnection(AbstractConnection connection) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("id", connection.getId());
+        result.put("host", connection.getHost());
+        result.put("isConnected", connection.isConnected());
+        result.put("dbName", connection.getDbName());
+        result.put("databaseType", connection.getDatabaseType());
+        result.put("options", connection.getOptions());
+        if (!StringUtils.isEmpty(connection.getPassword())) {
+            result.put("password", EncryptionUtils.passwordBaseEncrypt(connection.getPassword()) + "_ENC");
+
+        }
+        result.put("timeout", ((RedisConnection) connection).getTimeout());
+        result.put("weight", ((RedisConnection) connection).getWeight());
+        return  result;
+    }
 }
 

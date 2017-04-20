@@ -3,9 +3,6 @@ package org.jahia.modules.databaseConnector.services;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.ConnectionData;
 
-import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
-import org.json.JSONException;
-
 import java.util.Map;
 
 /**
@@ -27,9 +24,9 @@ public interface DatabaseConnectorService {
 
     boolean testConnection(AbstractConnection connection);
 
-    boolean removeConnection(String connectionId, DatabaseTypes databaseType);
+    boolean removeConnection(String connectionId, String databaseType);
 
-    boolean updateConnection(String connectionId, DatabaseTypes databaseType, boolean connect);
+    boolean updateConnection(String connectionId, String databaseType, boolean connect);
 
     boolean isConnectionIdAvailable(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException;
 
