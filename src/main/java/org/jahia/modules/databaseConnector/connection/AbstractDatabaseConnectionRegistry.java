@@ -12,7 +12,7 @@ import javax.jcr.RepositoryException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.jahia.modules.databaseConnector.Utils.query;
+import static org.jahia.modules.databaseConnector.util.Utils.query;
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.*;
 import static org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager.*;
 
@@ -67,7 +67,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
 //                    connectionNode = databaseConnectorNode.addNode(connection.getId(), nodeType);
                     if (isConnectionIdAvailable(connection.getId(), session)) {
                         connectionNode = databaseConnectorNode.addNode(
-                                JCRContentUtils.findAvailableNodeName(databaseConnectorNode, connection.getDatabaseType().name().toLowerCase()),
+                                JCRContentUtils.findAvailableNodeName(databaseConnectorNode, connection.getDatabaseType().toLowerCase()),
                                 nodeType);
                     } else {
                         return false;

@@ -7,13 +7,14 @@ import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.query.QueryResult;
 import java.util.Map;
 
-import static org.jahia.modules.databaseConnector.Utils.query;
+import static org.jahia.modules.databaseConnector.util.Utils.query;
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.DB_NAME_KEY;
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.HOST_KEY;
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.ID_KEY;
@@ -122,5 +123,15 @@ public class MongoConnectionRegistry extends AbstractDatabaseConnectionRegistry<
         MongoConnection mongoConnection = (MongoConnection) connection;
         node.setProperty(WRITE_CONCERN_KEY, mongoConnection.getWriteConcern());
         node.setProperty(AUTH_DB_KEY, mongoConnection.getAuthDb());
+    }
+
+    @Override
+    public String getConnectionType() {
+        return MongoConnection.DATABASE_TYPE;
+    }
+
+    @Override
+    public String getConnectionDisplayName() {
+        return null;
     }
 }

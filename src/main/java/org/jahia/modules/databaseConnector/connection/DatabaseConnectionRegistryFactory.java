@@ -1,7 +1,7 @@
 package org.jahia.modules.databaseConnector.connection;
 
-import org.jahia.modules.databaseConnector.connection.mongo.MongoConnectionRegistry;
-import org.jahia.modules.databaseConnector.connection.redis.RedisConnectionRegistry;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Date: 11/6/2013
@@ -11,17 +11,26 @@ import org.jahia.modules.databaseConnector.connection.redis.RedisConnectionRegis
  */
 public class DatabaseConnectionRegistryFactory {
 
-    public static DatabaseConnectionRegistry makeDatabaseConnectionRegistry(DatabaseTypes databaseType) {
-        DatabaseConnectionRegistry databaseConnectionRegistry = null;
-        switch (databaseType) {
-            case MONGO:
-                databaseConnectionRegistry = new MongoConnectionRegistry();
-                break;
-            case REDIS:
-                databaseConnectionRegistry = new RedisConnectionRegistry();
-                break;
-        }
+    private static Map<String, Class> registeredConnections = new LinkedHashMap<>();
+
+    public static <T extends DatabaseConnectionRegistry> DatabaseConnectionRegistry makeDatabaseConnectionRegistry(Class self) throws InstantiationException, IllegalAccessException {
+        T databaseConnectionRegistry = null;
+        databaseConnectionRegistry = (T) self.newInstance();
         databaseConnectionRegistry.populateRegistry();
         return databaseConnectionRegistry;
+    }
+
+    public static boolean registerConnectionType(String name, Class registeringClass) {
+        synchronized (registeredConnections) {
+            if (!registeredConnections.containsKey(name)) {
+                registeredConnections.put(name, registeringClass);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Map<String, Class> getRegisteredConnections() {
+        return registeredConnections;
     }
 }

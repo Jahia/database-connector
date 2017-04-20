@@ -25,20 +25,21 @@ package org.jahia.modules.databaseConnector.api;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.jahia.modules.databaseConnector.Utils;
+import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
+import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;
+import org.jahia.modules.databaseConnector.util.Utils;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.api.subresources.MongoDB;
 import org.jahia.modules.databaseConnector.api.subresources.RedisDB;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
-import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
-import org.jahia.services.content.JCRTemplate;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osgi.service.component.annotations.Component;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 
-import javax.inject.Inject;
 import javax.jcr.RepositoryException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -56,24 +57,29 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * @author stefan on 2016-05-02.
  */
-@Component
+@Component(service = DCApi.class)
 @Path("/databaseconnector")
 @Produces({"application/hal+json"})
-public class DCAPI {
-    private static final Logger logger = getLogger(DCAPI.class);
+public class DCApi {
+    private static final Logger logger = getLogger(DCApi.class);
     private DatabaseConnector databaseConnector;
-
-    @Inject
-    public DCAPI(JCRTemplate jcrTemplate, DatabaseConnectorManager databaseConnectorManager) {
-        databaseConnector = new DatabaseConnector(databaseConnectorManager);
+    private BundleContext context;
+    @Activate
+    public void activate(BundleContext context) {
+        this.context = context;
     }
 
-    //@TODO Remove when production ready
+    @Reference(cardinality = ReferenceCardinality.MANDATORY, policy = ReferencePolicy.STATIC, service = DatabaseConnectorService.class)
+    public void getDatabaseConnectorService(DatabaseConnectorService databaseConnectorService) {
+        databaseConnector = (DatabaseConnector) databaseConnectorService;
+    }
+    //****************** API ENTRY POINTS START ******************//
+
     @GET
     @Path("/test")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHello() {
-        return Response.status(Response.Status.OK).entity("{\"success\":\"Successfully setup DCAPI\"}").build();
+        return Response.status(Response.Status.OK).entity("{\"success\":\"Successfully setup DCApi\"}").build();
     }
 
     @GET
@@ -233,6 +239,12 @@ public class DCAPI {
             return Response.status(Response.Status.OK).entity(databaseConnector.getAllConnections()).build();
         } catch (JSONException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
+        } catch (InstantiationException ex) {
+            logger.error("Cannot instantiate connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
+        } catch (IllegalAccessException ex) {
+            logger.error("Cannot access connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
         }
     }
 

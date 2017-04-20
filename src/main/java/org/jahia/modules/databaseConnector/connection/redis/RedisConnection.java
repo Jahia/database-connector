@@ -9,7 +9,6 @@ import com.lambdaworks.redis.resource.ClientResources;
 import com.lambdaworks.redis.resource.DefaultClientResources;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
-import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.utils.EncryptionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedHashMap;
 import java.util.concurrent.TimeUnit;
 
-import static org.jahia.modules.databaseConnector.Utils.*;
+import static org.jahia.modules.databaseConnector.util.Utils.*;
 
 /**
  * @author by stefan on 2016-05-11.
@@ -33,7 +32,8 @@ public class RedisConnection extends AbstractConnection {
     public static final String DEFAULT_DATABASE_NUMBER = "0";
 
     private static final Logger logger = LoggerFactory.getLogger(RedisConnection.class);
-    private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.REDIS;
+    public static final String DATABASE_TYPE = "Redis";
+    public static final String DISPLAY_NAME = "RedisDB";
     private static final int TEST_CONNECTION_TIMEOUT = 5000;
     private RedisClient redisClient;
     private RedisClusterClient redisClusterClient;
@@ -72,6 +72,7 @@ public class RedisConnection extends AbstractConnection {
         redisConnectionData.setWeight(weight);
         redisConnectionData.setDatabaseType(DATABASE_TYPE);
         redisConnectionData.setOptions(options);
+        redisConnectionData.setDisplayName(DISPLAY_NAME);
         return redisConnectionData;
     }
 
@@ -208,8 +209,13 @@ public class RedisConnection extends AbstractConnection {
         return builder.build();
     }
 
-    public DatabaseTypes getDatabaseType() {
+    public String getDatabaseType() {
         return DATABASE_TYPE;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return DISPLAY_NAME;
     }
 
 

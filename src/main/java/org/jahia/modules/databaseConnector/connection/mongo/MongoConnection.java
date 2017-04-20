@@ -6,7 +6,6 @@ import org.apache.commons.lang.StringUtils;
 import org.bson.BsonDocument;
 import org.bson.BsonInt32;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
-import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.utils.EncryptionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,7 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.jahia.modules.databaseConnector.Utils.*;
+import static org.jahia.modules.databaseConnector.util.Utils.*;
 
 /**
  * Date: 11/1/2013
@@ -35,7 +34,8 @@ public class MongoConnection extends AbstractConnection {
     public static final Integer DEFAULT_PORT = 27017;
 
     private static final Logger logger = LoggerFactory.getLogger(MongoConnection.class);
-    private static final DatabaseTypes DATABASE_TYPE = DatabaseTypes.MONGO;
+    public static final String DATABASE_TYPE = "Mongo";
+    public static final String DISPLAY_NAME = "MongoDB";
     private static List WRITE_CONCERN_OPTIONS = null;
     private MongoDatabase databaseConnection;
 
@@ -75,6 +75,7 @@ public class MongoConnection extends AbstractConnection {
         mongoConnectionData.setWriteConcern(writeConcern);
         mongoConnectionData.setAuthDb(authDb);
         mongoConnectionData.setDatabaseType(DATABASE_TYPE);
+        mongoConnectionData.setDisplayName(DISPLAY_NAME);
         mongoConnectionData.setOptions(options);
         return mongoConnectionData;
     }
@@ -115,8 +116,13 @@ public class MongoConnection extends AbstractConnection {
         return databaseConnection;
     }
 
-    public DatabaseTypes getDatabaseType() {
+    public String getDatabaseType() {
         return DATABASE_TYPE;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return DISPLAY_NAME;
     }
 
     @Override

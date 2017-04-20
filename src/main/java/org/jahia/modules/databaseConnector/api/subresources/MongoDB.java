@@ -29,7 +29,6 @@ import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
-import org.jahia.services.content.JCRTemplate;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,14 +53,22 @@ public class MongoDB {
 
     @Inject
     public MongoDB(DatabaseConnectorManager databaseConnectorManager) {
-        databaseConnector = new DatabaseConnector(databaseConnectorManager);
+        //databaseConnector = new DatabaseConnector(databaseConnectorManager);
     }
 
     @GET
     @Path("/connection/{databaseId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnection(@PathParam("databaseId") String databaseId) {
-        return Response.status(Response.Status.OK).entity(databaseConnector.getConnection(databaseId, DatabaseTypes.MONGO)).build();
+        try {
+            return Response.status(Response.Status.OK).entity(databaseConnector.getConnection(databaseId, MongoConnection.DATABASE_TYPE)).build();
+        } catch (InstantiationException ex) {
+            logger.error("Cannot instantiate connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
+        } catch (IllegalAccessException ex) {
+            logger.error("Cannot access connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
+        }
     }
 
     @GET
@@ -69,9 +76,13 @@ public class MongoDB {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnections() {
         try {
-            return Response.status(Response.Status.OK).entity(databaseConnector.getConnections(DatabaseTypes.MONGO)).build();
-        } catch (JSONException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
+            return Response.status(Response.Status.OK).entity(databaseConnector.getConnections(MongoConnection.DATABASE_TYPE)).build();
+        } catch (InstantiationException ex) {
+            logger.error("Cannot instantiate connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
+        } catch (IllegalAccessException ex) {
+            logger.error("Cannot access connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
         }
     }
 
@@ -242,7 +253,15 @@ public class MongoDB {
     @Path("/isconnectionvalid/{connectionId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response isConnectionIdAvailable(@PathParam("connectionId") String connectionId) {
-        return Response.status(Response.Status.OK).entity(databaseConnector.isConnectionIdAvailable(connectionId, DatabaseTypes.MONGO)).build();
+        try {
+            return Response.status(Response.Status.OK).entity(databaseConnector.isConnectionIdAvailable(connectionId, MongoConnection.DATABASE_TYPE)).build();
+        } catch (InstantiationException ex) {
+            logger.error("Cannot instantiate connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
+        } catch (IllegalAccessException ex) {
+            logger.error("Cannot access connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
+        }
     }
 
     @POST
@@ -302,7 +321,7 @@ public class MongoDB {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getServerStatus(@PathParam("connectionId") String connectionId) {
         try {
-            Map<String, Object> serverStatus = databaseConnector.getServerStatus(connectionId, DatabaseTypes.MONGO);
+            Map<String, Object> serverStatus = databaseConnector.getServerStatus(connectionId, MongoConnection.DATABASE_TYPE);
             if (serverStatus.containsKey("failed")) {
                 logger.info("Failed to retrieve Status for MongoDB connection with id: " + connectionId);
             } else {

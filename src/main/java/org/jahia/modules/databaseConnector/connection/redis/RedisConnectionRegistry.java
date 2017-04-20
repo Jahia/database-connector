@@ -14,7 +14,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.query.QueryResult;
 import java.util.Map;
 
-import static org.jahia.modules.databaseConnector.Utils.query;
+import static org.jahia.modules.databaseConnector.util.Utils.query;
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.DB_NAME_KEY;
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.HOST_KEY;
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.ID_KEY;
@@ -132,6 +132,16 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
         if (redisConnection.getWeight() != null) {
             node.setProperty(WEIGHT_KEY, redisConnection.getWeight());
         }
+    }
+
+    @Override
+    public String getConnectionType() {
+        return RedisConnection.DATABASE_TYPE;
+    }
+
+    @Override
+    public String getConnectionDisplayName() {
+        return null;
     }
 
 }

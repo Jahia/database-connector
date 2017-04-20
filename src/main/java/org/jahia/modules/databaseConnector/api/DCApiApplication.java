@@ -23,39 +23,42 @@
  */
 package org.jahia.modules.databaseConnector.api;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import org.glassfish.hk2.api.Factory;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.jahia.modules.databaseConnector.api.factories.DatabaseConnectorManagerFactory;
-import org.jahia.modules.databaseConnector.api.factories.JCRTemplateFactory;
-import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
-import org.jahia.services.content.JCRTemplate;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+
+import javax.ws.rs.core.Application;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author stefan on 2016-05-02.
  */
-public class DCApiApplication extends ResourceConfig {
-    public DCApiApplication() {
-        this(JCRTemplateFactory.class,
-                DatabaseConnectorManagerFactory.class);
+public class DCApiApplication extends Application {
+    private BundleContext context;
+    private final Set<Object> singletons;
+
+    public DCApiApplication(BundleContext context) {
+        this.context = context;
+        ServiceReference ref = this.context.getServiceReference(DCApi.class.getName());
+        //Add Main Resource
+        DCApi api = (DCApi)this.context.getService(ref);
+        singletons = new HashSet<>();
+        singletons.add(api);
     }
 
-    DCApiApplication(final Class<? extends Factory<JCRTemplate>> jcrTemplateFactoryClass,
-                     final Class<? extends Factory<DatabaseConnectorManager>> databaseConnectorManagerClass) {
-        super(DCAPI.class,
-                jcrTemplateFactoryClass,
-                databaseConnectorManagerClass,
-                JacksonJaxbJsonProvider.class,
-                HeadersResponseFilter.class,
-                MultiPartFeature.class);
-        register(new AbstractBinder() {
-            @Override
-            protected void configure() {
-                bindFactory(jcrTemplateFactoryClass).to(JCRTemplate.class);
-                bindFactory(databaseConnectorManagerClass).to(DatabaseConnectorManager.class);
-            }
-        });
+    @Override
+    public Set<Object> getSingletons() {
+        return singletons;
+    }
+
+    @Override
+    public Set<Class<?>> getClasses() {
+        final Set<Class<?>> classes = new HashSet<Class<?>>();
+        // register resources and features
+        classes.add(MultiPartFeature.class);
+        classes.add(LoggingFilter.class);
+        return classes;
     }
 }

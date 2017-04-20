@@ -30,7 +30,9 @@ public abstract class ConnectionData implements Serializable {
 
     protected String options;
 
-    protected DatabaseTypes databaseType;
+    protected String databaseType;
+
+    protected String displayName;
 
     public String getId() {
         return id;
@@ -96,16 +98,20 @@ public abstract class ConnectionData implements Serializable {
         this.password = password;
     }
 
-    public DatabaseTypes getDatabaseType() {
+    public String getDatabaseType() {
         return databaseType;
     }
 
-    public void setDatabaseType(DatabaseTypes databaseType) {
+    public void setDatabaseType(String databaseType) {
         this.databaseType = databaseType;
     }
 
     public String getDisplayName() {
-        return databaseType.getDisplayName();
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getOptions() {
@@ -114,5 +120,9 @@ public abstract class ConnectionData implements Serializable {
 
     public void setOptions(String options) {
         this.options = options;
+    }
+
+    public String getJson() {
+       return null;
     }
 }

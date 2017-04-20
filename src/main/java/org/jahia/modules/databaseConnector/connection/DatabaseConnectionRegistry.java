@@ -25,4 +25,8 @@ public interface DatabaseConnectionRegistry<T> {
     boolean connect(final String databaseConnectionId);
 
     boolean disconnect(final String databaseConnectionId);
+
+    String getConnectionType();
+
+    String getConnectionDisplayName();
 }

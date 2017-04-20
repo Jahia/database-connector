@@ -2,8 +2,7 @@ package org.jahia.modules.databaseConnector.connection;
 
 import org.apache.commons.io.FileUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
-import org.eclipse.gemini.blueprint.context.BundleContextAware;
-import org.jahia.modules.databaseConnector.Utils;
+import org.jahia.modules.databaseConnector.util.Utils;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
 import org.jahia.modules.databaseConnector.connection.redis.RedisConnection;
 import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
@@ -13,9 +12,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,15 +24,14 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static org.jahia.modules.databaseConnector.connection.DatabaseTypes.getAllDatabaseTypes;
-
 /**
  * Date: 2013-10-17
  *
  * @author Frédéric Pierre
  * @version 1.0
  */
-public class DatabaseConnectorManager implements BundleContextAware, InitializingBean {
+@Component(service = DatabaseConnectorManager.class)
+public class DatabaseConnectorManager {
 
     public static final String DATABASE_CONNECTOR_ROOT_PATH = "/settings/";
 
@@ -43,14 +42,15 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
     private static final Pattern ALPHA_NUMERIC_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectorManager.class);
     private static DatabaseConnectorManager instance;
-    private BundleContext bundleContext;
+    private BundleContext context;
     private DSLExecutor dslExecutor;
     private Map<String, DSLHandler> dslHandlerMap;
-    private Map<DatabaseTypes, DatabaseConnectionRegistry> databaseConnectionRegistries;
+    private Map<String, DatabaseConnectionRegistry> databaseConnectionRegistries;
+    private Map<String, String> availableDatabaseTypes = new LinkedHashMap<>();
 
-    private Set<DatabaseTypes> activatedDatabaseTypes = getAllDatabaseTypes();
-
-    public DatabaseConnectorManager() {
+    @Activate
+    public void activate(BundleContext context) {
+        this.context = context;
         databaseConnectionRegistries = new TreeMap<>();
     }
 
@@ -65,88 +65,34 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         return instance;
     }
 
-    @Override
-    public void afterPropertiesSet() {
-        for (DatabaseTypes activatedDatabaseType : activatedDatabaseTypes) {
-            try {
-                DatabaseConnectionRegistry databaseConnectionRegistry = DatabaseConnectionRegistryFactory.makeDatabaseConnectionRegistry(activatedDatabaseType);
-                databaseConnectionRegistries.put(activatedDatabaseType, databaseConnectionRegistry);
-                Map registry = databaseConnectionRegistry.getRegistry();
-                Set set = registry.keySet();
-                for (Object connectionId : set) {
-                    //Only register the service if it was previously connected and registered.
-                    if (((AbstractConnection) registry.get(connectionId)).isConnected()) {
-                        ((AbstractConnection) registry.get(connectionId)).registerAsService();
-                    }
-                }
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
-    }
-
-    public <T extends AbstractConnection> Map<String, T> getRegisteredConnections(DatabaseTypes databaseType) {
+    public <T extends AbstractConnection> Map<String, T> getConnections(String databaseType) throws InstantiationException, IllegalAccessException {
         return findRegisteredConnections().get(databaseType);
     }
 
-    public Map<DatabaseTypes, Map> findRegisteredConnections() {
-        Map<DatabaseTypes, Map> registeredConnections = new HashMap<>();
-        for (DatabaseTypes databaseType : databaseConnectionRegistries.keySet()) {
-            switch (databaseType) {
-                case MONGO:
-                    Map<String, MongoConnection> mongoRegistry = databaseConnectionRegistries.get(databaseType).getRegistry();
-                    if (!mongoRegistry.isEmpty()) {
-                        Map<String, MongoConnection> mongoConnectionSet = new HashMap<>();
-                        for (Map.Entry<String, MongoConnection> entry : mongoRegistry.entrySet()) {
-                            mongoConnectionSet.put(entry.getKey(), entry.getValue());
-                        }
-                        registeredConnections.put(DatabaseTypes.MONGO, mongoConnectionSet);
-                    }
-                    break;
-                case REDIS:
-                    Map<String, RedisConnection> redisRegistry = databaseConnectionRegistries.get(databaseType).getRegistry();
-                    if (!redisRegistry.isEmpty()) {
-                        Map<String, RedisConnection> redisConnectionSet = new HashMap<>();
-                        for (Map.Entry<String, RedisConnection> entry : redisRegistry.entrySet()) {
-                            redisConnectionSet.put(entry.getKey(), entry.getValue());
-                        }
-                        registeredConnections.put(DatabaseTypes.REDIS, redisConnectionSet);
-                    }
-
-                    break;
+    public <T extends AbstractConnection, E extends AbstractDatabaseConnectionRegistry> Map<String, Map> findRegisteredConnections() throws InstantiationException, IllegalAccessException{
+        Map<String, Map> registeredConnections = new HashMap<>();
+        for (Map.Entry<String, Class> entry: DatabaseConnectionRegistryFactory.getRegisteredConnections().entrySet()) {
+            String connectionType = entry.getKey();
+            Map<String, T> registry = databaseConnectionRegistries.get(connectionType).getRegistry();
+            if (!registry.isEmpty()) {
+                Map<String, T> connectionSet = new HashMap<>();
+                for (Map.Entry<String, T> registeryEntry : registry.entrySet()) {
+                    connectionSet.put(registeryEntry.getKey(), registeryEntry.getValue());
+                }
+                registeredConnections.put(connectionType, connectionSet);
             }
         }
         return registeredConnections;
     }
 
-    public <T extends AbstractConnection> T getConnection(String connectionId, DatabaseTypes databaseType) {
+    public <T extends AbstractConnection> T getConnection(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException{
         try {
-            Map<String, T> databaseConnection = getRegisteredConnections(databaseType);
+            Map<String, T> databaseConnection = getConnections(databaseType);
             return databaseConnection.get(connectionId);
         } catch (NullPointerException e) {
             logger.error(e.getMessage(), e);
             return null;
         }
-    }
-
-    public Map<DatabaseTypes, Map<String, Object>> findAllDatabaseTypes() {
-        Map<DatabaseTypes, Map<String, Object>> map = new LinkedHashMap<>();
-        for (DatabaseTypes databaseType : databaseConnectionRegistries.keySet()) {
-            Map<String, Object> submap = new HashMap<>();
-            submap.put("connectedDatabases", databaseConnectionRegistries.get(databaseType).getRegistry().size());
-            submap.put("displayName", databaseType.getDisplayName());
-            map.put(databaseType, submap);
-        }
-        return map;
-    }
-
-    public boolean isAvailableId(String id) {
-        for (DatabaseConnectionRegistry databaseConnectionRegistry : databaseConnectionRegistries.values()) {
-            if (databaseConnectionRegistry.getRegistry().containsKey(id)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public boolean addEditConnection(final AbstractConnection connection, final Boolean isEdition) {
@@ -371,15 +317,6 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         return password;
     }
 
-    protected BundleContext getBundleContext() {
-        return bundleContext;
-    }
-
-    @Override
-    public void setBundleContext(BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
-    }
-
     public void setDslExecutor(DSLExecutor dslExecutor) {
         this.dslExecutor = dslExecutor;
     }
@@ -388,7 +325,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         this.dslHandlerMap = dslHandlerMap;
     }
 
-    public File exportConnections(JSONObject connections) throws JSONException {
+    public File exportConnections(JSONObject connections) throws JSONException, InstantiationException, IllegalAccessException{
         File file = null;
 
         try {
@@ -401,7 +338,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
                 for (int i = 0; i < connectionsArray.length(); i++) {
                     String connectionId = connectionsArray.getString(i);
                     sb.append("connection {").append(Utils.NEW_LINE);
-                    sb.append(getConnection(connectionId, DatabaseTypes.valueOf(type)).getSerializedExportData());
+                    sb.append(getConnection(connectionId, type).getSerializedExportData());
                     sb.append(Utils.NEW_LINE).append("}").append(Utils.NEW_LINE);
                 }
             }
@@ -412,7 +349,7 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         return file;
     }
 
-    public Map<String, Object> getServerStatus(String connectionId, DatabaseTypes databaseType) {
+    public Map<String, Object> getServerStatus(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException{
         AbstractConnection connection = getConnection(connectionId, databaseType);
         Map<String, Object> serverStatus = new LinkedHashMap<>();
         if (!connection.isConnected()) {
@@ -422,5 +359,33 @@ public class DatabaseConnectorManager implements BundleContextAware, Initializin
         serverStatus.put("success", connection.getServerStatus());
         return serverStatus;
 
+    }
+
+    public Map<String, String> getAvailableDatabaseTypes() {
+        return availableDatabaseTypes;
+    }
+
+    public void registerConnectorToRegistry(String connectionType, Class connectionClass) {
+        if (DatabaseConnectionRegistryFactory.registerConnectionType(connectionType, connectionClass)) {
+            try {
+                DatabaseConnectionRegistry databaseConnectionRegistry = DatabaseConnectionRegistryFactory.makeDatabaseConnectionRegistry(connectionClass);
+                databaseConnectionRegistries.put(connectionType, databaseConnectionRegistry);
+                Map registry = databaseConnectionRegistry.getRegistry();
+                Set set = registry.keySet();
+                for (Object connectionId : set) {
+                    //Only register the service if it was previously connected and registered.
+                    if (((AbstractConnection) registry.get(connectionId)).isConnected()) {
+                        ((AbstractConnection) registry.get(connectionId)).registerAsService();
+                    }
+                }
+                availableDatabaseTypes.put(databaseConnectionRegistry.getConnectionType(), databaseConnectionRegistry.getConnectionDisplayName());
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
+
+    public BundleContext getBundleContext() {
+        return this.context;
     }
 }

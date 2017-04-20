@@ -7,23 +7,17 @@
         http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-3.0.xsd">
 
     <!--OSGi Service-->
-    <bean class="org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager" id="databaseConnectorManager" factory-method="getInstance">
-        <property name="dslExecutor" ref="dslExecutor"/>
-        <property name="dslHandlerMap">
-            <map key-type="java.lang.String" value-type="org.jahia.modules.databaseConnector.dsl.DSLHandler">
-                <entry key="importConnection" value-ref="dcConnectionImportHandler"/>
-            </map>
-        </property>
-    </bean>
-
-    <bean id="springBeansAccess" class="org.jahia.modules.databaseConnector.api.SpringBeansAccess"
-          factory-method="getInstance">
-        <property name="databaseConnectorManager" ref="databaseConnectorManager"/>
-        <property name="jcrTemplate" ref="jcrTemplate"/>
-    </bean>
+    <!--<bean class="org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager" id="databaseConnectorManager" factory-method="getInstance">-->
+        <!--<property name="dslExecutor" ref="dslExecutor"/>-->
+        <!--<property name="dslHandlerMap">-->
+            <!--<map key-type="java.lang.String" value-type="org.jahia.modules.databaseConnector.dsl.DSLHandler">-->
+                <!--<entry key="importConnection" value-ref="dcConnectionImportHandler"/>-->
+            <!--</map>-->
+        <!--</property>-->
+    <!--</bean>-->
 
     <lang:groovy id="dslExecutor" script-source="classpath:org/jahia/modules/databaseConnector/dsl/DSLExecutorImpl.groovy"></lang:groovy>
     <lang:groovy id="dcConnectionImportHandler" script-source="classpath:org/jahia/modules/databaseConnector/dsl/ConnectionImportHandler.groovy">
-        <lang:property name="databaseConnectorManager" ref="databaseConnectorManager"/>
+        <!--<lang:property name="databaseConnectorManager" ref="databaseConnectorManager"/>-->
     </lang:groovy>
 </beans>

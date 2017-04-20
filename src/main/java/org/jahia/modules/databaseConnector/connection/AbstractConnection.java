@@ -45,8 +45,8 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
     protected String options;
     protected Boolean isConnected;
 
-    public static String createFilter(DatabaseTypes databaseType, String databaseId) {
-        return "(&(" + DATABASE_TYPE_KEY + "=" + databaseType.name() + ")(" + DATABASE_ID_KEY + "=" + databaseId + "))";
+    public static String createFilter(String databaseType, String databaseId) {
+        return "(&(" + DATABASE_TYPE_KEY + "=" + databaseType + ")(" + DATABASE_ID_KEY + "=" + databaseId + "))";
     }
 
     public static String createSingleFilter(DatabaseTypes databaseType) {
@@ -67,17 +67,17 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
 
     public void unregisterAsService() {
         beforeUnregisterAsService();
-        logger.info("Start unregistering OSGi services for DatabaseConnection of type {} with id '{}'", getDatabaseType().getDisplayName(), id);
+        logger.info("Start unregistering OSGi services for DatabaseConnection of type {} with id '{}'", getDisplayName(), id);
         for (ServiceRegistration serviceRegistration : serviceRegistrations) {
             serviceRegistration.unregister();
         }
         serviceRegistrations.clear();
         this.isConnected = false;
-        logger.info("OSGi services successfully unregistered for DatabaseConnection of type {} with id '{}'", getDatabaseType().getDisplayName(), id);
+        logger.info("OSGi services successfully unregistered for DatabaseConnection of type {} with id '{}'", getDisplayName(), id);
     }
 
     protected boolean registerAsService(Object object, boolean withInterfaceNames) {
-        String[] messageArgs = {object.getClass().getSimpleName(), getDatabaseType().getDisplayName(), id};
+        String[] messageArgs = {object.getClass().getSimpleName(), getDisplayName(), id};
         logger.info("Start registering OSGi service for {} for DatabaseConnection of type {} with id '{}'", messageArgs);
         ServiceReference[] serviceReferences;
         BundleContext bundleContext = DatabaseConnectorManager.getInstance().getBundleContext();
@@ -102,9 +102,9 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
         return true;
     }
 
-    private Hashtable<String, String> createProperties(DatabaseTypes databaseType, String databaseId) {
+    private Hashtable<String, String> createProperties(String databaseType, String databaseId) {
         Hashtable<String, String> properties = new Hashtable<>();
-        properties.put(DATABASE_TYPE_KEY, databaseType.name());
+        properties.put(DATABASE_TYPE_KEY, databaseType);
         properties.put(DATABASE_ID_KEY, databaseId);
         return properties;
     }
@@ -190,11 +190,9 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
         isConnected = connected;
     }
 
-    public abstract DatabaseTypes getDatabaseType();
+    public abstract String getDatabaseType();
 
-    public String getDisplayName() {
-        return getDatabaseType().getDisplayName();
-    }
+    public abstract  String getDisplayName();
 
     public abstract String getSerializedExportData();
 

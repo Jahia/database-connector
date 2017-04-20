@@ -53,14 +53,22 @@ public class RedisDB {
 
     @Inject
     public RedisDB(JCRTemplate jcrTemplate, DatabaseConnectorManager databaseConnectorManager) {
-        databaseConnector = new DatabaseConnector(databaseConnectorManager);
+        //databaseConnector = new DatabaseConnector(databaseConnectorManager);
     }
 
     @GET
     @Path("/connection/{databaseId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnection(@PathParam("databaseId") String databaseId) {
-        return Response.status(Response.Status.OK).entity(databaseConnector.getConnection(databaseId, DatabaseTypes.REDIS)).build();
+        try {
+            return Response.status(Response.Status.OK).entity(databaseConnector.getConnection(databaseId, RedisConnection.DATABASE_TYPE)).build();
+        } catch (InstantiationException ex) {
+            logger.error("Cannot instantiate connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
+        } catch (IllegalAccessException ex) {
+            logger.error("Cannot access connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
+        }
     }
 
     @GET
@@ -68,9 +76,13 @@ public class RedisDB {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnections() {
         try {
-            return Response.status(Response.Status.OK).entity(databaseConnector.getConnections(DatabaseTypes.REDIS)).build();
-        } catch (JSONException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
+            return Response.status(Response.Status.OK).entity(databaseConnector.getConnections(RedisConnection.DATABASE_TYPE)).build();
+        } catch (InstantiationException ex) {
+            logger.error("Cannot instantiate connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
+        } catch (IllegalAccessException ex) {
+            logger.error("Cannot access connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
         }
     }
 
@@ -236,7 +248,15 @@ public class RedisDB {
     @Path("/isconnectionvalid/{connectionId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response isConnectionIdAvailable(@PathParam("connectionId") String connectionId) {
-        return Response.status(Response.Status.OK).entity(databaseConnector.isConnectionIdAvailable(connectionId, DatabaseTypes.REDIS)).build();
+        try {
+            return Response.status(Response.Status.OK).entity(databaseConnector.isConnectionIdAvailable(connectionId, RedisConnection.DATABASE_TYPE)).build();
+        } catch (InstantiationException ex) {
+            logger.error("Cannot instantiate connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
+        } catch (IllegalAccessException ex) {
+            logger.error("Cannot access connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
+        }
     }
 
     @POST
@@ -292,7 +312,7 @@ public class RedisDB {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getServerStatus(@PathParam("connectionId") String connectionId) {
         try {
-            Map<String, Object> serverStatus = databaseConnector.getServerStatus(connectionId, DatabaseTypes.REDIS);
+            Map<String, Object> serverStatus = databaseConnector.getServerStatus(connectionId, RedisConnection.DATABASE_TYPE);
             if (serverStatus.containsKey("failed")) {
                 logger.info("Failed to retrieve Status for RedisDB connection with id: " + connectionId);
             } else {

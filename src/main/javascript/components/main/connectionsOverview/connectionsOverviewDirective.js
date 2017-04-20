@@ -92,6 +92,7 @@
                     method: 'GET'
                 }).then(function (response) {
                     coc.connections = response.connections;
+                    console.log(coc.connections);
                     resolve();
                 }, function (response) {
                     reject();

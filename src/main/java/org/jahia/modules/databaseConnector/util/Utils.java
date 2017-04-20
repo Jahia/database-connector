@@ -1,7 +1,8 @@
-package org.jahia.modules.databaseConnector;
+package org.jahia.modules.databaseConnector.util;
 
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
+import org.jahia.modules.databaseConnector.connection.AbstractDatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
 import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
 import org.jahia.modules.databaseConnector.connection.redis.RedisConnection;
@@ -108,16 +109,16 @@ public class Utils {
         if (!StringUtils.isEmpty(connection.getPassword())) {
             result.put("password", EncryptionUtils.passwordBaseEncrypt(connection.getPassword()) + "_ENC");
         }
-        switch (connection.getDatabaseType()) {
-            case MONGO:
-                result.put("authDb", ((MongoConnection) connection).getAuthDb());
-                result.put("writeConcern", ((MongoConnection) connection).getWriteConcern());
-                break;
-            case REDIS:
-                result.put("timeout", ((RedisConnection) connection).getTimeout());
-                result.put("weight", ((RedisConnection) connection).getWeight());
-                break;
-        }
+//        switch (connection.getDatabaseType()) {
+//            case MONGO:
+//                result.put("authDb", ((MongoConnection) connection).getAuthDb());
+//                result.put("writeConcern", ((MongoConnection) connection).getWriteConcern());
+//                break;
+//            case REDIS:
+//                result.put("timeout", ((RedisConnection) connection).getTimeout());
+//                result.put("weight", ((RedisConnection) connection).getWeight());
+//                break;
+//        }
         return result;
     }
 }

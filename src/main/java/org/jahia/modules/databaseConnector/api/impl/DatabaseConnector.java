@@ -1,17 +1,14 @@
 package org.jahia.modules.databaseConnector.api.impl;
 
-import org.jahia.modules.databaseConnector.connection.AbstractConnection;
-import org.jahia.modules.databaseConnector.connection.ConnectionData;
-import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
-import org.jahia.modules.databaseConnector.connection.DatabaseTypes;
-import org.jahia.modules.databaseConnector.connection.mongo.MongoConnection;
-import org.jahia.modules.databaseConnector.connection.mongo.MongoConnectionData;
-import org.jahia.modules.databaseConnector.connection.redis.RedisConnection;
-import org.jahia.modules.databaseConnector.connection.redis.RedisConnectionData;
+import org.jahia.modules.databaseConnector.connection.*;
 import org.jahia.modules.databaseConnector.serialization.models.DbConnections;
+import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
+import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,72 +16,33 @@ import javax.jcr.RepositoryException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
- * @author donnylam on 2016-05-04.
+ * @author stefan on 2016-05-04.
  */
-public class DatabaseConnector {
+@Component(service = DatabaseConnectorService.class)
+public class DatabaseConnector implements DatabaseConnectorService {
     private final static Logger logger = LoggerFactory.getLogger(DatabaseConnector.class);
 
     private transient DatabaseConnectorManager databaseConnectorManager;
+    private BundleContext context;
+    @Activate
+    public void activate(BundleContext context) {
+        this.context = context;
+    }
 
-    public DatabaseConnector(DatabaseConnectorManager databaseConnectorManager) {
+    @Reference(cardinality = ReferenceCardinality.MANDATORY, policy = ReferencePolicy.STATIC, service = DatabaseConnectorManager.class)
+    public void setDatabaseConnectorManager(DatabaseConnectorManager databaseConnectorManager) {
         this.databaseConnectorManager = databaseConnectorManager;
     }
-
-    public String getConnection(String connectionId, DatabaseTypes databaseType) {
-        String connection = null;
-        switch (databaseType) {
-            case MONGO:
-                MongoConnection mongoConnection = databaseConnectorManager.getConnection(connectionId, databaseType);
-                connection = mongoConnection.makeConnectionData().getJson();
-                break;
-            case REDIS:
-                RedisConnection redisConnection = databaseConnectorManager.getConnection(connectionId, databaseType);
-                connection = redisConnection.makeConnectionData().getJson();
-                break;
-        }
-        return connection;
-    }
-
-    public <T extends ConnectionData> String getConnections(DatabaseTypes databaseType) throws JSONException {
-        String connections = null;
-        switch (databaseType) {
-            case MONGO:
-                Map<String, MongoConnection> mongoConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.MONGO);
-                if (mongoConnections != null) {
-                    List<MongoConnectionData> mongoConnectionArray = new ArrayList<>();
-                    for (Map.Entry<String, MongoConnection> entry : mongoConnections.entrySet()) {
-                        mongoConnectionArray.add(entry.getValue().makeConnectionData());
-                    }
-                    connections = new DbConnections(mongoConnectionArray).getJson();
-                }
-                break;
-            case REDIS:
-                Map<String, RedisConnection> redisConnections = databaseConnectorManager.getRegisteredConnections(DatabaseTypes.REDIS);
-                if (redisConnections != null) {
-                    List<RedisConnectionData> redisConnectionArray = new ArrayList<>();
-                    for (Map.Entry<String, RedisConnection> entry : redisConnections.entrySet()) {
-                        redisConnectionArray.add(entry.getValue().makeConnectionData());
-                    }
-                    connections = new DbConnections(redisConnectionArray).getJson();
-                }
-                break;
-        }
-        return connections == null ? new JSONArray().toString() : connections;
-    }
-
-    public <T extends ConnectionData> String getAllConnections() throws JSONException {
+    public <T extends ConnectionData> String getAllConnections() throws JSONException, InstantiationException, IllegalAccessException{
         String connections;
 
         Map<String, AbstractConnection> allConnections = new HashMap<>();
 
-        for (DatabaseTypes databaseType : DatabaseTypes.values()) {
-            Map<String, ? extends AbstractConnection> databaseTypeConnection = databaseConnectorManager.getRegisteredConnections(databaseType);
+        for (Map.Entry<String, Class> entry : DatabaseConnectionRegistryFactory.getRegisteredConnections().entrySet()) {
+            Map<String, ? extends AbstractConnection> databaseTypeConnection = databaseConnectorManager.getConnections(entry.getKey());
             if (databaseTypeConnection != null) {
                 allConnections.putAll(databaseTypeConnection);
             }
@@ -97,32 +55,76 @@ public class DatabaseConnector {
         return connections == null ? new JSONArray().toString() : connections;
     }
 
-    public boolean addEditConnection(AbstractConnection connection, Boolean isEdition) {
-        return databaseConnectorManager.addEditConnection(connection, isEdition);
-    }
-
-    public boolean testConnection(AbstractConnection connection) {
-        return databaseConnectorManager.testConnection(connection);
-    }
-
-    public boolean removeConnection(String connectionId, DatabaseTypes databaseType) {
-        return databaseConnectorManager.removeConnection(connectionId, databaseType);
-    }
-
-    public boolean updateConnection(String connectionId, DatabaseTypes databaseType, boolean connect) {
-        return databaseConnectorManager.updateConnection(connectionId, databaseType, connect);
-    }
-
     public String getDatabaseTypes() throws JSONException {
         JSONObject databaseTypes = new JSONObject();
-        for (DatabaseTypes databaseType : DatabaseTypes.getAllDatabaseTypes()) {
-            databaseTypes.put(databaseType.name(), databaseType.getDisplayName());
+        for ( Map.Entry<String, String> entry: this.databaseConnectorManager.getAvailableDatabaseTypes().entrySet()) {
+            databaseTypes.put(entry.getKey(), entry.getValue());
         }
         return databaseTypes.toString();
     }
 
-    public boolean isConnectionIdAvailable(String connectionId, DatabaseTypes databaseType) {
-        Map<String, AbstractConnection> connections = databaseConnectorManager.getRegisteredConnections(databaseType);
+    public File exportConnections(JSONObject data)
+            throws IOException, RepositoryException, JSONException, InstantiationException, IllegalAccessException{
+        return databaseConnectorManager.exportConnections(data);
+    }
+
+    public Map importConnections(InputStream source) {
+        return databaseConnectorManager.executeConnectionImportHandler(source);
+    }
+
+    @Override
+    public <T extends AbstractConnection> T getConnection(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException{
+        return databaseConnectorManager.getConnection(connectionId, databaseType);
+    }
+
+    @Override
+    public <T extends AbstractConnection> String getConnectionAsString(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException{
+        AbstractConnection connectionObj = databaseConnectorManager.getConnection(connectionId, databaseType);
+        return connectionObj.makeConnectionData().getJson();
+    }
+
+    @Override
+    public <T extends AbstractConnection> Map<String, T> getConnections(String databaseType) throws InstantiationException, IllegalAccessException{
+        return databaseConnectorManager.getConnections(databaseType);
+    }
+
+    @Override
+    public <T extends AbstractConnection, E extends ConnectionData> String getConnectionsAsString(String databaseType) throws InstantiationException, IllegalAccessException {
+        String connections = null;
+        Map<String, T> connectionsObj = databaseConnectorManager.getConnections(databaseType);
+        if (connectionsObj != null) {
+            List<E> connectionArray = new ArrayList<>();
+            for (Map.Entry<String, T> entry : connectionsObj.entrySet()) {
+                connectionArray.add((E)entry.getValue().makeConnectionData());
+            }
+            connections = new DbConnections(connectionArray).getJson();
+        }
+        return connections == null ? new JSONArray().toString() : connections;
+    }
+
+    @Override
+    public boolean addEditConnection(AbstractConnection connection, Boolean isEdition) {
+        return databaseConnectorManager.addEditConnection(connection, isEdition);
+    }
+
+    @Override
+    public boolean testConnection(AbstractConnection connection) {
+        return databaseConnectorManager.testConnection(connection);
+    }
+
+    @Override
+    public boolean removeConnection(String connectionId, DatabaseTypes databaseType) {
+        return databaseConnectorManager.removeConnection(connectionId, databaseType);
+    }
+
+    @Override
+    public boolean updateConnection(String connectionId, DatabaseTypes databaseType, boolean connect) {
+        return databaseConnectorManager.updateConnection(connectionId, databaseType, connect);
+    }
+
+    @Override
+    public boolean isConnectionIdAvailable(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException {
+        Map<String, AbstractConnection> connections = databaseConnectorManager.getConnections(databaseType);
         if (connections != null) {
             for (Map.Entry<String, AbstractConnection> entry : connections.entrySet()) {
                 if (entry.getKey().equals(connectionId)) {
@@ -133,17 +135,13 @@ public class DatabaseConnector {
         return true;
     }
 
-
-    public File exportConnections(JSONObject data)
-            throws IOException, RepositoryException, JSONException {
-        return databaseConnectorManager.exportConnections(data);
-    }
-
-    public Map importConnections(InputStream source) {
-        return databaseConnectorManager.executeConnectionImportHandler(source);
-    }
-
-    public Map<String, Object> getServerStatus(String connectionId, DatabaseTypes databaseType) {
+    @Override
+    public Map<String, Object> getServerStatus(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException {
         return databaseConnectorManager.getServerStatus(connectionId, databaseType);
+    }
+
+    @Override
+    public void registerConnectorToRegistry(String connectionType, Class connectionClass) {
+        databaseConnectorManager.registerConnectorToRegistry(connectionType, connectionClass);
     }
 }
