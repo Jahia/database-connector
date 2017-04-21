@@ -454,6 +454,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
         addJSToAngularConfigFile(renderContext, DEFINITION_QUERY, filePath, extraResourceBundles);
 
+        //TODO handle resource bundles
         // Find Resource Bundle for theme
 //        ExtendedNodeType nodeType = NodeTypeRegistry.getInstance().getNodeType("fcnt:form");
 //        for (ScriptResolver scriptResolver : renderService.getScriptResolvers()) {
@@ -508,7 +509,6 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                             NodeIterator ni = q.execute().getNodes();
 
                             while (ni.hasNext()) {
-                                //TODO make sure this is the right id
                                 extraResourceBundlePackages.add(pack.getId());
                                 JCRNodeWrapper node = (JCRNodeWrapper) ni.next();
                                 String[] views = node.getPropertyAsString("views").split(" ");
@@ -538,7 +538,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                 dependents.add(pack);
             }
         }
-        return packages;
+        return dependents;
     } 
 
     /**
