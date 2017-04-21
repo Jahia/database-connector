@@ -1,15 +1,9 @@
 package org.jahia.modules.databaseConnector.connection;
 
-import org.apache.commons.lang.StringUtils;
 import org.jahia.services.content.*;
 import org.jahia.utils.EncryptionUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -17,9 +11,9 @@ import org.springframework.util.Assert;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import static org.jahia.modules.databaseConnector.util.Utils.query;
 import static org.jahia.modules.databaseConnector.connection.AbstractConnection.*;
@@ -31,7 +25,7 @@ import static org.jahia.modules.databaseConnector.connection.DatabaseConnectorMa
  * @author Frédéric Pierre
  * @version 1.0
  */
-@Component
+
 public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseConnectionRegistry<T> {
 
     private final static String NODE_TYPE = "dcmix:databaseConnection";
@@ -42,16 +36,11 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
 
     protected JCRTemplate jcrTemplate;
 
-    private DatabaseConnectorManager databaseConnectorManager;
+    protected static final Pattern ALPHA_NUMERIC_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
 
     public AbstractDatabaseConnectionRegistry() {
         this.jcrTemplate = JCRTemplate.getInstance();
         this.registry = new TreeMap<>();
-    }
-
-    @Reference(cardinality = ReferenceCardinality.MANDATORY, policy = ReferencePolicy.STATIC, service = DatabaseConnectorManager.class)
-    public void getDatabaseConnectorManager(DatabaseConnectorManager databaseConnectorManager) {
-        this.databaseConnectorManager = databaseConnectorManager;
     }
 
     public Map<String, T> getRegistry() {

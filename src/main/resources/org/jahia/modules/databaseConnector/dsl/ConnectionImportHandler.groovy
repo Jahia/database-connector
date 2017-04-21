@@ -1,23 +1,13 @@
 package org.jahia.modules.databaseConnector.dsl
 
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager
-import org.osgi.service.component.annotations.Component
-import org.osgi.service.component.annotations.Reference
-import org.osgi.service.component.annotations.ReferenceCardinality
-import org.osgi.service.component.annotations.ReferencePolicy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-@Component
 class ConnectionImportHandler implements DSLHandler {
     private static final Logger logger = LoggerFactory.getLogger(ConnectionImportHandler.class);
 
     def DatabaseConnectorManager databaseConnectorManager
-
-    @Reference(cardinality = ReferenceCardinality.MANDATORY, policy = ReferencePolicy.STATIC, service = DatabaseConnectorManager.class)
-    public void setDatabaseConnectorManager(DatabaseConnectorManager databaseConnectorManager) {
-        this.databaseConnectorManager = databaseConnectorManager;
-    }
 
     def connection(@DelegatesTo(DatabaseConnectorWizardParser) Closure cl) {
         parseDeclaration(cl)

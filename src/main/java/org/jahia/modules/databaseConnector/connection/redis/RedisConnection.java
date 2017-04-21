@@ -33,7 +33,7 @@ public class RedisConnection extends AbstractConnection {
     public static final String DEFAULT_DATABASE_NUMBER = "0";
 
     private static final Logger logger = LoggerFactory.getLogger(RedisConnection.class);
-    public static final String DATABASE_TYPE = "Redis";
+    public static final String DATABASE_TYPE = "REDIS";
     public static final String DISPLAY_NAME = "RedisDB";
     private static final int TEST_CONNECTION_TIMEOUT = 5000;
     private RedisClient redisClient;

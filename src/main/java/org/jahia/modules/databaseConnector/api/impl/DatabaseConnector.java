@@ -41,7 +41,7 @@ public class DatabaseConnector implements DatabaseConnectorService {
 
         Map<String, AbstractConnection> allConnections = new HashMap<>();
 
-        for (Map.Entry<String, Class> entry : DatabaseConnectionRegistryFactory.getRegisteredConnections().entrySet()) {
+        for (Map.Entry<String, DatabaseConnectionRegistry> entry : DatabaseConnectionRegistryFactory.getRegisteredConnections().entrySet()) {
             Map<String, ? extends AbstractConnection> databaseTypeConnection = databaseConnectorManager.getConnections(entry.getKey());
             if (databaseTypeConnection != null) {
                 allConnections.putAll(databaseTypeConnection);
@@ -75,6 +75,7 @@ public class DatabaseConnector implements DatabaseConnectorService {
     public DatabaseConnectionRegistry getConnectionRegistryClassInstance(String databaseType) {
         return databaseConnectorManager.getConnectionRegistryClassInstance(databaseType);
     }
+
     @Override
     public <T extends AbstractConnection> T getConnection(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException{
         return databaseConnectorManager.getConnection(connectionId, databaseType);
@@ -144,7 +145,17 @@ public class DatabaseConnector implements DatabaseConnectorService {
     }
 
     @Override
-    public void registerConnectorToRegistry(String connectionType, Class connectionClass) {
-        databaseConnectorManager.registerConnectorToRegistry(connectionType, connectionClass);
+    public void registerConnectorToRegistry(String connectionType, DatabaseConnectionRegistry databaseConnectionRegistry) {
+        databaseConnectorManager.registerConnectorToRegistry(connectionType, databaseConnectionRegistry);
+    }
+
+    @Override
+    public <T extends AbstractConnection> boolean hasConnection(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException {
+        return databaseConnectorManager.hasConnection(connectionId, databaseType);
+    }
+
+    @Override
+    public String setPassword(Map<String, Object> map, String password) {
+        return databaseConnectorManager.setPassword(map, password);
     }
 }

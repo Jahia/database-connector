@@ -11,26 +11,17 @@ import java.util.Map;
  */
 public class DatabaseConnectionRegistryFactory {
 
-    private static Map<String, Class> registeredConnections = new LinkedHashMap<>();
+    private static Map<String, DatabaseConnectionRegistry> registeredConnections = new LinkedHashMap<>();
 
-    public static <T extends DatabaseConnectionRegistry> DatabaseConnectionRegistry makeDatabaseConnectionRegistry(Class self) throws InstantiationException, IllegalAccessException {
-        T databaseConnectionRegistry = null;
-        databaseConnectionRegistry = (T) self.newInstance();
+    public static <T extends DatabaseConnectionRegistry> void makeDatabaseConnectionRegistry(DatabaseConnectionRegistry databaseConnectionRegistry) throws InstantiationException, IllegalAccessException {
         databaseConnectionRegistry.populateRegistry();
-        return databaseConnectionRegistry;
     }
 
-    public static boolean registerConnectionType(String name, Class registeringClass) {
-        synchronized (registeredConnections) {
-            if (!registeredConnections.containsKey(name)) {
-                registeredConnections.put(name, registeringClass);
-                return true;
-            }
-        }
-        return false;
+    public static void registerConnectionType(String name, DatabaseConnectionRegistry databaseConnectionRegistry) {
+        registeredConnections.put(name, databaseConnectionRegistry);
     }
 
-    public static Map<String, Class> getRegisteredConnections() {
+    public static Map<String, DatabaseConnectionRegistry> getRegisteredConnections() {
         return registeredConnections;
     }
 }

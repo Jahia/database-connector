@@ -19,7 +19,7 @@ public interface DatabaseConnectionRegistry<T> {
 
     boolean addEditConnection(final AbstractConnection connection, final Boolean isEdition);
 
-    boolean importConnection(final Map<String, Object> map);
+    void importConnection(final Map<String, Object> map);
 
     boolean testConnection(final AbstractConnection connection);
 
@@ -33,7 +33,7 @@ public interface DatabaseConnectionRegistry<T> {
 
     String getConnectionDisplayName();
 
-    Map<String, Object> prepareConnectionMapFromJSON(Map<String, Object> result, JSONObject jsonConnectionData) throws JSONException;
+    Map<String, Object> prepareConnectionMapFromJSON(final Map<String, Object> result, final JSONObject jsonConnectionData) throws JSONException;
 
-    Map<String, Object> prepareConnectionMapFromConnection (AbstractConnection connection);
+    Map<String, Object> prepareConnectionMapFromConnection (final AbstractConnection connection);
 }

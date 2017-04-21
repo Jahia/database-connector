@@ -3,6 +3,7 @@ package org.jahia.modules.databaseConnector.connection.redis;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.AbstractDatabaseConnectionRegistry;
+import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;
 import org.jahia.services.content.JCRCallback;
 import org.jahia.services.content.JCRNodeWrapper;
 import org.jahia.services.content.JCRSessionWrapper;
@@ -10,6 +11,8 @@ import org.jahia.utils.EncryptionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -37,14 +40,27 @@ import static org.jahia.modules.databaseConnector.connection.redis.RedisConnecti
  * @author Frédéric Pierre
  * @version 1.0
  */
+@Component
 public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<RedisConnection> {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisConnectionRegistry.class);
+    private DatabaseConnectorService databaseConnectorService = null;
+    private BundleContext context;
 
     public RedisConnectionRegistry() {
         super();
     }
 
+    @Activate
+    public void activate(BundleContext context) {
+        this.context = context;
+        this.databaseConnectorService.registerConnectorToRegistry(RedisConnection.DATABASE_TYPE, this);
+    }
+
+    @Reference(cardinality = ReferenceCardinality.MANDATORY, policy = ReferencePolicy.STATIC, service = DatabaseConnectorService.class)
+    public void setDatabaseConnectorService(DatabaseConnectorService databaseConnectorService) {
+        this.databaseConnectorService = databaseConnectorService;
+    }
     @Override
     public Map<String, RedisConnection> populateRegistry() {
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
@@ -125,8 +141,66 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
 
 
     @Override
-    public boolean importConnection(Map<String, Object> map) {
-        return false;
+    public void importConnection(Map<String, Object> map) {
+        try {
+            if (!ALPHA_NUMERIC_PATTERN.matcher((String)map.get("identifier")).matches()) {
+                map.put("status", "failed");
+                map.put("statusMessage", "invalidIdentifier");
+                //Create instance to be able to parse the options of a failed connection.
+                if (map.containsKey("options")) {
+                    RedisConnection connection = new RedisConnection((String) map.get("identifier"));
+                    map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+                }
+            } else if (databaseConnectorService.hasConnection((String) map.get("identifier"), (String) map.get("type"))) {
+                map.put("status", "failed");
+                map.put("statusMessage", "connectionExists");
+                //Create instance to be able to parse the options of a failed connection.
+                if (map.containsKey("options")) {
+                    RedisConnection connection = new RedisConnection((String) map.get("identifier"));
+                    map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+                }
+            } else {
+                //Create connection object
+                RedisConnection connection = new RedisConnection((String) map.get("identifier"));
+                String host = map.containsKey("host") ? (String) map.get("host") : null;
+                Integer port = map.containsKey("port") ? Integer.parseInt((String) map.get("port")) : RedisConnection.DEFAULT_PORT;
+                Boolean isConnected = map.containsKey("isConnected") && Boolean.parseBoolean((String) map.get("isConnected"));
+                String dbName = map.containsKey("dbName") ? (String) map.get("dbName") : RedisConnection.DEFAULT_DATABASE_NUMBER;
+                String options = map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null;
+                map.put("options", options);
+                String password = (String) map.get("password");
+                Long timeout = map.containsKey("timeout") ? Long.parseLong((String) map.get("timeout")) : null;
+                Integer weight = map.containsKey("weight") ? Integer.parseInt((String) map.get("weight")) : null;
+
+                password = databaseConnectorService.setPassword(map, password);
+
+                connection.setHost(host);
+                connection.setPort(port);
+                connection.isConnected(isConnected);
+                connection.setDbName(dbName);
+                connection.setPassword(password);
+                connection.setWeight(weight);
+                connection.setTimeout(timeout);
+                connection.setOptions(options);
+
+                databaseConnectorService.addEditConnection(connection, false);
+                map.put("status", "success");
+            }
+
+        } catch (Exception ex) {
+            map.put("status", "failed");
+            map.put("statusMessage", "creationFailed");
+            //try to parse options if the exist otherwise we will just remove them.
+            try {
+                if (map.containsKey("options")) {
+                    RedisConnection connection = new RedisConnection((String) map.get("identifier"));
+                    map.put("options", map.containsKey("options") ? connection.parseOptions((LinkedHashMap) map.get("options")) : null);
+                }
+            } catch (Exception e) {
+                map.remove("options");
+            }
+            logger.info("Import " + (map.containsKey("identifier") ? "for connection: '" + map.get("identifier") + "'" : "") + " failed", ex.getMessage(), ex);
+        }
     }
 
     @Override
