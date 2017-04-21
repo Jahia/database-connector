@@ -10,6 +10,9 @@
     <bean class="org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager" id="databaseConnectorManager" factory-method="getInstance">
         <property name="dslExecutor" ref="dslExecutor"/>
         <property name="settingsBean" ref="settingsBean"/>
+        <property name="jcrTemplate" ref="jcrTemplate" />
+        <property name="renderService" ref="RenderService"/>
+        <property name="templateManagerService" ref="JahiaTemplateManagerService"/>
         <property name="dslHandlerMap">
             <map key-type="java.lang.String" value-type="org.jahia.modules.databaseConnector.dsl.DSLHandler">
                 <entry key="importConnection" value-ref="dcConnectionImportHandler"/>

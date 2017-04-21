@@ -3,15 +3,25 @@ package org.jahia.modules.databaseConnector.connection;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
+import org.jahia.api.Constants;
 import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.databaseConnector.factories.DatabaseConnectionRegistryFactory;
 import org.jahia.modules.databaseConnector.util.Utils;
 import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
 import org.jahia.modules.databaseConnector.dsl.DSLHandler;
 import org.jahia.osgi.BundleResource;
+import org.jahia.services.SpringContextSingleton;
+import org.jahia.services.content.JCRCallback;
+import org.jahia.services.content.JCRNodeWrapper;
+import org.jahia.services.content.JCRSessionWrapper;
+import org.jahia.services.content.JCRTemplate;
 import org.jahia.services.content.nodetypes.ExtendedNodeType;
 import org.jahia.services.content.nodetypes.NodeTypeRegistry;
 import org.jahia.services.content.nodetypes.ParseException;
+import org.jahia.services.render.*;
+import org.jahia.services.render.scripting.ScriptResolver;
+import org.jahia.services.templates.JahiaTemplateManagerService;
+import org.jahia.services.usermanager.JahiaUserManagerService;
 import org.jahia.settings.SettingsBean;
 import org.jahia.utils.EncryptionUtils;
 import org.json.JSONArray;
@@ -27,11 +37,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -42,14 +56,15 @@ import java.util.*;
  */
 @Component(service = DatabaseConnectorManager.class)
 public class DatabaseConnectorManager implements InitializingBean, BundleListener {
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectorManager.class);
 
     public static final String DATABASE_CONNECTOR_ROOT_PATH = "/settings/";
-
     public static final String DATABASE_CONNECTOR_PATH = "databaseConnector";
-
     public static final String DATABASE_CONNECTOR_NODE_TYPE = "dc:databaseConnector";
 
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectorManager.class);
+    private static final String DEFINITION_QUERY = "SELECT * FROM [dcmix:directiveDefinition] AS result WHERE ISDESCENDANTNODE(result, ''{0}'')";
+
+    private final static Object lock = new Object();
     private static DatabaseConnectorManager instance;
     private BundleContext context;
     private DSLExecutor dslExecutor;
@@ -57,13 +72,22 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     private Map<String, DatabaseConnectionRegistry> databaseConnectionRegistries;
     private Map<String, String> availableDatabaseTypes = new LinkedHashMap<>();
     private final static Set<Long> installedBundles = new LinkedHashSet<>();
+    private final static Map<String, String> angularConfigFilesPath = new HashMap<>();
+    private final static Map<String, Long> angularConfigFilesTimestamp = new HashMap<>();
     private SettingsBean settingsBean;
+    private JCRTemplate jcrTemplate;
+    private RenderService renderService;
+    private JahiaTemplateManagerService templateManagerService;
+    private Bundle bundle;
+
+    private static Date lastDeployDate;
 
     @Activate
     public void activate(BundleContext context) {
         this.context = context;
         this.context.addBundleListener(this);
         databaseConnectionRegistries = new TreeMap<>();
+        this.bundle = this.context.getBundle();
         instance = this;
     }
 
@@ -91,6 +115,23 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                     logger.error("Parse exception: " + e.getMessage());
                 } catch (IOException e) {
                     logger.error("IO exception: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (settingsBean.isProcessingServer()) {
+            lastDeployDate = new Date();
+            parseDefinitionWizards(bundle);
+            for (Bundle currentBundle : bundle.getBundleContext().getBundles()) {
+                if (!(currentBundle.getSymbolicName().equals(bundle.getSymbolicName()))
+                        && org.jahia.osgi.BundleUtils.isJahiaModuleBundle(currentBundle)
+                        && (currentBundle.getState() == Bundle.INSTALLED
+                            || currentBundle.getState() == Bundle.RESOLVED
+                            || currentBundle.getState() == Bundle.ACTIVE)) {
+                    parseDefinitionWizards(currentBundle);
                 }
             }
         }
@@ -318,6 +359,26 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         return databaseConnectionRegistries.get(databaseType);
     }
 
+    public void setSettingsBean(SettingsBean settingsBean) {
+        this.settingsBean = settingsBean;
+    }
+
+    public void setJcrTemplate(JCRTemplate jcrTemplate) {
+        this.jcrTemplate = jcrTemplate;
+    }
+
+    public void setRenderService(RenderService renderService) {
+        this.renderService = renderService;
+    }
+
+    public void setTemplateManagerService(JahiaTemplateManagerService jahiaTemplateManagerService) {
+        this.templateManagerService = jahiaTemplateManagerService;
+    }
+
+    /********************************************************************************************
+     * Definition parsing and file aggregation below
+     ********************************************************************************************/
+
     private boolean parseDefinitionWizards(Bundle bundle) throws ParseException, IOException {
         JahiaTemplatesPackage packageById = org.jahia.osgi.BundleUtils.getModule(bundle);
         boolean foundDefinitions = false;
@@ -344,12 +405,189 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         return foundDefinitions;
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
+    /**
+     * This function get the path of the file which handle the directives use by angular
+     *
+     * @param renderContext The render context on which to get the current site
+     * @return The path of the file to use
+     * @throws Exception
+     */
+    public String getAngularConfigFilePath(RenderContext renderContext) throws Exception {
+        String key = getCacheKey(renderContext);
 
+        if (settingsBean.isDevelopmentMode()) {
+            return getAngularConfigFilePath(renderContext, key);
+        }
+
+        if (angularConfigFilesPath.get(key) == null) {
+            synchronized (lock) {
+                if (angularConfigFilesPath.get(key) != null) return angularConfigFilesPath.get(key);
+                return getAngularConfigFilePath(renderContext, key);
+            }
+        } else {
+            return angularConfigFilesPath.get(key);
+        }
     }
 
-    public void setSettingsBean(SettingsBean settingsBean) {
-        this.settingsBean = settingsBean;
+    public Long getAngularConfigFileTimestamp(RenderContext renderContext) throws Exception {
+        String key = getCacheKey(renderContext);
+        if (settingsBean.isDevelopmentMode()) {
+            if(renderContext.getRequest().getAttribute("ffdevconfigfiletimestamp") == null) {
+                renderContext.getRequest().setAttribute("ffdevconfigfiletimestamp", String.valueOf(System.currentTimeMillis()));
+            }
+            return Long.valueOf((String) renderContext.getRequest().getAttribute("ffdevconfigfiletimestamp"));
+        }
+        else if (angularConfigFilesTimestamp.containsKey(key)) return angularConfigFilesTimestamp.get(key);
+        else return System.currentTimeMillis();
+    }
+
+    private String getCacheKey(RenderContext renderContext) {
+        String language = renderContext.getUILocale().toString();
+        String mode = "/builder";
+        return renderContext.getSiteInfo().getSitePath() + renderContext.getWorkspace() + mode + "/" + language;
+    }
+
+    private String getAngularConfigFilePath(RenderContext renderContext, String key) throws RepositoryException, IOException {
+        String fileName = "database-connector-angular-builder-config_" + renderContext.getSite().getIdentifier() + "_" + renderContext.getUILocale().toString() + ".js";
+        String filePath = prepareAngularConfigFile(renderContext, fileName);
+        Set<String> extraResourceBundles = new HashSet<>();
+
+        addJSToAngularConfigFile(renderContext, DEFINITION_QUERY, filePath, extraResourceBundles);
+
+        // Find Resource Bundle for theme
+//        ExtendedNodeType nodeType = NodeTypeRegistry.getInstance().getNodeType("fcnt:form");
+//        for (ScriptResolver scriptResolver : renderService.getScriptResolvers()) {
+//            SortedSet<View> viewsSet = scriptResolver.getViewsSet(nodeType, renderContext.getSite(), "html");
+//            for (View view : viewsSet) {
+//                String displayName = view.getDisplayName();
+//                if (displayName.startsWith("form.")) {
+//                    String id = view.getModule().getId();
+//                    if (!extraResourceBundles.contains(id) && !"form-factory-core".equals(id)) {
+//                        extraResourceBundles.add(id);
+//                    }
+//                }
+//            }
+//        }
+//        for (String extraResourceBundle : extraResourceBundles) {
+//            addRBDictionnaryToAngularConfigFile(renderContext, filePath, extraResourceBundle);
+//        }
+
+        File file = new File(filePath);
+        if (FileUtils.sizeOf(file) == 0 || !FileUtils.isFileNewer(file, lastDeployDate)) {
+            FileUtils.forceDelete(file);
+        } else {
+            angularConfigFilesPath.put(key, filePath);
+            angularConfigFilesTimestamp.put(key, file.lastModified());
+        }
+        return filePath;
+    }
+
+    /**
+     * This function generate the javascript file to contains directives use by angular
+     *
+     * @param renderContext               The render context on which to get the current site
+     * @param extraResourceBundlePackages
+     * @return The path to the generated file
+     * @throws RepositoryException
+     */
+    private void addJSToAngularConfigFile(final RenderContext renderContext, final String query, final String filePath, final Set<String> extraResourceBundlePackages) throws RepositoryException, IOException {
+        jcrTemplate.doExecuteWithSystemSessionAsUser(JahiaUserManagerService.getInstance().lookupRootUser().getJahiaUser(), Constants.EDIT_WORKSPACE, renderContext.getUILocale(), new JCRCallback<Object>() {
+            @Override
+            public String doInJCR(JCRSessionWrapper session) throws RepositoryException {
+                Set<String> allDependencies = renderContext.getSite().getInstalledModulesWithAllDependencies();
+                File jsFile = new File(filePath);
+                try {
+                    FileWriter fw = new FileWriter(jsFile.getAbsoluteFile(), true);
+                    BufferedWriter bw = new BufferedWriter(fw);
+
+                    for (String allDependency : allDependencies) {
+                        try {
+                            JahiaTemplatesPackage templatePackageById = templateManagerService.getTemplatePackageById(allDependency);
+                            if (templatePackageById != null) {
+                                QueryManager qm = session.getWorkspace().getQueryManager();
+                                String rootPath = templatePackageById.getRootFolderPath() + "/" + templatePackageById.getVersion().toString();
+                                Query q = qm.createQuery(MessageFormat.format(query, rootPath), Query.JCR_SQL2);
+                                NodeIterator ni = q.execute().getNodes();
+
+                                while (ni.hasNext()) {
+                                    if (!allDependency.equals("database-connector")) {
+                                        extraResourceBundlePackages.add(allDependency);
+                                    }
+                                    JCRNodeWrapper node = (JCRNodeWrapper) ni.next();
+                                    String[] views = node.getPropertyAsString("views").split(" ");
+                                    for (String view : views) {
+                                        writeViewToWriter(node, renderContext, bw, view);
+                                    }
+                                }
+                            }
+                        } catch (RenderException e) {
+                            logger.error("Failed to render view: " + e.getMessage() + "\n" + e);
+                        }
+                    }
+                    bw.close();
+                } catch (IOException e) {
+                    logger.error("Failed to write to buffer: " + e.getMessage() + "\n" + e);
+                }
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Renders and writes a given view, if it exists, to write buffer (bw).
+     *
+     * @param currentNode
+     * @param renderContext
+     * @param bw
+     * @param viewName
+     * @throws IOException
+     * @throws RenderException
+     * @throws RepositoryException
+     */
+    private void writeViewToWriter(JCRNodeWrapper currentNode, RenderContext renderContext, BufferedWriter bw, String viewName) throws IOException, RenderException, RepositoryException {
+        if (renderService.hasView(currentNode, viewName, "js", renderContext)) {
+            bw.write("/**\n");
+            bw.write(" * nodeType: " + currentNode.getPrimaryNodeTypeName() + "\n");
+            bw.write(" * path: " + currentNode.getPath() + "\n");
+            bw.write(" */\n");
+            String render = renderService.render(new Resource(currentNode, "js", viewName, Resource.CONFIGURATION_INCLUDE), renderContext);
+            bw.write(render);
+            bw.newLine();
+        }
+    }
+
+    private String prepareAngularConfigFile(RenderContext renderContext, final String fileName) throws RepositoryException {
+        return jcrTemplate.doExecuteWithSystemSessionAsUser(JahiaUserManagerService.getInstance().lookupRootUser().getJahiaUser(), Constants.EDIT_WORKSPACE, renderContext.getUILocale(), new JCRCallback<String>() {
+            @Override
+            public String doInJCR(JCRSessionWrapper session) throws RepositoryException {
+                new File(getFileSystemPath("/generated-resources")).mkdirs();
+
+                File jsFile = new File(getFileSystemPath("/generated-resources/" + fileName));
+                try {
+                    if (!jsFile.exists())
+                        jsFile.createNewFile();
+
+                    FileWriter fw = new FileWriter(jsFile.getAbsoluteFile());
+                    BufferedWriter bw = new BufferedWriter(fw);
+                    bw.write("");
+                    bw.close();
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
+                return jsFile.getPath();
+            }
+        });
+    }
+
+    private String getFileSystemPath(String path) {
+        try {
+            return SettingsBean.class.getMethod("getJahiaGeneratedResourcesDiskPath", null).invoke(SettingsBean.getInstance()) + path.replace("/generated-resources", "");
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            logger.error("Failed to get file path for generated resources " + e.getMessage() + "\n" + e);
+            return SettingsBean.getInstance().getJahiaVarDiskPath() + path;
+        } catch (NoSuchMethodException e) {
+            logger.error("Older version of SettingsBean detected " + e.getMessage() + "\n" + e);
+            return SettingsBean.getInstance().getJahiaVarDiskPath() + path;
+        }
     }
 }
