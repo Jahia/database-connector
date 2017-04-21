@@ -27,3 +27,9 @@
 
 [dc:databaseConnector] > jnt:content
  + * (dcmix:databaseConnection)
+
+
+[dcmix:directiveDefinition] > mix:title mixin
+- label (string) i18n
+- tag (string)
+- views (string) multiple

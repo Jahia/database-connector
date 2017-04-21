@@ -1,15 +1,27 @@
 package org.jahia.modules.databaseConnector.connection;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
+import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.databaseConnector.util.Utils;
 import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
 import org.jahia.modules.databaseConnector.dsl.DSLHandler;
+import org.jahia.osgi.BundleResource;
+import org.jahia.services.SpringContextSingleton;
+import org.jahia.services.content.nodetypes.ExtendedNodeType;
+import org.jahia.services.content.nodetypes.NodeTypeRegistry;
+import org.jahia.services.content.nodetypes.ParseException;
 import org.jahia.utils.EncryptionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +31,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -28,7 +41,7 @@ import java.util.*;
  * @version 1.0
  */
 @Component(service = DatabaseConnectorManager.class)
-public class DatabaseConnectorManager implements InitializingBean {
+public class DatabaseConnectorManager implements InitializingBean, BundleListener{
 
     public static final String DATABASE_CONNECTOR_ROOT_PATH = "/settings/";
 
@@ -47,12 +60,25 @@ public class DatabaseConnectorManager implements InitializingBean {
     @Activate
     public void activate(BundleContext context) {
         this.context = context;
+        this.context.addBundleListener(this);
         databaseConnectionRegistries = new TreeMap<>();
         instance = this;
     }
 
     public static DatabaseConnectorManager getInstance() {
         return instance;
+    }
+
+    @Override
+    public void bundleChanged(BundleEvent bundleEvent) {
+        System.out.println("*****Bundle changed!!!");
+//        try {
+//            parseDefinitionWizards(bundleEvent.getBundle());
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public <T extends AbstractConnection> Map<String, T> getConnections(String databaseType) throws InstantiationException, IllegalAccessException {
@@ -262,6 +288,37 @@ public class DatabaseConnectorManager implements InitializingBean {
 
     public DatabaseConnectionRegistry getConnectionRegistryClassInstance(String databaseType) {
         return databaseConnectionRegistries.get(databaseType);
+    }
+
+    private boolean parseDefinitionWizards(Bundle bundle) throws ParseException, IOException {
+        JahiaTemplatesPackage packageById = org.jahia.osgi.BundleUtils.getModule(bundle);
+        DSLExecutor executor = (DSLExecutor) SpringContextSingleton.getBean("dslExecutor");
+        Map<String, DSLHandler> handlerMap = new HashMap<>();
+        handlerMap.put("directive", (DSLHandler) SpringContextSingleton.getBean("directiveHandler"));
+
+        boolean foundDefinitions = false;
+        if (packageById != null) {
+            List<String> definitionsFiles = new LinkedList<>(packageById.getDefinitionsFiles());
+
+            for (String definitionsFile : definitionsFiles) {
+                BundleResource bundleResource = new BundleResource(bundle.getResource(definitionsFile), bundle);
+                List<ExtendedNodeType> definitionsFromFile = NodeTypeRegistry.getInstance().getDefinitionsFromFile(bundleResource, bundle.getSymbolicName());
+                for (ExtendedNodeType type : definitionsFromFile) {
+                    if (!type.isMixin()) {
+                        List<String> superTypes = Arrays.asList(type.getDeclaredSupertypeNames());
+
+                        URL resource = bundle.getResource(type.getName().replace(":", "_") + "/html/" + StringUtils.substringAfter(type.getName(), ":") + ".wzd");
+                        if (resource != null) {
+                            if (superTypes.contains("dcmix:directiveDefinition")) {
+                                foundDefinitions = true;
+                                executor.execute(resource, handlerMap.get("directive"), packageById, type);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return foundDefinitions;
     }
 
     @Override
