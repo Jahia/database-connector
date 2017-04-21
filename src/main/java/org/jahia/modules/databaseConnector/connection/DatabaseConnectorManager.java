@@ -12,6 +12,7 @@ import org.jahia.services.SpringContextSingleton;
 import org.jahia.services.content.nodetypes.ExtendedNodeType;
 import org.jahia.services.content.nodetypes.NodeTypeRegistry;
 import org.jahia.services.content.nodetypes.ParseException;
+import org.jahia.settings.SettingsBean;
 import org.jahia.utils.EncryptionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,7 +42,7 @@ import java.util.*;
  * @version 1.0
  */
 @Component(service = DatabaseConnectorManager.class)
-public class DatabaseConnectorManager implements InitializingBean, BundleListener{
+public class DatabaseConnectorManager implements InitializingBean, BundleListener {
 
     public static final String DATABASE_CONNECTOR_ROOT_PATH = "/settings/";
 
@@ -56,6 +57,8 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     private Map<String, DSLHandler> dslHandlerMap;
     private Map<String, DatabaseConnectionRegistry> databaseConnectionRegistries;
     private Map<String, String> availableDatabaseTypes = new LinkedHashMap<>();
+    private final static Set<Long> installedBundles = new LinkedHashSet<>();
+    private SettingsBean settingsBean;
 
     @Activate
     public void activate(BundleContext context) {
@@ -71,14 +74,27 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     @Override
     public void bundleChanged(BundleEvent bundleEvent) {
-        System.out.println("*****Bundle changed!!!");
-//        try {
-//            parseDefinitionWizards(bundleEvent.getBundle());
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        if (settingsBean.isProcessingServer()) {
+            Bundle bundleEventBundle = bundleEvent.getBundle();
+//            if (bundleEvent.getType() == BundleEvent.STARTED || bundleEvent.getType() == BundleEvent.STOPPED) {
+//                FLush stuff here
+//            }
+            long bundleId = bundleEvent.getBundle().getBundleId();
+            if (bundleEvent.getType() == BundleEvent.INSTALLED || bundleEvent.getType() == BundleEvent.UPDATED) {
+                installedBundles.add(bundleId);
+            }
+            if ((bundleEvent.getType() == BundleEvent.RESOLVED && installedBundles.contains(bundleId)) || (bundleEventBundle.getState() == Bundle.RESOLVED && bundleEvent.getType() == BundleEvent.INSTALLED)) {
+                installedBundles.remove(bundleId);
+                try {
+                    logger.info("Parsing directive definitions");
+                    parseDefinitionWizards(bundleEvent.getBundle());
+                } catch (ParseException e) {
+                    logger.error("Parse exception: " + e.getMessage());
+                } catch (IOException e) {
+                    logger.error("IO exception: " + e.getMessage());
+                }
+            }
+        }
     }
 
     public <T extends AbstractConnection> Map<String, T> getConnections(String databaseType) throws InstantiationException, IllegalAccessException {
@@ -292,14 +308,9 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     private boolean parseDefinitionWizards(Bundle bundle) throws ParseException, IOException {
         JahiaTemplatesPackage packageById = org.jahia.osgi.BundleUtils.getModule(bundle);
-        DSLExecutor executor = (DSLExecutor) SpringContextSingleton.getBean("dslExecutor");
-        Map<String, DSLHandler> handlerMap = new HashMap<>();
-        handlerMap.put("directive", (DSLHandler) SpringContextSingleton.getBean("directiveHandler"));
-
         boolean foundDefinitions = false;
         if (packageById != null) {
             List<String> definitionsFiles = new LinkedList<>(packageById.getDefinitionsFiles());
-
             for (String definitionsFile : definitionsFiles) {
                 BundleResource bundleResource = new BundleResource(bundle.getResource(definitionsFile), bundle);
                 List<ExtendedNodeType> definitionsFromFile = NodeTypeRegistry.getInstance().getDefinitionsFromFile(bundleResource, bundle.getSymbolicName());
@@ -311,7 +322,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                         if (resource != null) {
                             if (superTypes.contains("dcmix:directiveDefinition")) {
                                 foundDefinitions = true;
-                                executor.execute(resource, handlerMap.get("directive"), packageById, type);
+                                dslExecutor.execute(resource, dslHandlerMap.get("directive"), packageById, type);
                             }
                         }
                     }
@@ -324,5 +335,9 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     @Override
     public void afterPropertiesSet() throws Exception {
 
+    }
+
+    public void setSettingsBean(SettingsBean settingsBean) {
+        this.settingsBean = settingsBean;
     }
 }
