@@ -6,6 +6,7 @@
 <%@ taglib prefix="functions" uri="http://www.jahia.org/tags/functions" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="query" uri="http://www.jahia.org/tags/queryLib" %>
+<%@ taglib prefix="dbconnector" uri="http://www.jahia.org/dbconnector/functions" %>
 <%--@elvariable id="currentNode" type="org.jahia.services.content.JCRNodeWrapper"--%>
 <%--@elvariable id="currentResource" type="org.jahia.services.render.Resource"--%>
 <%--@elvariable id="flowRequestContext" type="org.springframework.webflow.execution.RequestContext"--%>
@@ -31,6 +32,10 @@
 <c:if test="${empty i18nJSFile}">
     <template:addResources type="javascript" resources="i18n/database-connector-i18n.js"/>
 </c:if>
+
+<%--<formfactory:jsResources/>--%>
+<dbconnector:jsResources />
+
 <div ui-view id="main_${currentNode.identifier}"></div>
 
 <script>

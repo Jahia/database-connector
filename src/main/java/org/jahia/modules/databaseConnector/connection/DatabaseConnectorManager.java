@@ -494,30 +494,26 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         jcrTemplate.doExecuteWithSystemSessionAsUser(JahiaUserManagerService.getInstance().lookupRootUser().getJahiaUser(), Constants.EDIT_WORKSPACE, renderContext.getUILocale(), new JCRCallback<Object>() {
             @Override
             public String doInJCR(JCRSessionWrapper session) throws RepositoryException {
-                Set<String> allDependencies = renderContext.getSite().getInstalledModulesWithAllDependencies();
+                List<JahiaTemplatesPackage> dependencies = getDependentModules();
                 File jsFile = new File(filePath);
                 try {
                     FileWriter fw = new FileWriter(jsFile.getAbsoluteFile(), true);
                     BufferedWriter bw = new BufferedWriter(fw);
 
-                    for (String allDependency : allDependencies) {
+                    for (JahiaTemplatesPackage pack : dependencies) {
                         try {
-                            JahiaTemplatesPackage templatePackageById = templateManagerService.getTemplatePackageById(allDependency);
-                            if (templatePackageById != null) {
-                                QueryManager qm = session.getWorkspace().getQueryManager();
-                                String rootPath = templatePackageById.getRootFolderPath() + "/" + templatePackageById.getVersion().toString();
-                                Query q = qm.createQuery(MessageFormat.format(query, rootPath), Query.JCR_SQL2);
-                                NodeIterator ni = q.execute().getNodes();
+                            QueryManager qm = session.getWorkspace().getQueryManager();
+                            String rootPath = pack.getRootFolderPath() + "/" + pack.getVersion().toString();
+                            Query q = qm.createQuery(MessageFormat.format(query, rootPath), Query.JCR_SQL2);
+                            NodeIterator ni = q.execute().getNodes();
 
-                                while (ni.hasNext()) {
-                                    if (!allDependency.equals("database-connector")) {
-                                        extraResourceBundlePackages.add(allDependency);
-                                    }
-                                    JCRNodeWrapper node = (JCRNodeWrapper) ni.next();
-                                    String[] views = node.getPropertyAsString("views").split(" ");
-                                    for (String view : views) {
-                                        writeViewToWriter(node, renderContext, bw, view);
-                                    }
+                            while (ni.hasNext()) {
+                                //TODO make sure this is the right id
+                                extraResourceBundlePackages.add(pack.getId());
+                                JCRNodeWrapper node = (JCRNodeWrapper) ni.next();
+                                String[] views = node.getPropertyAsString("views").split(" ");
+                                for (String view : views) {
+                                    writeViewToWriter(node, renderContext, bw, view);
                                 }
                             }
                         } catch (RenderException e) {
@@ -532,6 +528,18 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             }
         });
     }
+    
+    private List<JahiaTemplatesPackage> getDependentModules() {
+        List<JahiaTemplatesPackage> packages = templateManagerService.getAvailableTemplatePackages();
+        JahiaTemplatesPackage currentPackage = templateManagerService.getTemplatePackageById("database-connector");
+        List<JahiaTemplatesPackage> dependents = new ArrayList<>();
+        for (JahiaTemplatesPackage pack : packages) {
+            if (pack.getDependencies().contains(currentPackage)) {
+                dependents.add(pack);
+            }
+        }
+        return packages;
+    } 
 
     /**
      * Renders and writes a given view, if it exists, to write buffer (bw).
