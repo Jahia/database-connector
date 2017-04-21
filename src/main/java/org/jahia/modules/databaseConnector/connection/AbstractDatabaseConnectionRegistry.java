@@ -4,6 +4,8 @@ import org.jahia.services.content.*;
 import org.jahia.utils.EncryptionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;

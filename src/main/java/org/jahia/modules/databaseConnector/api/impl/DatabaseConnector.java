@@ -1,6 +1,7 @@
 package org.jahia.modules.databaseConnector.api.impl;
 
 import org.jahia.modules.databaseConnector.connection.*;
+import org.jahia.modules.databaseConnector.factories.DatabaseConnectionRegistryFactory;
 import org.jahia.modules.databaseConnector.serialization.models.DbConnections;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;
@@ -157,5 +158,10 @@ public class DatabaseConnector implements DatabaseConnectorService {
     @Override
     public String setPassword(Map<String, Object> map, String password) {
         return databaseConnectorManager.setPassword(map, password);
+    }
+
+    @Override
+    public void deregisterConnectorFromRegistry(String connectionType) {
+        databaseConnectorManager.deregisterConnectorFromRegistry(connectionType);
     }
 }

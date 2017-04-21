@@ -36,4 +36,7 @@ public interface DatabaseConnectionRegistry<T> {
     Map<String, Object> prepareConnectionMapFromJSON(final Map<String, Object> result, final JSONObject jsonConnectionData) throws JSONException;
 
     Map<String, Object> prepareConnectionMapFromConnection (final AbstractConnection connection);
+
+    //Use do any logic before services in registry will be stopped and unregistered from connector and registry removed.
+    void beforeRegistryRemoval();
 }

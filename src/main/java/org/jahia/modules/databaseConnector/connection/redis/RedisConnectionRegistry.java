@@ -291,5 +291,10 @@ public class RedisConnectionRegistry extends AbstractDatabaseConnectionRegistry<
         result.put("weight", ((RedisConnection) connection).getWeight());
         return  result;
     }
+
+    @Override
+    public void beforeRegistryRemoval() {
+
+    }
 }
 

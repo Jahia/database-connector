@@ -36,4 +36,6 @@ public interface DatabaseConnectorService {
     Map<String, Object> getServerStatus(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException;
 
     String setPassword(Map<String, Object> map, String password);
+
+    public void deregisterConnectorFromRegistry(String connectionType);
 }

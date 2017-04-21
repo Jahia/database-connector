@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.jahia.data.templates.JahiaTemplatesPackage;
+import org.jahia.modules.databaseConnector.factories.DatabaseConnectionRegistryFactory;
 import org.jahia.modules.databaseConnector.util.Utils;
 import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
 import org.jahia.modules.databaseConnector.dsl.DSLHandler;
@@ -285,8 +286,8 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             DatabaseConnectionRegistryFactory.makeDatabaseConnectionRegistry(databaseConnectionRegistry);
             databaseConnectionRegistries.put(connectionType, databaseConnectionRegistry);
             Map registry = databaseConnectionRegistry.getRegistry();
-            Set set = registry.keySet();
-            for (Object connectionId : set) {
+            Set<String> set = registry.keySet();
+            for (String connectionId : set) {
                 //Only register the service if it was previously connected and registered.
                 if (((AbstractConnection) registry.get(connectionId)).isConnected()) {
                     ((AbstractConnection) registry.get(connectionId)).registerAsService();
@@ -296,6 +297,19 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    public <T extends AbstractConnection> void deregisterConnectorFromRegistry(String connectionType) {
+        DatabaseConnectionRegistry databaseConnectionRegistry = databaseConnectionRegistries.get(connectionType);
+        databaseConnectionRegistry.beforeRegistryRemoval();
+        Map<String, T> registry = databaseConnectionRegistries.get(connectionType).getRegistry();
+        for (Map.Entry<String, T> entry: registry.entrySet()) {
+            T connection = entry.getValue();
+            if (connection.isConnected()) {
+                connection.unregisterAsService();
+            }
+        }
+        databaseConnectionRegistries.remove(connectionType);
     }
 
     public BundleContext getBundleContext() {

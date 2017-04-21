@@ -1,4 +1,6 @@
-package org.jahia.modules.databaseConnector.connection;
+package org.jahia.modules.databaseConnector.factories;
+
+import org.jahia.modules.databaseConnector.connection.DatabaseConnectionRegistry;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
