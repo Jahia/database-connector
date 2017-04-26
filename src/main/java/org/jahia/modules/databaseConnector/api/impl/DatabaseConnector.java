@@ -1,6 +1,7 @@
 package org.jahia.modules.databaseConnector.api.impl;
 
 import org.jahia.modules.databaseConnector.connection.*;
+import org.jahia.modules.databaseConnector.connector.AbstractConnectorMetaData;
 import org.jahia.modules.databaseConnector.factories.DatabaseConnectionRegistryFactory;
 import org.jahia.modules.databaseConnector.serialization.models.DbConnections;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
@@ -56,12 +57,12 @@ public class DatabaseConnector implements DatabaseConnectorService {
         return connections == null ? new JSONArray().toString() : connections;
     }
 
-    public String getDatabaseTypes() throws JSONException {
-        JSONObject databaseTypes = new JSONObject();
-        for ( Map.Entry<String, String> entry: this.databaseConnectorManager.getAvailableDatabaseTypes().entrySet()) {
-            databaseTypes.put(entry.getKey(), entry.getValue());
+    public String getConnectorsMetaData() throws JSONException {
+        JSONObject connectorsMetaData = new JSONObject();
+        for ( Map.Entry<String, AbstractConnectorMetaData> entry: this.databaseConnectorManager.getAvailableConnectors().entrySet()) {
+            connectorsMetaData.put(entry.getKey(), new JSONObject(entry.getValue().getJson()));
         }
-        return databaseTypes.toString();
+        return connectorsMetaData.toString();
     }
 
     public File exportConnections(JSONObject data)

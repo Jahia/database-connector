@@ -1,5 +1,6 @@
 package org.jahia.modules.databaseConnector.connection;
 
+import org.jahia.modules.databaseConnector.connector.AbstractConnectorMetaData;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,6 +29,8 @@ public interface DatabaseConnectionRegistry<T> {
     boolean connect(final String databaseConnectionId);
 
     boolean disconnect(final String databaseConnectionId);
+
+    AbstractConnectorMetaData getConnectorMetaData();
 
     String getConnectionType();
 

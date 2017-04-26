@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.jahia.api.Constants;
 import org.jahia.data.templates.JahiaTemplatesPackage;
+import org.jahia.modules.databaseConnector.connector.AbstractConnectorMetaData;
 import org.jahia.modules.databaseConnector.factories.DatabaseConnectionRegistryFactory;
 import org.jahia.modules.databaseConnector.util.Utils;
 import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
@@ -70,7 +71,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     private DSLExecutor dslExecutor;
     private Map<String, DSLHandler> dslHandlerMap;
     private Map<String, DatabaseConnectionRegistry> databaseConnectionRegistries;
-    private Map<String, String> availableDatabaseTypes = new LinkedHashMap<>();
+    private Map<String, AbstractConnectorMetaData> availableConnectors = new LinkedHashMap<>();
     private final static Set<Long> installedBundles = new LinkedHashSet<>();
     private final static Map<String, String> angularConfigFilesPath = new HashMap<>();
     private final static Map<String, Long> angularConfigFilesTimestamp = new HashMap<>();
@@ -205,8 +206,8 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             file = File.createTempFile("temporaryImportFile", ".wzd");
             FileUtils.copyInputStreamToFile(source, file);
             dslExecutor.execute(file.toURI().toURL(), dslHandlerMap.get("importConnection"), parsedConnections);
-            for (Map.Entry<String, String> entry: this.availableDatabaseTypes.entrySet()) {
-                String databaseType = entry.getKey();
+            for (Map.Entry<String, AbstractConnectorMetaData> entry: this.availableConnectors.entrySet()) {
+                String databaseType = entry.getValue().getDatabaseType();
                 if (parsedConnections.containsKey(databaseType)) {
                     Map<String, List> results = new LinkedHashMap<>();
                     List<Map> validConnections = new LinkedList();
@@ -315,8 +316,8 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     }
 
-    public Map<String, String> getAvailableDatabaseTypes() {
-        return availableDatabaseTypes;
+    public Map<String, AbstractConnectorMetaData> getAvailableConnectors() {
+        return availableConnectors;
     }
 
     public void registerConnectorToRegistry(String connectionType, DatabaseConnectionRegistry databaseConnectionRegistry) {
@@ -332,7 +333,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                     ((AbstractConnection) registry.get(connectionId)).registerAsService();
                 }
             }
-            availableDatabaseTypes.put(databaseConnectionRegistry.getConnectionType(), databaseConnectionRegistry.getConnectionDisplayName());
+            availableConnectors.put(databaseConnectionRegistry.getConnectionType(), databaseConnectionRegistry.getConnectorMetaData());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }

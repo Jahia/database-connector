@@ -1,6 +1,8 @@
 package org.jahia.modules.databaseConnector.util;
 
 import org.jahia.services.content.JCRSessionWrapper;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.query.Query;
@@ -22,5 +24,10 @@ public class Utils {
         QueryManager queryManager = session.getWorkspace().getQueryManager();
         Query query = queryManager.createQuery(statement, Query.JCR_SQL2);
         return query.execute();
+    }
+
+    public static Object getService(Class classObj, BundleContext context) {
+        ServiceReference ref = context.getServiceReference(classObj.getName());
+        return ref != null ? context.getService(ref) : ref;
     }
 }

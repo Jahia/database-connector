@@ -26,11 +26,8 @@ package org.jahia.modules.databaseConnector.api;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.connection.AbstractDatabaseConnectionRegistry;
-import org.jahia.modules.databaseConnector.connection.DatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;
-import org.jahia.modules.databaseConnector.util.Utils;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
-import org.jahia.modules.databaseConnector.api.subresources.RedisDB;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,7 +55,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @author stefan on 2016-05-02.
  */
 @Component(service = DCApi.class)
-@Path("/databaseconnector")
+@Path("/dbconn")
 @Produces({"application/hal+json"})
 public class DCApi {
     private static final Logger logger = getLogger(DCApi.class);
@@ -83,11 +80,11 @@ public class DCApi {
     }
 
     @GET
-    @Path("/databasetypes")
+    @Path("/connectorsmetadata")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getDatabaseTypes() {
+    public Response getConnectorsMetaData() {
         try {
-            return Response.status(Response.Status.OK).entity(databaseConnector.getDatabaseTypes()).build();
+            return Response.status(Response.Status.OK).entity(databaseConnector.getConnectorsMetaData()).build();
         } catch (JSONException ex) {
             logger.error("Failed to retrieve database types", ex.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Failed to retrieve database types\"}").build();
@@ -108,13 +105,6 @@ public class DCApi {
             logger.error("Failed to perform import", ex.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Failed to perform import\"}").build();
         }
-    }
-
-    //SUBRESOURCES MAPPINGS
-
-    @Path(RedisDB.MAPPING)
-    public Class<RedisDB> getRedisDBSubResource() {
-        return RedisDB.class;
     }
 
     @POST
@@ -261,5 +251,4 @@ public class DCApi {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
         }
     }
-
 }

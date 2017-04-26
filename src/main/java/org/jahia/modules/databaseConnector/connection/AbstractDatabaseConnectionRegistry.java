@@ -1,11 +1,10 @@
 package org.jahia.modules.databaseConnector.connection;
 
+import org.jahia.modules.databaseConnector.connector.AbstractConnectorMetaData;
 import org.jahia.services.content.*;
 import org.jahia.utils.EncryptionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -39,6 +38,8 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
     protected JCRTemplate jcrTemplate;
 
     protected static final Pattern ALPHA_NUMERIC_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
+
+    protected AbstractConnectorMetaData connectorMetaData;
 
     public AbstractDatabaseConnectionRegistry() {
         this.jcrTemplate = JCRTemplate.getInstance();

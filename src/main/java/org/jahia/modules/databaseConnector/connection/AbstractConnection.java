@@ -1,7 +1,5 @@
 package org.jahia.modules.databaseConnector.connection;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
