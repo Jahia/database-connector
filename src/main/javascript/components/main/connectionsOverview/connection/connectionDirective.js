@@ -37,7 +37,7 @@
         cc.goToStatus = goToStatus;
         cc.serverStatusAvailable = serverStatusAvailable;
         cc.$onInit = function() {
-            cc.imageUrl = contextualData.context + '/modules/database-connector/images/' + cc.connection.databaseType.toLowerCase() + '/logo_60.png';
+            cc.imageUrl = contextualData.context + '/modules/' + contextualData.connectorsMetaData[cc.connection.databaseType].moduleName + '/images/' + cc.connection.databaseType.toLowerCase() + '/logo_60.png';
             cc.originalConnection = angular.copy(cc.connection);
 
             $scope.$on('resetExportSelection', function(){
@@ -60,7 +60,7 @@
 
         function updateConnection(connect) {
             cc.spinnerOptions.showSpinner = true;
-            var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[cc.connection.databaseType] + '/' + (connect ? 'connect' : 'disconnect') + '/' + cc.connection.id;
+            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cc.connection.databaseType].entryPoint + (connect ? '/connect/' : '/disconnect/') + cc.connection.id;
             dcDataFactory.customRequest({
                 url: url,
                 method: 'PUT'
@@ -117,7 +117,7 @@
 
         function deleteConnection() {
             cc.spinnerOptions.showSpinner = true;
-            var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[cc.connection.databaseType] + '/' +'remove'+ '/' + cc.connection.id;
+            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cc.connection.databaseType].entryPoint + '/remove/' + cc.connection.id;
             dcDataFactory.customRequest({
                 url: url,
                 method: 'DELETE'
@@ -170,7 +170,7 @@
         }
 
         function getUpdatedConnection() {
-            var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[cc.connection.databaseType] + '/connection/' + cc.connection.id;
+            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cc.connection.databaseType].entryPoint + '/connection/' + cc.connection.id;
             dcDataFactory.customRequest({
                 url: url,
                 method: 'GET'
@@ -205,7 +205,7 @@
 
         function verifyServerStatus() {
             //verify if this connection is authenticated to retrieve server status
-            var url = contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[cc.connection.databaseType] + '/status/' + cc.connection.id;
+            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cc.connection.databaseType].entryPoint + '/status/' + cc.connection.id;
             dcDataFactory.customRequest({
                 url: url,
                 method: 'GET'

@@ -4,7 +4,7 @@
             getData: getData,
             customRequest: customRequest,
             parseRedisStatus: parseRedisStatus,
-            getDatabaseTypes: getDatabaseTypes
+            getConnectorsMetaData: getConnectorsMetaData
         };
 
         function getData(url) {
@@ -44,9 +44,9 @@
             return response;
         }
 
-        function getDatabaseTypes() {
+        function getConnectorsMetaData() {
             return customRequest({
-                url: contextualData.context + '/modules/databaseconnector/databasetypes',
+                url: contextualData.apiUrl + '/connectorsmetadata',
                 method: 'GET'
             });
         }

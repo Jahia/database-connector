@@ -23,6 +23,7 @@
  */
 package org.jahia.modules.databaseConnector.api;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.osgi.framework.BundleContext;
@@ -59,6 +60,8 @@ public class DCApiApplication extends Application {
         // register resources and features
         classes.add(MultiPartFeature.class);
         classes.add(LoggingFilter.class);
+        classes.add(JacksonJaxbJsonProvider.class);
+        classes.add(HeadersResponseFilter.class);
         return classes;
     }
 }

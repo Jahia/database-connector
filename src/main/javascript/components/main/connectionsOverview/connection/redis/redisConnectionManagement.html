@@ -51,7 +51,7 @@
                         <input title="Connection Name" md-maxlength="30" name="id" required
                                ng-pattern="/^[a-zA-Z0-9]+$/"
                                ng-model="rcm.connection.id" original-value="{{rcm.connection.oldId}}"
-                               connection-id-validator="redis">
+                               connection-id-validator="{{cmcc.databaseType.toLowerCase()}}">
                         <div ng-messages="redisForm.id.$error">
                             <div ng-message-exp="validationName"
                                  ng-repeat="(validationName, validationMessage) in rcm.validations.id"

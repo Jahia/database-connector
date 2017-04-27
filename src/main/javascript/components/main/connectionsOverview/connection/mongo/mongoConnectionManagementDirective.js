@@ -9,7 +9,8 @@
             controllerAs: 'cmcc',
             bindToController: {
                 mode: '@',
-                connection: '='
+                connection: '=',
+                databaseType: '@'
             },
             link: linkFunc
         };
@@ -44,7 +45,7 @@
                 'minlength': i18n.format('dc_databaseConnector.label.validation.minLength', '4')
             },
             port: {
-                'pattern': i18n.format('dc_databaseConnector.label.validation.range', '1|65535'),
+                'pattern': i18n.format('dc_databaseConnector.label.validation.range', '1|65535')
             },
             id: {
                 'required': i18n.message('dc_databaseConnector.label.validation.required'),
@@ -110,7 +111,9 @@
         cmcc.getMessage = i18n.message;
 
         cmcc.$onInit = function init() {
-            var url = contextualData.context + '/modules/databaseconnector/mongodb/writeconcernoptions';
+            console.log(contextualData.connectorsMetaData);
+            console.log(cmcc.connection);
+            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cmcc.databaseType].entryPoint + '/writeconcernoptions';
             dcDataFactory.customRequest({
                 url: url,
                 method: 'GET'
@@ -153,7 +156,7 @@
                 return;
             }
             cmcc.spinnerOptions.showSpinner = true;
-            var url = contextualData.context + '/modules/databaseconnector/mongodb/add';
+            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cmcc.databaseType].entryPoint + '/add';
 
             var data = angular.copy(cmcc.connection);
             var options = prepareOptions(data.options);
@@ -192,7 +195,7 @@
                 return;
             }
             cmcc.spinnerOptions.showSpinner = true;
-            var url = contextualData.context + '/modules/databaseconnector/mongodb/edit';
+            var url = contextualData.apiUrl + '/mongo/edit';
             var data = angular.copy(cmcc.connection);
             var options = prepareOptions(data.options);
             if (options == null) {
@@ -226,7 +229,8 @@
 
         function testMongoConnection() {
             cmcc.spinnerOptions.showSpinner = true;
-            var url = contextualData.context + '/modules/databaseconnector/mongodb/testconnection';
+            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cmcc.databaseType].entryPoint + '/testconnection';
+            console.log(url);
             var data = angular.copy(cmcc.connection);
             var options = prepareOptions(data.options);
             if (options == null) {

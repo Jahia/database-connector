@@ -35,7 +35,7 @@
         };
 
         function init() {
-            getDatabaseTypes();
+            getConnectorsMetaData();
             getAllConnections();
         }
 
@@ -46,7 +46,7 @@
             
             if (file) {
                 var request = {
-                    url: contextualData.context + '/modules/databaseconnector/import',
+                    url: contextualData.apiUrl + '/import',
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/octet-stream'
@@ -86,7 +86,7 @@
         }
         function getAllConnections() {
             return $q(function(resolve, reject){
-                var url = contextualData.context + '/modules/databaseconnector/getallconnections';
+                var url = contextualData.apiUrl + '/getallconnections';
                 dcDataFactory.customRequest({
                     url: url,
                     method: 'GET'
@@ -99,9 +99,10 @@
                 });
             });
         }
-        function getDatabaseTypes() {
-            dcDataFactory.getDatabaseTypes().then(function(response){
-                coc.databaseTypes = response;
+        function getConnectorsMetaData() {
+            dcDataFactory.getConnectorsMetaData().then(function(response){
+                coc.connectorsMetaData = response;
+                contextualData.connectorsMetaData = angular.copy(coc.connectorsMetaData);
             });
         }
 
@@ -139,7 +140,7 @@
                     data[i] = _.keys(coc.exportConnections[i]);
                 }
             }
-            var url = contextualData.context + '/modules/databaseconnector/export/' + multipleConnections;
+            var url = contextualData.apiUrl + '/export/' + multipleConnections;
             return dcDownloadFactory.download(url, 'text/plain', data).$promise
                 .then(function (data) {
                     // promise fulfilled
@@ -184,7 +185,11 @@
 
         function init() {
             $scope.cpc.connection = {};
-            getDatabaseTypes();
+            $scope.cpc.images = {};
+            $scope.cpc.databaseTypes = angular.copy(contextualData.connectorsMetaData);
+            for (var i in $scope.cpc.databaseTypes) {
+                $scope.cpc.images[$scope.cpc.databaseTypes[i].databaseType] = contextualData.context + '/modules/' + $scope.cpc.databaseTypes[i].moduleName  + '/images/' + $scope.cpc.databaseTypes[i].databaseType.toLowerCase() + '/logo_60.png';
+            }
         }
 
 
@@ -196,20 +201,6 @@
             resetCreationProcess();
         });
 
-
-        function getDatabaseTypes() {
-            var url = contextualData.context + '/modules/databaseconnector/databasetypes';
-            dcDataFactory.customRequest({
-                url: url,
-                method: 'GET'
-            }).then(function(response) {
-                $scope.cpc.images = {};
-                $scope.cpc.databaseTypes = response;
-                for (var databaseType in $scope.cpc.databaseTypes) {
-                    $scope.cpc.images[databaseType] = contextualData.context + '/modules/database-connector/images/' + databaseType.toLowerCase() + '/logo_60.png';
-                }
-            }, function(response) {});
-        }
 
         function resetCreationProcess() {
             $scope.cpc.connection = {};

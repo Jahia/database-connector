@@ -9,7 +9,8 @@
             controllerAs: 'rcm',
             bindToController: {
                 mode: '@',
-                connection: '='
+                connection: '=',
+                databaseType: '@'
             },
             link: linkFunc
         };
@@ -109,7 +110,7 @@
                 return;
             }
             rcm.spinnerOptions.showSpinner = true;
-            var url = contextualData.context + '/modules/databaseconnector/redis/add';
+            var url = contextualData.apiUrl + contextualData.connectorsMetaData[rcm.connection.databaseType].entryPoint + '/add';
             var data = angular.copy(rcm.connection);
             var options = prepareOptions(data.options);
             if (options == null) {
@@ -141,7 +142,7 @@
                 return;
             }
             rcm.spinnerOptions.showSpinner = true;
-            var url = contextualData.context + '/modules/databaseconnector/redis/edit';
+            var url = contextualData.apiUrl + contextualData.connectorsMetaData[rcm.connection.databaseType].entryPoint + '/edit';
             var data = angular.copy(rcm.connection);
             var options = prepareOptions(data.options);
             if (options == null) {
@@ -170,7 +171,7 @@
 
         function testRedisConnection() {
             rcm.spinnerOptions.showSpinner = true;
-            var url = contextualData.context + '/modules/databaseconnector/redis/testconnection';
+            var url = contextualData.apiUrl + contextualData.connectorsMetaData[rcm.connection.databaseType].entryPoint + '/testconnection';
             var data = angular.copy(rcm.connection);
             var options = prepareOptions(data.options);
             if (options == null) {

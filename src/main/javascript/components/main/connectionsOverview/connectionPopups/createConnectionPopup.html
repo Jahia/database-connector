@@ -8,16 +8,16 @@
         <md-dialog-content class="databaseSelection">
             <div ng-if="!cpc.databaseTypeSelected">
                 <div layout layout-wrap>
-                    <div ng-repeat="(databaseType, displayableName) in cpc.databaseTypes" flex="50">
-                        <md-button class="md-button" layout-margin ng-click="cpc.setSelectedDatabaseType(databaseType)">
-                            <img ng-src="{{cpc.images[databaseType]}}">
+                    <div ng-repeat="(i, connectorMetaData) in cpc.databaseTypes" flex="50">
+                        <md-button class="md-button" layout-margin ng-click="cpc.setSelectedDatabaseType(connectorMetaData.databaseType)">
+                            <img ng-src="{{cpc.images[connectorMetaData.databaseType]}}">
                         </md-button>
                     </div>
                 </div>
             </div>
             <div ng-switch="cpc.selectedDatabaseType">
-                <mongo-connection-management ng-switch-when="MONGO" mode="create" connection="cpc.connection"></mongo-connection-management>
-                <redis-connection-management ng-switch-when="REDIS" mode="create" connection="cpc.connection"></redis-connection-management>
+                <mongo-connection-management ng-switch-when="MONGO" mode="create" database-type="{{cpc.selectedDatabaseType}}" connection="cpc.connection"></mongo-connection-management>
+                <redis-connection-management ng-switch-when="REDIS" mode="create" database-type="{{cpc.selectedDatabaseType}}" connection="cpc.connection"></redis-connection-management>
             </div>
         </md-dialog-content>
 </md-dialog>

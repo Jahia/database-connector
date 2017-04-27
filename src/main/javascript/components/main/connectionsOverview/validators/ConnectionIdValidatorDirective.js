@@ -18,7 +18,7 @@
                     return $q.when(true);
                 }
                 var deferred = $q.defer();
-                var url = contextualData.context + '/modules/databaseconnector/' + databaseType + '/isconnectionvalid/' + viewValue;
+                var url = contextualData.apiUrl + contextualData.connectorsMetaData[databaseType].entryPoint + '/isconnectionvalid/' + viewValue;
                 dcDataFactory.customRequest({
                     url: url,
                     method: 'GET'
