@@ -71,7 +71,7 @@ public class Functions {
         } catch (RepositoryException e){
             try {
                 JCRSessionWrapper session = renderContext.getMainResource().getNode().getSession();
-                QueryResultWrapper execute = session.getWorkspace().getQueryManager().createQuery("select * from [fcmix:directiveDefinition] where localname() = '" + StringUtils.substringAfterLast(endOfUri, "/") + "'", Query.JCR_SQL2).execute();
+                QueryResultWrapper execute = session.getWorkspace().getQueryManager().createQuery("select * from [dcmix:directiveDefinition] where localname() = '" + StringUtils.substringAfterLast(endOfUri, "/") + "'", Query.JCR_SQL2).execute();
                 if (execute.getNodes().hasNext()) {
                     path += execute.getNodes().nextNode().getPath() + ".html.ajax";
                 }
