@@ -1,5 +1,6 @@
 package org.jahia.modules.databaseConnector.connection;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
@@ -379,6 +380,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     /********************************************************************************************
      * Definition parsing and file aggregation below
      ********************************************************************************************/
+
 
     private boolean parseDefinitionWizards(Bundle bundle) throws ParseException, IOException {
         JahiaTemplatesPackage packageById = org.jahia.osgi.BundleUtils.getModule(bundle);

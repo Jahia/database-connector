@@ -20,4 +20,11 @@
         <tag-class>org.jahia.modules.databaseConnector.taglib.JsResourceLoader</tag-class>
         <body-content>JSP</body-content>
     </tag>
+    <function>
+        <description>Add Database Connector module path to your element with base and context</description>
+        <name>addDatabaseConnectorModulePath</name>
+        <function-class>org.jahia.modules.databaseConnector.taglib.Functions</function-class>
+        <function-signature>java.lang.String addDatabaseConnectorModulePath(java.lang.String,org.jahia.services.render.RenderContext)</function-signature>
+        <example>${dbconnector:addDatabaseConnectorModulePath('/database-connector-directive/my-directive', renderContext)}</example>
+    </function>
 </taglib>
