@@ -162,7 +162,8 @@
                             org.jahia.modules.databaseConnector.services,
                             org.jahia.modules.databaseConnector.connection,
                             org.jahia.modules.databaseConnector.connector,
-                            org.jahia.modules.databaseConnector.util
+                            org.jahia.modules.databaseConnector.util,
+                            org.jahia.modules.databaseConnector.taglib
                         </Export-Package>
                         <Jahia-Depends>default,serverSettings</Jahia-Depends>
                         <JAX-RS-Alias>/dbconn</JAX-RS-Alias>
