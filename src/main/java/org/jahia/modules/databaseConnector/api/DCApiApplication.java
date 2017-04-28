@@ -26,6 +26,7 @@ package org.jahia.modules.databaseConnector.api;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.jahia.modules.databaseConnector.api.filters.HeadersResponseFilter;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 

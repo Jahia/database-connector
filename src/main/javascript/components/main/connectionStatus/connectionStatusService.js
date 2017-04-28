@@ -29,7 +29,7 @@
 
         function requestConnectionStatusEvent() {
            dcDataFactory.customRequest({
-                url: contextualData.context + '/modules/databaseconnector/' + contextualData.entryPoints[databaseType] + '/status/' + connectionId, 
+                url: contextualData.apiUrl + contextualData.connectorsMetaData[databaseType].entryPoint + '/status/' + connectionId,
                 method: 'GET'
            }).then(function(response) {
                currentConnectionStatus = databaseType == 'REDIS' ? dcDataFactory.parseRedisStatus(response.success) : response.success;

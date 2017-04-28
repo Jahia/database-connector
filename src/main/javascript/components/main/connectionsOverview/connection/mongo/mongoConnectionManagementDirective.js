@@ -111,8 +111,6 @@
         cmcc.getMessage = i18n.message;
 
         cmcc.$onInit = function init() {
-            console.log(contextualData.connectorsMetaData);
-            console.log(cmcc.connection);
             var url = contextualData.apiUrl + contextualData.connectorsMetaData[cmcc.databaseType].entryPoint + '/writeconcernoptions';
             dcDataFactory.customRequest({
                 url: url,
@@ -230,7 +228,6 @@
         function testMongoConnection() {
             cmcc.spinnerOptions.showSpinner = true;
             var url = contextualData.apiUrl + contextualData.connectorsMetaData[cmcc.databaseType].entryPoint + '/testconnection';
-            console.log(url);
             var data = angular.copy(cmcc.connection);
             var options = prepareOptions(data.options);
             if (options == null) {

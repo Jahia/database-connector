@@ -21,7 +21,7 @@
  * <p>
  * ==========================================================================================
  */
-package org.jahia.modules.databaseConnector.api;
+package org.jahia.modules.databaseConnector.api.filters;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
