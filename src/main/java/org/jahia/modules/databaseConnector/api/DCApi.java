@@ -25,6 +25,7 @@ package org.jahia.modules.databaseConnector.api;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.jahia.modules.databaseConnector.api.impl.DirectivesRetriever;
 import org.jahia.modules.databaseConnector.connection.AbstractDatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
@@ -249,6 +250,18 @@ public class DCApi {
         } catch (IllegalAccessException ex) {
             logger.error("Cannot access connection class" + ex.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
+        }
+    }
+
+    @GET
+    @Path("/alldirectives")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllAvailableDirectives() {
+        try {
+            return Response.status(Response.Status.OK).entity(DirectivesRetriever.getAllDirectives().getJson()).build();
+        } catch (RepositoryException e) {
+            logger.error("Cannot get directives" + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot get directives\"}").build();
         }
     }
 }
