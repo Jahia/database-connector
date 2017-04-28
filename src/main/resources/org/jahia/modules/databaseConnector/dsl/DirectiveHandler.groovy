@@ -26,12 +26,7 @@ class DirectiveHandler implements DSLHandler {
     private static final Logger logger = LoggerFactory.getLogger(DirectiveHandler.class);
     def JCRTemplate jcrTemplate;
 
-//    @Reference(cardinality = ReferenceCardinality.MANDATORY, policy = ReferencePolicy.STATIC, service = JCRTemplate.class)
-//    public void setJCRTemplate(JCRTemplate jcrTemplate) {
-//        this.jcrTemplate = jcrTemplate;
-//    }
-
-    def directive(@DelegatesTo(DatabaseConnectorWizardParser) Closure cl) {
+    def directives(@DelegatesTo(DatabaseConnectorWizardParser) Closure cl) {
         parseDeclaration(cl)
     }
 
@@ -47,17 +42,17 @@ class DirectiveHandler implements DSLHandler {
 
     def createWizard(Map<String, Object> map, JahiaTemplatesPackage currentPackage, ExtendedNodeType currentNodeType) {
         assert map.containsKey("label")
-        assert map.containsKey("tag")
-        assert map.containsKey("views")
+        assert map.containsKey("statusDirectives")
+        assert map.containsKey("connectionDirective")
         jcrTemplate.doExecuteWithSystemSessionAsUser(JahiaUserManagerService.instance.lookupRootUser().jahiaUser, Constants.EDIT_WORKSPACE, Locale.ENGLISH, new JCRCallback() {
             @Override
             Object doInJCR(JCRSessionWrapper jcrSessionWrapper) throws RepositoryException {
                 JCRNodeWrapper bundleRootNode = jcrSessionWrapper.getNode(currentPackage.rootFolderPath + "/" + currentPackage.getVersion().toString())
                 def rNodeWrapper = bundleRootNode.getNode("templates").getNode("contents")
-                if (!rNodeWrapper.hasNode("database-connector-directive")) {
-                    rNodeWrapper.addNode("database-connector-directive","jnt:contentFolder")
+                if (!rNodeWrapper.hasNode("database-connector-directives")) {
+                    rNodeWrapper.addNode("database-connector-directives","jnt:contentFolder")
                 }
-                def directiveRootNode = rNodeWrapper.getNode("database-connector-directive")
+                def directiveRootNode = rNodeWrapper.getNode("database-connector-directives")
                 def nodeName = JCRContentUtils.generateNodeName(map["label"], 32)
 
                 if (directiveRootNode.hasNode(nodeName)) {
@@ -75,17 +70,24 @@ class DirectiveHandler implements DSLHandler {
                 node.setProperty(Constants.JCR_TITLE, map["label"])
                 map.remove("label")
 
-                def views
-                if (map.get("views") instanceof List) {
-                    views = (List<String>) map.get("views")
-                } else {
-                    views = [map.get("views")]
-                }
-                node.setProperty("views", views.toArray(new String[views.size()]))
-                map.remove("views")
+                //Need to save so that statusDirectives node is autocreated
+                jcrSessionWrapper.save()
 
-                node.setProperty("tag", map["tag"])
-                map.remove("tag")
+                def properties = map["statusDirectives"]
+                JCRNodeWrapper statusDirectives = node.getNode("statusDirectives");
+                properties.each { key, value ->
+                    def directiveNode = statusDirectives.addNode(key, "dc:directiveDefinition")
+                    if (value instanceof String) {
+                        directiveNode.setProperty("name", key)
+                        directiveNode.setProperty("tag", value)
+                    }
+                }
+                map.remove("statusDirectives")
+
+                JCRNodeWrapper connectionDirective = node.addNode("connectionDirective", "dc:directiveDefinition")
+                connectionDirective.setProperty("name", "connectionDirective")
+                connectionDirective.setProperty("tag", map["connectionDirective"])
+
 
                 jcrSessionWrapper.save()
                 return null

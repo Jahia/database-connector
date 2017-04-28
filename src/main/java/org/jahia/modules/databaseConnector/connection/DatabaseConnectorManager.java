@@ -396,7 +396,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
                         URL resource = bundle.getResource(type.getName().replace(":", "_") + "/html/" + StringUtils.substringAfter(type.getName(), ":") + ".wzd");
                         if (resource != null) {
-                            if (superTypes.contains("dcmix:directiveDefinition")) {
+                            if (superTypes.contains("dcmix:directivesDefinition")) {
                                 foundDefinitions = true;
                                 dslExecutor.execute(resource, dslHandlerMap.get("directive"), packageById, type);
                             }

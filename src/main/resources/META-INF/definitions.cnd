@@ -29,7 +29,14 @@
  + * (dcmix:databaseConnection)
 
 
-[dcmix:directiveDefinition] > mix:title mixin
+[dcmix:directivesDefinition] > mix:title mixin
 - label (string) i18n
-- tag (string)
-- views (string) multiple
++ statusDirectives (dc:statusDirectives) = dc:statusDirectives autocreated
++ * (dc:directiveDefinition) = dc:directiveDefinition
+
+[dc:directiveDefinition] > jnt:content
+- name (string)
+- tag  (string)
+
+[dc:statusDirectives] > jnt:content
++ * (dc:directiveDefinition) = dc:directiveDefinition
