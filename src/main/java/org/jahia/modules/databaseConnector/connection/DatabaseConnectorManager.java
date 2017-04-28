@@ -13,10 +13,7 @@ import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
 import org.jahia.modules.databaseConnector.dsl.DSLHandler;
 import org.jahia.osgi.BundleResource;
 import org.jahia.services.SpringContextSingleton;
-import org.jahia.services.content.JCRCallback;
-import org.jahia.services.content.JCRNodeWrapper;
-import org.jahia.services.content.JCRSessionWrapper;
-import org.jahia.services.content.JCRTemplate;
+import org.jahia.services.content.*;
 import org.jahia.services.content.nodetypes.ExtendedNodeType;
 import org.jahia.services.content.nodetypes.NodeTypeRegistry;
 import org.jahia.services.content.nodetypes.ParseException;
@@ -514,7 +511,8 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                             while (ni.hasNext()) {
                                 extraResourceBundlePackages.add(pack.getId());
                                 JCRNodeWrapper node = (JCRNodeWrapper) ni.next();
-                                String[] views = node.getPropertyAsString("views").split(" ");
+//                                String[] views = node.getPropertyAsString("views").split(" ");
+                                String[] views = getDirectiveViews(node);
                                 for (String view : views) {
                                     writeViewToWriter(node, renderContext, bw, view);
                                 }
@@ -530,6 +528,17 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                 return null;
             }
         });
+    }
+
+    private String[] getDirectiveViews(JCRNodeWrapper node) throws RepositoryException {
+        List<String> views = new ArrayList<>();
+        views.add("connectionDirective");
+        JCRNodeWrapper statusDirectives = node.getNode("statusDirectives");
+        List<JCRNodeWrapper> sd = JCRContentUtils.getChildrenOfType(statusDirectives, "dc:directiveDefinition");
+        for (JCRNodeWrapper d : sd) {
+            views.add(d.getPropertyAsString("name"));
+        }
+        return (String[]) views.toArray();
     }
     
     private List<JahiaTemplatesPackage> getDependentModules() {
