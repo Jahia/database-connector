@@ -12,9 +12,9 @@ import java.util.List;
 public class Directives {
     private String label;
     private Directive connectionDirective;
-    private List<Directives> statusDirectives;
+    private List<Directive> statusDirectives;
 
-    public Directives(String label, Directive connectionDirective, List<Directives> statusDirectives) {
+    public Directives(String label, Directive connectionDirective, List<Directive> statusDirectives) {
         this.label = label;
         this.connectionDirective = connectionDirective;
         this.statusDirectives = statusDirectives;
@@ -36,11 +36,11 @@ public class Directives {
         this.connectionDirective = connectionDirective;
     }
 
-    public List<Directives> getStatusDirectives() {
+    public List<Directive> getStatusDirectives() {
         return statusDirectives;
     }
 
-    public void setStatusDirectives(List<Directives> statusDirectives) {
+    public void setStatusDirectives(List<Directive> statusDirectives) {
         this.statusDirectives = statusDirectives;
     }
 
