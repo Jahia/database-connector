@@ -24,7 +24,8 @@
         .module('databaseConnector')
         .directive('dcConnection', ['$log', 'contextualData', Connection]);
 
-    var ConnectionController = function($scope, contextualData, dcDataFactory, $mdDialog, $filter, toaster, $state, i18n) {
+    var ConnectionController = function($scope, contextualData, dcDataFactory,
+                                        $mdDialog, $filter, toaster, $state, i18n, $DCSS, $DCCMS) {
         var cc = this;
         cc.spinnerOptions = {
             mode: 'indeterminate',
@@ -37,64 +38,32 @@
         cc.goToStatus = goToStatus;
         cc.serverStatusAvailable = serverStatusAvailable;
         cc.$onInit = function() {
-            cc.imageUrl = contextualData.context + '/modules/' + contextualData.connectorsMetaData[cc.connection.databaseType].moduleName + '/images/' + cc.connection.databaseType.toLowerCase() + '/logo_60.png';
-            cc.originalConnection = angular.copy(cc.connection);
-
-            $scope.$on('resetExportSelection', function(){
-                cc.connection.export = false;
-            });
-            $scope.$on('refreshConnectionStatus', function(){
-                verifyServerStatus();
-            });
-            init();
-        };
-
-        function init() {
-            //Replace any null values, so they dont show up.
+            cc.imageUrl = contextualData.context + '/modules/' + $DCSS.connectorsMetaData[cc.connection.databaseType].moduleName + '/images/' + cc.connection.databaseType.toLowerCase() + '/logo_60.png';
             for (var i in cc.connection) {
                 cc.connection[i] = $filter('replaceNull')(cc.connection[i]);
             }
             cc.originalConnection = angular.copy(cc.connection);
-            verifyServerStatus();
-        }
+            $scope.$on('resetExportSelection', function(){
+                cc.connection.export = false;
+            });
+            $scope.$on('refreshConnectionStatus', function(){
+                $DCCMS.verifyServerStatus(cc.connection).then(function(connection){
+                    cc.connection = connection;
+                    cc.originalConnection = angular.copy(connection);
+                });
+            });
+            $DCCMS.verifyServerStatus(cc.connection).then(function(connection){
+                cc.connection = connection;
+                cc.originalConnection = angular.copy(connection);
+            });
+        };
 
         function updateConnection(connect) {
             cc.spinnerOptions.showSpinner = true;
-            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cc.connection.databaseType].entryPoint + (connect ? '/connect/' : '/disconnect/') + cc.connection.id;
-            dcDataFactory.customRequest({
-                url: url,
-                method: 'PUT'
-            }).then(function(response) {
-                if (response.success) {
-                    cc.connection.isConnected = connect;
-                    cc.originalConnection.isConnected = connect;
-                    if (connect) {
-                        verifyServerStatus();
-                    } else {
-                        cc.connection.canRetrieveStatus = false;
-                        cc.originalConnection.canRetrieveStatus = cc.connection.canRetrieveStatus;
-                    }
-                    toaster.pop({
-                        type   : 'success',
-                        title: i18n.message('dc_databaseConnector.toast.title.connectionSuccessfullyUpdated'),
-                        toastId: 'cu',
-                        timeout: 3000
-                    });
-                } else {
-                    toaster.pop({
-                        type   : 'error',
-                        title: i18n.message('dc_databaseConnector.toast.title.connectionUpdateFailed'),
-                        toastId: 'cu',
-                        timeout: 3000
-                    });
-                    cc.connection.canRetrieveStatus = false;
-                    cc.originalConnection.canRetrieveStatus = cc.connection.canRetrieveStatus;
-                }
+            $DCCMS.updateConnection(cc.connection, connect).then(function(connection) {
+                cc.connection = connection;
+                cc.originalConnection = angular.copy(connection);
                 cc.spinnerOptions.showSpinner = false;
-            }, function(response) {
-                cc.spinnerOptions.showSpinner = false;
-                cc.connection.canRetrieveStatus = false;
-                cc.originalConnection.canRetrieveStatus = cc.connection.canRetrieveStatus;
             });
         }
 
@@ -117,7 +86,7 @@
 
         function deleteConnection() {
             cc.spinnerOptions.showSpinner = true;
-            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cc.connection.databaseType].entryPoint + '/remove/' + cc.connection.id;
+            var url = contextualData.apiUrl + $DCSS.connectorsMetaData[cc.connection.databaseType].entryPoint + '/remove/' + cc.connection.id;
             dcDataFactory.customRequest({
                 url: url,
                 method: 'DELETE'
@@ -170,7 +139,7 @@
         }
 
         function getUpdatedConnection() {
-            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cc.connection.databaseType].entryPoint + '/connection/' + cc.connection.id;
+            var url = contextualData.apiUrl + $DCSS.connectorsMetaData[cc.connection.databaseType].entryPoint + '/connection/' + cc.connection.id;
             dcDataFactory.customRequest({
                 url: url,
                 method: 'GET'
@@ -203,46 +172,13 @@
             $state.go('connectionsStatus', {connection: cc.connection});
         }
 
-        function verifyServerStatus() {
-            //verify if this connection is authenticated to retrieve server status
-            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cc.connection.databaseType].entryPoint + '/status/' + cc.connection.id;
-            dcDataFactory.customRequest({
-                url: url,
-                method: 'GET'
-            }).then(function(response) {
-                //status can be retrieved
-                if (_.isUndefined(response.failed)) {
-                    cc.connection.canRetrieveStatus = true;
-                    cc.originalConnection.canRetrieveStatus = true;
-                    if(cc.connection.databaseType == "MONGO"){
-                        cc.connection.dbVersion = response.success.version;
-                        cc.connection.uptime = response.success.uptime;
-                        cc.originalConnection.dbVersion = cc.connection.dbVersion;
-                        cc.originalConnection.uptime = cc.connection.uptime;
-                    } else if (cc.connection.databaseType == "REDIS") {
-                        response.success = dcDataFactory.parseRedisStatus(response.success);
-                        cc.connection.dbVersion = response.success.redis_version;
-                        cc.connection.uptime = response.success.uptime_in_seconds;
-                        cc.originalConnection.dbVersion = cc.connection.dbVersion;
-                        cc.originalConnection.uptime = cc.connection.uptime;
-                    }
-                } else {
-                    cc.connection.canRetrieveStatus = false;
-                    cc.originalConnection.canRetrieveStatus = cc.connection.canRetrieveStatus;
-                }
-            }, function(response) {
-                //status cannot be retrieved
-                cc.connection.canRetrieveStatus = false;
-                cc.originalConnection.canRetrieveStatus = false;
-            });
-        }
-
         function serverStatusAvailable() {
             return !_.isUndefined(cc.connection.canRetrieveStatus) && cc.connection.canRetrieveStatus && cc.connection.isConnected;
         }
     };
 
-    ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', '$filter', 'toaster', '$state', 'i18nService'];
+    ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog',
+        '$filter', 'toaster', '$state', 'i18nService', '$DCStateService', '$DCConnectionManagerService'];
     
     function EditConnectionPopupController($scope, $mdDialog, connection) {
         $scope.ecp = this;

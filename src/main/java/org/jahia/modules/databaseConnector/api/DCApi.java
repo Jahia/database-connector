@@ -237,7 +237,7 @@ public class DCApi {
     }
 
     @GET
-    @Path("/getallconnections")
+    @Path("/allconnections")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnections() {
         try {

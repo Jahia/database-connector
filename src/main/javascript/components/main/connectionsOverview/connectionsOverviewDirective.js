@@ -21,7 +21,7 @@
         .directive('dcConnectionsOverview', ['$log', 'contextualData', connectionsOverview]);
 
     var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog,
-                                                 dcDownloadFactory, toaster, $state, i18n, $q, $timeout) {
+                                                 dcDownloadFactory, toaster, $state, i18n, $q, $timeout, $DCSS, $DCMS) {
         var coc = this;
         coc.getAllConnections = getAllConnections;
         coc.createConnection = createConnection;
@@ -31,13 +31,8 @@
         coc.importConnections = importConnections;
 
         coc.$onInit = function() {
-            init();
-        };
-
-        function init() {
-            getConnectorsMetaData();
             getAllConnections();
-        }
+        };
 
         function importConnections (file, mode) {
             if (file == null && mode == 'test') {
@@ -86,23 +81,13 @@
         }
         function getAllConnections() {
             return $q(function(resolve, reject){
-                var url = contextualData.apiUrl + '/getallconnections';
-                dcDataFactory.customRequest({
-                    url: url,
-                    method: 'GET'
-                }).then(function (response) {
-                    coc.connections = response.connections;
-                    console.log(coc.connections);
-                    resolve();
-                }, function (response) {
+                $DCMS.getAvailableConnections().then(function(connections){
+                    coc.connections = connections;
+                    resolve(connections);
+                }, function(response){
+                    //Could not retrieve connections.
                     reject();
-                });
-            });
-        }
-        function getConnectorsMetaData() {
-            dcDataFactory.getConnectorsMetaData().then(function(response){
-                coc.connectorsMetaData = response;
-                contextualData.connectorsMetaData = angular.copy(coc.connectorsMetaData);
+                })
             });
         }
 
@@ -123,7 +108,6 @@
                         $scope.$broadcast('refreshConnectionStatus', null);
                     });
                 });
-            }, function () {
             });
         }
 
@@ -173,10 +157,10 @@
     };
 
     connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog',
-        'dcDownloadFactory', 'toaster', '$state', 'i18nService', '$q', '$timeout'];
+        'dcDownloadFactory', 'toaster', '$state', 'i18nService', '$q', '$timeout', '$DCStateService', '$DCManagementService'];
 
 
-    function CreateConnectionPopupController($scope, $mdDialog, contextualData, dcDataFactory) {
+    function CreateConnectionPopupController($scope, $mdDialog, contextualData, $DCSS) {
         $scope.cpc = this;
         $scope.cpc.databaseTypeSelected = false;
         $scope.cpc.setSelectedDatabaseType = setSelectedDatabaseType;
@@ -186,7 +170,7 @@
         function init() {
             $scope.cpc.connection = {};
             $scope.cpc.images = {};
-            $scope.cpc.databaseTypes = angular.copy(contextualData.connectorsMetaData);
+            $scope.cpc.databaseTypes = angular.copy($DCSS.connectorsMetaData);
             for (var i in $scope.cpc.databaseTypes) {
                 $scope.cpc.images[$scope.cpc.databaseTypes[i].databaseType] = contextualData.context + '/modules/' + $scope.cpc.databaseTypes[i].moduleName  + '/images/' + $scope.cpc.databaseTypes[i].databaseType.toLowerCase() + '/logo_60.png';
             }
@@ -214,5 +198,6 @@
     
     }
     
-    CreateConnectionPopupController.$inject = ['$scope', '$mdDialog', 'contextualData', 'dcDataFactory', 'updateConnections', 'i18nService'];
+    CreateConnectionPopupController.$inject = ['$scope', '$mdDialog', 'contextualData',
+        'updateConnections', 'i18nService', '$DCStateService'];
 })();
