@@ -198,6 +198,5 @@
     
     }
     
-    CreateConnectionPopupController.$inject = ['$scope', '$mdDialog', 'contextualData',
-        'updateConnections', 'i18nService', '$DCStateService'];
+    CreateConnectionPopupController.$inject = ['$scope', '$mdDialog', 'contextualData', '$DCStateService'];
 })();

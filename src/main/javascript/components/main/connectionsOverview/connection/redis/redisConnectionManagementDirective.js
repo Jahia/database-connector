@@ -26,7 +26,8 @@
         .module('databaseConnector')
         .directive('redisConnectionManagement', ['$log', 'contextualData', redisConnectionManagement]);
 
-    var redisConnectionManagementController = function ($scope, contextualData, dcDataFactory, toaster, i18n) {
+    var redisConnectionManagementController = function ($scope, contextualData,
+                                                        dcDataFactory, toaster, i18n, $DCSS) {
         var rcm = this;
         rcm.isEmpty = {};
         rcm.spinnerOptions = {
@@ -110,7 +111,7 @@
                 return;
             }
             rcm.spinnerOptions.showSpinner = true;
-            var url = contextualData.apiUrl + contextualData.connectorsMetaData[rcm.connection.databaseType].entryPoint + '/add';
+            var url = contextualData.apiUrl + $DCSS.connectorsMetaData[rcm.connection.databaseType].entryPoint + '/add';
             var data = angular.copy(rcm.connection);
             var options = prepareOptions(data.options);
             if (options == null) {
@@ -142,7 +143,7 @@
                 return;
             }
             rcm.spinnerOptions.showSpinner = true;
-            var url = contextualData.apiUrl + contextualData.connectorsMetaData[rcm.connection.databaseType].entryPoint + '/edit';
+            var url = contextualData.apiUrl + $DCSS.connectorsMetaData[rcm.connection.databaseType].entryPoint + '/edit';
             var data = angular.copy(rcm.connection);
             var options = prepareOptions(data.options);
             if (options == null) {
@@ -171,7 +172,7 @@
 
         function testRedisConnection() {
             rcm.spinnerOptions.showSpinner = true;
-            var url = contextualData.apiUrl + contextualData.connectorsMetaData[rcm.connection.databaseType].entryPoint + '/testconnection';
+            var url = contextualData.apiUrl + $DCSS.connectorsMetaData[rcm.connection.databaseType].entryPoint + '/testconnection';
             var data = angular.copy(rcm.connection);
             var options = prepareOptions(data.options);
             if (options == null) {
@@ -272,6 +273,7 @@
         }
     };
 
-    redisConnectionManagementController.$inject = ['$scope', 'contextualData', 'dcDataFactory', 'toaster', 'i18nService'];
+    redisConnectionManagementController.$inject = ['$scope', 'contextualData',
+        'dcDataFactory', 'toaster', 'i18nService', '$DCStateService'];
 
 })();

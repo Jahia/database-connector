@@ -1,7 +1,8 @@
 (function() {
     'use strict';
 
-    var ConnectionIdValidator = function($log, contextualData, $timeout, $q, dcDataFactory) {
+    var ConnectionIdValidator = function($log, contextualData,
+                                         $timeout, $q, dcDataFactory, $DCSS) {
         var directive = {
             restrict: 'A',
             require: ['^ngModel'],
@@ -18,7 +19,7 @@
                     return $q.when(true);
                 }
                 var deferred = $q.defer();
-                var url = contextualData.apiUrl + contextualData.connectorsMetaData[databaseType].entryPoint + '/isconnectionvalid/' + viewValue;
+                var url = contextualData.apiUrl + $DCSS.connectorsMetaData[databaseType].entryPoint + '/isconnectionvalid/' + viewValue;
                 dcDataFactory.customRequest({
                     url: url,
                     method: 'GET'
@@ -41,6 +42,7 @@
 
     angular
         .module('databaseConnector')
-        .directive('connectionIdValidator', ['$log', 'contextualData', '$timeout', '$q', 'dcDataFactory', ConnectionIdValidator]);
+        .directive('connectionIdValidator', ['$log', 'contextualData',
+            '$timeout', '$q', 'dcDataFactory', '$DCStateService', ConnectionIdValidator]);
 
 })();

@@ -26,7 +26,8 @@
         .module('databaseConnector')
         .directive('mongoConnectionManagement', ['$log', 'contextualData', mongoConnectionManagement]);
 
-    var mongoConnectionManagementController = function ($scope, contextualData, dcDataFactory, toaster, i18n) {
+    var mongoConnectionManagementController = function ($scope, contextualData,
+                                                        dcDataFactory, toaster, i18n, $DCSS) {
         var cmcc = this;
 
         cmcc.isEmpty = {};
@@ -111,7 +112,7 @@
         cmcc.getMessage = i18n.message;
 
         cmcc.$onInit = function init() {
-            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cmcc.databaseType].entryPoint + '/writeconcernoptions';
+            var url = contextualData.apiUrl + $DCSS.connectorsMetaData[cmcc.databaseType].entryPoint + '/writeconcernoptions';
             dcDataFactory.customRequest({
                 url: url,
                 method: 'GET'
@@ -154,7 +155,7 @@
                 return;
             }
             cmcc.spinnerOptions.showSpinner = true;
-            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cmcc.databaseType].entryPoint + '/add';
+            var url = contextualData.apiUrl + $DCSS.connectorsMetaData[cmcc.databaseType].entryPoint + '/add';
 
             var data = angular.copy(cmcc.connection);
             var options = prepareOptions(data.options);
@@ -227,7 +228,7 @@
 
         function testMongoConnection() {
             cmcc.spinnerOptions.showSpinner = true;
-            var url = contextualData.apiUrl + contextualData.connectorsMetaData[cmcc.databaseType].entryPoint + '/testconnection';
+            var url = contextualData.apiUrl + $DCSS.connectorsMetaData[cmcc.databaseType].entryPoint + '/testconnection';
             var data = angular.copy(cmcc.connection);
             var options = prepareOptions(data.options);
             if (options == null) {
@@ -385,6 +386,7 @@
 
     };
 
-    mongoConnectionManagementController.$inject = ['$scope', 'contextualData', 'dcDataFactory', 'toaster', 'i18nService'];
+    mongoConnectionManagementController.$inject = ['$scope', 'contextualData',
+        'dcDataFactory', 'toaster', 'i18nService', '$DCStateService'];
 
 })();
