@@ -38,6 +38,7 @@ public class DatabaseConnector implements DatabaseConnectorService {
     public void setDatabaseConnectorManager(DatabaseConnectorManager databaseConnectorManager) {
         this.databaseConnectorManager = databaseConnectorManager;
     }
+
     public <T extends ConnectionData> String getAllConnections() throws JSONException, InstantiationException, IllegalAccessException{
         String connections;
 

@@ -61,7 +61,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     public static final String DATABASE_CONNECTOR_PATH = "databaseConnector";
     public static final String DATABASE_CONNECTOR_NODE_TYPE = "dc:databaseConnector";
 
-    private static final String DEFINITION_QUERY = "SELECT * FROM [dcmix:directiveDefinition] AS result WHERE ISDESCENDANTNODE(result, ''{0}'')";
+    private static final String DEFINITION_QUERY = "SELECT * FROM [dcmix:directivesDefinition] AS result WHERE ISDESCENDANTNODE(result, ''{0}'')";
 
     private final static Object lock = new Object();
     private static DatabaseConnectorManager instance;
@@ -538,7 +538,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         for (JCRNodeWrapper d : sd) {
             views.add(d.getPropertyAsString("name"));
         }
-        return (String[]) views.toArray();
+        return views.toArray(new String[0]);
     }
     
     private List<JahiaTemplatesPackage> getDependentModules() {
