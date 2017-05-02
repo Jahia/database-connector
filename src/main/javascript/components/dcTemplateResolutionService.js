@@ -25,6 +25,6 @@
     ResolveTemplatesService.$inject = ['$log'];
 
     angular
-        .module('databaseConnector', [])
+        .module('databaseConnector')
         .service('dcTemplateResolver', ResolveTemplatesService);
 })();

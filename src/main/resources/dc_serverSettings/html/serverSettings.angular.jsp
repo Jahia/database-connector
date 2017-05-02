@@ -33,7 +33,6 @@
     <template:addResources type="javascript" resources="i18n/database-connector-i18n.js"/>
 </c:if>
 
-<%--<formfactory:jsResources/>--%>
 <dbconnector:jsResources />
 
 <div ui-view id="main_${currentNode.identifier}"></div>
