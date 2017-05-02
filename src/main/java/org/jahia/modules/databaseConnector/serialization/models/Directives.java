@@ -11,6 +11,7 @@ import java.util.List;
  */
 public class Directives {
     private String label;
+    private String databaseType;
     private Directive connectionDirective;
     private List<Directive> statusDirectives;
 
@@ -26,6 +27,14 @@ public class Directives {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public String getDatabaseType() {
+        return databaseType;
+    }
+
+    public void setDatabaseType(String databaseType) {
+        this.databaseType = databaseType;
     }
 
     public Directive getConnectionDirective() {

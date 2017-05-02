@@ -38,6 +38,7 @@ public class DirectivesRetriever {
 
     private static Directives getDirectives(JCRNodeWrapper node) throws RepositoryException {
         Directives directives = new Directives(node.getPropertyAsString(Constants.JCR_TITLE), null, null);
+        directives.setDatabaseType(node.getPropertyAsString("databaseType"));
         JCRNodeWrapper connectionDirective = node.getNode("connectionDirective");
         directives.setConnectionDirective(
                 new Directive(connectionDirective.getPropertyAsString("name"), connectionDirective.getPropertyAsString("tag"))

@@ -42,6 +42,7 @@ class DirectiveHandler implements DSLHandler {
 
     def createWizard(Map<String, Object> map, JahiaTemplatesPackage currentPackage, ExtendedNodeType currentNodeType) {
         assert map.containsKey("label")
+        assert map.containsKey("databaseType")
         assert map.containsKey("statusDirectives")
         assert map.containsKey("connectionDirective")
         jcrTemplate.doExecuteWithSystemSessionAsUser(JahiaUserManagerService.instance.lookupRootUser().jahiaUser, Constants.EDIT_WORKSPACE, Locale.ENGLISH, new JCRCallback() {
@@ -69,6 +70,9 @@ class DirectiveHandler implements DSLHandler {
                 def node = directiveRootNode.addNode(nodeName, currentNodeType.name)
                 node.setProperty(Constants.JCR_TITLE, map["label"])
                 map.remove("label")
+
+                node.setProperty("databaseType", map["databaseType"])
+                map.remove("databaseType")
 
                 //Need to save so that statusDirectives node is autocreated
                 jcrSessionWrapper.save()

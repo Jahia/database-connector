@@ -31,6 +31,7 @@
 
 [dcmix:directivesDefinition] > mix:title mixin
 - label (string) i18n
+- databaseType (string)
 + statusDirectives (dc:statusDirectives) = dc:statusDirectives autocreated
 + * (dc:directiveDefinition) = dc:directiveDefinition
 
