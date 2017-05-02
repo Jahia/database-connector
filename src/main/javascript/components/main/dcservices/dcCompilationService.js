@@ -14,10 +14,11 @@
         this.compileInsideElement = function(compilationScope, directiveTag, elementId, parameterMap) {
             return $q(function(resolve, reject) {
                 $timeout(function() {
-                    var element = angular.element(document.getElementById(elementId));
-                    if (element === undefined || element === null) {
+                    var el = document.getElementById(elementId);
+                    if (el === undefined || el === null) {
                         reject("No element with id '" + elementId + "' found");
                     }
+                    var element = angular.element(document.getElementById(elementId));
 
                     var scope = compilationScope.$new();
                     if (parameterMap !== undefined && parameterMap !== null) {

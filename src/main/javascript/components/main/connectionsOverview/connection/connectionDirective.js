@@ -180,7 +180,7 @@
     ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog',
         '$filter', 'toaster', '$state', 'i18nService', '$DCStateService', '$DCConnectionManagerService'];
     
-    function EditConnectionPopupController($scope, $mdDialog, connection, CS, $timeout) {
+    function EditConnectionPopupController($scope, $mdDialog, connection, CS, $timeout, DCSS) {
         $scope.ecp = this;
         $scope.ecp.connection = connection;
         $scope.compiled = false;
@@ -197,25 +197,28 @@
             //TODO get directive from server (from alldirectives object)
             if (!$scope.compiled) {
                 $timeout(function() {
-                    var tag = "<mongo-connection-directive></mongo-connection-directive>";
-                    var promise = CS.compileInsideElement($scope, tag, "editConnectionContent", [
-                            {attrName:"mode", attrValue:"edit"},
-                            {attrName:"database-type", attrValue:"{{ecp.connection.databaseType}}"},
-                            {attrName:"connection", attrValue:"ecp.connection"}
-                        ]
-                    );
-                    promise.then(function(data) {
-                        //console.log(data);
+                    DCSS.getDirectivesForType($scope.ecp.connection.databaseType).then(function(data) {
+                        var promise = CS.compileInsideElement($scope, data.connectionDirective.tag, "editConnectionContent", [
+                                {attrName:"mode", attrValue:"edit"},
+                                {attrName:"database-type", attrValue:"{{ecp.connection.databaseType}}"},
+                                {attrName:"connection", attrValue:"ecp.connection"}
+                            ]
+                        );
+                        promise.then(function(data) {
+                            //console.log(data);
+                        }, function(error) {
+                            console.error(error);
+                        })
                     }, function(error) {
                         console.error(error);
-                    })
+                    });
                 });
                 $scope.compiled = true;
             }
         };
     }
 
-    EditConnectionPopupController.$inject = ['$scope', '$mdDialog', 'connection', 'dcCompilationService', '$timeout'];
+    EditConnectionPopupController.$inject = ['$scope', '$mdDialog', 'connection', 'dcCompilationService', '$timeout', '$DCStateService'];
     
     function DeleteConnectionPopupController($scope, $mdDialog, $sce, i18n) {
         $scope.dcp = this;

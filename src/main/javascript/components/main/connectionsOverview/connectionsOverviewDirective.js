@@ -32,6 +32,7 @@
 
         coc.$onInit = function() {
             getAllConnections();
+            populateCache();
         };
 
         function importConnections (file, mode) {
@@ -145,6 +146,16 @@
 
         function isExportDisabled() {
             return _.isEmpty(coc.exportConnections);
+        }
+
+        function populateCache() {
+            //Preload alldirective
+            $DCSS.getFromCache("alldirectives").then(function(data) {
+                //Do nothing
+                //console.log(data);
+            }, function(error) {
+                console.error(error);
+            });
         }
 
         $scope.$on('notifyRefreshConnectionStatus', function () {
