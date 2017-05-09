@@ -171,10 +171,11 @@
         'dcDownloadFactory', 'toaster', '$state', 'i18nService', '$q', '$timeout', '$DCStateService', '$DCManagementService'];
 
 
-    function CreateConnectionPopupController($scope, $mdDialog, contextualData, $DCSS) {
+    function CreateConnectionPopupController($scope, $mdDialog, contextualData, $DCSS, $timeout, CS) {
         $scope.cpc = this;
         $scope.cpc.databaseTypeSelected = false;
         $scope.cpc.setSelectedDatabaseType = setSelectedDatabaseType;
+        $scope.compiled = false;
 
         init();
 
@@ -196,6 +197,30 @@
             resetCreationProcess();
         });
 
+        $scope.compileDirective = function() {
+            if (!$scope.compiled) {
+                $timeout(function() {
+                    console.log($scope.cpc.connection, $scope.cpc.selectedDatabaseType);
+                    $DCSS.getDirectivesForType($scope.cpc.selectedDatabaseType).then(function(data) {
+                        var promise = CS.compileInsideElement($scope, data.connectionDirective.tag, "createConnectionContent", [
+                                {attrName:"mode", attrValue:"create"},
+                                {attrName:"database-type", attrValue:"{{cpc.selectedDatabaseType}}"},
+                                {attrName:"connection", attrValue:"cpc.connection"}
+                            ]
+                        );
+                        promise.then(function(data) {
+                            //console.log(data);
+                        }, function(error) {
+                            console.error(error);
+                        })
+                    }, function(error) {
+                        console.error(error);
+                    });
+                });
+                $scope.compiled = true;
+            }
+        };
+
 
         function resetCreationProcess() {
             $scope.cpc.connection = {};
@@ -205,9 +230,10 @@
         function setSelectedDatabaseType(databaseType) {
             $scope.cpc.selectedDatabaseType = databaseType;
             $scope.cpc.databaseTypeSelected = true;
+            $scope.compileDirective();
         }
-    
+
     }
-    
-    CreateConnectionPopupController.$inject = ['$scope', '$mdDialog', 'contextualData', '$DCStateService'];
+
+    CreateConnectionPopupController.$inject = ['$scope', '$mdDialog', 'contextualData', '$DCStateService', '$timeout', 'dcCompilationService'];
 })();

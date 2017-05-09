@@ -15,9 +15,6 @@
                     </div>
                 </div>
             </div>
-            <div ng-switch="cpc.selectedDatabaseType">
-                <mongo-connection-management ng-switch-when="MONGO" mode="create" database-type="{{cpc.selectedDatabaseType}}" connection="cpc.connection"></mongo-connection-management>
-                <redis-connection-management ng-switch-when="REDIS" mode="create" database-type="{{cpc.selectedDatabaseType}}" connection="cpc.connection"></redis-connection-management>
-            </div>
+            <div id="createConnectionContent"></div>
         </md-dialog-content>
 </md-dialog>
