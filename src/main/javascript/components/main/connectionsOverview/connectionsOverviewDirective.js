@@ -80,6 +80,7 @@
                 });
             }
         }
+
         function getAllConnections() {
             return $q(function(resolve, reject){
                 $DCMS.getAvailableConnections().then(function(connections){
@@ -166,6 +167,7 @@
         $scope.cpc.databaseTypeSelected = false;
         $scope.cpc.setSelectedDatabaseType = setSelectedDatabaseType;
         $scope.compiled = false;
+        var compilationResult = {}; //scope and element
 
         init();
 
@@ -190,7 +192,6 @@
         $scope.compileDirective = function() {
             if (!$scope.compiled) {
                 $timeout(function() {
-                    console.log($scope.cpc.connection, $scope.cpc.selectedDatabaseType);
                     $DCSS.getDirectivesForType($scope.cpc.selectedDatabaseType).then(function(data) {
                         var promise = CS.compileInsideElement($scope, data.connectionDirective.tag, "createConnectionContent", [
                                 {attrName:"mode", attrValue:"create"},
@@ -200,6 +201,7 @@
                         );
                         promise.then(function(data) {
                             //console.log(data);
+                            compilationResult = data;
                         }, function(error) {
                             console.error(error);
                         })
@@ -216,6 +218,8 @@
             $scope.cpc.connection = {};
             $scope.cpc.databaseTypeSelected = false;
             $scope.cpc.selectedDatabaseType = '';
+            compilationResult.scope.$destroy();
+            compilationResult.element.empty();
         }
         function setSelectedDatabaseType(databaseType) {
             $scope.cpc.selectedDatabaseType = databaseType;
