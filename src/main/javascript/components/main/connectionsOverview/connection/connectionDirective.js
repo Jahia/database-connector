@@ -25,7 +25,7 @@
         .directive('dcConnection', ['$log', 'contextualData', Connection]);
 
     var ConnectionController = function($scope, contextualData, dcDataFactory,
-                                        $mdDialog, $filter, toaster, $state, i18n, $DCSS, $DCCMS) {
+                                        $mdDialog, $filter, toaster, $state, i18n, $DCSS, $DCCMS, $DCMS) {
         var cc = this;
         cc.spinnerOptions = {
             mode: 'indeterminate',
@@ -45,12 +45,6 @@
             cc.originalConnection = angular.copy(cc.connection);
             $scope.$on('resetExportSelection', function(){
                 cc.connection.export = false;
-            });
-            $scope.$on('refreshConnectionStatus', function(){
-                $DCCMS.verifyServerStatus(cc.connection).then(function(connection){
-                    cc.connection = connection;
-                    cc.originalConnection = angular.copy(connection);
-                });
             });
             $DCCMS.verifyServerStatus(cc.connection).then(function(connection){
                 cc.connection = connection;
@@ -96,7 +90,7 @@
                     delete exportConnectionsTemp[cc.connection.id];
                     cc.exportConnections = exportConnectionsTemp;
                 }
-                $scope.$emit('notifyRefreshConnectionStatus', null);
+                $DCMS.removeConnection(cc.connection.id);
                 toaster.pop({
                     type   : 'success',
                     title: i18n.message('dc_databaseConnector.toast.title.connectionSuccessfullyDeleted'),
@@ -143,10 +137,11 @@
             dcDataFactory.customRequest({
                 url: url,
                 method: 'GET'
-            }).then(function(response) {
-                cc.connection = response;
-                cc.originalConnection = angular.copy(response);
-                $scope.$emit('notifyRefreshConnectionStatus', null);
+            }).then(function(updatedConnection) {
+                $DCCMS.verifyServerStatus(updatedConnection).then(function(connection){
+                    cc.connection = connection;
+                    cc.originalConnection = angular.copy(connection);
+                });
             }, function(response) {});
         }
         
@@ -178,7 +173,8 @@
     };
 
     ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog',
-        '$filter', 'toaster', '$state', 'i18nService', '$DCStateService', '$DCConnectionManagerService'];
+        '$filter', 'toaster', '$state', 'i18nService', '$DCStateService',
+        '$DCConnectionManagerService', '$DCManagementService'];
     
     function EditConnectionPopupController($scope, $mdDialog, connection, CS, $timeout, DCSS) {
         $scope.ecp = this;
@@ -218,7 +214,8 @@
         };
     }
 
-    EditConnectionPopupController.$inject = ['$scope', '$mdDialog', 'connection', 'dcCompilationService', '$timeout', '$DCStateService'];
+    EditConnectionPopupController.$inject = ['$scope', '$mdDialog', 'connection',
+        'dcCompilationService', '$timeout', '$DCStateService'];
     
     function DeleteConnectionPopupController($scope, $mdDialog, $sce, i18n) {
         $scope.dcp = this;

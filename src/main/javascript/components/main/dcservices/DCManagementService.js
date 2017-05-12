@@ -1,6 +1,6 @@
 (function() {
-    var DCManagementService = function($http, contextualData, $q, $DCSS) {
-
+    var DCManagementService = function($http, contextualData, $q, $DCSS, $DCCMS) {
+        var self = this;
         init();
         function init() {
             retrieveConnectorsMetaData();
@@ -53,10 +53,35 @@
                     })
                 }
             });
+        };
+
+        this.refreshAllConnectionsStatus = function() {
+            return $q(function(resolve, reject){
+                self.getAvailableConnections().then(function(connections){
+                    for (var i = 0; i < connections.length; i++) {
+                        $DCCMS.verifyServerStatus(connections[i]).then(function(connection){
+                            connections[i] = connection;
+                        });
+                    }
+                    resolve(connections);
+                }, function(error){
+                    reject(error);
+                });
+            });
+        };
+
+        this.removeConnection = function (connectionId){
+            for (var i = 0; i < $DCSS.connections.length; i++) {
+                if (connectionId == $DCSS.connections[i].id) {
+                    $DCSS.connections.splice(i, 1);
+                    return;
+                }
+            }
         }
     };
 
     angular
         .module('databaseConnector')
-        .service('$DCManagementService', ['$http', 'contextualData', '$q', '$DCStateService', DCManagementService]);
+        .service('$DCManagementService', ['$http', 'contextualData',
+            '$q', '$DCStateService', '$DCConnectionManagerService', DCManagementService]);
 })();

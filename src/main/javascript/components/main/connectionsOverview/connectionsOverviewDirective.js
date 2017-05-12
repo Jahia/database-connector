@@ -104,10 +104,8 @@
                 clickOutsideToClose: true,
                 fullscreen: true
             }).then(function () {
-                getAllConnections().then(function(){
-                    $timeout(function(){
-                        $scope.$broadcast('refreshConnectionStatus', null);
-                    });
+                $DCMS.refreshAllConnectionsStatus().then(function(connections){
+                    coc.connections = connections;
                 });
             });
         }
@@ -157,14 +155,6 @@
                 console.error(error);
             });
         }
-
-        $scope.$on('notifyRefreshConnectionStatus', function () {
-            getAllConnections().then(function(){
-                $timeout(function(){
-                    $scope.$broadcast('refreshConnectionStatus', null);
-                });
-            });
-        });
     };
 
     connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog',
