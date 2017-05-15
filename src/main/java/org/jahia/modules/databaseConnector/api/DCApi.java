@@ -27,9 +27,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.api.impl.DirectivesRetriever;
 import org.jahia.modules.databaseConnector.connection.AbstractDatabaseConnectionRegistry;
+import org.jahia.modules.databaseConnector.connection.DatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
+import org.jahia.modules.databaseConnector.util.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -178,7 +180,7 @@ public class DCApi {
                     Map<String, Object> result = new LinkedHashMap<>();
                     if (connectionJsonObject.has("databaseType")) {
                         String databaseType = connectionJsonObject.getString("databaseType");
-                        AbstractDatabaseConnectionRegistry databaseConnectionRegistry = (AbstractDatabaseConnectionRegistry) databaseConnector.getConnectionRegistryClassInstance(databaseType);
+                        DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(databaseType, this.context);
                         databaseConnectionRegistry.buildConnectionMapFromJSON(result, connectionJsonObject);
                         if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
                             AbstractConnection connection = ((AbstractConnection) result.get("connection"));
@@ -208,7 +210,7 @@ public class DCApi {
                 Map<String, Object> result = new LinkedHashMap<>();
                 if (connectionJsonObject.has("databaseType")) {
                     String databaseType = connectionJsonObject.getString("databaseType");
-                    AbstractDatabaseConnectionRegistry databaseConnectionRegistry = (AbstractDatabaseConnectionRegistry) databaseConnector.getConnectionRegistryClassInstance(databaseType);
+                    DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(databaseType, this.context);
                     databaseConnectionRegistry.buildConnectionMapFromJSON(result, connectionJsonObject);
                     if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
                         AbstractConnection connection = (AbstractConnection) result.get("connection");

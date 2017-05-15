@@ -2,7 +2,6 @@ package org.jahia.modules.databaseConnector.api.impl;
 
 import org.jahia.modules.databaseConnector.connection.*;
 import org.jahia.modules.databaseConnector.connector.AbstractConnectorMetaData;
-import org.jahia.modules.databaseConnector.factories.DatabaseConnectionRegistryFactory;
 import org.jahia.modules.databaseConnector.serialization.models.DbConnections;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;
@@ -42,17 +41,13 @@ public class DatabaseConnector implements DatabaseConnectorService {
     public <T extends ConnectionData> String getAllConnections() throws JSONException, InstantiationException, IllegalAccessException{
         String connections;
 
-        Map<String, AbstractConnection> allConnections = new HashMap<>();
-
-        for (Map.Entry<String, DatabaseConnectionRegistry> entry : DatabaseConnectionRegistryFactory.getRegisteredConnections().entrySet()) {
-            Map<String, ? extends AbstractConnection> databaseTypeConnection = databaseConnectorManager.getConnections(entry.getKey());
-            if (databaseTypeConnection != null) {
-                allConnections.putAll(databaseTypeConnection);
-            }
-        }
         List<ConnectionData> connectionArray = new ArrayList<>();
-        for (Map.Entry<String, AbstractConnection> entry : allConnections.entrySet()) {
-            connectionArray.add(entry.getValue().makeConnectionData());
+        for (Map.Entry<String, AbstractConnectorMetaData> entry: databaseConnectorManager.getAvailableConnectors().entrySet()) {
+            LinkedHashMap<String, ? extends AbstractConnection> abstractConnectionLinkedHashMap = (LinkedHashMap<String, AbstractConnection>) databaseConnectorManager.getConnections(entry.getKey());
+            for (Map.Entry<String, ? extends AbstractConnection> connectionEntry: abstractConnectionLinkedHashMap.entrySet()) {
+                AbstractConnection abstractConnection = connectionEntry.getValue();
+                connectionArray.add(abstractConnection.makeConnectionData());
+            }
         }
         connections = new DbConnections(connectionArray).getJson();
         return connections == null ? new JSONArray().toString() : connections;
@@ -73,10 +68,6 @@ public class DatabaseConnector implements DatabaseConnectorService {
 
     public Map importConnections(InputStream source) {
         return databaseConnectorManager.executeConnectionImportHandler(source);
-    }
-
-    public DatabaseConnectionRegistry getConnectionRegistryClassInstance(String databaseType) {
-        return databaseConnectorManager.getConnectionRegistryClassInstance(databaseType);
     }
 
     @Override
@@ -148,8 +139,8 @@ public class DatabaseConnector implements DatabaseConnectorService {
     }
 
     @Override
-    public void registerConnectorToRegistry(String connectionType, DatabaseConnectionRegistry databaseConnectionRegistry) {
-        databaseConnectorManager.registerConnectorToRegistry(connectionType, databaseConnectionRegistry);
+    public void registerConnectorToRegistry(String connectionType, AbstractConnectorMetaData connectorMetaData) {
+        databaseConnectorManager.registerConnectorToRegistry(connectionType, connectorMetaData);
     }
 
     @Override

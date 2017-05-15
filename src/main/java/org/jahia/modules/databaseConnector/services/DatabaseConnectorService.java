@@ -4,6 +4,7 @@ import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connection.AbstractDatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.connection.ConnectionData;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectionRegistry;
+import org.jahia.modules.databaseConnector.connector.AbstractConnectorMetaData;
 
 import java.util.Map;
 
@@ -12,7 +13,7 @@ import java.util.Map;
  */
 public interface DatabaseConnectorService {
 
-    public void registerConnectorToRegistry(String connectionType, DatabaseConnectionRegistry databaseConnectionRegistry);
+    public void registerConnectorToRegistry(String connectionType, AbstractConnectorMetaData connectorMetadata);
     
     <T extends AbstractConnection> T getConnection(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException;
 

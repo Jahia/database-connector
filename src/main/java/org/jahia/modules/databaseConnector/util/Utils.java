@@ -27,7 +27,12 @@ public class Utils {
     }
 
     public static Object getService(Class classObj, BundleContext context) {
-        ServiceReference ref = context.getServiceReference(classObj.getName());
-        return ref != null ? context.getService(ref) : ref;
+        return getService(classObj.getName(), context);
     }
+
+    public static Object getService(String className, BundleContext context) {
+        ServiceReference ref = context.getServiceReference(className);
+        return ref != null ? context.getService(ref) : null;
+    }
+
 }

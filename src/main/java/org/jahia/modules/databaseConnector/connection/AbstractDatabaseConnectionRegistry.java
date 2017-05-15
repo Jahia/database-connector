@@ -12,6 +12,7 @@ import org.springframework.util.Assert;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
@@ -41,9 +42,13 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
 
     protected AbstractConnectorMetaData connectorMetaData;
 
+    protected String databseType = null;
+
+    protected String displayName = null;
+
     public AbstractDatabaseConnectionRegistry() {
         this.jcrTemplate = JCRTemplate.getInstance();
-        this.registry = new TreeMap<>();
+        this.registry = new LinkedHashMap<>();
     }
 
     public Map<String, T> getRegistry() {
@@ -252,6 +257,26 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
 
     public Map<String, Object> buildConnectionMapFromConnection(AbstractConnection connection) throws JSONException {
         return prepareConnectionMapFromConnection(connection);
+    }
+
+    public AbstractConnection getConnection(String connectionId) {
+        return (AbstractConnection) registry.get(connectionId);
+    }
+
+    public String getDatabseType() {
+        return databseType;
+    }
+
+    public void setDatabseType(String databseType) {
+        this.databseType = databseType;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 }
 

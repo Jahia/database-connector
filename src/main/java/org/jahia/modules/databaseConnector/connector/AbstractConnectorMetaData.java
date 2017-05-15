@@ -12,15 +12,18 @@ public abstract class AbstractConnectorMetaData {
     protected final String displayName;
     protected final String entryPoint;
     protected final String moduleName;
+    protected final String registryClassName;
 
     public AbstractConnectorMetaData(final String databaseType,
                                      final String displayName,
                                      final String entryPoint,
-                                     final String moduleName) {
+                                     final String moduleName,
+                                     final String registryClassName) {
         this.databaseType = databaseType;
         this.displayName = displayName;
         this.entryPoint = entryPoint;
         this.moduleName = moduleName;
+        this.registryClassName = registryClassName;
     }
 
     public String getDatabaseType() {
@@ -37,6 +40,10 @@ public abstract class AbstractConnectorMetaData {
 
     public String getModuleName() {
         return moduleName;
+    }
+
+    public String getRegistryClassName() {
+        return registryClassName;
     }
 
     @JsonIgnore
