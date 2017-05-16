@@ -26,19 +26,14 @@ package org.jahia.modules.databaseConnector.api;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.api.impl.DirectivesRetriever;
+import org.jahia.modules.databaseConnector.connection.DatabaseConnectionAPI;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectionRegistry;
-import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;
-import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.util.Utils;
-import org.jahia.settings.SettingsBean;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osgi.framework.BundleContext;
 
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 
 import javax.jcr.RepositoryException;

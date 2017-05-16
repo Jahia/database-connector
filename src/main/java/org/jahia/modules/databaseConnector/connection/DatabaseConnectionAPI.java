@@ -1,4 +1,4 @@
-package org.jahia.modules.databaseConnector.api;
+package org.jahia.modules.databaseConnector.connection;
 
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;

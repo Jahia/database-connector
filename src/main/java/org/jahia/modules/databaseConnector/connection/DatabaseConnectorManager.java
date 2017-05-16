@@ -45,7 +45,7 @@ import java.util.*;
  * @author Frédéric Pierre
  * @version 1.0
  */
-@Component(service = DatabaseConnectorManager.class)
+@Component(service = DatabaseConnectorManager.class, immediate = true)
 public class DatabaseConnectorManager implements InitializingBean, BundleListener {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectorManager.class);
 
