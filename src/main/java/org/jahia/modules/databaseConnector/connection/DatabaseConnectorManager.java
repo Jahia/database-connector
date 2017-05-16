@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import org.osgi.framework.*;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -325,14 +326,16 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             //Get the service that is registering to databse connector and retrieve the registry.
             ServiceReference databaseConnectionRegisteryRef = this.context.getServiceReference(connectorMetaData.getRegistryClassName());
             DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) this.context.getService(databaseConnectionRegisteryRef);
-            Map registry = databaseConnectionRegistry.getRegistry();
-            Set<String> set = registry.keySet();
-            for (String connectionId : set) {
-                //Only register the service if it was previously connected and registered.
-                if (((AbstractConnection) registry.get(connectionId)).isConnected()) {
-                    ((AbstractConnection) registry.get(connectionId)).registerAsService();
+//            if (databaseConnectionRegistry != null) {
+                Map registry = databaseConnectionRegistry.getRegistry();
+                Set<String> set = registry.keySet();
+                for (String connectionId : set) {
+                    //Only register the service if it was previously connected and registered.
+                    if (((AbstractConnection) registry.get(connectionId)).isConnected()) {
+                        ((AbstractConnection) registry.get(connectionId)).registerAsService();
+                    }
                 }
-            }
+//            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -341,14 +344,16 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     public <T extends AbstractConnection> void deregisterConnectorFromRegistry(String connectionType) {
         AbstractConnectorMetaData abstractConnectorMetaData = availableConnectors.get(connectionType);
         DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(abstractConnectorMetaData.getRegistryClassName(), this.context);
-        databaseConnectionRegistry.beforeRegistryRemoval();
-        Map<String, T> registry = databaseConnectionRegistry.getRegistry();
-        for (Map.Entry<String, T> entry: registry.entrySet()) {
-            T connection = entry.getValue();
-            if (connection.isConnected()) {
-                connection.unregisterAsService();
+//        if (databaseConnectionRegistry != null) {
+            databaseConnectionRegistry.beforeRegistryRemoval();
+            Map<String, T> registry = databaseConnectionRegistry.getRegistry();
+            for (Map.Entry<String, T> entry: registry.entrySet()) {
+                T connection = entry.getValue();
+                if (connection.isConnected()) {
+                    connection.unregisterAsService();
+                }
             }
-        }
+//        }
         availableConnectors.remove(connectionType);
     }
 
