@@ -26,17 +26,18 @@ package org.jahia.modules.databaseConnector.api;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.api.impl.DirectivesRetriever;
-import org.jahia.modules.databaseConnector.connection.AbstractDatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;
 import org.jahia.modules.databaseConnector.api.impl.DatabaseConnector;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.util.Utils;
+import org.jahia.settings.SettingsBean;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.*;
 import org.slf4j.Logger;
 
@@ -57,23 +58,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * @author stefan on 2016-05-02.
  */
-@Component(service = DCApi.class)
 @Path("/dbconn")
 @Produces({"application/hal+json"})
-public class DCApi {
+public class DCApi extends DatabaseConnectionAPI {
     private static final Logger logger = getLogger(DCApi.class);
-    private DatabaseConnector databaseConnector;
-    private BundleContext context;
-    @Activate
-    public void activate(BundleContext context) {
-        this.context = context;
-    }
 
-    @Reference(cardinality = ReferenceCardinality.MANDATORY, policy = ReferencePolicy.STATIC, service = DatabaseConnectorService.class)
-    public void getDatabaseConnectorService(DatabaseConnectorService databaseConnectorService) {
-        databaseConnector = (DatabaseConnector) databaseConnectorService;
+    public DCApi() {
+        super(DCApi.class);
     }
-    //****************** API ENTRY POINTS START ******************//
 
     @GET
     @Path("/test")
@@ -87,7 +79,7 @@ public class DCApi {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnectorsMetaData() {
         try {
-            return Response.status(Response.Status.OK).entity(databaseConnector.getConnectorsMetaData()).build();
+            return Response.status(Response.Status.OK).entity(getDatabaseConnector().getConnectorsMetaData()).build();
         } catch (JSONException ex) {
             logger.error("Failed to retrieve database types", ex.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Failed to retrieve database types\"}").build();
@@ -101,7 +93,7 @@ public class DCApi {
     public Response importTest(InputStream source) {
         JSONObject jsonAnswer = new JSONObject();
         try {
-            Map results = databaseConnector.importConnections(source);
+            Map results = getDatabaseConnector().importConnections(source);
             jsonAnswer.put("results", results);
             return Response.status(((Map)results.get("report")).get("status").toString().equals("success") ? Response.Status.OK : Response.Status.BAD_REQUEST).entity(jsonAnswer.toString()).build();
         } catch (JSONException ex) {
@@ -132,7 +124,7 @@ public class DCApi {
             } else {
                 exportName = "DBConnectorConnectionsExport";
             }
-            File exportedConnections = databaseConnector.exportConnections(jsonObject);
+            File exportedConnections = getDatabaseConnector().exportConnections(jsonObject);
             Response.ResponseBuilder response;
             if (exportedConnections != null) {
                 response = Response.ok(exportedConnections);
@@ -180,14 +172,14 @@ public class DCApi {
                     Map<String, Object> result = new LinkedHashMap<>();
                     if (connectionJsonObject.has("databaseType")) {
                         String databaseType = connectionJsonObject.getString("databaseType");
-                        DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(databaseType, this.context);
+                        DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(databaseType, getContext());
                         databaseConnectionRegistry.buildConnectionMapFromJSON(result, connectionJsonObject);
                         if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
                             AbstractConnection connection = ((AbstractConnection) result.get("connection"));
-                            if (connection.isConnected() && !databaseConnector.testConnection(connection)) {
+                            if (connection.isConnected() && !getDatabaseConnector().testConnection(connection)) {
                                 connection.isConnected(false);
                             }
-                            if (databaseConnector.addEditConnection(connection, false)) {
+                            if (getDatabaseConnector().addEditConnection(connection, false)) {
                                 result.put("connection", databaseConnectionRegistry.buildConnectionMapFromConnection(connection));
                                 success.push(result);
                             } else {
@@ -210,14 +202,14 @@ public class DCApi {
                 Map<String, Object> result = new LinkedHashMap<>();
                 if (connectionJsonObject.has("databaseType")) {
                     String databaseType = connectionJsonObject.getString("databaseType");
-                    DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(databaseType, this.context);
+                    DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(databaseType, getContext());
                     databaseConnectionRegistry.buildConnectionMapFromJSON(result, connectionJsonObject);
                     if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
                         AbstractConnection connection = (AbstractConnection) result.get("connection");
-                        if (connection.isConnected() && !databaseConnector.testConnection(connection)) {
+                        if (connection.isConnected() && !getDatabaseConnector().testConnection(connection)) {
                             connection.isConnected(false);
                         }
-                        if (databaseConnector.addEditConnection(connection, false)) {
+                        if (getDatabaseConnector().addEditConnection(connection, false)) {
                             jsonAnswer.put("success", databaseConnectionRegistry.buildConnectionMapFromConnection(connection));
                         } else {
                             jsonAnswer.put("failed", databaseConnectionRegistry.buildConnectionMapFromConnection(connection));
@@ -243,7 +235,7 @@ public class DCApi {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnections() {
         try {
-            return Response.status(Response.Status.OK).entity(databaseConnector.getAllConnections()).build();
+            return Response.status(Response.Status.OK).entity(getDatabaseConnector().getAllConnections()).build();
         } catch (JSONException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot parse json data\"}").build();
         } catch (InstantiationException ex) {

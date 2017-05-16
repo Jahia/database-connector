@@ -28,6 +28,7 @@ public class DatabaseConnector implements DatabaseConnectorService {
 
     private transient DatabaseConnectorManager databaseConnectorManager;
     private BundleContext context;
+
     @Activate
     public void activate(BundleContext context) {
         this.context = context;
