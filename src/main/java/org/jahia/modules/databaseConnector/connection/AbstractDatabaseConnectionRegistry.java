@@ -283,6 +283,8 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
         return ((AbstractConnection)registry.get(connectionId)).getClient(connectionId);
     }
 
+    public abstract Object getDatabase(String connectionId);
+
     public void closeConnections() {
         for (Map.Entry<String, T> entry : registry.entrySet()) {
             ((AbstractConnection)entry.getValue()).forgetConnection();
