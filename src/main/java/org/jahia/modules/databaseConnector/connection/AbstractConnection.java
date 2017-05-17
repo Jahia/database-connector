@@ -49,54 +49,7 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
         return "(" + DATABASE_TYPE_KEY + "=" + databaseType + ")";
     }
 
-    protected abstract Object beforeRegisterAsService();
-
-    public abstract void beforeUnregisterAsService();
-
     public abstract boolean testConnectionCreation();
-
-    public void registerAsService() {
-        Object service = beforeRegisterAsService();
-        registerAsService(service, true);
-        this.isConnected = true;
-    }
-
-    public void unregisterAsService() {
-        beforeUnregisterAsService();
-        logger.info("Start unregistering OSGi services for DatabaseConnection of type {} with id '{}'", getDisplayName(), id);
-        for (ServiceRegistration serviceRegistration : serviceRegistrations) {
-            serviceRegistration.unregister();
-        }
-        serviceRegistrations.clear();
-        this.isConnected = false;
-        logger.info("OSGi services successfully unregistered for DatabaseConnection of type {} with id '{}'", getDisplayName(), id);
-    }
-
-    protected boolean registerAsService(Object object, boolean withInterfaceNames) {
-        String[] messageArgs = {object.getClass().getSimpleName(), getDisplayName(), id};
-        logger.info("Start registering OSGi service for {} for DatabaseConnection of type {} with id '{}'", messageArgs);
-        ServiceReference[] serviceReferences;
-        BundleContext bundleContext = DatabaseConnectorManager.getInstance().getBundleContext();
-        try {
-            serviceReferences = bundleContext.getAllServiceReferences(object.getClass().getName(), createFilter(getDatabaseType(), id));
-        } catch (InvalidSyntaxException e) {
-            logger.error(e.getMessage(), e);
-            return false;
-        }
-        if (serviceReferences != null) {
-            logger.info("OSGi service for {} already registered for DatabaseConnection of type {} with id '{}'", messageArgs);
-            return true;
-        }
-        ServiceRegistration serviceRegistration;
-        if (withInterfaceNames) {
-            serviceRegistration = bundleContext.registerService(getInterfacesNames(object), object, createProperties(getDatabaseType(), id));
-        } else {
-            serviceRegistration = bundleContext.registerService(object.getClass().getName(), object, createProperties(getDatabaseType(), id));
-        }
-        serviceRegistrations.add(serviceRegistration);
-        logger.info("OSGi service for {} successfully registered for DatabaseConnection of type {} with id '{}'", messageArgs);
-        return true;
-    }
 
     private Hashtable<String, String> createProperties(String databaseType, String databaseId) {
         Hashtable<String, String> properties = new Hashtable<>();
