@@ -45,9 +45,11 @@ public class DatabaseConnector implements DatabaseConnectorService {
         List<ConnectionData> connectionArray = new ArrayList<>();
         for (Map.Entry<String, AbstractConnectorMetaData> entry: databaseConnectorManager.getAvailableConnectors().entrySet()) {
             Map<String, AbstractConnection> con = databaseConnectorManager.getConnections(entry.getKey());
-            for (Map.Entry<String, ? extends AbstractConnection> connectionEntry: con.entrySet()) {
-                AbstractConnection abstractConnection = connectionEntry.getValue();
-                connectionArray.add(abstractConnection.makeConnectionData());
+            if (con != null) {
+                for (Map.Entry<String, ? extends AbstractConnection> connectionEntry: con.entrySet()) {
+                    AbstractConnection abstractConnection = connectionEntry.getValue();
+                    connectionArray.add(abstractConnection.makeConnectionData());
+                }
             }
         }
         connections = new DbConnections(connectionArray).getJson();

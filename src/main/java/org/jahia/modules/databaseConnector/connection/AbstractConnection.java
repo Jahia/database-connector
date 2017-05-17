@@ -205,5 +205,11 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
     public abstract T makeConnectionData();
 
     public abstract E getServerStatus();
+
+    public abstract Object establishConnection();
+
+    public abstract void forgetConnection();
+
+    public abstract Object getClient(String connectionId);
 }
 

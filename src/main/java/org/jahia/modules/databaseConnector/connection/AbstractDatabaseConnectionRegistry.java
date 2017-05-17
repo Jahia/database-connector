@@ -127,7 +127,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
     public boolean removeConnection(final String databaseConnectionId) {
         Assert.isTrue(registry.containsKey(databaseConnectionId), "No database connection with ID: " + databaseConnectionId);
         if (((AbstractConnection) registry.get(databaseConnectionId)).isConnected()) {
-            ((AbstractConnection) registry.get(databaseConnectionId)).unregisterAsService();
+            ((AbstractConnection) registry.get(databaseConnectionId)).forgetConnection();
         }
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
@@ -151,7 +151,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
     }
 
     public boolean connect(final String databaseConnectionId) {
-        ((AbstractConnection) registry.get(databaseConnectionId)).registerAsService();
+        ((AbstractConnection) registry.get(databaseConnectionId)).establishConnection();
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 Node databaseConnectionNode = getDatabaseConnectionNode(databaseConnectionId, session);
@@ -172,7 +172,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
     }
 
     public boolean disconnect(final String databaseConnectionId) {
-        ((AbstractConnection) registry.get(databaseConnectionId)).unregisterAsService();
+        ((AbstractConnection) registry.get(databaseConnectionId)).forgetConnection();
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 Node databaseConnectionNode = getDatabaseConnectionNode(databaseConnectionId, session);
@@ -278,5 +278,15 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
+
+    public Object getClient(String connectionId) {
+        return ((AbstractConnection)registry.get(connectionId)).getClient(connectionId);
+    }
+
+    public void closeConnections() {
+        for (Map.Entry<String, T> entry : registry.entrySet()) {
+            ((AbstractConnection)entry.getValue()).forgetConnection();
+        }
+    };
 }
 
