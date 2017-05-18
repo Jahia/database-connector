@@ -1,6 +1,6 @@
 package org.jahia.modules.databaseConnector.connection;
 
-import org.jahia.modules.databaseConnector.connector.AbstractConnectorMetaData;
+import org.jahia.modules.databaseConnector.connector.ConnectorMetaData;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,11 +30,13 @@ public interface DatabaseConnectionRegistry<T> {
 
     boolean disconnect(final String databaseConnectionId);
 
-    AbstractConnectorMetaData getConnectorMetaData();
+    ConnectorMetaData getConnectorMetaData();
 
     String getConnectionType();
 
     String getConnectionDisplayName();
+
+    String getEntryPoint();
 
     Map<String, Object> prepareConnectionMapFromJSON(final Map<String, Object> result, final JSONObject jsonConnectionData) throws JSONException;
 
@@ -46,6 +48,4 @@ public interface DatabaseConnectionRegistry<T> {
 
     AbstractConnection getConnection(String connectionId);
 
-    //Use do any logic before services in registry will be stopped and unregistered from connector and registry removed.
-    void beforeRegistryRemoval();
 }

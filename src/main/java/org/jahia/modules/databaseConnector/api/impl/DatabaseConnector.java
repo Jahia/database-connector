@@ -1,7 +1,7 @@
 package org.jahia.modules.databaseConnector.api.impl;
 
 import org.jahia.modules.databaseConnector.connection.*;
-import org.jahia.modules.databaseConnector.connector.AbstractConnectorMetaData;
+import org.jahia.modules.databaseConnector.connector.ConnectorMetaData;
 import org.jahia.modules.databaseConnector.serialization.models.DbConnections;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectorManager;
 import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;
@@ -43,7 +43,7 @@ public class DatabaseConnector implements DatabaseConnectorService {
         String connections;
 
         List<ConnectionData> connectionArray = new ArrayList<>();
-        for (Map.Entry<String, AbstractConnectorMetaData> entry: databaseConnectorManager.getAvailableConnectors().entrySet()) {
+        for (Map.Entry<String, ConnectorMetaData> entry: databaseConnectorManager.getAvailableConnectors().entrySet()) {
             Map<String, AbstractConnection> con = databaseConnectorManager.getConnections(entry.getKey());
             if (con != null) {
                 for (Map.Entry<String, ? extends AbstractConnection> connectionEntry: con.entrySet()) {
@@ -58,7 +58,7 @@ public class DatabaseConnector implements DatabaseConnectorService {
 
     public String getConnectorsMetaData() throws JSONException {
         JSONObject connectorsMetaData = new JSONObject();
-        for ( Map.Entry<String, AbstractConnectorMetaData> entry: this.databaseConnectorManager.getAvailableConnectors().entrySet()) {
+        for ( Map.Entry<String, ConnectorMetaData> entry: this.databaseConnectorManager.getAvailableConnectors().entrySet()) {
             connectorsMetaData.put(entry.getKey(), new JSONObject(entry.getValue().getJson()));
         }
         return connectorsMetaData.toString();
@@ -142,11 +142,6 @@ public class DatabaseConnector implements DatabaseConnectorService {
     }
 
     @Override
-    public void registerConnectorToRegistry(String connectionType, AbstractConnectorMetaData connectorMetaData) {
-        databaseConnectorManager.registerConnectorToRegistry(connectionType, connectorMetaData);
-    }
-
-    @Override
     public <T extends AbstractConnection> boolean hasConnection(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException {
         return databaseConnectorManager.hasConnection(connectionId, databaseType);
     }
@@ -154,10 +149,5 @@ public class DatabaseConnector implements DatabaseConnectorService {
     @Override
     public String setPassword(Map<String, Object> map, String password) {
         return databaseConnectorManager.setPassword(map, password);
-    }
-
-    @Override
-    public void deregisterConnectorFromRegistry(String connectionType) {
-        databaseConnectorManager.deregisterConnectorFromRegistry(connectionType);
     }
 }

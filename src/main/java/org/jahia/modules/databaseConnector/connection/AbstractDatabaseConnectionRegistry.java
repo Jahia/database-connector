@@ -1,6 +1,6 @@
 package org.jahia.modules.databaseConnector.connection;
 
-import org.jahia.modules.databaseConnector.connector.AbstractConnectorMetaData;
+import org.jahia.modules.databaseConnector.connector.ConnectorMetaData;
 import org.jahia.services.content.*;
 import org.jahia.utils.EncryptionUtils;
 import org.json.JSONException;
@@ -14,7 +14,6 @@ import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import static org.jahia.modules.databaseConnector.util.Utils.query;
@@ -40,7 +39,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
 
     protected static final Pattern ALPHA_NUMERIC_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
 
-    protected AbstractConnectorMetaData connectorMetaData;
+    protected ConnectorMetaData connectorMetaData;
 
     protected String databseType = null;
 
@@ -263,22 +262,6 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
         return (AbstractConnection) registry.get(connectionId);
     }
 
-    public String getDatabseType() {
-        return databseType;
-    }
-
-    public void setDatabseType(String databseType) {
-        this.databseType = databseType;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
     public Object getClient(String connectionId) {
         return ((AbstractConnection)registry.get(connectionId)).getClient(connectionId);
     }
@@ -290,5 +273,15 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
             ((AbstractConnection)entry.getValue()).forgetConnection();
         }
     };
+
+    public void setConnectorProperties(String moduleName, String registryClassName) {
+        this.connectorMetaData = new ConnectorMetaData(
+                getConnectionType(),
+                getConnectionDisplayName(),
+                getEntryPoint(),
+                moduleName,
+                registryClassName
+                );
+    }
 }
 

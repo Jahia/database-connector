@@ -7,18 +7,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Created by stefan on 2017-04-26.
  */
-public abstract class AbstractConnectorMetaData {
+public class ConnectorMetaData {
     protected final String databaseType;
     protected final String displayName;
     protected final String entryPoint;
     protected final String moduleName;
     protected final String registryClassName;
 
-    public AbstractConnectorMetaData(final String databaseType,
-                                     final String displayName,
-                                     final String entryPoint,
-                                     final String moduleName,
-                                     final String registryClassName) {
+    public ConnectorMetaData(final String databaseType,
+                             final String displayName,
+                             final String entryPoint,
+                             final String moduleName,
+                             final String registryClassName) {
         this.databaseType = databaseType;
         this.displayName = displayName;
         this.entryPoint = entryPoint;

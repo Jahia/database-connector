@@ -5,7 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.jahia.api.Constants;
 import org.jahia.data.templates.JahiaTemplatesPackage;
-import org.jahia.modules.databaseConnector.connector.AbstractConnectorMetaData;
+import org.jahia.modules.databaseConnector.connector.ConnectorMetaData;
 import org.jahia.modules.databaseConnector.util.Utils;
 import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
 import org.jahia.modules.databaseConnector.dsl.DSLHandler;
@@ -25,7 +25,6 @@ import org.json.JSONObject;
 import org.osgi.framework.*;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -61,7 +60,6 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     private BundleContext context;
     private DSLExecutor dslExecutor;
     private Map<String, DSLHandler> dslHandlerMap;
-    private Map<String, AbstractConnectorMetaData> availableConnectors = new LinkedHashMap<>();
     private final static Set<Long> installedBundles = new LinkedHashSet<>();
     private final static Map<String, String> angularConfigFilesPath = new HashMap<>();
     private final static Map<String, Long> angularConfigFilesTimestamp = new HashMap<>();
@@ -133,9 +131,9 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     public <T extends AbstractConnection, E extends AbstractDatabaseConnectionRegistry> Map<String, Map> findRegisteredConnections() throws InstantiationException, IllegalAccessException{
         Map<String, Map> registeredConnections = new HashMap<>();
-        for (Map.Entry<String, AbstractConnectorMetaData> entry: availableConnectors.entrySet()) {
-            DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(entry.getValue().getRegistryClassName(), this.context);
-            String connectionType = entry.getKey();
+
+        for (DatabaseConnectionRegistry databaseConnectionRegistry: getDatabaseConnectionRegistryServices()) {
+            String connectionType = databaseConnectionRegistry.getConnectionType();
             Map<String, T> registry = databaseConnectionRegistry.getRegistry();
             if (!registry.isEmpty()) {
                 Map<String, T> connectionSet = new HashMap<>();
@@ -163,20 +161,17 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         return databaseConnections.containsKey(connectionId);
     }
     public boolean addEditConnection(final AbstractConnection connection, final Boolean isEdition) {
-        AbstractConnectorMetaData abstractConnectorMetaData = availableConnectors.get(connection.getDatabaseType());
-        DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(abstractConnectorMetaData.getRegistryClassName(), this.context);
+        DatabaseConnectionRegistry databaseConnectionRegistry = getDatabaseConnectionRegistryService(connection.getDatabaseType());
         return databaseConnectionRegistry.addEditConnection(connection, isEdition);
     }
 
     public boolean removeConnection(String connectionId, String databaseType) {
-        AbstractConnectorMetaData abstractConnectorMetaData = availableConnectors.get(databaseType);
-        DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(abstractConnectorMetaData.getRegistryClassName(), this.context);
+        DatabaseConnectionRegistry databaseConnectionRegistry = getDatabaseConnectionRegistryService(databaseType);
         return databaseConnectionRegistry.removeConnection(connectionId);
     }
 
     public boolean updateConnection(String connectionId, String databaseType, boolean connect) {
-        AbstractConnectorMetaData abstractConnectorMetaData = availableConnectors.get(databaseType);
-        DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(abstractConnectorMetaData.getRegistryClassName(), this.context);
+        DatabaseConnectionRegistry databaseConnectionRegistry = getDatabaseConnectionRegistryService(databaseType);
         if (connect) {
             if (((AbstractConnection) databaseConnectionRegistry.getRegistry().get((connectionId))).testConnectionCreation()) {
                 databaseConnectionRegistry.connect(connectionId);
@@ -190,8 +185,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     }
 
     public boolean testConnection(AbstractConnection connection) {
-        AbstractConnectorMetaData abstractConnectorMetaData = availableConnectors.get(connection.getDatabaseType());
-        DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(abstractConnectorMetaData.getRegistryClassName(), this.context);
+        DatabaseConnectionRegistry databaseConnectionRegistry = getDatabaseConnectionRegistryService(connection.getDatabaseType());
         return databaseConnectionRegistry.testConnection(connection);
     }
 
@@ -204,7 +198,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             file = File.createTempFile("temporaryImportFile", ".wzd");
             FileUtils.copyInputStreamToFile(source, file);
             dslExecutor.execute(file.toURI().toURL(), dslHandlerMap.get("importConnection"), parsedConnections);
-            for (Map.Entry<String, AbstractConnectorMetaData> entry: this.availableConnectors.entrySet()) {
+            for (Map.Entry<String, ConnectorMetaData> entry: getAvailableConnectors().entrySet()) {
                 String databaseType = entry.getValue().getDatabaseType();
                 if (parsedConnections.containsKey(databaseType)) {
                     Map<String, List> results = new LinkedHashMap<>();
@@ -249,10 +243,9 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     }
 
     public Map<String, Object> importConnection(Map<String, Object> map) {
-        if (availableConnectors.containsKey(map.get("type"))) {
+        DatabaseConnectionRegistry databaseConnectionRegistry = getDatabaseConnectionRegistryService((String)map.get("type"));
+        if (databaseConnectionRegistry != null) {
             logger.info("Importing connection " + map);
-            AbstractConnectorMetaData abstractConnectorMetaData = availableConnectors.get(map.get("type"));
-            DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(abstractConnectorMetaData.getRegistryClassName(), this.context);
             databaseConnectionRegistry.importConnection(map);
         } else {
             map.put("status", "failed");
@@ -316,16 +309,12 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     }
 
-    public Map<String, AbstractConnectorMetaData> getAvailableConnectors() {
+    public Map<String, ConnectorMetaData> getAvailableConnectors() {
+        Map<String, ConnectorMetaData> availableConnectors = new LinkedHashMap<>();
+        for (DatabaseConnectionRegistry databaseConnectionRegistry: getDatabaseConnectionRegistryServices()) {
+            availableConnectors.put(databaseConnectionRegistry.getConnectionType(), databaseConnectionRegistry.getConnectorMetaData());
+        }
         return availableConnectors;
-    }
-
-    public void registerConnectorToRegistry(String connectionType, AbstractConnectorMetaData connectorMetaData) {
-        availableConnectors.put(connectionType, connectorMetaData);
-    }
-
-    public <T extends AbstractConnection> void deregisterConnectorFromRegistry(String connectionType) {
-        availableConnectors.remove(connectionType);
     }
 
     public BundleContext getBundleContext() {
@@ -583,5 +572,33 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             logger.error("Older version of SettingsBean detected " + e.getMessage() + "\n" + e);
             return SettingsBean.getInstance().getJahiaVarDiskPath() + path;
         }
+    }
+
+    private DatabaseConnectionRegistry getDatabaseConnectionRegistryService(String databaseType) {
+        try {
+            ServiceReference[] serviceReferences = this.context.getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
+            for (int i = 0; i < serviceReferences.length; i++) {
+                DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) this.context.getService(serviceReferences[i]);
+                if (databaseConnectionRegistry.getConnectionType().equals(databaseType)) {
+                    return databaseConnectionRegistry;
+                }
+            }
+        } catch (InvalidSyntaxException ex) {
+            logger.error("Could not find service: " + ex.getMessage());
+        }
+        return null;
+    }
+
+    private List<DatabaseConnectionRegistry> getDatabaseConnectionRegistryServices() {
+        List<DatabaseConnectionRegistry> databaseConnectionRegistryServices = new LinkedList<>();
+        try {
+            ServiceReference[] serviceReferences = this.context.getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
+            for (int i = 0; i < serviceReferences.length; i++) {
+                databaseConnectionRegistryServices.add((DatabaseConnectionRegistry) this.context.getService(serviceReferences[i]));
+            }
+        } catch (InvalidSyntaxException ex) {
+            logger.error("Could not find service: " + ex.getMessage());
+        }
+        return databaseConnectionRegistryServices;
     }
 }
