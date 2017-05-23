@@ -20,7 +20,9 @@
         .module('databaseConnector')
         .directive('dcImportResults', ['$log', 'contextualData', importResults]);
 
-    function ImportResultsController($scope, contextualData, dcDataFactory, $state, $stateParams, toaster, $mdDialog, i18n) {
+    function ImportResultsController($scope, contextualData, dcDataFactory,
+                                     $state, $stateParams, toaster, $mdDialog, i18n,
+                                     $DCSS) {
         var irc = this;
         irc.importResults = {};
         irc.selectedImports = {};
@@ -35,38 +37,30 @@
         irc.isReImportDisabled = isReImportDisabled;
         irc.getFormattedImportHeader = getFormattedImportHeader;
         irc.getMessage = i18n.message;
-
+        irc.connectorsMetaData = $DCSS.connectorsMetaData;
         irc.$onInit = function() {
           init();
         };
 
         function init() {
             var url = contextualData.context + '/modules/databaseconnector/databasetypes';
-            dcDataFactory.customRequest({
-                url: url,
-                method: 'GET'
-            }).then(function(response) {
-                if ($stateParams.results !== null) {
-                    irc.importResults = $stateParams.results;
-                    irc.databaseTypes = response;
-                    toaster.pop({
-                        type: $stateParams.status ? 'success' : 'error',
-                        title: i18n.message('dc_databaseConnector.toast.title.importStatus'),
-                        body: $stateParams.status ? i18n.message('dc_databaseConnector.toast.message.connectionsImportedSuccessfully') : i18n.message('dc_databaseConnector.toast.message.connectionsImportIncomplete'),
-                        toastId: 'irc',
-                        timeout: 3000
-                    });
-                } else {
-                    $state.go('connections');
-                }
-            }, function(response) {
+            if ($stateParams.results !== null) {
+                irc.importResults = $stateParams.results;
+                toaster.pop({
+                    type: $stateParams.status ? 'success' : 'error',
+                    title: i18n.message('dc_databaseConnector.toast.title.importStatus'),
+                    body: $stateParams.status ? i18n.message('dc_databaseConnector.toast.message.connectionsImportedSuccessfully') : i18n.message('dc_databaseConnector.toast.message.connectionsImportIncomplete'),
+                    toastId: 'irc',
+                    timeout: 3000
+                });
+            } else {
                 $state.go('connections');
-            });
+            }
         }
 
         function reImportConnection(connection, $index) {
             irc.importInProgress = true;
-            var url = contextualData.context + '/modules/databaseconnector/reimport/false';
+            var url = contextualData.apiUrl + '/reimport/false';
             dcDataFactory.customRequest({
                 url: url,
                 method: 'POST',
@@ -86,7 +80,7 @@
 
         function reImportConnections() {
             irc.importInProgress = true;
-            var url = contextualData.context + '/modules/databaseconnector/reimport/true';
+            var url = contextualData.apiUrl + '/reimport/true';
             var connections = [];
             for (var databaseType in irc.selectedImports) {
                 for(var i in irc.selectedImports[databaseType]) {
@@ -173,10 +167,10 @@
         }
 
         function clearSelectedImports() {
-            for (var databaseType in irc.databaseTypes) {
-                if (databaseType in irc.importResults) {
-                    for (var i in irc.importResults[databaseType].failed) {
-                        irc.importResults[databaseType].failed[i].reImport = null;
+            for (var connectorMetaData in irc.connectorsMetaData) {
+                if (connectorMetaData.databaseType in irc.importResults) {
+                    for (var i in irc.importResults[connectorMetaData.databaseType].failed) {
+                        irc.importResults[connectorMetaData.databaseType].failed[i].reImport = null;
                     }
                 }
             }
@@ -188,7 +182,8 @@
         }
     }
 
-    ImportResultsController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$state', '$stateParams', 'toaster', '$mdDialog', 'i18nService'];
+    ImportResultsController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$state',
+        '$stateParams', 'toaster', '$mdDialog', 'i18nService', '$DCStateService'];
 
     function EditImportedConnectionPopupController($scope, $mdDialog, connection) {
         $scope.eicc = this;

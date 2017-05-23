@@ -61,6 +61,8 @@
                     for (var i = 0; i < connections.length; i++) {
                         $DCCMS.verifyServerStatus(connections[i]).then(function(connection){
                             connections[i] = connection;
+                        }, function(error) {
+                            connections[i] = error.connection;
                         });
                     }
                     resolve(connections);

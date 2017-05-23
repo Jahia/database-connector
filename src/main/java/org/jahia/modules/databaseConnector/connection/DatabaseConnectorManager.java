@@ -122,6 +122,9 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                     parseDefinitionWizards(currentBundle);
                 }
             }
+            for (DatabaseConnectionRegistry databaseConnectionRegistry: getDatabaseConnectionRegistryServices()) {
+                databaseConnectionRegistry.registerServices();
+            }
         }
     }
 
@@ -135,13 +138,13 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         for (DatabaseConnectionRegistry databaseConnectionRegistry: getDatabaseConnectionRegistryServices()) {
             String connectionType = databaseConnectionRegistry.getConnectionType();
             Map<String, T> registry = databaseConnectionRegistry.getRegistry();
-            if (!registry.isEmpty()) {
-                Map<String, T> connectionSet = new HashMap<>();
-                for (Map.Entry<String, T> registeryEntry : registry.entrySet()) {
-                    connectionSet.put(registeryEntry.getKey(), registeryEntry.getValue());
+            Map<String, T> connectionMap = new HashMap<>();
+            if (registry != null) {
+                for (Map.Entry<String, T> registryEntry : registry.entrySet()) {
+                    connectionMap.put(registryEntry.getKey(), registryEntry.getValue());
                 }
-                registeredConnections.put(connectionType, connectionSet);
             }
+            registeredConnections.put(connectionType, connectionMap);
         }
         return registeredConnections;
     }

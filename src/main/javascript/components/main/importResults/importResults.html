@@ -28,12 +28,12 @@
         </div>
     </md-toolbar>
     <md-list>
-        <div ng-if="irc.hasResults(databaseType)" ng-repeat="(databaseType, displayableName) in irc.databaseTypes">
+        <div ng-if="irc.hasResults(connectorMetaData.databaseType)" ng-repeat="connectorMetaData in irc.connectorsMetaData">
             <md-subheader>
-                <h4>{{irc.getFormattedImportHeader(displayableName)}}</h4>
+                <h4>{{irc.getFormattedImportHeader(connectorMetaData.displayName)}}</h4>
             </md-subheader>
             <md-divider></md-divider>
-            <md-list-item ng-repeat="failedConnection in irc.importResults[databaseType].failed track by $index">
+            <md-list-item ng-repeat="failedConnection in irc.importResults[connectorMetaData.databaseType].failed track by $index">
                 <div class="errorStatusBar"></div>
                 <div>
                     <h3>
@@ -48,11 +48,11 @@
                              ng-model="failedConnection.reImport"
                              ng-true-value="'{{$index}}'"
                              ng-false-value="null"
-                             ng-change="irc.updateSelectedImports($index, databaseType)">
+                             ng-change="irc.updateSelectedImports($index, connectorMetaData.databaseType)">
                 </md-checkbox>
                 <md-icon class="md-secondary"
                            aria-label="Edit import connection"
-                           ng-click="irc.editConnection($index, databaseType, $event)">
+                           ng-click="irc.editConnection($index, connectorMetaData.databaseType, $event)">
                     <i class="fa fa-pencil"></i>
                     <md-tooltip class="noToolTipAnimation"
                                 md-direction="top"
@@ -73,7 +73,7 @@
                 <md-divider></md-divider>
             </md-list-item>
 
-            <md-list-item ng-repeat="successConnection in irc.importResults[databaseType].success">
+            <md-list-item ng-repeat="successConnection in irc.importResults[connectorMetaData.databaseType].success">
                 <div class="successStatusBar"></div>
                 <div>
                     <h3>

@@ -6,14 +6,6 @@
 
 [dc:serverSettings] > jnt:content, jmix:studioOnly, mix:title, jmix:siteComponent
 
-[dc:mongoConnection] > jnt:content, dcmix:databaseConnection
- - dc:writeConcern (String, choicelist[mongoWriteConcern])
- - dc:authDb (String)
-
-[dc:redisConnection] > jnt:content, dcmix:databaseConnection
- - dc:timeout (long)
- - dc:weight (long)
-
 [dcmix:databaseConnection] mixin
  - dc:id (String) mandatory
  - dc:host (String)

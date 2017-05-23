@@ -27,6 +27,10 @@
         }
 
         function parseRedisStatus(response) {
+            if (_.isEmpty(response)) {
+                return null;
+            }
+
             var lines = response.split( "\r\n" );
             var RedisJsonStats = { };
             for ( var i = 0, l = response.length; i < l; i++ ) {

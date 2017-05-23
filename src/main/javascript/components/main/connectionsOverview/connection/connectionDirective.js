@@ -49,6 +49,9 @@
             $DCCMS.verifyServerStatus(cc.connection).then(function(connection){
                 cc.connection = connection;
                 cc.originalConnection = angular.copy(connection);
+            }, function(error){
+                cc.connection = error.connection;
+                cc.originalConnection = angular.copy(error.connection);
             });
         };
 
@@ -57,6 +60,10 @@
             $DCCMS.updateConnection(cc.connection, connect).then(function(connection) {
                 cc.connection = connection;
                 cc.originalConnection = angular.copy(connection);
+                cc.spinnerOptions.showSpinner = false;
+            }, function(error) {
+                cc.connection = error.connection;
+                cc.originalConnection = angular.copy(error.connection);
                 cc.spinnerOptions.showSpinner = false;
             });
         }
@@ -141,8 +148,14 @@
                 $DCCMS.verifyServerStatus(updatedConnection).then(function(connection){
                     cc.connection = connection;
                     cc.originalConnection = angular.copy(connection);
+                }, function(error){
+                    cc.connection = error.connection;
+                    cc.originalConnection = angular.copy(error.connection);
                 });
-            }, function(response) {});
+            }, function(error) {
+                cc.connection = error.connection;
+                cc.originalConnection = angular.copy(error.connection);
+            });
         }
         
         function exportValueChanged() {

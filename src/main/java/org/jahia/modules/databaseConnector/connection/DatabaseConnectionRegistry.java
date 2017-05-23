@@ -48,4 +48,5 @@ public interface DatabaseConnectionRegistry<T> {
 
     AbstractConnection getConnection(String connectionId);
 
+    void registerServices();
 }

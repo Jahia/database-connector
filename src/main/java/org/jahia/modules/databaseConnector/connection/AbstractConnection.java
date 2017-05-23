@@ -1,9 +1,5 @@
 package org.jahia.modules.databaseConnector.connection;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +23,6 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
     public final static String OPTIONS_KEY = "dc:options";
     private static final Logger logger = LoggerFactory.getLogger(AbstractConnection.class);
     private static final long serialVersionUID = 1L;
-    private final static String DATABASE_ID_KEY = "databaseId";
-    public final static String DATABASE_TYPE_KEY = "databaseType";
-    private final List<ServiceRegistration> serviceRegistrations = new LinkedList<>();
     protected String id;
     protected String oldId;
     protected String host;
@@ -41,31 +34,19 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
     protected String options;
     protected Boolean isConnected;
 
-    public static String createFilter(String databaseType, String databaseId) {
-        return "(&(" + DATABASE_TYPE_KEY + "=" + databaseType + ")(" + DATABASE_ID_KEY + "=" + databaseId + "))";
-    }
-
-    public static String createSingleFilter(String databaseType) {
-        return "(" + DATABASE_TYPE_KEY + "=" + databaseType + ")";
-    }
-
     public abstract boolean testConnectionCreation();
-
-    private Hashtable<String, String> createProperties(String databaseType, String databaseId) {
-        Hashtable<String, String> properties = new Hashtable<>();
-        properties.put(DATABASE_TYPE_KEY, databaseType);
-        properties.put(DATABASE_ID_KEY, databaseId);
-        return properties;
-    }
-
-    private String[] getInterfacesNames(Object obj) {
-        Class[] interfaces = obj.getClass().getInterfaces();
-        String[] interfacesNames = new String[interfaces.length];
-        for (int i = 0; i < interfaces.length; i++) {
-            interfacesNames[i] = interfaces[i].getName();
-        }
-        return interfacesNames;
-    }
+    public abstract Object beforeRegisterAsService();
+    public abstract void beforeUnregisterAsService();
+    public abstract String parseOptions(LinkedHashMap<String, Object> options);
+    public abstract T makeConnectionData();
+    public abstract E getServerStatus();
+    public abstract Object establishConnection();
+    public abstract void forgetConnection();
+    public abstract Object getClient(String connectionId);
+    public abstract String getNodeType();
+    public abstract String getDatabaseType();
+    public abstract  String getDisplayName();
+    public abstract String getSerializedExportData();
 
     public String getId() {
         return id;
@@ -139,12 +120,6 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
         isConnected = connected;
     }
 
-    public abstract String getDatabaseType();
-
-    public abstract  String getDisplayName();
-
-    public abstract String getSerializedExportData();
-
     public String getOptions() {
         return options;
     }
@@ -152,17 +127,5 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
     public void setOptions(String options) {
         this.options = options;
     }
-
-    public abstract String parseOptions(LinkedHashMap<String, Object> options);
-
-    public abstract T makeConnectionData();
-
-    public abstract E getServerStatus();
-
-    public abstract Object establishConnection();
-
-    public abstract void forgetConnection();
-
-    public abstract Object getClient(String connectionId);
 }
 

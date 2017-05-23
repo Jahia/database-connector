@@ -5,6 +5,10 @@ import org.jahia.services.content.*;
 import org.jahia.utils.EncryptionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -12,8 +16,7 @@ import org.springframework.util.Assert;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static org.jahia.modules.databaseConnector.util.Utils.query;
@@ -27,7 +30,7 @@ import static org.jahia.modules.databaseConnector.connection.DatabaseConnectorMa
  * @version 1.0
  */
 
-public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseConnectionRegistry<T> {
+public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConnection> implements DatabaseConnectionRegistry<T> {
 
     private final static String NODE_TYPE = "dcmix:databaseConnection";
 
@@ -41,14 +44,19 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
 
     protected ConnectorMetaData connectorMetaData;
 
-    protected String databseType = null;
+    protected BundleContext context = null;
 
-    protected String displayName = null;
+    private Map<String, ServiceRegistration> serviceRegistrations = new LinkedHashMap<>();
+
+    private final static String DATABASE_ID_KEY = "databaseId";
+    public final static String DATABASE_TYPE_KEY = "databaseType";
 
     public AbstractDatabaseConnectionRegistry() {
         this.jcrTemplate = JCRTemplate.getInstance();
         this.registry = new LinkedHashMap<>();
     }
+
+    protected abstract boolean beforeAddEditConnection(final AbstractConnection connection, final boolean isEdition);
 
     public Map<String, T> getRegistry() {
         return registry;
@@ -120,13 +128,49 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
         }
     }
 
-    protected void storeAdvancedConfig(AbstractConnection connection, JCRNodeWrapper node) throws RepositoryException {
+    protected abstract void storeAdvancedConfig(AbstractConnection connection, JCRNodeWrapper node) throws RepositoryException;
+
+    @Override
+    public boolean addEditConnection (final AbstractConnection connection, final Boolean isEdition) {
+        if (!beforeAddEditConnection(connection, isEdition)) {
+            return false;
+        }
+
+        if (storeConnection(connection, connection.getNodeType(), isEdition)) {
+            if (isEdition) {
+                if (((AbstractConnection) registry.get(connection.getOldId())).isConnected()) {
+                    unregisterAsService(connection);
+                }
+                if (!connection.getId().equals(connection.getOldId())) {
+                    registry.remove(connection.getOldId());
+                }
+                if (connection.isConnected() && connection.testConnectionCreation()) {
+                    registerAsService(connection);
+                } else {
+                    connection.isConnected(false);
+                }
+                registry.put(connection.getId(), (T) connection);
+            } else {
+
+                registry.put(connection.getId(), (T) connection);
+                if (connection.isConnected() && connection.testConnectionCreation()) {
+                    registerAsService(connection);
+                } else {
+                    connection.isConnected(false);
+                }
+
+            }
+            return true;
+
+        } else {
+            return false;
+        }
     }
 
     public boolean removeConnection(final String databaseConnectionId) {
         Assert.isTrue(registry.containsKey(databaseConnectionId), "No database connection with ID: " + databaseConnectionId);
         if (((AbstractConnection) registry.get(databaseConnectionId)).isConnected()) {
-            ((AbstractConnection) registry.get(databaseConnectionId)).forgetConnection();
+            unregisterAsService(((AbstractConnection) registry.get(databaseConnectionId)));
         }
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
@@ -150,7 +194,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
     }
 
     public boolean connect(final String databaseConnectionId) {
-        ((AbstractConnection) registry.get(databaseConnectionId)).establishConnection();
+        registerAsService(((AbstractConnection) registry.get(databaseConnectionId)));
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 Node databaseConnectionNode = getDatabaseConnectionNode(databaseConnectionId, session);
@@ -171,7 +215,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
     }
 
     public boolean disconnect(final String databaseConnectionId) {
-        ((AbstractConnection) registry.get(databaseConnectionId)).forgetConnection();
+        unregisterAsService(((AbstractConnection) registry.get(databaseConnectionId)));
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 Node databaseConnectionNode = getDatabaseConnectionNode(databaseConnectionId, session);
@@ -266,8 +310,6 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
         return ((AbstractConnection)registry.get(connectionId)).getClient(connectionId);
     }
 
-    public abstract Object getDatabase(String connectionId);
-
     public void closeConnections() {
         for (Map.Entry<String, T> entry : registry.entrySet()) {
             ((AbstractConnection)entry.getValue()).forgetConnection();
@@ -281,7 +323,84 @@ public abstract class AbstractDatabaseConnectionRegistry<T> implements DatabaseC
                 getEntryPoint(),
                 moduleName,
                 registryClassName
-                );
+        );
+    }
+
+    @Override
+    public ConnectorMetaData getConnectorMetaData() {
+        return this.connectorMetaData;
+    }
+
+    protected void registerAsService(AbstractConnection connection) {
+        Object service = connection.beforeRegisterAsService();
+        registerAsService(service, true, connection);
+        connection.isConnected(true);
+    }
+
+    private boolean registerAsService(Object object, boolean withInterfaceNames, AbstractConnection connection) {
+        String[] messageArgs = {object.getClass().getSimpleName(), connection.getDisplayName(), connection.getId()};
+        logger.info("Start registering OSGi service for {} for DatabaseConnection of type {} with id '{}'", messageArgs);
+        ServiceReference[] serviceReferences;
+        try {
+            serviceReferences = this.context.getAllServiceReferences(object.getClass().getName(), createFilter(connection.getDatabaseType(), connection.getId()));
+        } catch (InvalidSyntaxException e) {
+            logger.error(e.getMessage(), e);
+            return false;
+        }
+        if (serviceReferences != null) {
+            logger.info("OSGi service for {} already registered for DatabaseConnection of type {} with id '{}'", messageArgs);
+            return true;
+        }
+        ServiceRegistration serviceRegistration;
+        if (withInterfaceNames) {
+            serviceRegistration = this.context.registerService(getInterfacesNames(object), object, createProperties(connection.getDatabaseType(), connection.getId()));
+        } else {
+            serviceRegistration = this.context.registerService(object.getClass().getName(), object, createProperties(connection.getDatabaseType(), connection.getId()));
+        }
+        this.serviceRegistrations.put(connection.getId(), serviceRegistration);
+        logger.info("OSGi service for {} successfully registered for DatabaseConnection of type {} with id '{}'", messageArgs);
+        return true;
+    }
+
+    protected void unregisterAsService(AbstractConnection connection) {
+        connection.beforeUnregisterAsService();
+        logger.info("Start unregistering OSGi services for DatabaseConnection of type {} with id '{}'", connection.getDisplayName(), connection.getId());
+        ServiceRegistration serviceRegistration = this.serviceRegistrations.get(connection.getId());
+        if (serviceRegistration != null) {
+            serviceRegistration.unregister();
+            this.serviceRegistrations.remove(connection.getId());
+        }
+        connection.isConnected = false;
+        logger.info("OSGi services successfully unregistered for DatabaseConnection of type {} with id '{}'", connection.getDisplayName(), connection.getId());
+    }
+
+    private String[] getInterfacesNames(Object obj) {
+        Class[] interfaces = obj.getClass().getInterfaces();
+        String[] interfacesNames = new String[interfaces.length];
+        for (int i = 0; i < interfaces.length; i++) {
+            interfacesNames[i] = interfaces[i].getName();
+        }
+        return interfacesNames;
+    }
+
+    private Hashtable<String, String> createProperties(String databaseType, String databaseId) {
+        Hashtable<String, String> properties = new Hashtable<>();
+        properties.put(DATABASE_TYPE_KEY, databaseType);
+        properties.put(DATABASE_ID_KEY, databaseId);
+        return properties;
+    }
+
+    public static String createFilter(String databaseType, String databaseId) {
+        return "(&(" + DATABASE_TYPE_KEY + "=" + databaseType + ")(" + DATABASE_ID_KEY + "=" + databaseId + "))";
+    }
+
+    public void registerServices() {
+        for (Map.Entry<String, T> entry: registry.entrySet()) {
+            AbstractConnection connection = entry.getValue();
+            if (connection.isConnected()) {
+                registerAsService(connection);
+            }
+        }
     }
 }
 

@@ -2,7 +2,7 @@
     var DCConnectionManagerService = function($http, contextualData, $q, toaster, i18n, $DCSS, dcDataFactory) {
         var self = this;
         this.updateConnection = function(connection, connect) {
-            return $q(function(resolve){
+            return $q(function(resolve, reject){
                 var url = contextualData.apiUrl + $DCSS.connectorsMetaData[connection.databaseType].entryPoint + (connect ? '/connect/' : '/disconnect/') + connection.id;
                 $http({
                     url: url,
@@ -36,13 +36,14 @@
                     }
 
                 }, function(response) {
-                    cc.connection.canRetrieveStatus = false;
+                    connection.canRetrieveStatus = false;
+                    resolve({data:response.data, connection:connection});
                 });
             });
         };
 
         this.verifyServerStatus = function(connection) {
-            return $q(function(resolve){
+            return $q(function(resolve, reject){
                 //verify if this connection is authenticated to retrieve server status
                 var url = contextualData.apiUrl + $DCSS.connectorsMetaData[connection.databaseType].entryPoint + '/status/' + connection.id;
                 $http({
@@ -56,11 +57,13 @@
                         if(connection.databaseType == "MONGO"){
                             connection.dbVersion = response.data.success.version;
                             connection.uptime = response.data.success.uptime;
-                        } else if (cc.connection.databaseType == "REDIS") {
+                        } else if (connection.databaseType == "REDIS") {
                             //@TODO this needs to be extracted into the redis module
                             response.data.success = dcDataFactory.parseRedisStatus(response.data.success);
-                            connection.dbVersion = response.data.success.redis_version;
-                            connection.uptime = response.data.success.uptime_in_seconds;
+                            if (response.data.success != null) {
+                                connection.dbVersion = response.data.success.redis_version;
+                                connection.uptime = response.data.success.uptime_in_seconds;
+                            }
                         }
                     } else {
                         connection.canRetrieveStatus = false;
@@ -69,7 +72,7 @@
                 }, function(response) {
                     //status cannot be retrieved
                     connection.canRetrieveStatus = false;
-                    resolve(connection)
+                    reject({data:response.data, connection:connection});
                 });
             });
         };
