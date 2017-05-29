@@ -580,10 +580,12 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     private DatabaseConnectionRegistry getDatabaseConnectionRegistryService(String databaseType) {
         try {
             ServiceReference[] serviceReferences = this.context.getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
-            for (int i = 0; i < serviceReferences.length; i++) {
-                DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) this.context.getService(serviceReferences[i]);
-                if (databaseConnectionRegistry.getConnectionType().equals(databaseType)) {
-                    return databaseConnectionRegistry;
+            if (serviceReferences != null) {
+                for (ServiceReference serviceReference : serviceReferences) {
+                    DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) this.context.getService(serviceReference);
+                    if (databaseConnectionRegistry.getConnectionType().equals(databaseType)) {
+                        return databaseConnectionRegistry;
+                    }
                 }
             }
         } catch (InvalidSyntaxException ex) {
@@ -596,8 +598,10 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         List<DatabaseConnectionRegistry> databaseConnectionRegistryServices = new LinkedList<>();
         try {
             ServiceReference[] serviceReferences = this.context.getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
-            for (int i = 0; i < serviceReferences.length; i++) {
-                databaseConnectionRegistryServices.add((DatabaseConnectionRegistry) this.context.getService(serviceReferences[i]));
+            if (serviceReferences != null) {
+                for (ServiceReference serviceReference : serviceReferences) {
+                    databaseConnectionRegistryServices.add((DatabaseConnectionRegistry) this.context.getService(serviceReference));
+                }
             }
         } catch (InvalidSyntaxException ex) {
             logger.error("Could not find service: " + ex.getMessage());
