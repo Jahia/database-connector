@@ -10,7 +10,7 @@
                 <div layout layout-wrap>
                     <div ng-repeat="(i, connectorMetaData) in cpc.databaseTypes" flex="50">
                         <md-button class="md-button" layout-margin ng-click="cpc.setSelectedDatabaseType(connectorMetaData.databaseType)">
-                            <img ng-src="{{cpc.images[connectorMetaData.databaseType]}}">
+                            <img ng-src="{{cpc.images[connectorMetaData.databaseType]}}" width="211" height="60">
                         </md-button>
                     </div>
                 </div>

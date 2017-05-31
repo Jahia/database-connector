@@ -303,16 +303,14 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
     }
 
     public AbstractConnection getConnection(String connectionId) {
-        return (AbstractConnection) registry.get(connectionId);
+        return registry.get(connectionId);
     }
 
-    public Object getClient(String connectionId) {
-        return ((AbstractConnection)registry.get(connectionId)).getClient(connectionId);
-    }
+    //@TODO implement function that will retrieve a particular client service.
 
     public void closeConnections() {
         for (Map.Entry<String, T> entry : registry.entrySet()) {
-            ((AbstractConnection)entry.getValue()).forgetConnection();
+            entry.getValue().forgetConnection();
         }
     };
 

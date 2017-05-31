@@ -42,7 +42,6 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
     public abstract E getServerStatus();
     public abstract Object establishConnection();
     public abstract void forgetConnection();
-    public abstract Object getClient(String connectionId);
     public abstract String getNodeType();
     public abstract String getDatabaseType();
     public abstract  String getDisplayName();
