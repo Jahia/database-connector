@@ -6,6 +6,7 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.jahia.api.Constants;
 import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.databaseConnector.connector.ConnectorMetaData;
+import org.jahia.modules.databaseConnector.services.DatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.util.Utils;
 import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
 import org.jahia.modules.databaseConnector.dsl.DSLHandler;

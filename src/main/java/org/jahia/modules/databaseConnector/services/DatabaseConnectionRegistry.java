@@ -1,5 +1,6 @@
-package org.jahia.modules.databaseConnector.connection;
+package org.jahia.modules.databaseConnector.services;
 
+import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.connector.ConnectorMetaData;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,6 +48,10 @@ public interface DatabaseConnectionRegistry<T> {
     Map<String, Object> buildConnectionMapFromConnection(AbstractConnection connection) throws JSONException;
 
     AbstractConnection getConnection(String connectionId);
+
+    Object getConnectionService(String databaseType, String connectionId);
+
+    Object getConnectionService(Class c, String databaseType, String connectionId);
 
     void registerServices();
 }

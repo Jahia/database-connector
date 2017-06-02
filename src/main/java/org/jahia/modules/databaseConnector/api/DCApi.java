@@ -27,7 +27,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.modules.databaseConnector.api.impl.DirectivesRetriever;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectionAPI;
-import org.jahia.modules.databaseConnector.connection.DatabaseConnectionRegistry;
+import org.jahia.modules.databaseConnector.services.DatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
 import org.jahia.modules.databaseConnector.util.Utils;
 import org.json.JSONArray;

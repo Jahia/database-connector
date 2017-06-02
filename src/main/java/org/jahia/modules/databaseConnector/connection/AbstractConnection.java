@@ -40,8 +40,6 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
     public abstract String parseOptions(LinkedHashMap<String, Object> options);
     public abstract T makeConnectionData();
     public abstract E getServerStatus();
-    public abstract Object establishConnection();
-    public abstract void forgetConnection();
     public abstract String getNodeType();
     public abstract String getDatabaseType();
     public abstract  String getDisplayName();
