@@ -309,8 +309,6 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
         return registry.get(connectionId);
     }
 
-    //@TODO implement function that will retrieve a particular client service.
-
     public void closeConnections() {
         for (Map.Entry<String, T> entry : registry.entrySet()) {
             unregisterAsService(entry.getValue());
