@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.jahia.api.Constants;
 import org.jahia.data.templates.JahiaTemplatesPackage;
+import org.jahia.modules.databaseConnector.bundle.RBExecutor;
 import org.jahia.modules.databaseConnector.connector.ConnectorMetaData;
 import org.jahia.modules.databaseConnector.services.DatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.util.Utils;
@@ -68,7 +69,9 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     private JCRTemplate jcrTemplate;
     private RenderService renderService;
     private JahiaTemplateManagerService templateManagerService;
+    private JahiaUserManagerService userManagerService;
     private Bundle bundle;
+    private RBExecutor rbExecutor;
 
     private static Date lastDeployDate;
 
@@ -77,6 +80,11 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         this.context = context;
         this.context.addBundleListener(this);
         this.bundle = this.context.getBundle();
+        this.userManagerService = JahiaUserManagerService.getInstance();
+        if (jcrTemplate == null) {
+            jcrTemplate = JCRTemplate.getInstance();
+        }
+        this.rbExecutor = new RBExecutor(jcrTemplate);
         instance = this;
     }
 
@@ -96,7 +104,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                 installedBundles.add(bundleId);
             }
             if (bundleEvent.getType() == BundleEvent.STARTED) {
-                for (DatabaseConnectionRegistry databaseConnectionRegistry: getDatabaseConnectionRegistryServices()) {
+                for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
                     databaseConnectionRegistry.registerServices();
                 }
             }
@@ -123,12 +131,12 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                 if (!(currentBundle.getSymbolicName().equals(bundle.getSymbolicName()))
                         && org.jahia.osgi.BundleUtils.isJahiaModuleBundle(currentBundle)
                         && (currentBundle.getState() == Bundle.INSTALLED
-                            || currentBundle.getState() == Bundle.RESOLVED
-                            || currentBundle.getState() == Bundle.ACTIVE)) {
+                        || currentBundle.getState() == Bundle.RESOLVED
+                        || currentBundle.getState() == Bundle.ACTIVE)) {
                     parseDefinitionWizards(currentBundle);
                 }
             }
-            for (DatabaseConnectionRegistry databaseConnectionRegistry: getDatabaseConnectionRegistryServices()) {
+            for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
                 databaseConnectionRegistry.registerServices();
             }
         }
@@ -138,10 +146,10 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         return findRegisteredConnections().get(databaseType);
     }
 
-    public <T extends AbstractConnection, E extends AbstractDatabaseConnectionRegistry> Map<String, Map> findRegisteredConnections() throws InstantiationException, IllegalAccessException{
+    public <T extends AbstractConnection, E extends AbstractDatabaseConnectionRegistry> Map<String, Map> findRegisteredConnections() throws InstantiationException, IllegalAccessException {
         Map<String, Map> registeredConnections = new HashMap<>();
 
-        for (DatabaseConnectionRegistry databaseConnectionRegistry: getDatabaseConnectionRegistryServices()) {
+        for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
             String connectionType = databaseConnectionRegistry.getConnectionType();
             Map<String, T> registry = databaseConnectionRegistry.getRegistry();
             Map<String, T> connectionMap = new HashMap<>();
@@ -155,7 +163,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         return registeredConnections;
     }
 
-    public <T extends AbstractConnection> T getConnection(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException{
+    public <T extends AbstractConnection> T getConnection(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException {
         try {
             Map<String, T> databaseConnections = getConnections(databaseType);
             return databaseConnections.get(connectionId);
@@ -169,6 +177,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         Map<String, T> databaseConnections = getConnections(databaseType);
         return databaseConnections.containsKey(connectionId);
     }
+
     public boolean addEditConnection(final AbstractConnection connection, final Boolean isEdition) {
         DatabaseConnectionRegistry databaseConnectionRegistry = getDatabaseConnectionRegistryService(connection.getDatabaseType());
         return databaseConnectionRegistry.addEditConnection(connection, isEdition);
@@ -207,13 +216,13 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             file = File.createTempFile("temporaryImportFile", ".wzd");
             FileUtils.copyInputStreamToFile(source, file);
             dslExecutor.execute(file.toURI().toURL(), dslHandlerMap.get("importConnection"), parsedConnections);
-            for (Map.Entry<String, ConnectorMetaData> entry: getAvailableConnectors().entrySet()) {
+            for (Map.Entry<String, ConnectorMetaData> entry : getAvailableConnectors().entrySet()) {
                 String databaseType = entry.getValue().getDatabaseType();
                 if (parsedConnections.containsKey(databaseType)) {
                     Map<String, List> results = new LinkedHashMap<>();
                     List<Map> validConnections = new LinkedList();
                     List<Map> failedConnections = new LinkedList();
-                    for (Map connectionConfiguration: (LinkedList<Map>)parsedConnections.get(databaseType)) {
+                    for (Map connectionConfiguration : (LinkedList<Map>) parsedConnections.get(databaseType)) {
                         connectionConfiguration = importConnection(connectionConfiguration);
                         if (connectionConfiguration.get("status").equals("success")) {
                             validConnections.add(connectionConfiguration);
@@ -252,7 +261,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     }
 
     public Map<String, Object> importConnection(Map<String, Object> map) {
-        DatabaseConnectionRegistry databaseConnectionRegistry = getDatabaseConnectionRegistryService((String)map.get("type"));
+        DatabaseConnectionRegistry databaseConnectionRegistry = getDatabaseConnectionRegistryService((String) map.get("type"));
         if (databaseConnectionRegistry != null) {
             logger.info("Importing connection " + map);
             databaseConnectionRegistry.importConnection(map);
@@ -282,7 +291,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         this.dslHandlerMap = dslHandlerMap;
     }
 
-    public File exportConnections(JSONObject connections) throws JSONException, InstantiationException, IllegalAccessException{
+    public File exportConnections(JSONObject connections) throws JSONException, InstantiationException, IllegalAccessException {
         File file = null;
 
         try {
@@ -306,7 +315,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         return file;
     }
 
-    public Map<String, Object> getServerStatus(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException{
+    public Map<String, Object> getServerStatus(String connectionId, String databaseType) throws InstantiationException, IllegalAccessException {
         AbstractConnection connection = getConnection(connectionId, databaseType);
         Map<String, Object> serverStatus = new LinkedHashMap<>();
         if (!connection.isConnected()) {
@@ -320,7 +329,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     public Map<String, ConnectorMetaData> getAvailableConnectors() {
         Map<String, ConnectorMetaData> availableConnectors = new LinkedHashMap<>();
-        for (DatabaseConnectionRegistry databaseConnectionRegistry: getDatabaseConnectionRegistryServices()) {
+        for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
             availableConnectors.put(databaseConnectionRegistry.getConnectionType(), databaseConnectionRegistry.getConnectorMetaData());
         }
         return availableConnectors;
@@ -404,12 +413,11 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     public Long getAngularConfigFileTimestamp(RenderContext renderContext) throws Exception {
         String key = getCacheKey(renderContext);
         if (settingsBean.isDevelopmentMode()) {
-            if(renderContext.getRequest().getAttribute("ffdevconfigfiletimestamp") == null) {
+            if (renderContext.getRequest().getAttribute("ffdevconfigfiletimestamp") == null) {
                 renderContext.getRequest().setAttribute("ffdevconfigfiletimestamp", String.valueOf(System.currentTimeMillis()));
             }
             return Long.valueOf((String) renderContext.getRequest().getAttribute("ffdevconfigfiletimestamp"));
-        }
-        else if (angularConfigFilesTimestamp.containsKey(key)) return angularConfigFilesTimestamp.get(key);
+        } else if (angularConfigFilesTimestamp.containsKey(key)) return angularConfigFilesTimestamp.get(key);
         else return System.currentTimeMillis();
     }
 
@@ -426,24 +434,9 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
         addJSToAngularConfigFile(renderContext, DEFINITION_QUERY, filePath, extraResourceBundles);
 
-        //TODO handle resource bundles
-        // Find Resource Bundle for theme
-//        ExtendedNodeType nodeType = NodeTypeRegistry.getInstance().getNodeType("fcnt:form");
-//        for (ScriptResolver scriptResolver : renderService.getScriptResolvers()) {
-//            SortedSet<View> viewsSet = scriptResolver.getViewsSet(nodeType, renderContext.getSite(), "html");
-//            for (View view : viewsSet) {
-//                String displayName = view.getDisplayName();
-//                if (displayName.startsWith("form.")) {
-//                    String id = view.getModule().getId();
-//                    if (!extraResourceBundles.contains(id) && !"form-factory-core".equals(id)) {
-//                        extraResourceBundles.add(id);
-//                    }
-//                }
-//            }
-//        }
-//        for (String extraResourceBundle : extraResourceBundles) {
-//            addRBDictionnaryToAngularConfigFile(renderContext, filePath, extraResourceBundle);
-//        }
+        for (String extraResourceBundle : extraResourceBundles) {
+            rbExecutor.addRBDictionnaryToAngularConfigFile(userManagerService.lookupRootUser().getJahiaUser(), renderContext.getUILocale(), filePath, templateManagerService.getTemplatePackageById(extraResourceBundle));
+        }
 
         File file = new File(filePath);
         if (FileUtils.sizeOf(file) == 0 || !FileUtils.isFileNewer(file, lastDeployDate)) {
@@ -464,7 +457,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
      * @throws RepositoryException
      */
     private void addJSToAngularConfigFile(final RenderContext renderContext, final String query, final String filePath, final Set<String> extraResourceBundlePackages) throws RepositoryException, IOException {
-        jcrTemplate.doExecuteWithSystemSessionAsUser(JahiaUserManagerService.getInstance().lookupRootUser().getJahiaUser(), Constants.EDIT_WORKSPACE, renderContext.getUILocale(), new JCRCallback<Object>() {
+        jcrTemplate.doExecuteWithSystemSessionAsUser(userManagerService.lookupRootUser().getJahiaUser(), Constants.EDIT_WORKSPACE, renderContext.getUILocale(), new JCRCallback<Object>() {
             @Override
             public String doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 List<JahiaTemplatesPackage> dependencies = getDependentModules();
@@ -483,7 +476,6 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                             while (ni.hasNext()) {
                                 extraResourceBundlePackages.add(pack.getId());
                                 JCRNodeWrapper node = (JCRNodeWrapper) ni.next();
-//                                String[] views = node.getPropertyAsString("views").split(" ");
                                 String[] views = getDirectiveViews(node);
                                 for (String view : views) {
                                     writeViewToWriter(node, renderContext, bw, view);
@@ -512,7 +504,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         }
         return views.toArray(new String[0]);
     }
-    
+
     private List<JahiaTemplatesPackage> getDependentModules() {
         List<JahiaTemplatesPackage> packages = templateManagerService.getAvailableTemplatePackages();
         JahiaTemplatesPackage currentPackage = templateManagerService.getTemplatePackageById("database-connector");
@@ -523,7 +515,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             }
         }
         return dependents;
-    } 
+    }
 
     /**
      * Renders and writes a given view, if it exists, to write buffer (bw).
@@ -549,7 +541,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     }
 
     private String prepareAngularConfigFile(RenderContext renderContext, final String fileName) throws RepositoryException {
-        return jcrTemplate.doExecuteWithSystemSessionAsUser(JahiaUserManagerService.getInstance().lookupRootUser().getJahiaUser(), Constants.EDIT_WORKSPACE, renderContext.getUILocale(), new JCRCallback<String>() {
+        return jcrTemplate.doExecuteWithSystemSessionAsUser(userManagerService.lookupRootUser().getJahiaUser(), Constants.EDIT_WORKSPACE, renderContext.getUILocale(), new JCRCallback<String>() {
             @Override
             public String doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 new File(getFileSystemPath("/generated-resources")).mkdirs();
