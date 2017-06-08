@@ -14,24 +14,25 @@
         this.compileInsideElement = function(compilationScope, directiveTag, elementId, parameterMap) {
             return $q(function(resolve, reject) {
                 $timeout(function() {
-                    var el = document.getElementById(elementId);
-                    if (el === undefined || el === null) {
+                    var $el = angular.element('#' + elementId);
+                    if ($el.length == 0) {
                         reject("No element with id '" + elementId + "' found");
                     }
-                    var element = angular.element(document.getElementById(elementId));
-
                     var scope = compilationScope.$new();
                     if (parameterMap !== undefined && parameterMap !== null) {
                         directiveTag = directiveTag.replace(">", buildAttributeString(parameterMap) + ">");
                     }
-                    element.html(directiveTag);
-
-                    $compile(element.contents())(scope);
+                    $el.append(directiveTag);
+                    $compile($el.contents())(scope);
 
                     resolve({
                         scope: scope,
-                        element: element
+                        element: $el
                     });
+
+                    scope.$on('$destroy', function() {
+                        $el.empty();
+                    })
                 });
             });
         };
