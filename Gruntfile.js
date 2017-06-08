@@ -34,7 +34,8 @@ module.exports = function(grunt) {
         },
         watch       : {
             files: ['Gruntfile.js', 'src/main/javascript/**/*.js', 'src/main/javascript/**/*.html'],
-            tasks: ['concat', 'copy', 'less', 'uglify']
+            tasks: ['concat', 'copy', 'less']
+            // tasks: ['concat', 'copy', 'less', 'uglify']
         },
         bower_concat: {
             all: {
@@ -84,6 +85,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-bower-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-less');
-    grunt.registerTask('default', ['concat', 'bower_concat', 'copy', 'less', 'uglify']);
-
+    //grunt.registerTask('default', ['concat', 'bower_concat', 'copy', 'less', 'uglify']);
+    /*DEV*/
+    grunt.registerTask('default', ['concat', 'bower_concat', 'copy', 'less']);
 };
