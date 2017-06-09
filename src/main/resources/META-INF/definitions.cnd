@@ -33,3 +33,7 @@
 
 [dc:statusDirectives] > jnt:content
 + * (dc:directiveDefinition) = dc:directiveDefinition
+
+[dcmix:servicesDefinition] > mix:title mixin
+ - label (string) i18n
+ - databaseType (string)

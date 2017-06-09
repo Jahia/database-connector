@@ -17,6 +17,7 @@
             <map key-type="java.lang.String" value-type="org.jahia.modules.databaseConnector.dsl.DSLHandler">
                 <entry key="importConnection" value-ref="dcConnectionImportHandler"/>
                 <entry key="directive" value-ref="directiveHandler"/>
+                <entry key="service" value-ref="serviceHandler"/>
             </map>
         </property>
     </bean>
@@ -26,6 +27,9 @@
         <lang:property name="databaseConnectorManager" ref="databaseConnectorManager"/>
     </lang:groovy>
     <lang:groovy id="directiveHandler" script-source="classpath:org/jahia/modules/databaseConnector/dsl/DirectiveHandler.groovy">
+        <lang:property name="jcrTemplate" ref="jcrTemplate"/>
+    </lang:groovy>
+    <lang:groovy id="serviceHandler" script-source="classpath:org/jahia/modules/databaseConnector/dsl/ServiceHandler.groovy">
         <lang:property name="jcrTemplate" ref="jcrTemplate"/>
     </lang:groovy>
 </beans>

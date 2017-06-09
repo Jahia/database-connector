@@ -56,6 +56,9 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     public static final String DATABASE_CONNECTOR_NODE_TYPE = "dc:databaseConnector";
 
     private static final String DEFINITION_QUERY = "SELECT * FROM [dcmix:directivesDefinition] AS result WHERE ISDESCENDANTNODE(result, ''{0}'')";
+    private static final String SERVICES_QUERY = "SELECT * FROM [dcmix:servicesDefinition] AS result WHERE ISDESCENDANTNODE(result, ''{0}'')";
+
+    private static final String SERVICE_VIEW_NAME = "service";
 
     private final static Object lock = new Object();
     private static DatabaseConnectorManager instance;
@@ -377,6 +380,9 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                             if (superTypes.contains("dcmix:directivesDefinition")) {
                                 foundDefinitions = true;
                                 dslExecutor.execute(resource, dslHandlerMap.get("directive"), packageById, type);
+                            } else if (superTypes.contains("dcmix:servicesDefinition")) {
+                                foundDefinitions = true;
+                                dslExecutor.execute(resource, dslHandlerMap.get("service"), packageById, type);
                             }
                         }
                     }
@@ -433,7 +439,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         Set<String> extraResourceBundles = new HashSet<>();
 
         addJSToAngularConfigFile(renderContext, DEFINITION_QUERY, filePath, extraResourceBundles);
-
+        addJSToAngularConfigFileByViewName(renderContext, SERVICES_QUERY, SERVICE_VIEW_NAME, filePath, extraResourceBundles);
         for (String extraResourceBundle : extraResourceBundles) {
             rbExecutor.addRBDictionnaryToAngularConfigFile(userManagerService.lookupRootUser().getJahiaUser(), renderContext.getUILocale(), filePath, templateManagerService.getTemplatePackageById(extraResourceBundle));
         }
@@ -479,6 +485,50 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                                 String[] views = getDirectiveViews(node);
                                 for (String view : views) {
                                     writeViewToWriter(node, renderContext, bw, view);
+                                }
+                            }
+                        } catch (RenderException e) {
+                            logger.error("Failed to render view: " + e.getMessage() + "\n" + e);
+                        }
+                    }
+                    bw.close();
+                } catch (IOException e) {
+                    logger.error("Failed to write to buffer: " + e.getMessage() + "\n" + e);
+                }
+                return null;
+            }
+        });
+    }
+
+    /**
+     * This function generate the javascript file to contains directives used by angular using a view name
+     *
+     * @param renderContext               The render context on which to get the current site
+     * @param extraResourceBundlePackages
+     * @return The path to the generated file
+     * @throws RepositoryException
+     */
+    private void addJSToAngularConfigFileByViewName(final RenderContext renderContext, final String query, final String viewName, final String filePath, final Set<String> extraResourceBundlePackages) throws RepositoryException, IOException {
+        jcrTemplate.doExecuteWithSystemSessionAsUser(userManagerService.lookupRootUser().getJahiaUser(), Constants.EDIT_WORKSPACE, renderContext.getUILocale(), new JCRCallback<Object>() {
+            @Override
+            public String doInJCR(JCRSessionWrapper session) throws RepositoryException {
+                List<JahiaTemplatesPackage> dependencies = getDependentModules();
+                File jsFile = new File(filePath);
+                try {
+                    FileWriter fw = new FileWriter(jsFile.getAbsoluteFile(), true);
+                    BufferedWriter bw = new BufferedWriter(fw);
+
+                    for (JahiaTemplatesPackage pack : dependencies) {
+                        try {
+                            if (pack != null) {
+                                QueryManager qm = session.getWorkspace().getQueryManager();
+                                String rootPath = pack.getRootFolderPath() + "/" + pack.getVersion().toString();
+                                Query q = qm.createQuery(MessageFormat.format(query, rootPath), Query.JCR_SQL2);
+                                NodeIterator ni = q.execute().getNodes();
+
+                                while (ni.hasNext()) {
+                                    extraResourceBundlePackages.add(pack.getId());
+                                    writeViewToWriter((JCRNodeWrapper) ni.next(), renderContext, bw, viewName);
                                 }
                             }
                         } catch (RenderException e) {

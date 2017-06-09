@@ -1,5 +1,5 @@
 (function(){
-    var DCConnectionManagerService = function($http, contextualData, $q, toaster, i18n, $DCSS, dcDataFactory) {
+    var DCConnectionManagerService = function($http, contextualData, $q, toaster, i18n, $DCSS, dcDataFactory, dcConnectionStatusService) {
         var self = this;
         this.updateConnection = function(connection, connect) {
             return $q(function(resolve, reject){
@@ -42,6 +42,7 @@
             });
         };
 
+        //@TODO this should just be replaced with a call that will compile a brief status directive for each connection
         this.verifyServerStatus = function(connection) {
             return $q(function(resolve, reject){
                 //verify if this connection is authenticated to retrieve server status
@@ -59,7 +60,8 @@
                             connection.uptime = response.data.success.uptime;
                         } else if (connection.databaseType == "REDIS") {
                             //@TODO this needs to be extracted into the redis module
-                            response.data.success = dcDataFactory.parseRedisStatus(response.data.success);
+                            console.log(response.data.success);
+                            response.data.success = dcConnectionStatusService.getParsedStatus(connection.databaseType, response.data.success);
                             if (response.data.success != null) {
                                 connection.dbVersion = response.data.success.redis_version;
                                 connection.uptime = response.data.success.uptime_in_seconds;
@@ -80,5 +82,5 @@
     angular
         .module('databaseConnector')
         .service('$DCConnectionManagerService', ['$http', 'contextualData', '$q', 'toaster',
-            'i18nService', '$DCStateService', 'dcDataFactory', DCConnectionManagerService]);
+            'i18nService', '$DCStateService', 'dcDataFactory', 'dcConnectionStatusService', DCConnectionManagerService]);
 })();
