@@ -8,15 +8,15 @@
          *
          * @param compilationScope
          * @param directiveTag
-         * @param elementId
+         * @param selector
          * @param parameterMap if defined => [{attrName: "mode", attrValue: "edit"}, ...]
          */
-        this.compileInsideElement = function(compilationScope, directiveTag, elementId, parameterMap) {
+        this.compileInsideElement = function(compilationScope, directiveTag, selector, parameterMap) {
             return $q(function(resolve, reject) {
                 $timeout(function() {
-                    var $el = angular.element('#' + elementId);
+                    var $el = angular.element(selector);
                     if ($el.length == 0) {
-                        reject("No element with id '" + elementId + "' found");
+                        reject("No element for '" + selector + "' found");
                     }
                     var scope = compilationScope.$new();
                     if (parameterMap !== undefined && parameterMap !== null) {
