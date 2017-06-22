@@ -193,7 +193,7 @@
             if (!$scope.compiled) {
                 $timeout(function() {
                     $DCSS.getDirectivesForType($scope.cpc.selectedDatabaseType).then(function(data) {
-                        var promise = CS.compileInsideElement($scope, data.connectionDirective.tag, "createConnectionContent", [
+                        var promise = CS.compileInsideElement($scope, data.connectionDirective.tag, "#createConnectionContent", [
                                 {attrName:"mode", attrValue:"create"},
                                 {attrName:"database-type", attrValue:"{{cpc.selectedDatabaseType}}"},
                                 {attrName:"connection", attrValue:"cpc.connection"}
