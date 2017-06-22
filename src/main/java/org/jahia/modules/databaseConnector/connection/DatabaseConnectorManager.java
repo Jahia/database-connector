@@ -97,7 +97,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     @Override
     public void bundleChanged(BundleEvent bundleEvent) {
-        if (settingsBean.isProcessingServer()) {
+        if (settingsBean != null && settingsBean.isProcessingServer()) {
             Bundle bundleEventBundle = bundleEvent.getBundle();
 //            if (bundleEvent.getType() == BundleEvent.STARTED || bundleEvent.getType() == BundleEvent.STOPPED) {
 //                FLush stuff here
@@ -127,7 +127,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (settingsBean.isProcessingServer()) {
+        if (settingsBean != null && settingsBean.isProcessingServer()) {
             lastDeployDate = new Date();
             parseDefinitionWizards(bundle);
             for (Bundle currentBundle : bundle.getBundleContext().getBundles()) {
