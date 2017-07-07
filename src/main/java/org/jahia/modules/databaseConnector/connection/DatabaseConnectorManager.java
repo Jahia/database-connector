@@ -84,6 +84,15 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         this.context.addBundleListener(this);
         this.bundle = this.context.getBundle();
         this.userManagerService = JahiaUserManagerService.getInstance();
+        if (instance != null) {
+            //set properties that were already set by spring
+            this.settingsBean = instance.settingsBean;
+            this.jcrTemplate = instance.jcrTemplate;
+            this.renderService = instance.renderService;
+            this.templateManagerService = instance.templateManagerService;
+            this.dslHandlerMap = instance.dslHandlerMap;
+            this.dslExecutor = instance.dslExecutor;
+        }
         if (jcrTemplate == null) {
             jcrTemplate = JCRTemplate.getInstance();
         }
@@ -92,6 +101,9 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     }
 
     public static DatabaseConnectorManager getInstance() {
+        if (instance == null) {
+            instance = new DatabaseConnectorManager();
+        }
         return instance;
     }
 
