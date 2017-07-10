@@ -376,32 +376,35 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
 
     private boolean parseDefinitionWizards(Bundle bundle) throws ParseException, IOException {
-        JahiaTemplatesPackage packageById = org.jahia.osgi.BundleUtils.getModule(bundle);
-        boolean foundDefinitions = false;
-        if (packageById != null) {
-            List<String> definitionsFiles = new LinkedList<>(packageById.getDefinitionsFiles());
-            for (String definitionsFile : definitionsFiles) {
-                BundleResource bundleResource = new BundleResource(bundle.getResource(definitionsFile), bundle);
-                List<ExtendedNodeType> definitionsFromFile = NodeTypeRegistry.getInstance().getDefinitionsFromFile(bundleResource, bundle.getSymbolicName());
-                for (ExtendedNodeType type : definitionsFromFile) {
-                    if (!type.isMixin()) {
-                        List<String> superTypes = Arrays.asList(type.getDeclaredSupertypeNames());
+        if (org.jahia.osgi.BundleUtils.isJahiaBundle(bundle)) {
+            JahiaTemplatesPackage packageById = org.jahia.osgi.BundleUtils.getModule(bundle);
+            boolean foundDefinitions = false;
+            if (packageById != null) {
+                List<String> definitionsFiles = new LinkedList<>(packageById.getDefinitionsFiles());
+                for (String definitionsFile : definitionsFiles) {
+                    BundleResource bundleResource = new BundleResource(bundle.getResource(definitionsFile), bundle);
+                    List<ExtendedNodeType> definitionsFromFile = NodeTypeRegistry.getInstance().getDefinitionsFromFile(bundleResource, bundle.getSymbolicName());
+                    for (ExtendedNodeType type : definitionsFromFile) {
+                        if (!type.isMixin()) {
+                            List<String> superTypes = Arrays.asList(type.getDeclaredSupertypeNames());
 
-                        URL resource = bundle.getResource(type.getName().replace(":", "_") + "/html/" + StringUtils.substringAfter(type.getName(), ":") + ".wzd");
-                        if (resource != null) {
-                            if (superTypes.contains("dcmix:directivesDefinition")) {
-                                foundDefinitions = true;
-                                dslExecutor.execute(resource, dslHandlerMap.get("directive"), packageById, type);
-                            } else if (superTypes.contains("dcmix:servicesDefinition")) {
-                                foundDefinitions = true;
-                                dslExecutor.execute(resource, dslHandlerMap.get("service"), packageById, type);
+                            URL resource = bundle.getResource(type.getName().replace(":", "_") + "/html/" + StringUtils.substringAfter(type.getName(), ":") + ".wzd");
+                            if (resource != null) {
+                                if (superTypes.contains("dcmix:directivesDefinition")) {
+                                    foundDefinitions = true;
+                                    dslExecutor.execute(resource, dslHandlerMap.get("directive"), packageById, type);
+                                } else if (superTypes.contains("dcmix:servicesDefinition")) {
+                                    foundDefinitions = true;
+                                    dslExecutor.execute(resource, dslHandlerMap.get("service"), packageById, type);
+                                }
                             }
                         }
                     }
                 }
             }
+            return foundDefinitions;
         }
-        return foundDefinitions;
+        return false;
     }
 
     /**
