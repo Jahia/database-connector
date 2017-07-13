@@ -27,8 +27,6 @@
 <template:addResources type="javascript" resources="jquery.min.js"/>
 <template:addResources type="css" resources="fontRoboto.css"/>
 <template:addResources type="css" resources="bootstrap.min.css"/>
-<template:addResources type="javascript" resources="lib/_dc.min.js"/>
-<template:addResources type="css" resources="lib/_dc.css"/>
 <body>
 <div class="container-fluid">
     <div class="row">
