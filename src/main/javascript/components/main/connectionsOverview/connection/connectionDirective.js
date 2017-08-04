@@ -207,7 +207,7 @@
             if (!$scope.compiled) {
                 $timeout(function() {
                     DCSS.getDirectivesForType($scope.ecp.connection.databaseType).then(function(data) {
-                        var promise = CS.compileInsideElement($scope, data.connectionDirective.tag, "editConnectionContent", [
+                        var promise = CS.compileInsideElement($scope, data.connectionDirective.tag, "#editConnectionContent", [
                                 {attrName:"mode", attrValue:"edit"},
                                 {attrName:"database-type", attrValue:"{{ecp.connection.databaseType}}"},
                                 {attrName:"connection", attrValue:"ecp.connection"}
