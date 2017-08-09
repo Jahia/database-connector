@@ -11,12 +11,12 @@
                     if (response.data.success) {
                         connection.isConnected = connect;
                         if (connect) {
-                            self.verifyServerStatus(connection).then(function(connection) {
-                                resolve(connection);
+                            self.verifyServerStatus({ connection: connection }).then(function(data) {
+                                resolve(data.connection);
                             });
                         } else {
                             connection.canRetrieveStatus = false;
-                            resolve(connection);
+                            resolve({ connection: connection });
                         }
                         toaster.pop({
                             type   : 'success',
@@ -43,38 +43,38 @@
         };
 
         //@TODO this should just be replaced with a call that will compile a brief status directive for each connection
-        this.verifyServerStatus = function(connection) {
+        this.verifyServerStatus = function(data) {
             return $q(function(resolve, reject){
                 //verify if this connection is authenticated to retrieve server status
-                var url = contextualData.apiUrl + $DCSS.connectorsMetaData[connection.databaseType].entryPoint + '/status/' + connection.id;
+                var url = contextualData.apiUrl + $DCSS.connectorsMetaData[data.connection.databaseType].entryPoint + '/status/' + data.connection.id;
                 $http({
                     url: url,
                     method: 'GET'
                 }).then(function(response) {
                     //status can be retrieved
                     if (_.isUndefined(response.data.failed)) {
-                        connection.canRetrieveStatus = true;
+                        data.connection.canRetrieveStatus = true;
                         //@TODO needs to be updated for each external connector module to handle their own setting of custom properties.
-                        if(connection.databaseType == "MONGO"){
-                            connection.dbVersion = response.data.success.version;
-                            connection.uptime = response.data.success.uptime;
-                        } else if (connection.databaseType == "REDIS") {
+                        if(data.connection.databaseType == "MONGO"){
+                            data.connection.dbVersion = response.data.success.version;
+                            data.connection.uptime = response.data.success.uptime;
+                        } else if (data.connection.databaseType == "REDIS") {
                             //@TODO this needs to be extracted into the redis module
-                            console.log(response.data.success);
-                            response.data.success = dcConnectionStatusService.getParsedStatus(connection.databaseType, response.data.success);
+                            response.data.success = dcConnectionStatusService.getParsedStatus(data.connection.databaseType, response.data.success);
                             if (response.data.success != null) {
-                                connection.dbVersion = response.data.success.redis_version;
-                                connection.uptime = response.data.success.uptime_in_seconds;
+                                data.connection.dbVersion = response.data.success.redis_version;
+                                data.connection.uptime = response.data.success.uptime_in_seconds;
                             }
                         }
                     } else {
-                        connection.canRetrieveStatus = false;
+                        data.connection.canRetrieveStatus = false;
                     }
-                    resolve(connection);
+                    resolve(data);
                 }, function(response) {
                     //status cannot be retrieved
-                    connection.canRetrieveStatus = false;
-                    reject({data:response.data, connection:connection});
+                    data.connection.canRetrieveStatus = false;
+                    data.response = response.data;
+                    reject(data);
                 });
             });
         };
