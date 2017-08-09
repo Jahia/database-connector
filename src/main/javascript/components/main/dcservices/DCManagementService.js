@@ -59,6 +59,19 @@
             return $q(function(resolve, reject){
                 self.getAvailableConnections().then(function(response) {
                     $DCSS.state.connections = angular.copy(response);
+                    for (var i in $DCSS.state.connections) {
+                        $DCCMS.verifyServerStatus({ connection: $DCSS.state.connections[i], index: i }).then(function(data){
+                            $DCSS.state.connections[data.index] = data.connection;
+                            if (data.index == $DCSS.state.connections.length - 1) {
+                                resolve(data);
+                            }
+                        }, function(error) {
+                            $DCSS.state.connections[error.index] = error.connection;
+                            if (error.index == $DCSS.state.connections.length - 1) {
+                                resolve(error);
+                            }
+                        });
+                    }
                 }, function(error){
                     reject(error);
                 });
