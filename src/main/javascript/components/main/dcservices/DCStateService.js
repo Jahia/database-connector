@@ -1,9 +1,8 @@
 (function(){
     var DCStateService = function(contextualData, $http, $q) {
-        this.dcActive = false;
+        var self = this;
         this.connectorsMetaData = null;
         this.connections = null;
-        this.selectedConnection = null;
         this.selectedDatabaseType = null;
         this.exportConnections = {};
         this.state = {
@@ -53,6 +52,11 @@
             }, function(error) {
                 reject(error);
             });
+        };
+
+
+        this.setActiveConnection = function(connection) {
+            self.state.activeConnection = connection;
         };
 
         function load(item) {

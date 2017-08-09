@@ -121,10 +121,9 @@
             for (var i in cc.connection) {
                 cc.connection[i] = $filter('replaceNull')(cc.connection[i]);
             }
+            //Set currently active connection.
+            $DCSS.setActiveConnection(cc.connection);
             $mdDialog.show({
-                locals: {
-                    connection: cc.connection
-                },
                 controller: EditConnectionPopupController,
                 templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connectionPopups/editConnectionPopup.html',
                 parent: angular.element(document.body),
@@ -189,46 +188,41 @@
         '$filter', 'toaster', '$state', 'i18nService', '$DCStateService',
         '$DCConnectionManagerService', '$DCManagementService'];
     
-    function EditConnectionPopupController($scope, $mdDialog, connection, CS, $timeout, DCSS) {
+    function EditConnectionPopupController($scope, $mdDialog, $DCSS, CS) {
         $scope.ecp = this;
-        $scope.ecp.connection = connection;
+        $scope.ecp.connection = $DCSS.state.activeConnection;
         $scope.compiled = false;
+        var compiledUUID = null;
 
-        $scope.$on('connectionSuccessfullyCreated', function(){
-            $mdDialog.hide();
-        });
-
-        $scope.$on('creationCancelled', function() {
-            $mdDialog.cancel();
-        });
-
-        $scope.compileDirective = function() {
-            //TODO get directive from server (from alldirectives object)
-            if (!$scope.compiled) {
-                $timeout(function() {
-                    DCSS.getDirectivesForType($scope.ecp.connection.databaseType).then(function(data) {
-                        var promise = CS.compileInsideElement($scope, data.connectionDirective.tag, "#editConnectionContent", [
-                                {attrName:"mode", attrValue:"edit"},
-                                {attrName:"database-type", attrValue:"{{ecp.connection.databaseType}}"},
-                                {attrName:"connection", attrValue:"ecp.connection"}
-                            ]
-                        );
-                        promise.then(function(data) {
-                            //console.log(data);
-                        }, function(error) {
-                            console.error(error);
-                        })
-                    }, function(error) {
-                        console.error(error);
-                    });
-                });
-                $scope.compiled = true;
+        $scope.closeDialog = function(action) {
+            CS.removeCompiledDirective(compiledUUID);
+            switch(action) {
+                case 'hide':
+                    $mdDialog.hide();
+                case 'cancel':
+                default:
+                    $mdDialog.cancel();
             }
+            $DCSS.state.activeConnection = null;
+        };
+        $scope.compileDirective = function() {
+            var attrs = [
+                {attrName: "mode", attrValue: "edit"},
+                {attrName: "database-type", attrValue: "{{ecp.connection.databaseType}}"},
+                {attrName: "connection", attrValue: "ecp.connection"},
+                {attrName: "closeDialog", attrValue: "ecp.closeDialog"}
+            ];
+
+            CS.compileDirective($scope, '#editConnectionContent', $scope.ecp.connection.databaseType, attrs).then(function(data){
+                compiledUUID = data.UUID;
+            }, function(error){
+                //compilation failed.
+            });
         };
     }
 
-    EditConnectionPopupController.$inject = ['$scope', '$mdDialog', 'connection',
-        'dcCompilationService', '$timeout', '$DCStateService'];
+    EditConnectionPopupController.$inject = ['$scope', '$mdDialog', '$DCStateService',
+        'dcCompilationService'];
     
     function DeleteConnectionPopupController($scope, $mdDialog, $sce, i18n) {
         $scope.dcp = this;

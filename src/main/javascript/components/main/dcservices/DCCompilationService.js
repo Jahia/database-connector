@@ -39,19 +39,13 @@
             });
         };
 
-        this.compileDirective = function($scope) {
+        this.compileDirective = function($scope, selector, selectedDatabaseType, attrs) {
             return $q(function(resolve, reject){
                 if (!$scope.compiled) {
                     $timeout(function() {
-                        $DCSS.getDirectivesForType($scope.cpc.selectedDatabaseType).then(function(data) {
-                            var promise = self.compileInsideElement($scope, data.connectionDirective.tag, "#createConnectionContent", [
-                                    {attrName:"mode", attrValue:"create"},
-                                    {attrName:"database-type", attrValue:"{{cpc.selectedDatabaseType}}"},
-                                    {attrName:"connection", attrValue:"cpc.connection"}
-                                ]
-                            );
+                        $DCSS.getDirectivesForType(selectedDatabaseType).then(function(data) {
+                            var promise = self.compileInsideElement($scope, data.connectionDirective.tag, selector, attrs);
                             promise.then(function(data) {
-                                console.log(data);
                                 var uuid = $DCU.generateUUID();
                                 compiledDirectives[uuid] = data;
                                 resolve({UUID: uuid})

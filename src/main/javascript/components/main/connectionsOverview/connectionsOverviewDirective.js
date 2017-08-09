@@ -187,7 +187,12 @@
         }
         function setSelectedDatabaseType(databaseType) {
             $scope.cpc.selectedDatabaseType = databaseType;
-            CS.compileDirective($scope).then(function(data){
+            var attrs = [
+                {attrName:"mode", attrValue:"create"},
+                {attrName:"database-type", attrValue:"{{cpc.selectedDatabaseType}}"},
+                {attrName:"connection", attrValue:"cpc.connection"}
+            ];
+            CS.compileDirective($scope, '#createConnectionContent', $scope.cpc.selectedDatabaseType, attrs).then(function(data){
                 compiledUUID = data.UUID;
             }, function(error){
                 //compilation failed.
