@@ -1,8 +1,10 @@
 (function() {
     'use strict';
 
-    var CompilationService = function($timeout, $compile, $q) {
+    var CompilationService = function($timeout, $compile, $q, $DCSS, $DCU) {
 
+        var compiledDirectives = {};
+        var self = this;
         /**
          * Compiles directive
          *
@@ -37,6 +39,43 @@
             });
         };
 
+        this.compileDirective = function($scope) {
+            return $q(function(resolve, reject){
+                if (!$scope.compiled) {
+                    $timeout(function() {
+                        $DCSS.getDirectivesForType($scope.cpc.selectedDatabaseType).then(function(data) {
+                            var promise = self.compileInsideElement($scope, data.connectionDirective.tag, "#createConnectionContent", [
+                                    {attrName:"mode", attrValue:"create"},
+                                    {attrName:"database-type", attrValue:"{{cpc.selectedDatabaseType}}"},
+                                    {attrName:"connection", attrValue:"cpc.connection"}
+                                ]
+                            );
+                            promise.then(function(data) {
+                                console.log(data);
+                                var uuid = $DCU.generateUUID();
+                                compiledDirectives[uuid] = data;
+                                resolve({UUID: uuid})
+                            }, function(error) {
+                                console.error(error);
+                                reject(error);
+                            })
+                        }, function(error) {
+                            console.error(error);
+                            reject(error);
+                        });
+                    });
+                    $scope.compiled = true;
+                }
+            });
+        };
+
+        this.removeCompiledDirective = function(uuid) {
+            if (uuid in compiledDirectives) {
+                compiledDirectives[uuid].scope.$destroy();
+                compiledDirectives[uuid].element.empty();
+            }
+        };
+
         function buildAttributeString(parameterMap) {
             var str = "";
             for (var index in parameterMap) {
@@ -47,7 +86,7 @@
         }
     };
 
-    CompilationService.$inject = ['$timeout', '$compile', '$q'];
+    CompilationService.$inject = ['$timeout', '$compile', '$q', '$DCStateService', '$DCUtilService'];
 
     angular
         .module('databaseConnector')

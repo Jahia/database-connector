@@ -6,7 +6,7 @@
             </div>
         </md-toolbar>
         <md-dialog-content class="databaseSelection">
-            <div ng-if="!cpc.databaseTypeSelected">
+            <div ng-if="!cpc.selectedDatabaseType">
                 <div layout layout-wrap>
                     <div ng-repeat="(i, connectorMetaData) in cpc.databaseTypes" flex="50">
                         <md-button class="md-button" layout-margin ng-click="cpc.setSelectedDatabaseType(connectorMetaData.databaseType)">

@@ -46,9 +46,9 @@
             $scope.$on('resetExportSelection', function(){
                 cc.connection.export = false;
             });
-            $DCCMS.verifyServerStatus(cc.connection).then(function(connection){
-                cc.connection = connection;
-                cc.originalConnection = angular.copy(connection);
+            $DCCMS.verifyServerStatus({ connection: cc.connection }).then(function(data){
+                cc.connection = data.connection;
+                cc.originalConnection = angular.copy(data.connection);
             }, function(error){
                 cc.connection = error.connection;
                 cc.originalConnection = angular.copy(error.connection);
@@ -57,9 +57,9 @@
 
         function updateConnection(connect) {
             cc.spinnerOptions.showSpinner = true;
-            $DCCMS.updateConnection(cc.connection, connect).then(function(connection) {
-                cc.connection = connection;
-                cc.originalConnection = angular.copy(connection);
+            $DCCMS.updateConnection(cc.connection, connect).then(function(data) {
+                cc.connection = data.connection;
+                cc.originalConnection = angular.copy(data.connection);
                 cc.spinnerOptions.showSpinner = false;
             }, function(error) {
                 cc.connection = error.connection;
@@ -145,9 +145,9 @@
                 url: url,
                 method: 'GET'
             }).then(function(updatedConnection) {
-                $DCCMS.verifyServerStatus(updatedConnection).then(function(connection){
-                    cc.connection = connection;
-                    cc.originalConnection = angular.copy(connection);
+                $DCCMS.verifyServerStatus({ connection: updatedConnection }).then(function(data){
+                    cc.connection = data.connection;
+                    cc.originalConnection = angular.copy(data.connection);
                 }, function(error){
                     cc.connection = error.connection;
                     cc.originalConnection = angular.copy(error.connection);
@@ -157,7 +157,7 @@
                 cc.originalConnection = angular.copy(error.connection);
             });
         }
-        
+
         function exportValueChanged() {
             if (cc.connection.export) {
                 var exportConnectionsTemp = angular.copy(cc.exportConnections);

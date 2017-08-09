@@ -83,9 +83,8 @@
 
         function getAllConnections() {
             return $q(function(resolve, reject){
-                $DCMS.getAvailableConnections().then(function(connections){
-                    coc.connections = connections;
-                    resolve(connections);
+                $DCMS.getAvailableConnections().then(function(){
+                    coc.state = $DCSS.state;
                 }, function(response){
                     //Could not retrieve connections.
                     reject();
@@ -95,9 +94,6 @@
 
         function createConnection(ev) {
             $mdDialog.show({
-                locals: {
-                    updateConnections: coc.getAllConnections
-                },
                 controller: CreateConnectionPopupController,
                 templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connectionPopups/createConnectionPopup.html',
                 parent: angular.element(document.body),
@@ -105,9 +101,8 @@
                 clickOutsideToClose: true,
                 fullscreen: true
             }).then(function () {
-                $DCMS.refreshAllConnectionsStatus().then(function(connections){
-                    coc.connections = connections;
-                });
+                $mdDialog.hide();
+                $DCMS.refreshAllConnectionsStatus();
             });
         }
 
@@ -162,72 +157,44 @@
         'dcDownloadFactory', 'toaster', '$state', 'i18nService', '$q', '$timeout', '$DCStateService', '$DCManagementService'];
 
 
-    function CreateConnectionPopupController($scope, $mdDialog, contextualData, $DCSS, $timeout, CS) {
+    function CreateConnectionPopupController($scope, contextualData, $DCSS, $timeout, CS) {
         $scope.cpc = this;
-        $scope.cpc.databaseTypeSelected = false;
         $scope.cpc.setSelectedDatabaseType = setSelectedDatabaseType;
         $scope.compiled = false;
-        var compilationResult = {}; //scope and element
 
+        var compiledUUID = null;
         init();
 
         function init() {
             $scope.cpc.connection = {};
             $scope.cpc.images = {};
             $scope.cpc.databaseTypes = angular.copy($DCSS.connectorsMetaData);
+
             for (var i in $scope.cpc.databaseTypes) {
                 $scope.cpc.images[$scope.cpc.databaseTypes[i].databaseType] = contextualData.context + '/modules/' + $scope.cpc.databaseTypes[i].moduleName  + '/images/' + $scope.cpc.databaseTypes[i].databaseType.toLowerCase() + '/logo_60.png';
             }
         }
 
-
-        $scope.$on('connectionSuccessfullyCreated', function(){
-            $mdDialog.hide();
-        });
-
         $scope.$on('creationCancelled', function() {
             resetCreationProcess();
         });
 
-        $scope.compileDirective = function() {
-            if (!$scope.compiled) {
-                $timeout(function() {
-                    $DCSS.getDirectivesForType($scope.cpc.selectedDatabaseType).then(function(data) {
-                        var promise = CS.compileInsideElement($scope, data.connectionDirective.tag, "#createConnectionContent", [
-                                {attrName:"mode", attrValue:"create"},
-                                {attrName:"database-type", attrValue:"{{cpc.selectedDatabaseType}}"},
-                                {attrName:"connection", attrValue:"cpc.connection"}
-                            ]
-                        );
-                        promise.then(function(data) {
-                            //console.log(data);
-                            compilationResult = data;
-                        }, function(error) {
-                            console.error(error);
-                        })
-                    }, function(error) {
-                        console.error(error);
-                    });
-                });
-                $scope.compiled = true;
-            }
-        };
-
-
         function resetCreationProcess() {
+            CS.removeCompiledDirective(compiledUUID);
             $scope.cpc.connection = {};
-            $scope.cpc.databaseTypeSelected = false;
             $scope.cpc.selectedDatabaseType = '';
-            compilationResult.scope.$destroy();
-            compilationResult.element.empty();
+            $scope.compiled = false;
         }
         function setSelectedDatabaseType(databaseType) {
             $scope.cpc.selectedDatabaseType = databaseType;
-            $scope.cpc.databaseTypeSelected = true;
-            $scope.compileDirective();
+            CS.compileDirective($scope).then(function(data){
+                compiledUUID = data.UUID;
+            }, function(error){
+                //compilation failed.
+            });
         }
 
     }
 
-    CreateConnectionPopupController.$inject = ['$scope', '$mdDialog', 'contextualData', '$DCStateService', '$timeout', 'dcCompilationService'];
+    CreateConnectionPopupController.$inject = ['$scope', 'contextualData', '$DCStateService', '$timeout', 'dcCompilationService'];
 })();

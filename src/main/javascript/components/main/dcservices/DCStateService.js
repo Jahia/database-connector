@@ -6,6 +6,9 @@
         this.selectedConnection = null;
         this.selectedDatabaseType = null;
         this.exportConnections = {};
+        this.state = {
+            connections: null
+        };
         var cache = {};
 
         /**

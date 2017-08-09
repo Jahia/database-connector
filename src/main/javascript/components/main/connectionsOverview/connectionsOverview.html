@@ -27,7 +27,7 @@
 </md-toolbar>
 
 <div layout="row" layout-wrap layout-margin>
-    <div flex-auto="33" ng-repeat="connection in coc.connections track by $index">
+    <div flex-auto="33" ng-repeat="connection in coc.state.connections track by $index">
         <dc-connection index="{{$index}}" export-connections="coc.exportConnections" connection="connection"></dc-connection>
     </div>
 </div>
