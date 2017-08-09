@@ -34,32 +34,31 @@
             init();
             $DCSS.getDirectivesForType(csc.connection.databaseType).then(function(data) {
                 var directives = data.statusDirectives;
-                if(!_.isEmpty(directives)) { console.log(directives);
+                if(!_.isEmpty(directives)) {
                     var $compilerStatusContainer = angular.element('#statusCompiler');
                     //Compile overview first
-                    for (var i = directives.length - 1; i >=0; i--) {
-                        console.log(directives[i]);
-                        if (directives[i].name == 'overview') {
+                    for (var i = directives.length - 1; i >= 0; i--) {
+                        if (directives[i].name === 'overview') {
                             $compilerStatusContainer.append(createStatusColumnContainer(directives[i].name));
                             $DCCS.compileInsideElement($scope, directives[i].tag, '#' + directives[i].name);
-                            directives.splice(i, 1);
                             break;
                         }
                     }
-                    //Compile rest of directives in the order they appear
-                    for (var i = directives.length - 1; i >=0; i--){
 
-                        var parameters = [{
+                    for (var i = directives.length - 1; i >= 0; i--){
+                        if (directives[i].name !== 'overview') {
+                            var parameters = [{
                                 attrName: 'chart-height',
                                 attrValue: "'320px'"
                             },
-                            {
-                                attrName: 'chart-width',
-                                attrValue: "'100%'"
-                            }
-                        ];
-                        $compilerStatusContainer.append(createStatusColumnContainer(directives[i].name));
-                        $DCCS.compileInsideElement($scope, directives[i].tag, '#' + directives[i].name, parameters);
+                                {
+                                    attrName: 'chart-width',
+                                    attrValue: "'100%'"
+                                }
+                            ];
+                            $compilerStatusContainer.append(createStatusColumnContainer(directives[i].name));
+                            $DCCS.compileInsideElement($scope, directives[i].tag, '#' + directives[i].name, parameters);
+                        }
                     }
                 }
                 $DCCS.compileInsideElement($scope, '',  '#statusCompiler');
@@ -72,7 +71,6 @@
                 $boxWrapper.addClass('box-wrap');
                 $boxWrapper.attr('id', id);
                 $div.append($boxWrapper);
-                console.log($div);
                 return $div;
             }
         };
