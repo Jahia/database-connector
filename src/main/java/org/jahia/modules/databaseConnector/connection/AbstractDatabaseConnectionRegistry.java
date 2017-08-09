@@ -141,13 +141,14 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
 
         if (storeConnection(connection, connection.getNodeType(), isEdition)) {
             if (isEdition) {
+                boolean wasConnected = connection.isConnected();
                 if (registry.get(connection.getOldId()).isConnected()) {
                     unregisterAsService(connection);
                 }
                 if (!connection.getId().equals(connection.getOldId())) {
                     registry.remove(connection.getOldId());
                 }
-                if (connection.isConnected() && connection.testConnectionCreation()) {
+                if (wasConnected && connection.testConnectionCreation()) {
                     registerAsService(connection);
                 } else {
                     connection.isConnected(false);
