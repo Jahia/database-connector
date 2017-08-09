@@ -74,13 +74,11 @@ form legend {
 }
 
 .off{
-    border:2px solid red;
     background: #ff8d96;
 
 
 }
 .on {
-    border: 2px solid green;
     background: #42ff7e;
 }
 
