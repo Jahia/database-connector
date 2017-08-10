@@ -12,7 +12,7 @@
                         connection.isConnected = connect;
                         if (connect) {
                             self.verifyServerStatus({ connection: connection }).then(function(data) {
-                                resolve(data.connection);
+                                resolve({ connection: data.connection });
                             });
                         } else {
                             connection.canRetrieveStatus = false;
@@ -32,7 +32,7 @@
                             timeout: 3000
                         });
                         connection.canRetrieveStatus = false;
-                        resolve(connection);
+                        resolve({ connection: connection });
                     }
 
                 }, function(response) {
@@ -59,6 +59,7 @@
                             data.connection.dbVersion = response.data.success.version;
                             data.connection.uptime = response.data.success.uptime;
                         } else if (data.connection.databaseType == "REDIS") {
+                            console.log(data.connection);
                             //@TODO this needs to be extracted into the redis module
                             response.data.success = dcConnectionStatusService.getParsedStatus(data.connection.databaseType, response.data.success);
                             if (response.data.success != null) {

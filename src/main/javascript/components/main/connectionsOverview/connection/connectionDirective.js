@@ -199,6 +199,7 @@
             switch(action) {
                 case 'hide':
                     $mdDialog.hide();
+                    break;
                 case 'cancel':
                 default:
                     $mdDialog.cancel();
