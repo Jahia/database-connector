@@ -29,6 +29,7 @@ import org.jahia.modules.databaseConnector.api.impl.DirectivesRetriever;
 import org.jahia.modules.databaseConnector.connection.DatabaseConnectionAPI;
 import org.jahia.modules.databaseConnector.services.DatabaseConnectionRegistry;
 import org.jahia.modules.databaseConnector.connection.AbstractConnection;
+import org.jahia.modules.databaseConnector.services.DatabaseConnectorService;
 import org.jahia.modules.databaseConnector.util.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -78,6 +79,23 @@ public class DCApi extends DatabaseConnectionAPI {
         } catch (JSONException ex) {
             logger.error("Failed to retrieve database types", ex.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Failed to retrieve database types\"}").build();
+        }
+    }
+
+    @GET
+    @Path("/connection/{databaseType}/{databaseId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getConnection(@PathParam("databaseId") String databaseId, @PathParam("databaseType") String databaseType) {
+        try {
+            DatabaseConnectionAPI databaseConnectionAPI = new DatabaseConnectionAPI(DCApi.class);
+            DatabaseConnectorService databaseConnectorService = databaseConnectionAPI.getDatabaseConnector();
+            return Response.status(Response.Status.OK).entity(databaseConnectorService.getConnection(databaseId, databaseType).makeConnectionData()).build();
+        } catch (InstantiationException ex) {
+            logger.error("Cannot instantiate connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
+        } catch (IllegalAccessException ex) {
+            logger.error("Cannot access connection class" + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Cannot access connection\"}").build();
         }
     }
 

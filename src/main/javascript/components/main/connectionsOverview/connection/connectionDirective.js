@@ -81,7 +81,6 @@
                 fullscreen: false
             }).then(function(){
                 deleteConnection();
-                getUpdatedConnection();
             }, function(){});
         }
 
@@ -139,7 +138,7 @@
         }
 
         function getUpdatedConnection() {
-            var url = contextualData.apiUrl + $DCSS.connectorsMetaData[cc.connection.databaseType].entryPoint + '/connection/' + cc.connection.id;
+            var url = contextualData.apiUrl + '/connection/' + cc.connection.databaseType + '/' + cc.connection.id;
             dcDataFactory.customRequest({
                 url: url,
                 method: 'GET'
