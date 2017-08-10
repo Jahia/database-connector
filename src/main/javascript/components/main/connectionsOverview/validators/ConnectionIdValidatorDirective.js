@@ -25,10 +25,8 @@
                     method: 'GET'
                 }).then(function (response) {
                     if (response) {
-                        console.log('connection id is available');
                         deferred.resolve();
                     } else {
-                        console.log('connection id is taken');
                         deferred.reject();
                     }
                 }, function (response) {

@@ -16,8 +16,7 @@ public class DCApiApplication extends ResourceConfig {
                 DCApi.class,
                 JacksonJaxbJsonProvider.class,
                 HeadersResponseFilter.class,
-                MultiPartFeature.class,
-                LoggingFilter.class
+                MultiPartFeature.class
         );
     }
 }
