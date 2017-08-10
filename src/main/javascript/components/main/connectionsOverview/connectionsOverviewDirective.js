@@ -157,7 +157,7 @@
         'dcDownloadFactory', 'toaster', '$state', 'i18nService', '$q', '$timeout', '$DCStateService', '$DCManagementService'];
 
 
-    function CreateConnectionPopupController($scope, contextualData, $DCSS, $timeout, CS) {
+    function CreateConnectionPopupController($scope, contextualData, $DCSS, $mdDialog, CS) {
         $scope.cpc = this;
         $scope.cpc.setSelectedDatabaseType = setSelectedDatabaseType;
         $scope.compiled = false;
@@ -175,9 +175,17 @@
             }
         }
 
-        $scope.$on('creationCancelled', function() {
-            resetCreationProcess();
-        });
+        $scope.closeDialog = function(action) {
+            CS.removeCompiledDirective(compiledUUID);
+            switch(action) {
+                case 'hide':
+                    $mdDialog.hide();
+                    break;
+                case 'cancel':
+                default:
+                    resetCreationProcess();
+            }
+        };
 
         function resetCreationProcess() {
             CS.removeCompiledDirective(compiledUUID);
@@ -190,7 +198,8 @@
             var attrs = [
                 {attrName:"mode", attrValue:"create"},
                 {attrName:"database-type", attrValue:"{{cpc.selectedDatabaseType}}"},
-                {attrName:"connection", attrValue:"cpc.connection"}
+                {attrName:"connection", attrValue:"cpc.connection"},
+                {attrName: "closeDialog", attrValue: "cpc.closeDialog"}
             ];
             CS.compileDirective($scope, '#createConnectionContent', $scope.cpc.selectedDatabaseType, attrs).then(function(data){
                 compiledUUID = data.UUID;
@@ -201,5 +210,5 @@
 
     }
 
-    CreateConnectionPopupController.$inject = ['$scope', 'contextualData', '$DCStateService', '$timeout', 'dcCompilationService'];
+    CreateConnectionPopupController.$inject = ['$scope', 'contextualData', '$DCStateService', '$mdDialog', 'dcCompilationService'];
 })();

@@ -185,7 +185,7 @@ public class DCApi extends DatabaseConnectionAPI {
                     Map<String, Object> result = new LinkedHashMap<>();
                     if (connectionJsonObject.has("databaseType")) {
                         String databaseType = connectionJsonObject.getString("databaseType");
-                        DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(databaseType, getContext());
+                        DatabaseConnectionRegistry databaseConnectionRegistry = getDatabaseConnector().getDatabaseConnectionRegistry(databaseType);
                         databaseConnectionRegistry.buildConnectionMapFromJSON(result, connectionJsonObject);
                         if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
                             AbstractConnection connection = ((AbstractConnection) result.get("connection"));
@@ -215,8 +215,8 @@ public class DCApi extends DatabaseConnectionAPI {
                 Map<String, Object> result = new LinkedHashMap<>();
                 if (connectionJsonObject.has("databaseType")) {
                     String databaseType = connectionJsonObject.getString("databaseType");
-                    DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) Utils.getService(databaseType, getContext());
-                    databaseConnectionRegistry.buildConnectionMapFromJSON(result, connectionJsonObject);
+                    DatabaseConnectionRegistry databaseConnectionRegistry = getDatabaseConnector().getDatabaseConnectionRegistry(databaseType);
+                        databaseConnectionRegistry.buildConnectionMapFromJSON(result, connectionJsonObject);
                     if (result != null && result.containsKey("connectionStatus") && result.get("connectionStatus").equals("success")) {
                         AbstractConnection connection = (AbstractConnection) result.get("connection");
                         if (connection.isConnected() && !getDatabaseConnector().testConnection(connection)) {

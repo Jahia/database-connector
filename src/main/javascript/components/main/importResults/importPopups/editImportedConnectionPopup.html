@@ -5,9 +5,6 @@
             </div>
         </md-toolbar>
         <md-dialog-content class="editConnectionContainer">
-            <div ng-switch="eicc.connection.databaseType">
-                <mongo-connection-management ng-switch-when="MONGO" mode="import-edit" connection="eicc.connection"></mongo-connection-management>
-                <redis-connection-management ng-switch-when="REDIS" mode="import-edit" connection="eicc.connection"></redis-connection-management>
-            </div>
+            <div id="editImportedConnectionContent"></div>
         </md-dialog-content>
 </md-dialog>

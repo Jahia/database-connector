@@ -640,7 +640,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         }
     }
 
-    private DatabaseConnectionRegistry getDatabaseConnectionRegistryService(String databaseType) {
+    public DatabaseConnectionRegistry getDatabaseConnectionRegistryService(String databaseType) {
         try {
             ServiceReference[] serviceReferences = this.context.getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
             if (serviceReferences != null) {

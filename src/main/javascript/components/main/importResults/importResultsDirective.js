@@ -132,10 +132,8 @@
 
         function editConnection($index, databaseType, ev) {
             var backupConnection = angular.copy(irc.importResults[databaseType].failed[$index]);
+            $DCSS.setActiveConnection(irc.importResults[databaseType].failed[$index]);
             $mdDialog.show({
-                locals: {
-                    connection: irc.importResults[databaseType].failed[$index]
-                },
                 controller: EditImportedConnectionPopupController,
                 templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/importResults/importPopups/editImportedConnectionPopup.html',
                 parent: angular.element(document.body),
@@ -145,11 +143,12 @@
 
             }).then(function(connection){
                 if (!_.isUndefined(connection) && connection !== null) {
-                    irc.importResults[databaseType].failed[$index] = {};
                     irc.importResults[databaseType].failed[$index] = connection;
                 }
+                $DCSS.state.activeConnection = null;
             }, function(){
                 irc.importResults[databaseType].failed[$index] = backupConnection;
+                $DCSS.state.activeConnection = null;
             });
         }
 
@@ -185,20 +184,45 @@
     ImportResultsController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$state',
         '$stateParams', 'toaster', '$mdDialog', 'i18nService', '$DCStateService'];
 
-    function EditImportedConnectionPopupController($scope, $mdDialog, connection) {
+    function EditImportedConnectionPopupController($scope, $mdDialog, $DCSS, CS) {
         $scope.eicc = this;
+        var compiledUUID = null;
+
+        $scope.closeDialog = function(action) {
+            CS.removeCompiledDirective(compiledUUID);
+            switch(action) {
+                case 'hide':
+                    $mdDialog.hide($scope.eicc.connection);
+                    break;
+                case 'cancel':
+                default:
+                    $mdDialog.cancel();
+            }
+        };
 
         init();
 
         function init() {
-            $scope.eicc.connection = connection;
+            $scope.eicc.connection = $DCSS.state.activeConnection;
+            $scope.compiled = false;
+            compileDirective();
         }
-        
-        $scope.$on('importConnectionClosed', function(event, connection){
-            $mdDialog.hide(connection);
-        });
 
+        function compileDirective() {
+            var attrs = [
+                {attrName: "mode", attrValue: "import-edit"},
+                {attrName: "database-type", attrValue: "{{eicc.connection.databaseType}}"},
+                {attrName: "connection", attrValue: "eicc.connection"},
+                {attrName: "closeDialog", attrValue: "eicc.closeDialog"}
+            ];
+
+            CS.compileDirective($scope, '#editImportedConnectionContent', $scope.eicc.connection.databaseType, attrs).then(function(data){
+                compiledUUID = data.UUID;
+            }, function(error){
+                //compilation failed.
+            });
+        }
     }
 
-    EditImportedConnectionPopupController.$inject = ['$scope', '$mdDialog', 'connection'];
+    EditImportedConnectionPopupController.$inject = ['$scope', '$mdDialog', '$DCStateService', 'dcCompilationService'];
 })();

@@ -132,8 +132,10 @@
 
             }).then(function(){
                 getUpdatedConnection();
+                $DCSS.state.activeConnection = null;
             }, function(){
                 cc.connection = angular.copy(cc.originalConnection);
+                $DCSS.state.activeConnection = null;
             });
         }
 
@@ -203,9 +205,10 @@
                 default:
                     $mdDialog.cancel();
             }
-            $DCSS.state.activeConnection = null;
         };
-        $scope.compileDirective = function() {
+
+        compileDirective();
+        function compileDirective() {
             var attrs = [
                 {attrName: "mode", attrValue: "edit"},
                 {attrName: "database-type", attrValue: "{{ecp.connection.databaseType}}"},
@@ -218,7 +221,7 @@
             }, function(error){
                 //compilation failed.
             });
-        };
+        }
     }
 
     EditConnectionPopupController.$inject = ['$scope', '$mdDialog', '$DCStateService',
