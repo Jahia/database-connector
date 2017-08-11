@@ -177,6 +177,7 @@
         }
         
         function goToStatus() {
+            $DCSS.selectedDatabaseType = cc.connection.databaseType;
             $state.go('connectionsStatus', {connection: cc.connection});
         }
 
