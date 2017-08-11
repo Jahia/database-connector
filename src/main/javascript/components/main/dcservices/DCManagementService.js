@@ -78,9 +78,9 @@
             });
         };
 
-        this.removeConnection = function (connectionId){
+        this.removeConnection = function (connectionId, databaseType){
             for (var i = 0; i < $DCSS.state.connections.length; i++) {
-                if (connectionId == $DCSS.state.connections[i].id) {
+                if (connectionId == $DCSS.state.connections[i].id && databaseType == $DCSS.state.connections[i].databaseType) {
                     $DCSS.state.connections.splice(i, 1);
                     return;
                 }

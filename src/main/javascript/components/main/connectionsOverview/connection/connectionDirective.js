@@ -96,7 +96,7 @@
                     delete exportConnectionsTemp[cc.connection.id];
                     cc.exportConnections = exportConnectionsTemp;
                 }
-                $DCMS.removeConnection(cc.connection.id);
+                $DCMS.removeConnection(cc.connection.id, cc.connection.databaseType);
                 toaster.pop({
                     type   : 'success',
                     title: i18n.message('dc_databaseConnector.toast.title.connectionSuccessfullyDeleted'),
