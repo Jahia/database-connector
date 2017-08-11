@@ -29,6 +29,7 @@
         coc.exportSelectedConnections = exportSelectedConnections;
         coc.isExportDisabled = isExportDisabled;
         coc.importConnections = importConnections;
+        coc.resolveTracker = resolveTracker;
 
         coc.$onInit = function() {
             getAllConnections();
@@ -151,6 +152,10 @@
             }, function(error) {
                 console.error(error);
             });
+        }
+
+        function resolveTracker(id, databaseType) {
+            return databaseType + '_' + id;
         }
     };
 

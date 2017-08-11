@@ -35,8 +35,6 @@ import static org.jahia.modules.databaseConnector.connection.DatabaseConnectorMa
 
 public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConnection> implements DatabaseConnectionRegistry<T> {
 
-    private final static String NODE_TYPE = "dcmix:databaseConnection";
-
     private static final Logger logger = LoggerFactory.getLogger(AbstractDatabaseConnectionRegistry.class);
 
     protected Map<String, T> registry;
@@ -241,7 +239,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
 
     private Node getDatabaseConnectionNode(String databaseConnectionId, JCRSessionWrapper session)
             throws RepositoryException, IllegalArgumentException {
-        String statement = "SELECT * FROM [" + NODE_TYPE + "] WHERE [" + ID_KEY + "] = '" + databaseConnectionId + "'";
+        String statement = "SELECT * FROM [" + getConnectionNodeType() + "] WHERE [" + ID_KEY + "] = '" + databaseConnectionId + "'";
         NodeIterator nodes = query(statement, session).getNodes();
         if (!nodes.hasNext()) {
             throw new IllegalArgumentException("No database connection with ID '" + databaseConnectionId + "' stored in the JCR");
@@ -250,7 +248,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
     }
 
     private boolean isConnectionIdAvailable(String databaseConnectionId, JCRSessionWrapper session) throws RepositoryException {
-        String statement = "SELECT * FROM [" + NODE_TYPE + "] WHERE [" + ID_KEY + "] = '" + databaseConnectionId + "'";
+        String statement = "SELECT * FROM [" + getConnectionNodeType() + "] WHERE [" + ID_KEY + "] = '" + databaseConnectionId + "'";
         NodeIterator nodes = query(statement, session).getNodes();
         return !nodes.hasNext();
     }
@@ -406,5 +404,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
     public Object getConnectionService(Class c, String databseType, String connectionId) {
        return BundleUtils.getOsgiService(c, createFilter(databseType, connectionId)) ;
     }
+
+    protected abstract String getConnectionNodeType();
 }
 
