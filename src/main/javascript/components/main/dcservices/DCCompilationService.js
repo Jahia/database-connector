@@ -41,25 +41,22 @@
 
         this.compileDirective = function($scope, selector, selectedDatabaseType, attrs) {
             return $q(function(resolve, reject){
-                if (!$scope.compiled) {
-                    $timeout(function() {
-                        $DCSS.getDirectivesForType(selectedDatabaseType).then(function(data) {
-                            var promise = self.compileInsideElement($scope, data.connectionDirective.tag, selector, attrs);
-                            promise.then(function(data) {
-                                var uuid = $DCU.generateUUID();
-                                compiledDirectives[uuid] = data;
-                                resolve({UUID: uuid})
-                            }, function(error) {
-                                console.error(error);
-                                reject(error);
-                            })
+                $timeout(function() {
+                    $DCSS.getDirectivesForType(selectedDatabaseType).then(function(data) {
+                        var promise = self.compileInsideElement($scope, data.connectionDirective.tag, selector, attrs);
+                        promise.then(function(data) {
+                            var uuid = $DCU.generateUUID();
+                            compiledDirectives[uuid] = data;
+                            resolve({UUID: uuid})
                         }, function(error) {
                             console.error(error);
                             reject(error);
-                        });
+                        })
+                    }, function(error) {
+                        console.error(error);
+                        reject(error);
                     });
-                    $scope.compiled = true;
-                }
+                });
             });
         };
 

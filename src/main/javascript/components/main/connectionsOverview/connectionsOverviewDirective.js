@@ -95,6 +95,7 @@
         function createConnection(ev) {
             $mdDialog.show({
                 controller: CreateConnectionPopupController,
+                controllerAs: "cpc",
                 templateUrl: contextualData.context + '/modules/database-connector/javascript/angular/components/main/connectionsOverview/connectionPopups/createConnectionPopup.html',
                 parent: angular.element(document.body),
                 targetEvent: ev,
@@ -161,6 +162,7 @@
         $scope.cpc = this;
         $scope.cpc.setSelectedDatabaseType = setSelectedDatabaseType;
         $scope.compiled = false;
+        $scope.cpc.selectedDatabaseType = '';
 
         var compiledUUID = null;
         init();
@@ -193,19 +195,25 @@
             $scope.cpc.selectedDatabaseType = '';
             $scope.compiled = false;
         }
+
         function setSelectedDatabaseType(databaseType) {
-            $scope.cpc.selectedDatabaseType = databaseType;
-            var attrs = [
-                {attrName:"mode", attrValue:"create"},
-                {attrName:"database-type", attrValue:"{{cpc.selectedDatabaseType}}"},
-                {attrName:"connection", attrValue:"cpc.connection"},
-                {attrName: "closeDialog", attrValue: "cpc.closeDialog"}
-            ];
-            CS.compileDirective($scope, '#createConnectionContent', $scope.cpc.selectedDatabaseType, attrs).then(function(data){
-                compiledUUID = data.UUID;
-            }, function(error){
-                //compilation failed.
-            });
+            //We should never manipulate variables from this controller inside compilation functions as it leads to bugs,
+            //confusion and reduces readability of code!!! It belongs here!!!
+            if (!$scope.compiled) {
+                $scope.cpc.selectedDatabaseType = databaseType;
+                var attrs = [
+                    {attrName:"mode", attrValue:"create"},
+                    {attrName:"database-type", attrValue:"{{cpc.selectedDatabaseType}}"},
+                    {attrName:"connection", attrValue:"cpc.connection"},
+                    {attrName: "closeDialog", attrValue: "cpc.closeDialog"}
+                ];
+                CS.compileDirective($scope, '#createConnectionContent', $scope.cpc.selectedDatabaseType, attrs).then(function(data){
+                    compiledUUID = data.UUID;
+                    $scope.compiled = true;
+                }, function(error){
+                    //compilation failed.
+                });
+            }
         }
 
     }

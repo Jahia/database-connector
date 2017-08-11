@@ -1,8 +1,8 @@
 <md-dialog>
         <md-toolbar>
             <div class="md-toolbar-tools">
-                <span message-key="dc_databaseConnector.label.createConnection" ng-if="cpc.databaseTypeSelected"></span>
-                <span message-key="dc_databaseConnector.label.selectDatabaseType" ng-if="!cpc.databaseTypeSelected"></span>
+                <span message-key="dc_databaseConnector.label.createConnection" ng-if="cpc.selectedDatabaseType !== ''"></span>
+                <span message-key="dc_databaseConnector.label.selectDatabaseType" ng-if="cpc.selectedDatabaseType === ''"></span>
             </div>
         </md-toolbar>
         <md-dialog-content class="databaseSelection">
