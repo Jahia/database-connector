@@ -22,7 +22,7 @@
 
     function ImportResultsController($scope, contextualData, dcDataFactory,
                                      $state, $stateParams, toaster, $mdDialog, i18n,
-                                     $DCSS) {
+                                     $DCSS, $timeout) {
         var irc = this;
         irc.importResults = {};
         irc.selectedImports = {};
@@ -43,15 +43,16 @@
         };
 
         function init() {
-            var url = contextualData.context + '/modules/databaseconnector/databasetypes';
             if ($stateParams.results !== null) {
                 irc.importResults = $stateParams.results;
-                toaster.pop({
-                    type: $stateParams.status ? 'success' : 'error',
-                    title: i18n.message('dc_databaseConnector.toast.title.importStatus'),
-                    body: $stateParams.status ? i18n.message('dc_databaseConnector.toast.message.connectionsImportedSuccessfully') : i18n.message('dc_databaseConnector.toast.message.connectionsImportIncomplete'),
-                    toastId: 'irc',
-                    timeout: 3000
+                $timeout(function() {
+                    toaster.pop({
+                        type: $stateParams.status ? 'success' : 'error',
+                        title: i18n.message('dc_databaseConnector.toast.title.importStatus'),
+                        body: $stateParams.status ? i18n.message('dc_databaseConnector.toast.message.connectionsImportedSuccessfully') : i18n.message('dc_databaseConnector.toast.message.connectionsImportIncomplete'),
+                        toastId: 'irc',
+                        timeout: 3000
+                    });
                 });
             } else {
                 $state.go('connections');
@@ -182,7 +183,7 @@
     }
 
     ImportResultsController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$state',
-        '$stateParams', 'toaster', '$mdDialog', 'i18nService', '$DCStateService'];
+        '$stateParams', 'toaster', '$mdDialog', 'i18nService', '$DCStateService', '$timeout'];
 
     function EditImportedConnectionPopupController($scope, $mdDialog, $DCSS, CS) {
         $scope.eicc = this;
