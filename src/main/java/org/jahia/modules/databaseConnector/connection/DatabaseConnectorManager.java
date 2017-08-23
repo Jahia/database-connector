@@ -3,6 +3,7 @@ package org.jahia.modules.databaseConnector.connection;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
+import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.jahia.api.Constants;
 import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.databaseConnector.bundle.RBExecutor;
@@ -25,8 +26,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.framework.*;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -47,8 +46,7 @@ import java.util.*;
  * @author Frédéric Pierre
  * @version 1.0
  */
-@Component(service = DatabaseConnectorManager.class, immediate = true)
-public class DatabaseConnectorManager implements InitializingBean, BundleListener {
+public class DatabaseConnectorManager implements InitializingBean, BundleListener, BundleContextAware {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectorManager.class);
 
     public static final String DATABASE_CONNECTOR_ROOT_PATH = "/settings/";
@@ -62,7 +60,6 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     private final static Object lock = new Object();
     private static DatabaseConnectorManager instance;
-    private BundleContext context;
     private DSLExecutor dslExecutor;
     private Map<String, DSLHandler> dslHandlerMap;
     private final static Set<Long> installedBundles = new LinkedHashSet<>();
@@ -75,34 +72,19 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     private JahiaUserManagerService userManagerService;
     private Bundle bundle;
     private RBExecutor rbExecutor;
-
+    private boolean bundleListenerSet = false;
     private static Date lastDeployDate;
-
-    @Activate
-    public void activate(BundleContext context) {
-        this.context = context;
-        this.context.addBundleListener(this);
-        this.bundle = this.context.getBundle();
-        this.userManagerService = JahiaUserManagerService.getInstance();
-        if (instance != null) {
-            //set properties that were already set by spring
-            this.settingsBean = instance.settingsBean;
-            this.jcrTemplate = instance.jcrTemplate;
-            this.renderService = instance.renderService;
-            this.templateManagerService = instance.templateManagerService;
-            this.dslHandlerMap = instance.dslHandlerMap;
-            this.dslExecutor = instance.dslExecutor;
-        }
-        if (jcrTemplate == null) {
-            jcrTemplate = JCRTemplate.getInstance();
-        }
-        this.rbExecutor = new RBExecutor(jcrTemplate);
-        instance = this;
-    }
 
     public static DatabaseConnectorManager getInstance() {
         if (instance == null) {
             instance = new DatabaseConnectorManager();
+            instance.userManagerService = JahiaUserManagerService.getInstance();
+
+            if (instance.jcrTemplate == null) {
+                instance.jcrTemplate = JCRTemplate.getInstance();
+            }
+
+            instance.rbExecutor = new RBExecutor(instance.jcrTemplate);
         }
         return instance;
     }
@@ -138,12 +120,17 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     }
 
     @Override
+    public void setBundleContext(BundleContext bundleContext) {
+        bundleContext.addBundleListener(this);
+        this.bundle = bundleContext.getBundle();
+    }
+
+    @Override
     public void afterPropertiesSet() throws Exception {
         if (settingsBean != null && settingsBean.isProcessingServer()) {
             lastDeployDate = new Date();
-            parseDefinitionWizards(bundle);
-            for (Bundle currentBundle : bundle.getBundleContext().getBundles()) {
-                if (!(currentBundle.getSymbolicName().equals(bundle.getSymbolicName()))
+            for (Bundle currentBundle : this.bundle.getBundleContext().getBundles()) {
+                if (!(currentBundle.getSymbolicName().equals(this.bundle.getSymbolicName()))
                         && org.jahia.osgi.BundleUtils.isJahiaModuleBundle(currentBundle)
                         && (currentBundle.getState() == Bundle.INSTALLED
                         || currentBundle.getState() == Bundle.RESOLVED
@@ -151,6 +138,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                     parseDefinitionWizards(currentBundle);
                 }
             }
+            parseDefinitionWizards(this.bundle);
             for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
                 databaseConnectionRegistry.registerServices();
             }
@@ -348,10 +336,6 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             availableConnectors.put(databaseConnectionRegistry.getConnectionType(), databaseConnectionRegistry.getConnectorMetaData());
         }
         return availableConnectors;
-    }
-
-    public BundleContext getBundleContext() {
-        return this.context;
     }
 
     public void setSettingsBean(SettingsBean settingsBean) {
@@ -642,10 +626,10 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     public DatabaseConnectionRegistry getDatabaseConnectionRegistryService(String databaseType) {
         try {
-            ServiceReference[] serviceReferences = this.context.getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
+            ServiceReference[] serviceReferences = this.bundle.getBundleContext().getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
             if (serviceReferences != null) {
                 for (ServiceReference serviceReference : serviceReferences) {
-                    DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) this.context.getService(serviceReference);
+                    DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) this.bundle.getBundleContext().getService(serviceReference);
                     if (databaseConnectionRegistry.getConnectionType().equals(databaseType)) {
                         return databaseConnectionRegistry;
                     }
@@ -660,15 +644,19 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     private List<DatabaseConnectionRegistry> getDatabaseConnectionRegistryServices() {
         List<DatabaseConnectionRegistry> databaseConnectionRegistryServices = new LinkedList<>();
         try {
-            ServiceReference[] serviceReferences = this.context.getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
+            ServiceReference[] serviceReferences = this.bundle.getBundleContext().getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
             if (serviceReferences != null) {
                 for (ServiceReference serviceReference : serviceReferences) {
-                    databaseConnectionRegistryServices.add((DatabaseConnectionRegistry) this.context.getService(serviceReference));
+                    databaseConnectionRegistryServices.add((DatabaseConnectionRegistry) this.bundle.getBundleContext().getService(serviceReference));
                 }
             }
         } catch (InvalidSyntaxException ex) {
             logger.error("Could not find service: " + ex.getMessage());
         }
         return databaseConnectionRegistryServices;
+    }
+
+    public boolean isBundleListenerSet() {
+        return bundleListenerSet;
     }
 }

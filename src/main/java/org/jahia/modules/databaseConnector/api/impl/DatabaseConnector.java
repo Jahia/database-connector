@@ -33,12 +33,9 @@ public class DatabaseConnector implements DatabaseConnectorService {
     @Activate
     public void activate(BundleContext context) {
         this.context = context;
+        this.databaseConnectorManager = DatabaseConnectorManager.getInstance();
     }
 
-    @Reference(cardinality = ReferenceCardinality.MANDATORY, policy = ReferencePolicy.STATIC, service = DatabaseConnectorManager.class)
-    public void setDatabaseConnectorManager(DatabaseConnectorManager databaseConnectorManager) {
-        this.databaseConnectorManager = databaseConnectorManager;
-    }
 
     public <T extends ConnectionData> String getAllConnections() throws JSONException, InstantiationException, IllegalAccessException{
         String connections;
