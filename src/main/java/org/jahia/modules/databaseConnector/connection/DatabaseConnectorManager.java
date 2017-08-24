@@ -72,7 +72,6 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     private JahiaUserManagerService userManagerService;
     private Bundle bundle;
     private RBExecutor rbExecutor;
-    private boolean bundleListenerSet = false;
     private static Date lastDeployDate;
 
     public static DatabaseConnectorManager getInstance() {
@@ -654,9 +653,5 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             logger.error("Could not find service: " + ex.getMessage());
         }
         return databaseConnectionRegistryServices;
-    }
-
-    public boolean isBundleListenerSet() {
-        return bundleListenerSet;
     }
 }
