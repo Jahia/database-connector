@@ -95,7 +95,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         if (settingsBean != null && settingsBean.isProcessingServer()) {
             Bundle bundleEventBundle = bundleEvent.getBundle();
             if (bundleEventBundle.getSymbolicName().contains("connector")) {
-                logger.info("Processing bundle: [" + bundleEventBundle.getSymbolicName() + "]" + " - Current Bundle Status: [" + Utils.resolveBundleName(bundleEvent.getType()) + "]");
+                logger.debug("Processing bundle: [" + bundleEventBundle.getSymbolicName() + "]" + " - Current Bundle Status: [" + Utils.resolveBundleName(bundleEvent.getType()) + "]");
             }
 //            if (bundleEvent.getType() == BundleEvent.STARTED || bundleEvent.getType() == BundleEvent.STOPPED) {
 //                FLush stuff here
@@ -105,17 +105,17 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                 installedBundles.add(bundleId);
             }
             if (bundleEvent.getType() == BundleEvent.STARTED) {
-                logger.info("Starting connection services registration process...");
+                logger.debug("Starting connection services registration process...");
                 for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
                     logger.info("\tRegistering services for: " + databaseConnectionRegistry.getConnectionDisplayName() + " using " + databaseConnectionRegistry.getClass());
                     databaseConnectionRegistry.registerServices();
                 }
-                logger.info("Registration process completed!");
+                logger.debug("Registration process completed!");
             }
             if ((bundleEvent.getType() == BundleEvent.RESOLVED && installedBundles.contains(bundleId)) || (bundleEventBundle.getState() == Bundle.RESOLVED && bundleEvent.getType() == BundleEvent.INSTALLED)) {
                 installedBundles.remove(bundleId);
                 try {
-                    logger.info("Preparing to Parse definitions");
+                    logger.debug("Preparing to Parse definitions");
                     parseDefinitionWizards(bundleEvent.getBundle());
                 } catch (ParseException e) {
                     logger.error("Parse exception: " + e.getMessage());
@@ -125,9 +125,9 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             }
         } else {
             if (settingsBean == null) {
-                logger.info("Settings bean is null...Skipping bundle: [" + bundleEvent.getBundle().getSymbolicName() + "]" + "\n\t - Current Bundle Status: [" + Utils.resolveBundleName(bundleEvent.getType()) + "]");
+                logger.debug("Settings bean is null...Skipping bundle: [" + bundleEvent.getBundle().getSymbolicName() + "]" + "\n\t - Current Bundle Status: [" + Utils.resolveBundleName(bundleEvent.getType()) + "]");
             } else {
-                logger.info("This is not a processing server... No action will be taken for bundle: [" + bundleEvent.getBundle().getSymbolicName() + "]" + "\n\t - Current Bundle Status: [" + Utils.resolveBundleName(bundleEvent.getType()) + "]");
+                logger.debug("This is not a processing server... No action will be taken for bundle: [" + bundleEvent.getBundle().getSymbolicName() + "]" + "\n\t - Current Bundle Status: [" + Utils.resolveBundleName(bundleEvent.getType()) + "]");
             }
         }
     }
@@ -141,32 +141,31 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     @Override
     public void afterPropertiesSet() throws Exception {
         if (settingsBean != null && settingsBean.isProcessingServer()) {
-            logger.info("Preparing to process bundles after properties set.");
+            logger.info("Preparing to process bundles after properties set of database connector module.");
             lastDeployDate = new Date();
             for (Bundle currentBundle : this.bundle.getBundleContext().getBundles()) {
                 if (currentBundle.getSymbolicName().contains("connector")) {
-                    logger.info("Processing bundle: [" + currentBundle.getSymbolicName() + "]" + " - Current Bundle Status: [" + Utils.resolveBundleName(currentBundle.getState()) + "]");
+                    logger.debug("Processing bundle: [" + currentBundle.getSymbolicName() + "]" + " - Current Bundle Status: [" + Utils.resolveBundleName(currentBundle.getState()) + "]");
                 }
                 if (!(currentBundle.getSymbolicName().equals(this.bundle.getSymbolicName()))
                         && org.jahia.osgi.BundleUtils.isJahiaModuleBundle(currentBundle)
                         && (currentBundle.getState() == Bundle.INSTALLED
                         || currentBundle.getState() == Bundle.RESOLVED
                         || currentBundle.getState() == Bundle.ACTIVE)) {
-                    logger.info("Preparing to Parse definitions");
                     parseDefinitionWizards(currentBundle);
                 }
             }
-            logger.info("Preparing to Parse [" + this.bundle.getSymbolicName() + "] directive definitions");
+            logger.debug("Preparing to Parse [" + this.bundle.getSymbolicName() + "] directive definitions");
             parseDefinitionWizards(this.bundle);
             for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
-                logger.info("\tRegistering services for: " + databaseConnectionRegistry.getConnectionDisplayName() + " using " + databaseConnectionRegistry.getClass());
+                logger.debug("\tRegistering services for: " + databaseConnectionRegistry.getConnectionDisplayName() + " using " + databaseConnectionRegistry.getClass());
                 databaseConnectionRegistry.registerServices();
             }
         } else {
             if (settingsBean == null) {
-                logger.info("Settings bean is null... Skipping bundle(s) processing");
+                logger.debug("Settings bean is null... Skipping bundle(s) processing");
             } else {
-                logger.info("This is not a processing server... Skipping bundle(s) processing");
+                logger.debug("This is not a processing server... Skipping bundle(s) processing");
             }
         }
     }
@@ -393,7 +392,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             if (packageById != null) {
                 List<String> definitionsFiles = new LinkedList<>(packageById.getDefinitionsFiles());
                 for (String definitionsFile : definitionsFiles) {
-                    logger.info("\tRetrieving Bundle resource...");
+                    logger.debug("\tRetrieving Bundle resource...");
                     BundleResource bundleResource = new BundleResource(bundle.getResource(definitionsFile), bundle);
                     List<ExtendedNodeType> definitionsFromFile = NodeTypeRegistry.getInstance().getDefinitionsFromFile(bundleResource, bundle.getSymbolicName());
                     for (ExtendedNodeType type : definitionsFromFile) {
@@ -401,28 +400,31 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                             String definitionType = resolveDslHandlerType(Arrays.asList(type.getDeclaredSupertypeNames()));
                             if (definitionType != null) {
                                 String url = type.getName().replace(":", "_") + "/html/" + StringUtils.substringAfter(type.getName(), ":") + ".wzd";
-                                logger.info("\tRetrieving definition wzd resource for: " + type.getName() + "(" + url + ")");
+                                logger.debug("\tRetrieving definition wzd resource for: " + type.getName() + "(" + url + ")");
                                 URL resource = bundle.getResource(type.getName().replace(":", "_") + "/html/" + StringUtils.substringAfter(type.getName(), ":") + ".wzd");
                                 if (resource != null) {
                                         logger.info("\tPreparing to execute DSL handler to register " + definitionType);
                                         foundDefinitions = true;
                                         dslExecutor.execute(resource, dslHandlerMap.get(definitionType), packageById, type);
+                                        parsedDefinitionsCount++;
                                 } else {
-                                    logger.info("\tCould not locate resource for definition: " + type.getName());
+                                    logger.warn("\tCould not locate resource for definition: " + type.getName());
                                 }
                             } else {
-                                logger.info("\tSkipping definition: " + type + " - super types is not of: " + DCMIX_DIRECTIVES_DEFINITION +  " or " + DCMIX_SERVICES_DEFINITION);
+                                logger.debug("\tSkipping definition: " + type + " - super types is not of: " + DCMIX_DIRECTIVES_DEFINITION +  " or " + DCMIX_SERVICES_DEFINITION);
                             }
                         }
                     }
                 }
             } else {
-                logger.info("\tNo Jahia Tempalte Package found for bundle [" + bundle.getSymbolicName() + "]");
+                logger.debug("\tNo Jahia Template Package found for bundle [" + bundle.getSymbolicName() + "]");
             }
-            logger.info("\tRegistered: (" + parsedDefinitionsCount + ") definitions. Parsing completed successfully!");
+            if(parsedDefinitionsCount>0) {
+                logger.info("\tRegistered: (" + parsedDefinitionsCount + ") definitions. Parsing completed successfully!");
+            }
             return foundDefinitions;
         }  else {
-            logger.info("\t[" + bundle.getSymbolicName() + "] is not a Jahia bundle. Skipping...");
+            logger.debug("\t[" + bundle.getSymbolicName() + "] is not a Jahia bundle. Skipping...");
         }
         return false;
     }
