@@ -20,7 +20,7 @@
         .module('databaseConnector')
         .directive('dcConnectionsOverview', ['$log', 'contextualData', connectionsOverview]);
 
-    var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog,
+    var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog, $http,
                                                  dcDownloadFactory, toaster, $state, i18n, $q, $timeout, $DCSS, $DCMS) {
         var coc = this;
         coc.getAllConnections = getAllConnections;
@@ -30,6 +30,7 @@
         coc.isExportDisabled = isExportDisabled;
         coc.importConnections = importConnections;
         coc.resolveTracker = resolveTracker;
+        coc.connectorsAvailable = connectorsAvailable;
 
         coc.$onInit = function() {
             getAllConnections();
@@ -157,9 +158,13 @@
         function resolveTracker(id, databaseType) {
             return databaseType + '_' + id;
         }
+
+        function connectorsAvailable(){
+            return !_.isEmpty($DCSS.connectorsMetaData);
+        }
     };
 
-    connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog',
+    connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', '$http',
         'dcDownloadFactory', 'toaster', '$state', 'i18nService', '$q', '$timeout', '$DCStateService', '$DCManagementService'];
 
 
