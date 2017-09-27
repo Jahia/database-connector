@@ -98,6 +98,7 @@
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jaxb-annotations</artifactId>
             <version>${jackson.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -131,6 +132,9 @@
     </dependencies>
     <repositories>
         <repository>
+            <id>jahia-public</id>
+            <name>Jahia Public Repository</name>
+            <url>https://devtools.jahia.com/nexus/content/groups/public</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>never</updatePolicy>
@@ -138,9 +142,30 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-            <id>jahia-public</id>
-            <name>Jahia Public Repository</name>
-            <url>https://devtools.jahia.com/nexus/content/groups/public</url>
+        </repository>
+        <repository>
+            <id>jahia-enterprise</id>
+            <name>Jahia Enterprise Repository</name>
+            <url>https://devtools.jahia.com/nexus/content/groups/enterprise</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jahia-internal</id>
+            <name>Jahia Internal Repository</name>
+            <url>https://devtools.jahia.com/nexus/content/groups/internal</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
     <distributionManagement>
