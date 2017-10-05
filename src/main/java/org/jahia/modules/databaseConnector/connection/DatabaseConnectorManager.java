@@ -32,6 +32,8 @@ import org.springframework.beans.factory.InitializingBean;
 
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
+import javax.jcr.observation.Event;
+import javax.jcr.observation.EventIterator;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import java.io.*;
@@ -92,8 +94,8 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     @Override
     public void bundleChanged(BundleEvent bundleEvent) {
+        Bundle bundleEventBundle = bundleEvent.getBundle();
         if (settingsBean != null && settingsBean.isProcessingServer()) {
-            Bundle bundleEventBundle = bundleEvent.getBundle();
             if (bundleEventBundle.getSymbolicName().contains("connector")) {
                 logger.debug("Processing bundle: [" + bundleEventBundle.getSymbolicName() + "]" + " - Current Bundle Status: [" + Utils.resolveBundleName(bundleEvent.getType()) + "]");
             }
@@ -104,14 +106,14 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             if (bundleEvent.getType() == BundleEvent.INSTALLED || bundleEvent.getType() == BundleEvent.UPDATED) {
                 installedBundles.add(bundleId);
             }
-            if (bundleEvent.getType() == BundleEvent.STARTED) {
-                logger.debug("Starting connection services registration process...");
-                for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
-                    logger.info("\tRegistering services for: " + databaseConnectionRegistry.getConnectionDisplayName() + " using " + databaseConnectionRegistry.getClass());
-                    databaseConnectionRegistry.registerServices();
-                }
-                logger.debug("Registration process completed!");
-            }
+//            if (bundleEvent.getType() == BundleEvent.STARTED) {
+//                logger.debug("Starting connection services registration process...");
+//                for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
+//                    logger.info("\tRegistering services for: " + databaseConnectionRegistry.getConnectionDisplayName() + " using " + databaseConnectionRegistry.getClass());
+//                    databaseConnectionRegistry.registerServices();
+//                }
+//                logger.debug("Registration process completed!");
+//            }
             if ((bundleEvent.getType() == BundleEvent.RESOLVED && installedBundles.contains(bundleId)) || (bundleEventBundle.getState() == Bundle.RESOLVED && bundleEvent.getType() == BundleEvent.INSTALLED)) {
                 installedBundles.remove(bundleId);
                 try {
@@ -130,6 +132,15 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                 logger.debug("This is not a processing server... No action will be taken for bundle: [" + bundleEvent.getBundle().getSymbolicName() + "]" + "\n\t - Current Bundle Status: [" + Utils.resolveBundleName(bundleEvent.getType()) + "]");
             }
         }
+
+//        if (bundleEventBundle.getSymbolicName().contains("connector") && bundleEvent.getType() == BundleEvent.STARTED) {
+//            logger.debug("Starting connection services registration process...");
+//            for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
+//                logger.info("\tRegistering services for: " + databaseConnectionRegistry.getConnectionDisplayName() + " using " + databaseConnectionRegistry.getClass());
+//                databaseConnectionRegistry.registerServices();
+//            }
+//            logger.debug("Registration process completed!");
+//        }
     }
 
     @Override
@@ -377,6 +388,47 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     public void setTemplateManagerService(JahiaTemplateManagerService jahiaTemplateManagerService) {
         this.templateManagerService = jahiaTemplateManagerService;
+    }
+
+    public DatabaseConnectionRegistry getDatabaseConnectionRegistryService(String databaseType) {
+        try {
+            ServiceReference[] serviceReferences = this.bundle.getBundleContext().getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
+            if (serviceReferences != null) {
+                for (ServiceReference serviceReference : serviceReferences) {
+                    DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) this.bundle.getBundleContext().getService(serviceReference);
+                    if (databaseConnectionRegistry.getConnectionType().equals(databaseType)) {
+                        return databaseConnectionRegistry;
+                    }
+                }
+            }
+        } catch (InvalidSyntaxException ex) {
+            logger.error("Could not find service: " + ex.getMessage());
+        }
+        return null;
+    }
+
+    private List<DatabaseConnectionRegistry> getDatabaseConnectionRegistryServices() {
+        List<DatabaseConnectionRegistry> databaseConnectionRegistryServices = new LinkedList<>();
+        try {
+            ServiceReference[] serviceReferences = this.bundle.getBundleContext().getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
+            if (serviceReferences != null) {
+                for (ServiceReference serviceReference : serviceReferences) {
+                    databaseConnectionRegistryServices.add((DatabaseConnectionRegistry) this.bundle.getBundleContext().getService(serviceReference));
+                }
+            }
+        } catch (InvalidSyntaxException ex) {
+            logger.error("Could not find service: " + ex.getMessage());
+        }
+        return databaseConnectionRegistryServices;
+    }
+
+    private String resolveDslHandlerType(List<String> superTypes) {
+        if (superTypes.contains(DCMIX_DIRECTIVES_DEFINITION)) {
+            return "directive";
+        } else if (superTypes.contains(DCMIX_SERVICES_DEFINITION)) {
+            return "service";
+        }
+        return null;
     }
 
     /********************************************************************************************
@@ -660,46 +712,5 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             logger.error("Older version of SettingsBean detected " + e.getMessage() + "\n" + e);
             return SettingsBean.getInstance().getJahiaVarDiskPath() + path;
         }
-    }
-
-    public DatabaseConnectionRegistry getDatabaseConnectionRegistryService(String databaseType) {
-        try {
-            ServiceReference[] serviceReferences = this.bundle.getBundleContext().getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
-            if (serviceReferences != null) {
-                for (ServiceReference serviceReference : serviceReferences) {
-                    DatabaseConnectionRegistry databaseConnectionRegistry = (DatabaseConnectionRegistry) this.bundle.getBundleContext().getService(serviceReference);
-                    if (databaseConnectionRegistry.getConnectionType().equals(databaseType)) {
-                        return databaseConnectionRegistry;
-                    }
-                }
-            }
-        } catch (InvalidSyntaxException ex) {
-            logger.error("Could not find service: " + ex.getMessage());
-        }
-        return null;
-    }
-
-    private List<DatabaseConnectionRegistry> getDatabaseConnectionRegistryServices() {
-        List<DatabaseConnectionRegistry> databaseConnectionRegistryServices = new LinkedList<>();
-        try {
-            ServiceReference[] serviceReferences = this.bundle.getBundleContext().getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
-            if (serviceReferences != null) {
-                for (ServiceReference serviceReference : serviceReferences) {
-                    databaseConnectionRegistryServices.add((DatabaseConnectionRegistry) this.bundle.getBundleContext().getService(serviceReference));
-                }
-            }
-        } catch (InvalidSyntaxException ex) {
-            logger.error("Could not find service: " + ex.getMessage());
-        }
-        return databaseConnectionRegistryServices;
-    }
-
-    private String resolveDslHandlerType(List<String> superTypes) {
-        if (superTypes.contains(DCMIX_DIRECTIVES_DEFINITION)) {
-            return "directive";
-        } else if (superTypes.contains(DCMIX_SERVICES_DEFINITION)) {
-            return "service";
-        }
-        return null;
     }
 }

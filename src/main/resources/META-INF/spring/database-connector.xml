@@ -22,6 +22,11 @@
         </property>
     </bean>
 
+    <bean class="org.jahia.modules.databaseConnector.connection.RegistryListener" id="registryListener">
+        <property name="settingsBean" ref="settingsBean"/>
+        <property name="jcrTemplate" ref="jcrTemplate" />
+    </bean>
+
     <lang:groovy id="dslExecutor" script-source="classpath:org/jahia/modules/databaseConnector/dsl/DSLExecutorImpl.groovy"></lang:groovy>
     <lang:groovy id="dcConnectionImportHandler" script-source="classpath:org/jahia/modules/databaseConnector/dsl/ConnectionImportHandler.groovy">
         <lang:property name="databaseConnectorManager" ref="databaseConnectorManager"/>
