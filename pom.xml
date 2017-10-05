@@ -24,9 +24,7 @@
     ==========================================================================================
 
 -->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.jahia.modules</groupId>
@@ -34,7 +32,7 @@
         <version>7.2.1.0</version>
     </parent>
     <artifactId>database-connector</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <version>2.0-beta1</version>
     <packaging>bundle</packaging>
     <name>Jahia Database Connector</name>
     <description>NoSQL Database (MongoDB, REDIS, OrientDB,..) Connection Provider</description>
@@ -42,7 +40,8 @@
         <connection>scm:git:git@github.com:Jahia/database-connector.git</connection>
         <developerConnection>scm:git:git@github.com:Jahia/database-connector.git</developerConnection>
         <url>scm:git:git@github.com:Jahia/database-connector.git</url>
-    </scm>
+      <tag>2_0_beta1</tag>
+  </scm>
     <properties>
         <jahia-module-type>system</jahia-module-type>
         <jahia-depends>default,siteSettings,serverSettings</jahia-depends>
