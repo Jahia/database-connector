@@ -14,9 +14,9 @@
     <name>Jahia Database Connector</name>
     <description>NoSQL Database (MongoDB, REDIS, OrientDB,..) Connection Provider</description>
     <scm>
-        <connection>scm:git@github.com:Jahia/database-connector.git</connection>
-        <developerConnection>scm:git@github.com:Jahia/database-connector.git</developerConnection>
-        <url>scm:git@github.com:Jahia/database-connector.git</url>
+        <connection>scm:git:git@github.com:Jahia/database-connector.git</connection>
+        <developerConnection>scm:git:git@github.com:Jahia/database-connector.git</developerConnection>
+        <url>scm:git:git@github.com:Jahia/database-connector.git</url>
     </scm>
     <properties>
         <jahia-module-type>system</jahia-module-type>
