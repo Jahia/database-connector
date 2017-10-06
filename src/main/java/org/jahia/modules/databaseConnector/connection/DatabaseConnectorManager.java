@@ -106,14 +106,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             if (bundleEvent.getType() == BundleEvent.INSTALLED || bundleEvent.getType() == BundleEvent.UPDATED) {
                 installedBundles.add(bundleId);
             }
-//            if (bundleEvent.getType() == BundleEvent.STARTED) {
-//                logger.debug("Starting connection services registration process...");
-//                for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
-//                    logger.info("\tRegistering services for: " + databaseConnectionRegistry.getConnectionDisplayName() + " using " + databaseConnectionRegistry.getClass());
-//                    databaseConnectionRegistry.registerServices();
-//                }
-//                logger.debug("Registration process completed!");
-//            }
+
             if ((bundleEvent.getType() == BundleEvent.RESOLVED && installedBundles.contains(bundleId)) || (bundleEventBundle.getState() == Bundle.RESOLVED && bundleEvent.getType() == BundleEvent.INSTALLED)) {
                 installedBundles.remove(bundleId);
                 try {
@@ -132,15 +125,6 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                 logger.debug("This is not a processing server... No action will be taken for bundle: [" + bundleEvent.getBundle().getSymbolicName() + "]" + "\n\t - Current Bundle Status: [" + Utils.resolveBundleName(bundleEvent.getType()) + "]");
             }
         }
-
-//        if (bundleEventBundle.getSymbolicName().contains("connector") && bundleEvent.getType() == BundleEvent.STARTED) {
-//            logger.debug("Starting connection services registration process...");
-//            for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
-//                logger.info("\tRegistering services for: " + databaseConnectionRegistry.getConnectionDisplayName() + " using " + databaseConnectionRegistry.getClass());
-//                databaseConnectionRegistry.registerServices();
-//            }
-//            logger.debug("Registration process completed!");
-//        }
     }
 
     @Override

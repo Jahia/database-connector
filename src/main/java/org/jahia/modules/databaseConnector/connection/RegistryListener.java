@@ -12,8 +12,10 @@ import org.springframework.beans.factory.InitializingBean;
 import javax.jcr.RepositoryException;
 import javax.jcr.observation.Event;
 import javax.jcr.observation.EventIterator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class RegistryListener extends DefaultEventListener implements InitializingBean, BundleListener, BundleContextAware, ExternalEventListener {
     private static final Logger logger = LoggerFactory.getLogger(RegistryListener.class);
@@ -23,42 +25,76 @@ public class RegistryListener extends DefaultEventListener implements Initializi
     private Bundle bundle;
 
     @Override
+    public String[] getNodeTypes() {
+        return new String[]{"dcmix:databaseConnection"};
+    }
+
+    @Override
     public int getEventTypes() {
-        return Event.NODE_ADDED + Event.NODE_REMOVED;
+        return Event.PROPERTY_CHANGED + Event.NODE_REMOVED;
     }
 
     @Override
     public void onEvent(EventIterator events) {
+        final Map<String, Map<String, Object>> nodeToPropertyValueMap = new HashMap<>();
+
         while (events.hasNext()) {
             final Event event = events.nextEvent();
             try {
+                String[] nodePathParts = event.getPath().split("/");
+                //i.e. /settings/databaseConnector/<connectionName>
+                String nodePath = "/".concat(nodePathParts[1]).concat("/").concat(nodePathParts[2]).concat("/").concat(nodePathParts[3]);
+                if (!nodeToPropertyValueMap.containsKey(nodePath)) {
+                    nodeToPropertyValueMap.put(nodePath, new HashMap<String, Object>());
+                }
+
                 if (settingsBean != null && !settingsBean.isProcessingServer() && isExternal(event) && event.getPath().startsWith("/settings/databaseConnector/")) {
-//                    System.out.println("******#" + getDatabaseConnectionRegistryServices().get(0).getConnection("myconnection").dbName);
-//                    System.out.println("**********---isExternal: " + isExternal(event));
-//                    System.out.println("********** " + event.toString());
+                    //Note that the value is the same for all entries as it is not used in anyway, the property name matters
                     switch (event.getType()) {
-                        case Event.NODE_ADDED :
-                            JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<Object>() {
-                                @Override
-                                public Object doInJCR(JCRSessionWrapper session) throws RepositoryException {
-                                    System.out.println("****NAME" + session.getNode(event.getPath()).getName());
-                                    return null;
-                                }
-                            });
-                        break;
-
-                        case Event.NODE_REMOVED :
-                        break;
-
                         case Event.PROPERTY_CHANGED :
-                        case Event.PROPERTY_ADDED :
-                        case Event.PROPERTY_REMOVED :
+                            nodeToPropertyValueMap.get(nodePath).put(nodePathParts[4], "modified");
                         break;
                     }
                 }
             } catch (RepositoryException e) {
                 e.printStackTrace();
             }
+        }
+        System.out.println("***While done");
+        try {
+            JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<Object>() {
+                @Override
+                public Object doInJCR(JCRSessionWrapper session) throws RepositoryException {
+                    for (Map.Entry<String, Map<String, Object>> entry: nodeToPropertyValueMap.entrySet()) {
+                        String connectionPath = entry.getKey();
+                        if (nodeToPropertyValueMap.get(connectionPath).size() == 0) {
+                            //Node was removed, we want to remove connection
+                            boolean removalResult = findAndRemoveConnectionByPath(connectionPath);
+                            System.out.println("**** Node removed: " + connectionPath);
+                            System.out.println("**** Node removed: " + removalResult);
+                        }
+                        else if (nodeToPropertyValueMap.get(connectionPath).containsKey("jcr:created") || nodeToPropertyValueMap.get(connectionPath).containsKey("jcr:lastModified")){
+                            //Node was created or modified so we want to either create a connection or edit existing one
+                            //Note that there are two batches of events in case a prop is modified: one that contains modified props and one that modifies lastModified date
+                            //we want to only get the second batch to prevent unneeded work
+                            JCRNodeWrapper connectionNode = session.getNode(connectionPath);
+                            DatabaseConnectionRegistry registry = getRegistryForDatabaseType(connectionNode.getPropertyAsString(AbstractConnection.DATABASE_TYPE_PROPETRY));
+                            if (registry != null) {
+                                AbstractConnection connection = registry.nodeToConnection(connectionNode);
+                                registry.addEditConnectionNoStore(
+                                        connection,
+                                        !(registry.getConnection(connection.getOldId()) == null && registry.getConnection(connection.getOldId()) == null)
+                                );
+                            }
+                            System.out.println("**** Node created or modified: " + connectionPath);
+                        }
+                    }
+                    session.save();
+                    return null;
+                }
+            });
+        } catch (RepositoryException e) {
+            e.printStackTrace();
         }
     }
 
@@ -101,6 +137,39 @@ public class RegistryListener extends DefaultEventListener implements Initializi
             logger.error("Could not find service: " + ex.getMessage());
         }
         return databaseConnectionRegistryServices;
+    }
+
+    private DatabaseConnectionRegistry getRegistryForDatabaseType(String databaseType) {
+        try {
+            ServiceReference[] serviceReferences = this.bundle.getBundleContext().getAllServiceReferences(DatabaseConnectionRegistry.class.getName(), null);
+            if (serviceReferences != null) {
+                for (ServiceReference serviceReference : serviceReferences) {
+                    DatabaseConnectionRegistry connectionRegistry = (DatabaseConnectionRegistry) this.bundle.getBundleContext().getService(serviceReference);
+                    if (connectionRegistry.getConnectionType().equals(databaseType)) {
+                        return connectionRegistry;
+                    }
+                }
+            }
+        } catch (InvalidSyntaxException ex) {
+            logger.error("Could not find service: " + ex.getMessage());
+        }
+        return null;
+    }
+
+    private boolean findAndRemoveConnectionByPath(String connectionPath) {
+        List<DatabaseConnectionRegistry> registries = getDatabaseConnectionRegistryServices();
+
+        for (DatabaseConnectionRegistry registry : registries) {
+            Map<String, AbstractConnection> availableConnections = registry.getRegistry();
+            for (Map.Entry<String, AbstractConnection> entry: availableConnections.entrySet()) {
+                AbstractConnection connection = availableConnections.get(entry.getKey());
+                if (connection.getPath().equals(connectionPath)) {
+                    registry.unregisterAndRemoveFromRegistry(connection.getId());
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void setSettingsBean(SettingsBean settingsBean) {

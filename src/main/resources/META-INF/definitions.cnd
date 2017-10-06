@@ -12,6 +12,7 @@
  - dc:port (long)
  - dc:uri (String)
  - dc:dbName (String)
+ - dc:databaseType (String)
  - dc:user (String)
  - dc:password (String)
  - dc:isConnected (boolean)

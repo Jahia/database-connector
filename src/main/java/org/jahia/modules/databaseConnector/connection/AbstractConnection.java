@@ -12,15 +12,18 @@ import java.util.*;
 
 public abstract class AbstractConnection<T extends ConnectionData, E extends Object> implements Serializable {
 
-    public final static String ID_KEY = "dc:id";
-    public final static String HOST_KEY = "dc:host";
-    public final static String PORT_KEY = "dc:port";
-    public final static String DB_NAME_KEY = "dc:dbName";
-    public final static String URI_KEY = "dc:uri";
-    public final static String USER_KEY = "dc:user";
-    public final static String PASSWORD_KEY = "dc:password";
-    public final static String IS_CONNECTED_KEY = "dc:isConnected";
-    public final static String OPTIONS_KEY = "dc:options";
+    public final static String CONNECTION_BASE = "/settings/databaseConnector";
+    public final static String DATABASE_TYPE_PROPETRY = "dc:databaseType"; //i.e. ELASTICSEARCH
+    public final static String ID_PROPERTY = "dc:id";
+    public final static String HOST_PROPERTY = "dc:host";
+    public final static String PORT_PROPERTY = "dc:port";
+    public final static String DB_NAME_PROPERTY = "dc:dbName";
+    public final static String URI_PROPERTY = "dc:uri";
+    public final static String USER_PROPERTY = "dc:user";
+    public final static String PASSWORD_PROPERTY = "dc:password";
+    public final static String IS_CONNECTED_PROPERTY = "dc:isConnected";
+    public final static String OPTIONS_PROPERTY = "dc:options";
+    public final static String CONNECTION_TYPE = "dc:options";
     private static final Logger logger = LoggerFactory.getLogger(AbstractConnection.class);
     private static final long serialVersionUID = 1L;
     protected String id;
@@ -28,6 +31,7 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
     protected String host;
     protected Integer port;
     protected String dbName;
+    protected String databaseType;
     protected String uri;
     protected String user;
     protected String password;
@@ -124,5 +128,11 @@ public abstract class AbstractConnection<T extends ConnectionData, E extends Obj
     public void setOptions(String options) {
         this.options = options;
     }
+
+    public void setDatabaseType(String databaseType) {
+        this.databaseType = databaseType;
+    }
+
+    public abstract String getPath();
 }
 

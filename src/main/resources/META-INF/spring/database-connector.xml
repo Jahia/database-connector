@@ -24,7 +24,7 @@
 
     <bean class="org.jahia.modules.databaseConnector.connection.RegistryListener" id="registryListener">
         <property name="settingsBean" ref="settingsBean"/>
-        <property name="jcrTemplate" ref="jcrTemplate" />
+        <property name="jcrTemplate" ref="jcrTemplate"/>
     </bean>
 
     <lang:groovy id="dslExecutor" script-source="classpath:org/jahia/modules/databaseConnector/dsl/DSLExecutorImpl.groovy"></lang:groovy>

@@ -34,23 +34,22 @@ import static org.jahia.modules.databaseConnector.connection.DatabaseConnectorMa
  */
 
 public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConnection> implements DatabaseConnectionRegistry<T> {
-
     private static final Logger logger = LoggerFactory.getLogger(AbstractDatabaseConnectionRegistry.class);
+
+    public final static String DATABASE_ID_KEY = "databaseId";
+    public final static String DATABASE_TYPE_KEY = "databaseType";
+    public final static String DATABASE_CONNECTION_PATH_PROPERTY = "connectionPath";
+    protected static final Pattern ALPHA_NUMERIC_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
 
     protected Map<String, T> registry;
 
     protected JCRTemplate jcrTemplate;
-
-    protected static final Pattern ALPHA_NUMERIC_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
 
     protected ConnectorMetaData connectorMetaData;
 
     protected BundleContext context = null;
 
     private Map<String, ServiceRegistration> serviceRegistrations = new LinkedHashMap<>();
-
-    private final static String DATABASE_ID_KEY = "databaseId";
-    public final static String DATABASE_TYPE_KEY = "databaseType";
 
     public AbstractDatabaseConnectionRegistry() {
         this.jcrTemplate = JCRTemplate.getInstance();
@@ -63,16 +62,20 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
         return registry;
     }
 
+    public Map<String, ServiceRegistration> getRegistrations() { return this.serviceRegistrations; }
+
     protected Boolean storeConnection(final AbstractConnection connection, final String nodeType, final boolean isEdition) {
 
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
 
+            //TODO store connection for every connection as property
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 JCRNodeWrapper databaseConnectorNode = getDatabaseConnectorNode(session);
+                String dbID = JCRContentUtils.generateNodeName(connection.getId());
                 session.checkout(databaseConnectorNode);
                 JCRNodeWrapper connectionNode;
                 if (isEdition) {
-                    if (!connection.getId().equals(connection.getOldId()) && !isConnectionIdAvailable(connection.getId(), session)) {
+                    if (!connection.getId().equals(connection.getOldId()) && !databaseConnectorNode.hasNode(dbID)) {
                         return false;
                     }
                     connectionNode = (JCRNodeWrapper) getDatabaseConnectionNode(connection.getOldId(), session);
@@ -81,41 +84,42 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
 
                 } else {
                     // As is the id of a database connection is editable, if you need it to be final uncomment
-                    // the next line and put the setProperty(ID_KEY, connection.getId()) inside the else statement.
+                    // the next line and put the setProperty(ID_PROPERTY, connection.getId()) inside the else statement.
                     // You will also need to add the attribute 'disabled="${isEdition}"' in the form input field
                     // for id in the file dc_serverSettings.html.serverSettings.flow.enterConfig.jsp and get rid of
                     // the javascript code corresponding to the warning modal
 //                    connectionNode = databaseConnectorNode.addNode(connection.getId(), nodeType);
-                    if (isConnectionIdAvailable(connection.getId(), session)) {
-                        connectionNode = databaseConnectorNode.addNode(
-                                JCRContentUtils.findAvailableNodeName(databaseConnectorNode, connection.getDatabaseType().toLowerCase()),
-                                nodeType);
-                    } else {
+                    if (databaseConnectorNode.hasNode(dbID)) {
                         return false;
                     }
+                    connectionNode = databaseConnectorNode.addNode(dbID, nodeType);
                 }
-                connectionNode.setProperty(ID_KEY, connection.getId());
+                connectionNode.setProperty(ID_PROPERTY, connection.getId());
+
+                if (connection.getDatabaseType() != null) {
+                    connectionNode.setProperty(DATABASE_TYPE_PROPETRY, connection.getDatabaseType());
+                }
                 if (connection.getHost() != null) {
-                    connectionNode.setProperty(HOST_KEY, connection.getHost());
+                    connectionNode.setProperty(HOST_PROPERTY, connection.getHost());
                 }
                 if (connection.getPort() != null) {
-                    connectionNode.setProperty(PORT_KEY, connection.getPort());
+                    connectionNode.setProperty(PORT_PROPERTY, connection.getPort());
                 }
-                connectionNode.setProperty(IS_CONNECTED_KEY, connection.isConnected());
+                connectionNode.setProperty(IS_CONNECTED_PROPERTY, connection.isConnected());
                 if (connection.getUri() != null) {
-                    connectionNode.setProperty(URI_KEY, connection.getUri());
+                    connectionNode.setProperty(URI_PROPERTY, connection.getUri());
                 }
                 if (connection.getDbName() != null) {
-                    connectionNode.setProperty(DB_NAME_KEY, connection.getDbName());
+                    connectionNode.setProperty(DB_NAME_PROPERTY, connection.getDbName());
                 }
                 if (connection.getUser() != null) {
-                    connectionNode.setProperty(USER_KEY, connection.getUser());
+                    connectionNode.setProperty(USER_PROPERTY, connection.getUser());
                 }
                 if (connection.getPassword() != null) {
-                    connectionNode.setProperty(PASSWORD_KEY, encodePassword(connection.getPassword()));
+                    connectionNode.setProperty(PASSWORD_PROPERTY, encodePassword(connection.getPassword()));
                 }
                 if (connection.getOptions() != null) {
-                    connectionNode.setProperty(OPTIONS_KEY, connection.getOptions());
+                    connectionNode.setProperty(OPTIONS_PROPERTY, connection.getOptions());
                 }
                 storeAdvancedConfig(connection, connectionNode);
                 session.save();
@@ -138,35 +142,38 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
         }
 
         if (storeConnection(connection, connection.getNodeType(), isEdition)) {
-            if (isEdition) {
-                boolean wasConnected = connection.isConnected();
-                if (registry.get(connection.getOldId()).isConnected()) {
-                    unregisterAsService(connection);
-                }
-                if (!connection.getId().equals(connection.getOldId())) {
-                    registry.remove(connection.getOldId());
-                }
-                if (wasConnected && connection.testConnectionCreation()) {
-                    registerAsService(connection);
-                } else {
-                    connection.isConnected(false);
-                }
-                registry.put(connection.getId(), (T) connection);
-            } else {
-
-                registry.put(connection.getId(), (T) connection);
-                if (connection.isConnected() && connection.testConnectionCreation()) {
-                    registerAsService(connection);
-                } else {
-                    connection.isConnected(false);
-                }
-
-            }
-            return true;
-
+            return addEditConnectionNoStore(connection, isEdition);
         } else {
             return false;
         }
+    }
+
+    @Override
+    public boolean addEditConnectionNoStore (final AbstractConnection connection, final Boolean isEdition) {
+        if (isEdition) {
+            boolean wasConnected = connection.isConnected();
+            if (registry.get(connection.getOldId()).isConnected()) {
+                unregisterAsService(connection);
+            }
+            if (!connection.getId().equals(connection.getOldId())) {
+                registry.remove(connection.getOldId());
+            }
+            if (wasConnected && connection.testConnectionCreation()) {
+                registerAsService(connection);
+            } else {
+                connection.isConnected(false);
+            }
+            registry.put(connection.getId(), (T) connection);
+        } else {
+            registry.put(connection.getId(), (T) connection);
+            if (connection.isConnected() && connection.testConnectionCreation()) {
+                registerAsService(connection);
+            } else {
+                connection.isConnected(false);
+            }
+
+        }
+        return true;
     }
 
     public boolean removeConnection(final String databaseConnectionId) {
@@ -195,13 +202,22 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
         return false;
     }
 
+    public void unregisterAndRemoveFromRegistry(String databaseConnectionId) {
+        //Same as above except we don't clear JCR, this one is needed for cluster processing
+        Assert.isTrue(registry.containsKey(databaseConnectionId), "No database connection with ID: " + databaseConnectionId);
+        if (registry.get(databaseConnectionId).isConnected()) {
+            unregisterAsService(registry.get(databaseConnectionId));
+        }
+        registry.remove(databaseConnectionId);
+    }
+
     public boolean connect(final String databaseConnectionId) {
         registerAsService(registry.get(databaseConnectionId));
         JCRCallback<Boolean> callback = new JCRCallback<Boolean>() {
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 Node databaseConnectionNode = getDatabaseConnectionNode(databaseConnectionId, session);
                 session.checkout(databaseConnectionNode);
-                databaseConnectionNode.setProperty(IS_CONNECTED_KEY, true);
+                databaseConnectionNode.setProperty(IS_CONNECTED_PROPERTY, true);
                 session.save();
                 return true;
             }
@@ -222,7 +238,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
             public Boolean doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 Node databaseConnectionNode = getDatabaseConnectionNode(databaseConnectionId, session);
                 session.checkout(databaseConnectionNode);
-                databaseConnectionNode.setProperty(IS_CONNECTED_KEY, false);
+                databaseConnectionNode.setProperty(IS_CONNECTED_PROPERTY, false);
                 session.save();
                 return true;
             }
@@ -239,7 +255,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
 
     private Node getDatabaseConnectionNode(String databaseConnectionId, JCRSessionWrapper session)
             throws RepositoryException, IllegalArgumentException {
-        String statement = "SELECT * FROM [" + getConnectionNodeType() + "] WHERE [" + ID_KEY + "] = '" + databaseConnectionId + "'";
+        String statement = "SELECT * FROM [" + getConnectionNodeType() + "] WHERE [" + ID_PROPERTY + "] = '" + databaseConnectionId + "'";
         NodeIterator nodes = query(statement, session).getNodes();
         if (!nodes.hasNext()) {
             throw new IllegalArgumentException("No database connection with ID '" + databaseConnectionId + "' stored in the JCR");
@@ -247,8 +263,9 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
         return nodes.nextNode();
     }
 
+    //TODO why do we do that???
     private boolean isConnectionIdAvailable(String databaseConnectionId, JCRSessionWrapper session) throws RepositoryException {
-        String statement = "SELECT * FROM [" + getConnectionNodeType() + "] WHERE [" + ID_KEY + "] = '" + databaseConnectionId + "'";
+        String statement = "SELECT * FROM [" + getConnectionNodeType() + "] WHERE [" + ID_PROPERTY + "] = '" + databaseConnectionId + "'";
         NodeIterator nodes = query(statement, session).getNodes();
         return !nodes.hasNext();
     }
@@ -350,7 +367,7 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
             return true;
         }
         ServiceRegistration serviceRegistration;
-        serviceRegistration = this.context.registerService(getInterfacesNames(object), object, createProperties(connection.getDatabaseType(), connection.getId()));
+        serviceRegistration = this.context.registerService(getInterfacesNames(object), object, createProperties(connection.getDatabaseType(), connection.getId(), connection.getPath()));
         this.serviceRegistrations.put(connection.getId(), serviceRegistration);
         logger.info("OSGi service for {} successfully registered for DatabaseConnection of type {} with id '{}'", messageArgs);
         return true;
@@ -377,10 +394,11 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
         return interfacesNames;
     }
 
-    private Hashtable<String, String> createProperties(String databaseType, String databaseId) {
+    private Hashtable<String, String> createProperties(String databaseType, String databaseId, String connectionPath) {
         Hashtable<String, String> properties = new Hashtable<>();
         properties.put(DATABASE_TYPE_KEY, databaseType);
         properties.put(DATABASE_ID_KEY, databaseId);
+        properties.put(DATABASE_CONNECTION_PATH_PROPERTY, connectionPath);
         return properties;
     }
 
