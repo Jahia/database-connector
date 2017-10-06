@@ -62,7 +62,7 @@ public class RegistryListener extends DefaultEventListener implements Initializi
         }
         System.out.println("***While done");
         try {
-            JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<Object>() {
+            jcrTemplate.doExecuteWithSystemSession(new JCRCallback<Object>() {
                 @Override
                 public Object doInJCR(JCRSessionWrapper session) throws RepositoryException {
                     for (Map.Entry<String, Map<String, Object>> entry: nodeToPropertyValueMap.entrySet()) {
@@ -121,7 +121,10 @@ public class RegistryListener extends DefaultEventListener implements Initializi
 
     @Override
     public void afterPropertiesSet() throws Exception {
-
+        for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
+            logger.debug("\tRegistering services for: " + databaseConnectionRegistry.getConnectionDisplayName() + " using " + databaseConnectionRegistry.getClass());
+            databaseConnectionRegistry.registerServices();
+        }
     }
 
     private List<DatabaseConnectionRegistry> getDatabaseConnectionRegistryServices() {

@@ -152,10 +152,6 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             }
             logger.debug("Preparing to Parse [" + this.bundle.getSymbolicName() + "] directive definitions");
             parseDefinitionWizards(this.bundle);
-            for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
-                logger.debug("\tRegistering services for: " + databaseConnectionRegistry.getConnectionDisplayName() + " using " + databaseConnectionRegistry.getClass());
-                databaseConnectionRegistry.registerServices();
-            }
         } else {
             if (settingsBean == null) {
                 logger.debug("Settings bean is null... Skipping bundle(s) processing");
