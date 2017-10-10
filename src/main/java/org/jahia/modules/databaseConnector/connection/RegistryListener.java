@@ -48,7 +48,7 @@ public class RegistryListener extends DefaultEventListener implements Initializi
                     nodeToPropertyValueMap.put(nodePath, new HashMap<String, Object>());
                 }
 
-                if (settingsBean != null && !settingsBean.isProcessingServer() && isExternal(event) && event.getPath().startsWith("/settings/databaseConnector/")) {
+                if (isExternal(event) && event.getPath().startsWith("/settings/databaseConnector/")) {
                     //Note that the value is the same for all entries as it is not used in anyway, the property name matters
                     switch (event.getType()) {
                         case Event.PROPERTY_CHANGED :

@@ -135,30 +135,22 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (settingsBean != null && settingsBean.isProcessingServer()) {
-            logger.info("Preparing to process bundles after properties set of database connector module.");
-            lastDeployDate = new Date();
-            for (Bundle currentBundle : this.bundle.getBundleContext().getBundles()) {
-                if (currentBundle.getSymbolicName().contains("connector")) {
-                    logger.debug("Processing bundle: [" + currentBundle.getSymbolicName() + "]" + " - Current Bundle Status: [" + Utils.resolveBundleName(currentBundle.getState()) + "]");
-                }
-                if (!(currentBundle.getSymbolicName().equals(this.bundle.getSymbolicName()))
-                        && org.jahia.osgi.BundleUtils.isJahiaModuleBundle(currentBundle)
-                        && (currentBundle.getState() == Bundle.INSTALLED
-                        || currentBundle.getState() == Bundle.RESOLVED
-                        || currentBundle.getState() == Bundle.ACTIVE)) {
-                    parseDefinitionWizards(currentBundle);
-                }
+        logger.info("Preparing to process bundles after properties set of database connector module.");
+        lastDeployDate = new Date();
+        for (Bundle currentBundle : this.bundle.getBundleContext().getBundles()) {
+            if (currentBundle.getSymbolicName().contains("connector")) {
+                logger.debug("Processing bundle: [" + currentBundle.getSymbolicName() + "]" + " - Current Bundle Status: [" + Utils.resolveBundleName(currentBundle.getState()) + "]");
             }
-            logger.debug("Preparing to Parse [" + this.bundle.getSymbolicName() + "] directive definitions");
-            parseDefinitionWizards(this.bundle);
-        } else {
-            if (settingsBean == null) {
-                logger.debug("Settings bean is null... Skipping bundle(s) processing");
-            } else {
-                logger.debug("This is not a processing server... Skipping bundle(s) processing");
+            if (!(currentBundle.getSymbolicName().equals(this.bundle.getSymbolicName()))
+                    && org.jahia.osgi.BundleUtils.isJahiaModuleBundle(currentBundle)
+                    && (currentBundle.getState() == Bundle.INSTALLED
+                    || currentBundle.getState() == Bundle.RESOLVED
+                    || currentBundle.getState() == Bundle.ACTIVE)) {
+                parseDefinitionWizards(currentBundle);
             }
         }
+        logger.debug("Preparing to Parse [" + this.bundle.getSymbolicName() + "] directive definitions");
+        parseDefinitionWizards(this.bundle);
     }
 
     public <T extends AbstractConnection> Map<String, T> getConnections(String databaseType) throws InstantiationException, IllegalAccessException {
