@@ -52,6 +52,7 @@
                     method: 'GET'
                 }).then(function(response) {
                     //status can be retrieved
+                    console.log(JSON.parse(response.data.success));
                     if (_.isUndefined(response.data.failed)) {
                         data.connection.canRetrieveStatus = true;
                         //@TODO needs to be updated for each external connector module to handle their own setting of custom properties.
@@ -65,6 +66,9 @@
                                 data.connection.dbVersion = response.data.success.redis_version;
                                 data.connection.uptime = response.data.success.uptime_in_seconds;
                             }
+                        }
+                        else if (data.connection.databaseType == "ELASTICSEARCH") {
+                            data.connection.dbVersion = JSON.parse(response.data.success).aboutConnection.dbVersion;
                         }
                     } else {
                         data.connection.canRetrieveStatus = false;
