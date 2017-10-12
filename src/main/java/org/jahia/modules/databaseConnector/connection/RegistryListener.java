@@ -44,17 +44,20 @@ public class RegistryListener extends DefaultEventListener implements Initializi
                 String[] nodePathParts = event.getPath().split("/");
                 //i.e. /settings/databaseConnector/<connectionName>
                 String nodePath = "/".concat(nodePathParts[1]).concat("/").concat(nodePathParts[2]).concat("/").concat(nodePathParts[3]);
-                if (!nodeToPropertyValueMap.containsKey(nodePath)) {
-                    nodeToPropertyValueMap.put(nodePath, new HashMap<String, Object>());
-                }
-
                 if (isExternal(event) && event.getPath().startsWith("/settings/databaseConnector/")) {
+                    if (!nodeToPropertyValueMap.containsKey(nodePath)) {
+                        nodeToPropertyValueMap.put(nodePath, new HashMap<String, Object>());
+                    }
                     //Note that the value is the same for all entries as it is not used in anyway, the property name matters
                     switch (event.getType()) {
                         case Event.PROPERTY_CHANGED :
                             nodeToPropertyValueMap.get(nodePath).put(nodePathParts[4], "modified");
                         break;
                     }
+                }
+                else if (!nodeToPropertyValueMap.containsKey(nodePath)) {
+                    //This means that we don't want to consider that case since event is not external
+                    nodeToPropertyValueMap.put(nodePath, null);
                 }
             } catch (RepositoryException e) {
                 e.printStackTrace();
@@ -67,26 +70,28 @@ public class RegistryListener extends DefaultEventListener implements Initializi
                 public Object doInJCR(JCRSessionWrapper session) throws RepositoryException {
                     for (Map.Entry<String, Map<String, Object>> entry: nodeToPropertyValueMap.entrySet()) {
                         String connectionPath = entry.getKey();
-                        if (nodeToPropertyValueMap.get(connectionPath).size() == 0) {
-                            //Node was removed, we want to remove connection
-                            boolean removalResult = findAndRemoveConnectionByPath(connectionPath);
-                            System.out.println("**** Node removed: " + connectionPath);
-                            System.out.println("**** Node removed: " + removalResult);
-                        }
-                        else if (nodeToPropertyValueMap.get(connectionPath).containsKey("jcr:created") || nodeToPropertyValueMap.get(connectionPath).containsKey("jcr:lastModified")){
-                            //Node was created or modified so we want to either create a connection or edit existing one
-                            //Note that there are two batches of events in case a prop is modified: one that contains modified props and one that modifies lastModified date
-                            //we want to only get the second batch to prevent unneeded work
-                            JCRNodeWrapper connectionNode = session.getNode(connectionPath);
-                            DatabaseConnectionRegistry registry = getRegistryForDatabaseType(connectionNode.getPropertyAsString(AbstractConnection.DATABASE_TYPE_PROPETRY));
-                            if (registry != null) {
-                                AbstractConnection connection = registry.nodeToConnection(connectionNode);
-                                registry.addEditConnectionNoStore(
-                                        connection,
-                                        !(registry.getConnection(connection.getOldId()) == null && registry.getConnection(connection.getOldId()) == null)
-                                );
+                        if (nodeToPropertyValueMap.get(connectionPath) != null) {
+                            if (nodeToPropertyValueMap.get(connectionPath).size() == 0) {
+                                //Node was removed, we want to remove connection
+                                boolean removalResult = findAndRemoveConnectionByPath(connectionPath);
+                                System.out.println("**** Node removed: " + connectionPath);
+                                System.out.println("**** Node removed: " + removalResult);
                             }
-                            System.out.println("**** Node created or modified: " + connectionPath);
+                            else if (nodeToPropertyValueMap.get(connectionPath).containsKey("jcr:created") || nodeToPropertyValueMap.get(connectionPath).containsKey("jcr:lastModified")){
+                                //Node was created or modified so we want to either create a connection or edit existing one
+                                //Note that there are two batches of events in case a prop is modified: one that contains modified props and one that modifies lastModified date
+                                //we want to only get the second batch to prevent unneeded work
+                                JCRNodeWrapper connectionNode = session.getNode(connectionPath);
+                                DatabaseConnectionRegistry registry = getRegistryForDatabaseType(connectionNode.getPropertyAsString(AbstractConnection.DATABASE_TYPE_PROPETRY));
+                                if (registry != null) {
+                                    AbstractConnection connection = registry.nodeToConnection(connectionNode);
+                                    registry.addEditConnectionNoStore(
+                                            connection,
+                                            !(registry.getConnection(connection.getOldId()) == null && registry.getConnection(connection.getOldId()) == null)
+                                    );
+                                }
+                                System.out.println("**** Node created or modified: " + connectionPath);
+                            }
                         }
                     }
                     session.save();
