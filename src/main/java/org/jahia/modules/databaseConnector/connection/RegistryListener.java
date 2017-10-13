@@ -1,8 +1,10 @@
 package org.jahia.modules.databaseConnector.connection;
 
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
+import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.databaseConnector.services.DatabaseConnectionRegistry;
 import org.jahia.services.content.*;
+import org.jahia.services.templates.JahiaTemplateManagerService;
 import org.jahia.settings.SettingsBean;
 import org.osgi.framework.*;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ public class RegistryListener extends DefaultEventListener implements Initializi
 
     private SettingsBean settingsBean;
     private JCRTemplate jcrTemplate;
+    private JahiaTemplateManagerService templateManagerService;
     private Bundle bundle;
 
     @Override
@@ -114,7 +117,7 @@ public class RegistryListener extends DefaultEventListener implements Initializi
         //Register service when module restarts
         Bundle bundleEventBundle = bundleEvent.getBundle();
         //TODO get bundle dependencies and make sure that "database-connector" is there instead of connector
-        if (bundleEventBundle.getSymbolicName().contains("connector") && bundleEvent.getType() == BundleEvent.STARTED) {
+        if (bundleEvent.getType() == BundleEvent.STARTED && dependsOnDatabaseConnector(bundleEventBundle)) {
             logger.debug("Starting connection services registration process...");
             for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
                 logger.info("\tRegistering services for: " + databaseConnectionRegistry.getConnectionDisplayName() + " using " + databaseConnectionRegistry.getClass());
@@ -180,11 +183,28 @@ public class RegistryListener extends DefaultEventListener implements Initializi
         return false;
     }
 
+    private boolean dependsOnDatabaseConnector(Bundle bundle) {
+        JahiaTemplatesPackage pack = templateManagerService.getTemplatePackage((String) bundle.getHeaders().get("Bundle-Name"));
+
+        if (pack == null) return false;
+
+        for (JahiaTemplatesPackage dependency : pack.getDependencies()) {
+            if (dependency.getId().equals("database-connector")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void setSettingsBean(SettingsBean settingsBean) {
         this.settingsBean = settingsBean;
     }
 
     public void setJcrTemplate(JCRTemplate jcrTemplate) {
         this.jcrTemplate = jcrTemplate;
+    }
+
+    public void setTemplateManagerService(JahiaTemplateManagerService templateManagerService) {
+        this.templateManagerService = templateManagerService;
     }
 }
