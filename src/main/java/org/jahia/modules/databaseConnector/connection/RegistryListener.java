@@ -66,7 +66,7 @@ public class RegistryListener extends DefaultEventListener implements Initializi
                 e.printStackTrace();
             }
         }
-        System.out.println("***While done");
+
         try {
             jcrTemplate.doExecuteWithSystemSession(new JCRCallback<Object>() {
                 @Override
@@ -77,8 +77,7 @@ public class RegistryListener extends DefaultEventListener implements Initializi
                             if (nodeToPropertyValueMap.get(connectionPath).size() == 0) {
                                 //Node was removed, we want to remove connection
                                 boolean removalResult = findAndRemoveConnectionByPath(connectionPath);
-                                System.out.println("**** Node removed: " + connectionPath);
-                                System.out.println("**** Node removed: " + removalResult);
+                                logger.info(String.format("Tried to remove connection %s with result %b", connectionPath, removalResult));
                             }
                             else if (nodeToPropertyValueMap.get(connectionPath).containsKey("jcr:created") || nodeToPropertyValueMap.get(connectionPath).containsKey("jcr:lastModified")){
                                 //Node was created or modified so we want to either create a connection or edit existing one
@@ -93,7 +92,7 @@ public class RegistryListener extends DefaultEventListener implements Initializi
                                             !(registry.getConnection(connection.getOldId()) == null && registry.getConnection(connection.getOldId()) == null)
                                     );
                                 }
-                                System.out.println("**** Node created or modified: " + connectionPath);
+                                logger.info(String.format("Created or modified connection %s", connectionPath));
                             }
                         }
                     }
