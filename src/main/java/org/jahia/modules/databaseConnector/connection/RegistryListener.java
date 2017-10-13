@@ -116,7 +116,6 @@ public class RegistryListener extends DefaultEventListener implements Initializi
     public void bundleChanged(BundleEvent bundleEvent) {
         //Register service when module restarts
         Bundle bundleEventBundle = bundleEvent.getBundle();
-        //TODO get bundle dependencies and make sure that "database-connector" is there instead of connector
         if (bundleEvent.getType() == BundleEvent.STARTED && dependsOnDatabaseConnector(bundleEventBundle)) {
             logger.debug("Starting connection services registration process...");
             for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
