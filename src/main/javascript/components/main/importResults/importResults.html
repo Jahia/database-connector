@@ -8,7 +8,7 @@
             <span flex></span>
             <md-button class="md-icon-button"
                        ng-click="irc.goToConnections()">
-                <md-icon class="md-secondary"><i class="fa fa-home fa-2x"></i></md-icon>
+                <md-icon class="md-secondary"><i class="material-icons">home</i></md-icon>
                 <md-tooltip class="noToolTipAnimation"
                             md-direction="top"
                             md-delay="500">
@@ -18,7 +18,7 @@
             <md-button class="md-icon-button"
                        ng-click="irc.reImportConnections()"
                        ng-disabled="irc.isReImportDisabled()">
-                <md-icon class="md-secondary"><i class="fa fa-upload fa-2x"></i></md-icon>
+                <md-icon class="md-secondary"><i class="material-icons">file_upload</i></md-icon>
                 <md-tooltip class="noToolTipAnimation"
                             md-direction="top"
                             md-delay="500">
@@ -53,7 +53,7 @@
                 <md-icon class="md-secondary"
                            aria-label="Edit import connection"
                            ng-click="irc.editConnection($index, connectorMetaData.databaseType, $event)">
-                    <i class="fa fa-pencil"></i>
+                    <i class="material-icons">mode_edit</i>
                     <md-tooltip class="noToolTipAnimation"
                                 md-direction="top"
                                 md-delay="500">
@@ -63,7 +63,7 @@
                 <md-icon class="md-secondary"
                            aria-label="Import connection"
                            ng-click="irc.reImportConnection(failedConnection, $index)">
-                    <i class="fa fa-upload"></i>
+                    <i class="material-icons">file_upload</i>
                     <md-tooltip class="noToolTipAnimation"
                                 md-direction="top"
                                 md-delay="500">

@@ -16,10 +16,10 @@
 <%--@elvariable id="scriptInfo" type="java.lang.String"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <%--@elvariable id="workspace" type="java.lang.String"--%>
-<template:addResources type="css" resources="lib/font-awesome/css/font-awesome.css"/>
 <template:addResources type="css" resources="database-connector.css"/>
 <template:addResources type="css" resources="spinner.css"/>
 <template:addResources type="css" resources="lib/_dc.css"/>
+<template:addResources type="css" resources="${url.context}/modules/database-connector/css/materialIcons/iconfont/material-icons.css"/>
 
 <template:addResources type="javascript" resources="lib/_dc.js"/>
 <%--<template:addResources type="javascript" resources="lib/_dc-main.min.js"/>--%>

@@ -37,35 +37,35 @@
                                </div>
                            </div>
                            <div flex="10" layout-padding>
-                               <md-button class="md-icon-button" ng-if="!cc.connection.isConnected" ng-click="cc.updateConnection(true)"><i class="fa fa-plug" aria-label="connect to database"></i>
+                               <md-button class="md-icon-button" ng-if="!cc.connection.isConnected" ng-click="cc.updateConnection(true)"><i class="material-icons" aria-label="connect to database">power</i>
                                    <md-tooltip class="noToolTipAnimation"
                                                md-direction="right"
                                                md-delay="500">
                                        <span message-key="dc_databaseConnector.label.connect"></span>
                                    </md-tooltip>
                                </md-button>
-                               <md-button class="md-icon-button" ng-if="cc.connection.isConnected" ng-click="cc.updateConnection(false)"><i class="fa fa-chain-broken" aria-label="disconnect from database"></i>
+                               <md-button class="md-icon-button" ng-if="cc.connection.isConnected" ng-click="cc.updateConnection(false)"><i class="material-icons" aria-label="disconnect from database">power_settings_new</i>
                                    <md-tooltip class="noToolTipAnimation"
                                                md-direction="right"
                                                md-delay="500">
                                        <span message-key="dc_databaseConnector.label.disconnect"></span>
                                    </md-tooltip>
                                </md-button>
-                               <md-button class="md-icon-button" ng-click="cc.editConnection($event)"><i class="fa fa-pencil-square-o" aria-label="edit connections details"></i>
+                               <md-button class="md-icon-button" ng-click="cc.editConnection($event)"><i class="material-icons" aria-label="edit connections details">edit</i>
                                    <md-tooltip class="noToolTipAnimation"
                                                md-direction="right"
                                                md-delay="500">
                                        <span message-key="dc_databaseConnector.label.edit"></span>
                                    </md-tooltip>
                                </md-button>
-                               <md-button class="md-icon-button" ng-disabled="!cc.serverStatusAvailable()" ng-click="cc.goToStatus()"><i class="fa fa-line-chart" aria-label="connection status"></i>
+                               <md-button class="md-icon-button" ng-disabled="!cc.serverStatusAvailable()" ng-click="cc.goToStatus()"><i class="material-icons" aria-label="connection status">insert_chart</i>
                                    <md-tooltip class="noToolTipAnimation"
                                                md-direction="right"
                                                md-delay="500">
                                        <span message-key="dc_databaseConnector.label.connectionStats"></span>
                                    </md-tooltip>
                                </md-button>
-                               <md-button class="md-icon-button" ng-click="cc.openDeleteConnectionDialog($event)"><i class="fa fa-trash-o" aria-label="delete connection"></i>
+                               <md-button class="md-icon-button" ng-click="cc.openDeleteConnectionDialog($event)"><i class="material-icons" aria-label="delete connection">delete</i>
                                    <md-tooltip class="noToolTipAnimation"
                                                md-direction="right"
                                                md-delay="500">

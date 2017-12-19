@@ -134,6 +134,9 @@ form legend {
     min-width: 800px;
 }
 
+/*.test-class {*/
+    /*outline: 10px solid red*/
+/*}*/
 .connectionContainer {
     width: 400px;
 }
