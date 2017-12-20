@@ -31,15 +31,20 @@
     <h3 flex message-key="dc_databaseConnector.label.allConnections"></h3>
     <md-button ng-click="coc.createConnection($event)" ng-disabled="!coc.connectorsAvailable()" class="md-raised md-accent" aria-label="create a new connection"><span message-key="dc_databaseConnector.label.newConnection"></span></md-button>
 </div>
+<section class="main-section">
+    <div layout layout-wrap layout-margin>
+        <div flex-xs="100" flex-gt-sm="30" flex="50" ng-repeat="connection in coc.state.connections track by coc.resolveTracker(connection.id, connection.databaseType)">
+            <dc-connection
+                index="{{$index}}"
+                export-connections="coc.exportConnections"
+                connection="connection"
+                is-card-selection-enabled="coc.isCardSelectionEnabled"
+                export-single-connection="coc.exportSingleConnection"></dc-connection>
+        </div>
+    </div>
+</section>
 <div class="center-align" ng-if="!coc.connectorsAvailable()">
     <h3 message-key="dc_databaseConnector.label.noConnectors"></h3>
-</div>
-<div ng-repeat="connection in coc.state.connections track by coc.resolveTracker(connection.id, connection.databaseType)">
-    <dc-connection index="{{$index}}"
-                   export-connections="coc.exportConnections"
-                   connection="connection"
-                   is-card-selection-enabled="coc.isCardSelectionEnabled"
-                   export-single-connection="coc.exportSingleConnection"></dc-connection>
 </div>
 <input type="file" ng-show="false" id="importFileSelector">
 <button id="performImport" ng-click="coc.importConnections(null, 'test')" ng-show="false"></button>

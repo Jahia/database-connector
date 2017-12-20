@@ -1,43 +1,40 @@
 <dc-spinner spinner-mode="cc.spinnerOptions.mode" show="cc.spinnerOptions.showSpinner"></dc-spinner>
-<section class="main-section">
-
-   <md-card ng-click="cc.updateExportValue()" class="db-card" flex-xs ="100" flex-gt-sm="25" flex="50" ng-class="[{'db-linked': cc.connection.isConnected, 'db-unlinked': !cc.connection.isConnected, 'db-card-selected': cc.connection.export, 'db-card-not-selected': (cc.isCardSelectionEnabled() && !cc.connection.export), 'cursor-pointer transition md-ink-ripple': cc.isCardSelectionEnabled()}]">
-       <md-menu class="dbCard-menu">
-           <md-button aria-label="Open menu" class="md-icon-button" ng-click="$mdMenu.open($event)">
-               <i class="material-icons">more_vert</i>
-           </md-button>
-           <md-menu-content>
-               <md-menu-item>
-                   <md-button ng-click="cc.updateConnection(!cc.connection.isConnected)"><span message-key="{{!cc.connection.isConnected ? 'dc_databaseConnector.label.connect' : 'dc_databaseConnector.label.disconnect'}}"></span></md-button>
-               </md-menu-item>
-               <md-menu-item>
-                   <md-button ng-click="cc.editConnection($event)"><span message-key="dc_databaseConnector.label.edit"></span></md-button>
-               </md-menu-item>
-               <md-menu-item>
-                   <md-button ng-click="cc.openDeleteConnectionDialog($event)"><span message-key="dc_databaseConnector.label.delete"></span></md-button>
-               </md-menu-item>
-               <md-menu-item>
-                    <md-button ng-click="cc.exportConnection(cc.connection)"><span message-key="dc_databaseConnector.label.export"></span></md-button>
-               </md-menu-item>
-               <md-menu-item>
-                   <md-button ng-disabled="!cc.serverStatusAvailable()" ng-click="cc.goToStatus()"><span message-key="dc_databaseConnector.label.connectionStats"></span></md-button>
-               </md-menu-item>
-           </md-menu-content>
-       </md-menu>
-       <md-card-content>
-           <div class="db-info"><span message-key="dc_databaseConnector.label.databaseType"></span>: <span message-key="dc_databaseConnector.label.databaseType.{{cc.connection.databaseType.toLowerCase()}}"></span></div>
-           <div class="db-info"><span message-key="dc_databaseConnector.label.connection.connectionName"></span>: <span>{{cc.connection.id}}</span></div>
-           <div class="db-info" ng-if="cc.connection.databaseType=='MONGO'"><span message-key="dc_databaseConnector.label.connection.dbName"></span>: <span>{{cc.connection.dbName}}</span></div>
-           <div class="db-info" ng-if="cc.connection.databaseType=='REDIS'"><span message-key="dc_databaseConnector.label.connection.dbNumber"></span>: <span>{{cc.connection.dbName}}</span></div>
-           <div class="db-info"><span message-key="dc_databaseConnector.label.host"></span>: <span>{{cc.connection.host}}</span></div>
-           <div class="db-info"><span message-key="dc_databaseConnector.label.port"></span>: <span>{{cc.connection.port}}</span></div>
-           <div ng-if="cc.serverStatusAvailable()">
-               <div class="db-info"><span message-key="dc_databaseConnector.label.uptime"></span>: <span><i>{{cc.connection.uptime | momentFormatter : 'second' : 'fancy'}}</i></span></div>
-               <div class="db-info" ng-if="cc.connection.dbVersion!=null"><span message-key="dc_databaseConnector.label.version"></span>: <span>{{cc.connection.dbVersion}}</span></div>
-           </div>
-           <div ng-if="!cc.serverStatusAvailable()">
-               <div class="db-info"><span><b message-key="dc_databaseConnector.label.connection.statusWarningMessage" class="statusWarningMessage"></b></span></div>
-           </div>
-       </md-card-content>
-   </md-card>
-</section>
+<md-card ng-click="cc.updateExportValue()" class="db-card" ng-class="[{'db-linked': cc.connection.isConnected, 'db-unlinked': !cc.connection.isConnected, 'db-card-selected': cc.connection.export, 'db-card-not-selected': (cc.isCardSelectionEnabled() && !cc.connection.export), 'cursor-pointer transition md-ink-ripple': cc.isCardSelectionEnabled()}]">
+   <md-menu class="dbCard-menu">
+       <md-button aria-label="Open menu" class="md-icon-button" ng-click="$mdMenu.open($event)">
+           <i class="material-icons">more_vert</i>
+       </md-button>
+       <md-menu-content>
+           <md-menu-item>
+               <md-button ng-click="cc.updateConnection(!cc.connection.isConnected)"><span message-key="{{!cc.connection.isConnected ? 'dc_databaseConnector.label.connect' : 'dc_databaseConnector.label.disconnect'}}"></span></md-button>
+           </md-menu-item>
+           <md-menu-item>
+               <md-button ng-click="cc.editConnection($event)"><span message-key="dc_databaseConnector.label.edit"></span></md-button>
+           </md-menu-item>
+           <md-menu-item>
+               <md-button ng-click="cc.openDeleteConnectionDialog($event)"><span message-key="dc_databaseConnector.label.delete"></span></md-button>
+           </md-menu-item>
+           <md-menu-item>
+                <md-button ng-click="cc.exportConnection(cc.connection)"><span message-key="dc_databaseConnector.label.export"></span></md-button>
+           </md-menu-item>
+           <md-menu-item>
+               <md-button ng-disabled="!cc.serverStatusAvailable()" ng-click="cc.goToStatus()"><span message-key="dc_databaseConnector.label.connectionStats"></span></md-button>
+           </md-menu-item>
+       </md-menu-content>
+   </md-menu>
+   <md-card-content>
+       <div class="db-info"><span message-key="dc_databaseConnector.label.databaseType"></span>: <span message-key="dc_databaseConnector.label.databaseType.{{cc.connection.databaseType.toLowerCase()}}"></span></div>
+       <div class="db-info"><span message-key="dc_databaseConnector.label.connection.connectionName"></span>: <span>{{cc.connection.id}}</span></div>
+       <div class="db-info" ng-if="cc.connection.databaseType=='MONGO'"><span message-key="dc_databaseConnector.label.connection.dbName"></span>: <span>{{cc.connection.dbName}}</span></div>
+       <div class="db-info" ng-if="cc.connection.databaseType=='REDIS'"><span message-key="dc_databaseConnector.label.connection.dbNumber"></span>: <span>{{cc.connection.dbName}}</span></div>
+       <div class="db-info"><span message-key="dc_databaseConnector.label.host"></span>: <span>{{cc.connection.host}}</span></div>
+       <div class="db-info"><span message-key="dc_databaseConnector.label.port"></span>: <span>{{cc.connection.port}}</span></div>
+       <div ng-if="cc.serverStatusAvailable()">
+           <div class="db-info"><span message-key="dc_databaseConnector.label.uptime"></span>: <span><i>{{cc.connection.uptime | momentFormatter : 'second' : 'fancy'}}</i></span></div>
+           <div class="db-info" ng-if="cc.connection.dbVersion!=null"><span message-key="dc_databaseConnector.label.version"></span>: <span>{{cc.connection.dbVersion}}</span></div>
+       </div>
+       <div ng-if="!cc.serverStatusAvailable()">
+           <div class="db-info"><span><b message-key="dc_databaseConnector.label.connection.statusWarningMessage" class="statusWarningMessage"></b></span></div>
+       </div>
+   </md-card-content>
+</md-card>
