@@ -195,3 +195,87 @@ form legend {
     opacity: 1 !important;
     margin-top: 0px !important;
 }
+
+.main-section {
+    max-width: 90%;
+    margin: 0 auto;
+    padding-top: 16px;
+}
+
+.connection-containerMain {
+    border-bottom: 1px dashed #ccc;
+    padding-bottom: 12px;
+    margin-bottom: 26px;
+}
+
+.connection-containerMain h3 {
+    font-size: 14px;
+    color: rgba(0,0,0,0.52);
+    font-weight: 500;
+    padding-left: 8px;
+    margin-bottom: 0;
+}
+
+.connection-containerMain button {
+    color: #fff !important;
+    padding: 0 16px;
+}
+
+/* Custom style for DB card */
+
+.db-card {
+    position: relative;
+    outline: none;
+}
+
+.db-card.db-linked {
+    border-left: 4px solid #00E676;
+}
+
+.db-card.db-unlinked {
+    border-left: 4px solid #F44336;
+}
+
+.db-card .db-info {
+    color: rgba(0, 0, 0, 0.52);
+    font-size: 14px;
+    line-height: 24px;
+}
+
+.db-card .db-info span {
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.67);
+}
+
+.dbCard-menu {
+    position: absolute;
+    top: 4px;
+    right: 0;
+}
+
+.db-card-selected {
+    opacity: 1;
+}
+
+.db-card-not-selected {
+    opacity: .67;
+}
+.db-card.transition {
+    -webkit-transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.db-card.cursor-pointer:hover {
+    background-color: rgba(158,158,158,0.2);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Rules for using icons as black on a light background. */
+.material-icons.md-dark { color: rgba(195, 195, 195, 0.75); }
+.material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
+
+/* Rules for using icons as white on a dark background. */
+.material-icons.md-light { color: rgba(255, 255, 255, 1); }
+.material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }

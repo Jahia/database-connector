@@ -5,12 +5,6 @@
     <div class="md-toolbar-tools">
         <h2 message-key="dc_databaseConnector.label.connections"></h2>
         <span flex></span>
-        <md-button class="md-icon-button" ng-click="coc.createConnection($event)" ng-disabled="!coc.connectorsAvailable()">
-            <md-icon>
-                <i class="material-icons" aria-label="create a new connection">add</i>
-            </md-icon>
-            <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500"><span message-key="dc_databaseConnector.label.create"></span></md-tooltip>
-        </md-button>
         <md-button class="md-icon-button" type="file" ngf-select="coc.importConnections($file)" ng-disabled="!coc.connectorsAvailable()">
             <md-icon>
                 <i class="material-icons" aria-label="import a connection">file_upload</i>
@@ -23,18 +17,29 @@
             </md-icon>
             <md-tooltip class="noToolTipAnimation" md-direction="top" md-delay="500"><span message-key="dc_databaseConnector.label.export"></span></md-tooltip>
         </md-button>
+        <md-button class="md-icon-button" ng-click="coc.enableCardSelection()">
+            <md-icon>
+                <i class="material-icons {{coc.isCardSelectionEnabled() ? 'md-light' : 'md-dark'}}">view_module</i>
+            </md-icon>
+            <md-tooltip ng-if="!coc.isCardSelectionEnabled()" class="noToolTipAnimation" md-direction="top" md-delay="500"><span message-key="dc_databaseConnector.label.enableConnectionSelection"></span></md-tooltip>
+            <md-tooltip ng-if="coc.isCardSelectionEnabled()" class="noToolTipAnimation" md-direction="top" md-delay="500"><span message-key="dc_databaseConnector.label.disableConnectionSelection"></span></md-tooltip>
+        </md-button>
     </div>
 </md-toolbar>
 
+<div layout="row" class="connection-containerMain" layout-align="start end">
+    <h3 flex message-key="dc_databaseConnector.label.allConnections"></h3>
+    <md-button ng-click="coc.createConnection($event)" ng-disabled="!coc.connectorsAvailable()" class="md-raised md-accent" aria-label="create a new connection"><span message-key="dc_databaseConnector.label.newConnection"></span></md-button>
+</div>
 <div class="center-align" ng-if="!coc.connectorsAvailable()">
-    <h3>No Database Connectors Available</h3>
+    <h3 message-key="dc_databaseConnector.label.noConnectors"></h3>
 </div>
-
-<div layout="row" layout-wrap layout-margin>
-    <div flex-auto="33" ng-repeat="connection in coc.state.connections track by coc.resolveTracker(connection.id, connection.databaseType)">
-        <dc-connection index="{{$index}}" export-connections="coc.exportConnections" connection="connection"></dc-connection>
-    </div>
+<div ng-repeat="connection in coc.state.connections track by coc.resolveTracker(connection.id, connection.databaseType)">
+    <dc-connection index="{{$index}}"
+                   export-connections="coc.exportConnections"
+                   connection="connection"
+                   is-card-selection-enabled="coc.isCardSelectionEnabled"
+                   export-single-connection="coc.exportSingleConnection"></dc-connection>
 </div>
-
 <input type="file" ng-show="false" id="importFileSelector">
 <button id="performImport" ng-click="coc.importConnections(null, 'test')" ng-show="false"></button>

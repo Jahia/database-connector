@@ -31,6 +31,9 @@
         coc.importConnections = importConnections;
         coc.resolveTracker = resolveTracker;
         coc.connectorsAvailable = connectorsAvailable;
+        coc.enableCardSelection = enableCardSelection;
+        coc.isCardSelectionEnabled = isCardSelectionEnabled;
+        coc.exportSingleConnection = exportSingleConnection;
 
         coc.$onInit = function() {
             getAllConnections();
@@ -109,6 +112,27 @@
             });
         }
 
+        function exportSingleConnection(connection) {
+            var data = {};
+            data[connection.databaseType] = [connection.id];
+            console.log(connection);
+            var url = contextualData.apiUrl + '/export/false';
+            return dcDownloadFactory.download(url, 'text/plain', data).$promise
+                .then(function (data) {
+                    // promise fulfilled
+                    if (data.response.blob != null) {
+                        saveAs(data.response.blob, data.response.fileName);
+                    } else {
+                        toaster.pop({
+                            type: 'error',
+                            title: i18n.message('dc_databaseConnector.toast.title.exportImport'),
+                            toastId: 'eti',
+                            timeout: 3000
+                        });
+                    }
+                });
+        }
+
         function exportSelectedConnections() {
             var data = {};
             var databaseTypes = _.keys(coc.exportConnections);
@@ -142,7 +166,7 @@
         }
 
         function isExportDisabled() {
-            return _.isEmpty(coc.exportConnections);
+            return _.isEmpty(coc.exportConnections) || !coc.isCardSelectionEnabled();
         }
 
         function populateCache() {
@@ -161,6 +185,19 @@
 
         function connectorsAvailable(){
             return !_.isEmpty($DCSS.connectorsMetaData);
+        }
+
+        function isCardSelectionEnabled() {
+            return contextualData.cardSelectionEnabled;
+        }
+
+        function enableCardSelection() {
+            contextualData.cardSelectionEnabled = !contextualData.cardSelectionEnabled;
+            if (!contextualData.cardSelectionEnabled)  {
+                //reset exportConnections
+                coc.exportConnections = {};
+                $scope.$broadcast('resetExportSelection', null);
+            }
         }
     };
 

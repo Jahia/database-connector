@@ -10,7 +10,9 @@
             bindToController: {
                 index: '@',
                 connection: '=',
-                exportConnections: '='
+                exportConnections: '=',
+                isCardSelectionEnabled: '=',
+                exportConnection: "=exportSingleConnection"
             },
             link            : linkFunc
         };
@@ -34,9 +36,10 @@
         cc.updateConnection = updateConnection;
         cc.openDeleteConnectionDialog = openDeleteConnectionDialog;
         cc.editConnection = editConnection;
-        cc.exportValueChanged = exportValueChanged;
+        cc.updateExportValue = updateExportValue;
         cc.goToStatus = goToStatus;
         cc.serverStatusAvailable = serverStatusAvailable;
+
         cc.$onInit = function() {
             cc.imageUrl = contextualData.context + '/modules/' + $DCSS.connectorsMetaData[cc.connection.databaseType].moduleName + '/images/' + cc.connection.databaseType.toLowerCase() + '/logo_60.png';
             for (var i in cc.connection) {
@@ -158,7 +161,11 @@
             });
         }
 
-        function exportValueChanged() {
+        function updateExportValue() {
+            if (!cc.isCardSelectionEnabled) {
+                return;
+            }
+            cc.connection.export = !cc.connection.export;
             if (cc.connection.export) {
                 var exportConnectionsTemp = angular.copy(cc.exportConnections);
                 cc.exportConnections = exportConnectionsTemp;
