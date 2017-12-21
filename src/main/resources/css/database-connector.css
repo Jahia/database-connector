@@ -72,15 +72,6 @@ form legend {
     background: #ffffff;
 }
 
-.off{
-    background: #ff8d96;
-
-
-}
-.on {
-    background: #42ff7e;
-}
-
 .center-align {
     text-align: center;
 }
@@ -276,6 +267,12 @@ form legend {
     display: flex; align-items: center; justify-content: center; padding-left:8px;
 }
 
+.center-content {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Rules for using icons as black on a light background. */
 .material-icons.md-dark { color: rgba(195, 195, 195, 0.75); }
 .material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
@@ -283,3 +280,22 @@ form legend {
 /* Rules for using icons as white on a dark background. */
 .material-icons.md-light { color: rgba(255, 255, 255, 1); }
 .material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
+
+.toast-success, .toast-error, .toast-warn {
+    background-color: transparent !important;
+}
+.toast-success .md-toast-content{
+    background-color: rgba(92, 184, 92, 0.88) !important;
+}
+
+.toast-error .md-toast-content {
+    background-color: rgba(247, 77, 32, 0.88) !important;
+}
+
+.toast-warn .md-toast-content {
+    background-color: rgba(234,159,5,0.88) !important;
+}
+
+.float-right {
+    float:right;
+}

@@ -21,7 +21,7 @@
         .directive('dcConnectionsOverview', ['$log', 'contextualData', connectionsOverview]);
 
     var connectionsOverviewController = function($scope, contextualData, dcDataFactory, $mdDialog, $http,
-                                                 dcDownloadFactory, toaster, $state, i18n, $q, $timeout, $DCSS, $DCMS) {
+                                                 dcDownloadFactory, $mdToast, $state, i18n, $q, $timeout, $DCSS, $DCMS) {
         var coc = this;
         coc.getAllConnections = getAllConnections;
         coc.createConnection = createConnection;
@@ -71,17 +71,20 @@
                     coc.spinnerOn = false;
                     $state.go('importResults', {results:response.results, status: allImportsSuccessful});
                 }, function (response) {
-                    var errorToast = {
-                        type: 'error',
-                        title: i18n.message('dc_databaseConnector.toast.title.importFailed'),
-                        toastId: 'ims',
-                        timeout: 3000
-                    };
+                    var textContent;
                     if (response.data.results !== undefined && response.data.results.report !== undefined) {
-                        errorToast.body = i18n.message('dc_databaseConnector.toast.message.' + response.data.results.report.reason);
+                        textContent = i18n.message('dc_databaseConnector.toast.message.' + response.data.results.report.reason);
+                    } else {
+                        textContent = i18n.message('dc_databaseConnector.toast.title.importFailed');
                     }
                     coc.spinnerOn = false;
-                    toaster.pop(errorToast);
+                    $mdToast.show(
+                        $mdToast.simple()
+                            .textContent(textContent)
+                            .position('top right')
+                            .toastClass('toast-error')
+                            .hideDelay(3000)
+                    );
                 });
             }
         }
@@ -115,7 +118,6 @@
         function exportSingleConnection(connection) {
             var data = {};
             data[connection.databaseType] = [connection.id];
-            console.log(connection);
             var url = contextualData.apiUrl + '/export/false';
             return dcDownloadFactory.download(url, 'text/plain', data).$promise
                 .then(function (data) {
@@ -123,12 +125,13 @@
                     if (data.response.blob != null) {
                         saveAs(data.response.blob, data.response.fileName);
                     } else {
-                        toaster.pop({
-                            type: 'error',
-                            title: i18n.message('dc_databaseConnector.toast.title.exportImport'),
-                            toastId: 'eti',
-                            timeout: 3000
-                        });
+                        $mdToast.show(
+                            $mdToast.simple()
+                                .textContent(i18n.message('dc_databaseConnector.toast.title.exportImport'))
+                                .position('top right')
+                                .toastClass('toast-error')
+                                .hideDelay(3000)
+                        );
                     }
                 });
         }
@@ -155,12 +158,13 @@
                         coc.exportConnections = {};
                         $scope.$broadcast('resetExportSelection', null);
                     } else {
-                        toaster.pop({
-                            type: 'error',
-                            title: i18n.message('dc_databaseConnector.toast.title.exportImport'),
-                            toastId: 'eti',
-                            timeout: 3000
-                        });
+                        $mdToast.show(
+                            $mdToast.simple()
+                                .textContent(i18n.message('dc_databaseConnector.toast.title.exportImport'))
+                                .position('top right')
+                                .toastClass('toast-error')
+                                .hideDelay(3000)
+                        );
                     }
                 });
         }
@@ -202,7 +206,7 @@
     };
 
     connectionsOverviewController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog', '$http',
-        'dcDownloadFactory', 'toaster', '$state', 'i18nService', '$q', '$timeout', '$DCStateService', '$DCManagementService'];
+        'dcDownloadFactory', '$mdToast', '$state', 'i18nService', '$q', '$timeout', '$DCStateService', '$DCManagementService'];
 
 
     function CreateConnectionPopupController($scope, contextualData, $DCSS, $mdDialog, CS) {

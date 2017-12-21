@@ -27,7 +27,7 @@
         .directive('dcConnection', ['$log', 'contextualData', Connection]);
 
     var ConnectionController = function($scope, contextualData, dcDataFactory,
-                                        $mdDialog, $filter, toaster, $state, i18n, $DCSS, $DCCMS, $DCMS) {
+                                        $mdDialog, $filter, $state, i18n, $DCSS, $DCCMS, $DCMS, $mdToast) {
         var cc = this;
         cc.spinnerOptions = {
             mode: 'indeterminate',
@@ -100,22 +100,24 @@
                     cc.exportConnections = exportConnectionsTemp;
                 }
                 $DCMS.removeConnection(cc.connection.id, cc.connection.databaseType);
-                toaster.pop({
-                    type   : 'success',
-                    title: i18n.message('dc_databaseConnector.toast.title.connectionSuccessfullyDeleted'),
-                    toastId: 'cd',
-                    timeout: 3000
-                });
+                $mdToast.show(
+                    $mdToast.simple()
+                        .textContent(i18n.message('dc_databaseConnector.toast.title.connectionSuccessfullyDeleted'))
+                        .position('top right')
+                        .toastClass('toast-success')
+                        .hideDelay(3000)
+                );
                 cc.spinnerOptions.showSpinner = false;
             }, function(response){
                 console.log('error connection not deleted', response);
                 cc.spinnerOptions.showSpinner = false;
-                toaster.pop({
-                    type   : 'error',
-                    title: i18n.message('dc_databaseConnector.toast.title.connectionDeletionFailed'),
-                    toastId: 'cd',
-                    timeout: 3000
-                });
+                $mdToast.show(
+                    $mdToast.simple()
+                        .textContent(i18n.message('dc_databaseConnector.toast.title.connectionDeletionFailed'))
+                        .position('top right')
+                        .toastClass('toast-error')
+                        .hideDelay(3000)
+                );
             });
         }
         
@@ -194,8 +196,8 @@
     };
 
     ConnectionController.$inject = ['$scope', 'contextualData', 'dcDataFactory', '$mdDialog',
-        '$filter', 'toaster', '$state', 'i18nService', '$DCStateService',
-        '$DCConnectionManagerService', '$DCManagementService'];
+        '$filter', '$state', 'i18nService', '$DCStateService',
+        '$DCConnectionManagerService', '$DCManagementService', '$mdToast'];
     
     function EditConnectionPopupController($scope, $mdDialog, $DCSS, CS) {
         $scope.ecp = this;
