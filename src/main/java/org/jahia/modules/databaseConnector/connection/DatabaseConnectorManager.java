@@ -32,8 +32,6 @@ import org.springframework.beans.factory.InitializingBean;
 
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
-import javax.jcr.observation.Event;
-import javax.jcr.observation.EventIterator;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import java.io.*;
@@ -41,6 +39,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Semaphore;
 
 /**
  * Date: 2013-10-17
@@ -60,7 +61,6 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
     private static final String SERVICE_VIEW_NAME = "service";
 
-    private final static Object lock = new Object();
     private static DatabaseConnectorManager instance;
     private DSLExecutor dslExecutor;
     private Map<String, DSLHandler> dslHandlerMap;
@@ -75,9 +75,10 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     private Bundle bundle;
     private RBExecutor rbExecutor;
     private static Date lastDeployDate;
+    private static Date lastBundleEvent;
     private static String DCMIX_DIRECTIVES_DEFINITION = "dcmix:directivesDefinition";
     private static String DCMIX_SERVICES_DEFINITION = "dcmix:servicesDefinition";
-
+    private final static ConcurrentMap<String, Semaphore> processings = new ConcurrentHashMap<>();
     public static DatabaseConnectorManager getInstance() {
         if (instance == null) {
             instance = new DatabaseConnectorManager();
@@ -95,11 +96,15 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     @Override
     public void bundleChanged(BundleEvent bundleEvent) {
         Bundle bundleEventBundle = bundleEvent.getBundle();
+        if (bundleEvent.getType() == BundleEvent.INSTALLED || bundleEvent.getType() == BundleEvent.UPDATED ||
+                bundleEvent.getType() == BundleEvent.STARTED || bundleEvent.getType() == BundleEvent.STOPPED ||
+                bundleEvent.getType() == BundleEvent.RESOLVED) {
+            lastBundleEvent = new Date();
+        }
         if (settingsBean != null && settingsBean.isProcessingServer()) {
             if (bundleEventBundle.getSymbolicName().contains("connector")) {
                 logger.debug("Processing bundle: [" + bundleEventBundle.getSymbolicName() + "]" + " - Current Bundle Status: [" + Utils.resolveBundleName(bundleEvent.getType()) + "]");
             }
-
             long bundleId = bundleEvent.getBundle().getBundleId();
             if (bundleEvent.getType() == BundleEvent.INSTALLED || bundleEvent.getType() == BundleEvent.UPDATED) {
                 installedBundles.add(bundleId);
@@ -135,6 +140,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     public void afterPropertiesSet() throws Exception {
         logger.info("Preparing to process bundles after properties set of database connector module.");
         lastDeployDate = new Date();
+        lastBundleEvent = new Date();
         for (Bundle currentBundle : this.bundle.getBundleContext().getBundles()) {
             if (currentBundle.getSymbolicName().contains("connector")) {
                 logger.debug("Processing bundle: [" + currentBundle.getSymbolicName() + "]" + " - Current Bundle Status: [" + Utils.resolveBundleName(currentBundle.getState()) + "]");
@@ -462,13 +468,53 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         String key = getCacheKey(renderContext);
 
         if (settingsBean.isDevelopmentMode()) {
-            return getAngularConfigFilePath(renderContext, key);
+            Semaphore semaphore = processings.get(key);
+            if (semaphore == null) {
+                semaphore = new Semaphore(1);
+                Semaphore semaphoreOld = processings.putIfAbsent(key, semaphore);
+                if(semaphoreOld != null) {
+                    semaphore = semaphoreOld;
+                }
+            }
+            try {
+                semaphore.acquire();
+                if (!semaphore.hasQueuedThreads()) {
+                    angularConfigFilesPath.remove(key);
+                }
+                if (angularConfigFilesPath.get(key) != null && new File(angularConfigFilesPath.get(key)).exists())
+                    return angularConfigFilesPath.get(key);
+                return getAngularConfigFilePath(renderContext, key);
+            } catch (InterruptedException e) {
+                logger.debug(e.getMessage(), e);
+                Thread.currentThread().interrupt();
+                throw e;
+            } finally {
+                semaphore.release();
+            }
         }
 
-        if (angularConfigFilesPath.get(key) == null) {
-            synchronized (lock) {
-                if (angularConfigFilesPath.get(key) != null) return angularConfigFilesPath.get(key);
+        //Make sure the file actually exists
+        if (angularConfigFilesPath.get(key) == null || !new File(angularConfigFilesPath.get(key)).exists()) {
+            Semaphore semaphore = processings.get(key);
+            if (semaphore == null) {
+                semaphore = new Semaphore(1);
+                Semaphore semaphoreOld = processings.putIfAbsent(key, semaphore);
+                if(semaphoreOld != null) {
+                    semaphore = semaphoreOld;
+                }
+            }
+            try {
+                semaphore.acquire();
+                if (angularConfigFilesPath.get(key) != null && new File(angularConfigFilesPath.get(key)).exists())
+                    return angularConfigFilesPath.get(key);
+                logger.info("Generating js file for Database Connector for key {}", key);
                 return getAngularConfigFilePath(renderContext, key);
+            } catch (InterruptedException e) {
+                logger.debug(e.getMessage(), e);
+                Thread.currentThread().interrupt();
+                throw e;
+            } finally {
+                semaphore.release();
             }
         } else {
             return angularConfigFilesPath.get(key);
@@ -478,12 +524,19 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     public Long getAngularConfigFileTimestamp(RenderContext renderContext) throws Exception {
         String key = getCacheKey(renderContext);
         if (settingsBean.isDevelopmentMode()) {
-            if (renderContext.getRequest().getAttribute("ffdevconfigfiletimestamp") == null) {
-                renderContext.getRequest().setAttribute("ffdevconfigfiletimestamp", String.valueOf(System.currentTimeMillis()));
+            if (renderContext.getRequest().getAttribute("dbcdevconfigfiletimestamp") == null) {
+                long time;
+                if (lastBundleEvent.after(lastDeployDate)) {
+                    time = lastBundleEvent.getTime();
+                } else {
+                    time = lastDeployDate.getTime();
+                }
+                renderContext.getRequest().setAttribute("dbcdevconfigfiletimestamp", String.valueOf(time));
             }
-            return Long.valueOf((String) renderContext.getRequest().getAttribute("ffdevconfigfiletimestamp"));
-        } else if (angularConfigFilesTimestamp.containsKey(key)) return angularConfigFilesTimestamp.get(key);
-        else return System.currentTimeMillis();
+            return Long.valueOf((String) renderContext.getRequest().getAttribute("dbcdevconfigfiletimestamp"));
+        } else {
+            return angularConfigFilesTimestamp.get(key);
+        }
     }
 
     private String getCacheKey(RenderContext renderContext) {
@@ -493,7 +546,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     }
 
     private String getAngularConfigFilePath(RenderContext renderContext, String key) throws RepositoryException, IOException {
-        String fileName = "database-connector-angular-builder-config_" + renderContext.getSite().getIdentifier() + "_" + renderContext.getUILocale().toString() + ".js";
+        String fileName = "database-connector-angular-builder-config_" + renderContext.getSite().getIdentifier() + "_" + renderContext.getUILocale().toString() + ".js.temp";
         String filePath = prepareAngularConfigFile(renderContext, fileName);
         Set<String> extraResourceBundles = new HashSet<>();
 
@@ -502,15 +555,20 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         for (String extraResourceBundle : extraResourceBundles) {
             rbExecutor.addRBDictionnaryToAngularConfigFile(userManagerService.lookupRootUser().getJahiaUser(), renderContext.getUILocale(), filePath, templateManagerService.getTemplatePackageById(extraResourceBundle));
         }
-
+        addConnectorAvailability(filePath);
         File file = new File(filePath);
-        if (FileUtils.sizeOf(file) == 0 || !FileUtils.isFileNewer(file, lastDeployDate)) {
+
+        if (FileUtils.sizeOf(file) == 0) {
             FileUtils.forceDelete(file);
+            return null;
         } else {
+            filePath = file.getAbsolutePath().replace(".temp", "");
+            file.renameTo(new File(filePath));
+
             angularConfigFilesPath.put(key, filePath);
             angularConfigFilesTimestamp.put(key, file.lastModified());
+            return filePath;
         }
-        return filePath;
     }
 
     /**
@@ -657,9 +715,12 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
                 File jsFile = new File(getFileSystemPath("/generated-resources/" + fileName));
                 try {
-                    if (!jsFile.exists())
+                    if (!jsFile.exists()) {
                         jsFile.createNewFile();
-
+                    } else if (FileUtils.isFileOlder(jsFile, lastDeployDate) || FileUtils.isFileOlder(jsFile, lastBundleEvent)) {
+                        FileUtils.forceDelete(jsFile);
+                        jsFile.createNewFile();
+                    }
                     FileWriter fw = new FileWriter(jsFile.getAbsoluteFile());
                     BufferedWriter bw = new BufferedWriter(fw);
                     bw.write("");
@@ -681,6 +742,27 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
         } catch (NoSuchMethodException e) {
             logger.error("Older version of SettingsBean detected " + e.getMessage() + "\n" + e);
             return SettingsBean.getInstance().getJahiaVarDiskPath() + path;
+        }
+    }
+
+    private void addConnectorAvailability(String filePath) {
+        File jsFile = new File(filePath);
+        try {
+            FileWriter fw = new FileWriter(jsFile.getAbsoluteFile(), true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.newLine();
+            bw.write("(function(){\n");
+            bw.write("angular.module('databaseConnector').config(function(contextualData) {\n");
+            bw.write("contextualData.resolvedConnectors = [];\n");
+            for (DatabaseConnectionRegistry databaseConnectionRegistry : getDatabaseConnectionRegistryServices()) {
+                bw.write("contextualData.resolvedConnectors.push('" + databaseConnectionRegistry.getConnectionType() + "');\n");
+            }
+            bw.write("});\n");
+            bw.write("})();");
+
+            bw.close();
+        } catch (IOException e) {
+            logger.error("Failed to write to buffer: " + e.getMessage() + "\n" + e);
         }
     }
 }

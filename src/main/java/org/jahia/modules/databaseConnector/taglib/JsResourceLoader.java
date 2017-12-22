@@ -90,11 +90,10 @@ public class JsResourceLoader extends AbstractJahiaTag {
     private void writeResourceTag(RenderContext renderContext) {
         String filePath = getResourcePath(renderContext);
         if (filePath != null) {
-            Script script = ((Script) renderContext.getRequest().getAttribute("script"));
             StringBuilder builder = new StringBuilder();
             builder.append("<jahia:resource type=\"javascript\"");
             try {
-                logger.info("Generated resources file path: " + filePath+ " tramsformed too: "+StringUtils.substringAfter(filePath, "generated-resources").replaceAll(File.pathSeparator.equals("\\")?"\\\\":"/","/"));
+                logger.info("Generated resources file path: " + filePath+ " transformed too: " + StringUtils.substringAfter(filePath, "generated-resources").replaceAll(File.pathSeparator.equals("\\")?"\\\\":"/","/"));
                 builder.append(" path=\"").append(URLEncoder.encode(renderContext.getURLGenerator().getContext() + "/generated-resources/" + new File(filePath).getName(), "UTF-8")).append("?ts=").append(getResourceTimestamp(renderContext)).append("\"");
             } catch (UnsupportedEncodingException e) {
                 logger.error("Failed to encode file path: " + e.getMessage());

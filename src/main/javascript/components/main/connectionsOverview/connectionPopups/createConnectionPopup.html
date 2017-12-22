@@ -1,17 +1,30 @@
 <md-dialog role="dialog">
         <md-dialog-content class="databaseSelection md-dialog-content" role="document">
-            <h2 class="md-title ng-binding">
-                <b>
-                    <span message-key="dc_databaseConnector.label.createConnection" ng-if="cpc.selectedDatabaseType !== ''"></span>
-                    <span message-key="dc_databaseConnector.label.selectDatabaseType" ng-if="cpc.selectedDatabaseType === ''"></span>
-                </b>
+            <h2 class="md-title ng-binding" ng-if="cpc.selectedDatabaseType === ''">
+                <b><span message-key="dc_databaseConnector.label.createConnection"></span></b>
+                <md-button class="md-fab md-mini md-info center-content float-right reload-button"
+                           ng-if="cpc.isConnectorUnresolved()"
+                           ng-click="cpc.reloadPage()">
+                    <i class="material-icons">refresh</i>
+                    <md-tooltip class="noToolTipAnimation"
+                                md-direction="top"
+                                md-delay="500">
+                        <span message-key="dc_databaseConnector.label.reloadPage"></span>
+                    </md-tooltip>
+                </md-button>
+            </h2>
+            <h2 class="md-title ng-binding" ng-if="cpc.selectedDatabaseType !== ''">
+                <b><span message-key="dc_databaseConnector.label.selectDatabaseType"></span></b>
             </h2>
             <div ng-if="!cpc.selectedDatabaseType">
                 <div layout layout-wrap>
                     <div ng-repeat="(i, connectorMetaData) in cpc.databaseTypes" flex="50">
-                        <md-button class="md-button" layout-margin ng-click="cpc.setSelectedDatabaseType(connectorMetaData.databaseType)">
+
+                        <md-button ng-if="cpc.isConnectorResolved(i)" class="md-button" layout-margin ng-click="cpc.setSelectedDatabaseType(connectorMetaData.databaseType)">
                             <img ng-src="{{cpc.images[connectorMetaData.databaseType]}}" width="211" height="60">
                         </md-button>
+
+                        <img ng-if="!cpc.isConnectorResolved(i)" ng-src="{{cpc.images[connectorMetaData.databaseType]}}" class="disabled-img" width="211" height="60">
                     </div>
                 </div>
             </div>

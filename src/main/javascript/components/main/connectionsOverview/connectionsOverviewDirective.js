@@ -214,6 +214,9 @@
         $scope.cpc.setSelectedDatabaseType = setSelectedDatabaseType;
         $scope.compiled = false;
         $scope.cpc.selectedDatabaseType = '';
+        $scope.cpc.isConnectorResolved = isConnectorResolved;
+        $scope.cpc.isConnectorUnresolved = isConnectorUnresolved;
+        $scope.cpc.reloadPage = reloadPage;
 
         var compiledUUID = null;
         init();
@@ -267,6 +270,17 @@
             }
         }
 
+        function isConnectorResolved(type) {
+             return _.contains(contextualData.resolvedConnectors, type);
+        }
+
+        function isConnectorUnresolved() {
+            return _.keys($scope.cpc.databaseTypes).length !== contextualData.resolvedConnectors.length;
+        }
+
+        function reloadPage() {
+            window.location.reload();
+        }
     }
 
     CreateConnectionPopupController.$inject = ['$scope', 'contextualData', '$DCStateService', '$mdDialog', 'dcCompilationService'];

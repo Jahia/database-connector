@@ -16,6 +16,7 @@
 <%--@elvariable id="scriptInfo" type="java.lang.String"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <%--@elvariable id="workspace" type="java.lang.String"--%>
+<c:set var="endOfUri" value="?version=${script.view.moduleVersion}"/>
 <template:addResources type="css" resources="database-connector.css"/>
 <template:addResources type="css" resources="spinner.css"/>
 <template:addResources type="css" resources="lib/_dc.css"/>
@@ -29,10 +30,17 @@
 <template:addResources type="javascript" resources="lib/jasny-bootstrap.fileinput.js"/>
 <template:addResources type="javascript" resources="angular/components/i18n.js"/>
 
-<template:addResources type="javascript" resources="i18n/database-connector-i18n_${renderContext.UILocale.language}.js" var="i18nJSFile"/>
-<c:if test="${empty i18nJSFile}">
-    <template:addResources type="javascript" resources="i18n/database-connector-i18n.js"/>
-</c:if>
+<c:choose>
+    <c:when test="${renderContext.UILocale.language eq 'fr'}">
+        <template:addResources type="javascript" resources="${url.context}/modules/database-connector/javascript/i18n/database-connector-i18n_${renderContext.UILocale.language}.js${endOfUri}"/>
+    </c:when>
+    <c:when test="${renderContext.UILocale.language eq 'de'}">
+        <template:addResources type="javascript" resources="${url.context}/modules/database-connector/javascript/i18n/database-connector-i18n_${renderContext.UILocale.language}.js${endOfUri}"/>
+    </c:when>
+    <c:otherwise>
+        <template:addResources type="javascript" resources="${url.context}/modules/database-connector/javascript/i18n/database-connector-i18n_en.js${endOfUri}"/>
+    </c:otherwise>
+</c:choose>
 
 <dbconnector:jsResources />
 

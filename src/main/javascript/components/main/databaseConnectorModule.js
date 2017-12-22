@@ -9,6 +9,5 @@
         $mdThemingProvider.theme('blue-theme', 'default')
             .primaryPalette('light-blue',
                 {'default': '300'});
-        
     });
 })();

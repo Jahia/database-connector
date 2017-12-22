@@ -299,3 +299,20 @@ form legend {
 .float-right {
     float:right;
 }
+
+.disabled-img {
+    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+    filter: grayscale(100%);
+}
+
+.md-button.md-fab.md-info:not([disabled]){
+    background-color: #4997b8;
+}
+
+.md-button.md-fab.md-info:not([disabled]):hover {
+    background-color: rgba(73, 151, 184, 0.78);
+}
+.reload-button {
+    bottom:20px;
+    left:20px;
+}
