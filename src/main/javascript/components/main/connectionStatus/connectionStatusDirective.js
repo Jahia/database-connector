@@ -68,7 +68,6 @@
                 var $div = jQuery(document.createElement('div'));
                 $div.attr('flex', 100);
                 var $boxWrapper = jQuery(document.createElement('div'));
-                $boxWrapper.addClass('box-wrap');
                 $boxWrapper.attr('id', id);
                 $div.append($boxWrapper);
                 return $div;
