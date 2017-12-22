@@ -52,7 +52,6 @@
                     method: 'GET'
                 }).then(function(response) {
                     //status can be retrieved
-                    console.log(JSON.parse(response.data.success));
                     if (_.isUndefined(response.data.failed)) {
                         data.connection.canRetrieveStatus = true;
                         //@TODO needs to be updated for each external connector module to handle their own setting of custom properties.
