@@ -1,7 +1,7 @@
 <md-dialog role="dialog">
         <md-dialog-content class="databaseSelection md-dialog-content" role="document">
             <h2 class="md-title ng-binding" ng-if="cpc.selectedDatabaseType === ''">
-                <b><span message-key="dc_databaseConnector.label.createConnection"></span></b>
+                <b><span message-key="dc_databaseConnector.label.selectDatabaseType"></span></b>
                 <md-button class="md-fab md-mini md-info center-content float-right reload-button"
                            ng-if="cpc.isConnectorUnresolved()"
                            ng-click="cpc.reloadPage()">
@@ -14,7 +14,7 @@
                 </md-button>
             </h2>
             <h2 class="md-title ng-binding" ng-if="cpc.selectedDatabaseType !== ''">
-                <b><span message-key="dc_databaseConnector.label.selectDatabaseType"></span></b>
+                <b><span message-key="dc_databaseConnector.label.createConnection"></span></b>
             </h2>
             <div ng-if="!cpc.selectedDatabaseType">
                 <div layout layout-wrap>
