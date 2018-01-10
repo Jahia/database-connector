@@ -110,7 +110,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                 installedBundles.add(bundleId);
             }
 
-            if ((bundleEvent.getType() == BundleEvent.RESOLVED && installedBundles.contains(bundleId)) || (bundleEventBundle.getState() == Bundle.RESOLVED && bundleEvent.getType() == BundleEvent.INSTALLED)) {
+            if ((bundleEvent.getType() == BundleEvent.RESOLVED && installedBundles.contains(bundleId)) || (bundleEventBundle.getState() == Bundle.RESOLVED && bundleEvent.getType() == BundleEvent.INSTALLED) || (bundleEventBundle.getState() == BundleEvent.RESOLVED && bundleEvent.getType() == BundleEvent.STARTED)) {
                 installedBundles.remove(bundleId);
                 try {
                     logger.debug("Preparing to Parse definitions");
