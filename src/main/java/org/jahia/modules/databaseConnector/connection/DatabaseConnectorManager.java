@@ -413,7 +413,7 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
 
 
     private boolean parseDefinitionWizards(Bundle bundle) throws ParseException, IOException {
-        if (org.jahia.osgi.BundleUtils.isJahiaBundle(bundle)) {
+        if (org.jahia.osgi.BundleUtils.isJahiaModuleBundle(bundle)) {
             JahiaTemplatesPackage packageById = org.jahia.osgi.BundleUtils.getModule(bundle);
             boolean foundDefinitions = false;
             int parsedDefinitionsCount = 0;
