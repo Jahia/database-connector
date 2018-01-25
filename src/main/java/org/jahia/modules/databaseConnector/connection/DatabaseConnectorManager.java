@@ -81,14 +81,18 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
     private final static ConcurrentMap<String, Semaphore> processings = new ConcurrentHashMap<>();
     public static DatabaseConnectorManager getInstance() {
         if (instance == null) {
-            instance = new DatabaseConnectorManager();
-            instance.userManagerService = JahiaUserManagerService.getInstance();
+            synchronized (DatabaseConnectorManager.class) {
+                if (instance == null) {
+                    instance = new DatabaseConnectorManager();
+                    instance.userManagerService = JahiaUserManagerService.getInstance();
 
-            if (instance.jcrTemplate == null) {
-                instance.jcrTemplate = JCRTemplate.getInstance();
+                    if (instance.jcrTemplate == null) {
+                        instance.jcrTemplate = JCRTemplate.getInstance();
+                    }
+
+                    instance.rbExecutor = new RBExecutor(instance.jcrTemplate);
+                }
             }
-
-            instance.rbExecutor = new RBExecutor(instance.jcrTemplate);
         }
         return instance;
     }
