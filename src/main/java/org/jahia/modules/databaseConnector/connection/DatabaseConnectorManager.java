@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.jahia.api.Constants;
+import org.jahia.bin.filters.jcr.JcrSessionFilter;
 import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.databaseConnector.bundle.RBExecutor;
 import org.jahia.modules.databaseConnector.connector.ConnectorMetaData;
@@ -123,6 +124,8 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
                     logger.error("Parse exception: " + e.getMessage());
                 } catch (IOException e) {
                     logger.error("IO exception: " + e.getMessage());
+                } finally {
+                    JcrSessionFilter.endRequest();
                 }
             }
         } else {
@@ -423,31 +426,37 @@ public class DatabaseConnectorManager implements InitializingBean, BundleListene
             int parsedDefinitionsCount = 0;
             if (packageById != null) {
                 List<String> definitionsFiles = new LinkedList<>(packageById.getDefinitionsFiles());
-                for (String definitionsFile : definitionsFiles) {
-                    logger.debug("\tRetrieving Bundle resource...");
-                    BundleResource bundleResource = new BundleResource(bundle.getResource(definitionsFile), bundle);
-                    List<ExtendedNodeType> definitionsFromFile = NodeTypeRegistry.getInstance().getDefinitionsFromFile(bundleResource, bundle.getSymbolicName());
-                    for (ExtendedNodeType type : definitionsFromFile) {
-                        if (!type.isMixin()) {
-                            String definitionType = resolveDslHandlerType(Arrays.asList(type.getDeclaredSupertypeNames()));
-                            if (definitionType != null) {
-                                String url = type.getName().replace(":", "_") + "/html/" + StringUtils.substringAfter(type.getName(), ":") + ".wzd";
-                                logger.debug("\tRetrieving definition wzd resource for: " + type.getName() + "(" + url + ")");
-                                URL resource = bundle.getResource(type.getName().replace(":", "_") + "/html/" + StringUtils.substringAfter(type.getName(), ":") + ".wzd");
-                                if (resource != null) {
-                                        logger.info("\tPreparing to execute DSL handler to register " + definitionType);
-                                        foundDefinitions = true;
-                                        dslExecutor.execute(resource, dslHandlerMap.get(definitionType), packageById, type);
-                                        parsedDefinitionsCount++;
-                                } else {
-                                    logger.warn("\tCould not locate resource for definition: " + type.getName());
+                if (!definitionsFiles.isEmpty()) {
+                    try {
+                        for (String definitionsFile : definitionsFiles) {
+                            logger.debug("\tRetrieving Bundle resource...");
+                            BundleResource bundleResource = new BundleResource(bundle.getResource(definitionsFile), bundle);
+                            List<ExtendedNodeType> definitionsFromFile = NodeTypeRegistry.getInstance().getDefinitionsFromFile(bundleResource, bundle.getSymbolicName());
+                            for (ExtendedNodeType type : definitionsFromFile) {
+                                if (!type.isMixin()) {
+                                    String definitionType = resolveDslHandlerType(Arrays.asList(type.getDeclaredSupertypeNames()));
+                                    if (definitionType != null) {
+                                        String url = type.getName().replace(":", "_") + "/html/" + StringUtils.substringAfter(type.getName(), ":") + ".wzd";
+                                        logger.debug("\tRetrieving definition wzd resource for: " + type.getName() + "(" + url + ")");
+                                        URL resource = bundle.getResource(type.getName().replace(":", "_") + "/html/" + StringUtils.substringAfter(type.getName(), ":") + ".wzd");
+                                        if (resource != null) {
+                                                logger.info("\tPreparing to execute DSL handler to register " + definitionType);
+                                                foundDefinitions = true;
+                                                dslExecutor.execute(resource, dslHandlerMap.get(definitionType), packageById, type);
+                                                parsedDefinitionsCount++;
+                                        } else {
+                                            logger.warn("\tCould not locate resource for definition: " + type.getName());
+                                        }
+                                    } else {
+                                        logger.debug("\tSkipping definition: " + type + " - super types is not of: " + DCMIX_DIRECTIVES_DEFINITION +  " or " + DCMIX_SERVICES_DEFINITION);
+                                    }
                                 }
-                            } else {
-                                logger.debug("\tSkipping definition: " + type + " - super types is not of: " + DCMIX_DIRECTIVES_DEFINITION +  " or " + DCMIX_SERVICES_DEFINITION);
                             }
                         }
+                    } finally {
+                        JcrSessionFilter.endRequest();
                     }
-                }
+                } 
             } else {
                 logger.debug("\tNo Jahia Template Package found for bundle [" + bundle.getSymbolicName() + "]");
             }
