@@ -32,7 +32,7 @@
         <version>7.2.1.0</version>
     </parent>
     <artifactId>database-connector</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>Jahia Database Connector</name>
     <description>NoSQL Database (MongoDB, REDIS, OrientDB,..) Connection Provider</description>
@@ -40,7 +40,7 @@
         <connection>scm:git:git@github.com:Jahia/database-connector.git</connection>
         <developerConnection>scm:git:git@github.com:Jahia/database-connector.git</developerConnection>
         <url>scm:git:git@github.com:Jahia/database-connector.git</url>
-      <tag>1_0_0</tag>
+      <tag>HEAD</tag>
   </scm>
     <properties>
         <jahia-module-type>system</jahia-module-type>
