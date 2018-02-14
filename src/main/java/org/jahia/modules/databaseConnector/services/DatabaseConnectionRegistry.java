@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import org.osgi.framework.ServiceRegistration;
 
 import javax.jcr.RepositoryException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -86,6 +87,8 @@ public interface DatabaseConnectionRegistry<T> {
     Object getConnectionService(String databaseType, String connectionId);
 
     Object getConnectionService(Class c, String databaseType, String connectionId);
+
+    List<Map<String, Object>> getConnectionsInfo(String databaseType);
 
     void registerServices();
 }

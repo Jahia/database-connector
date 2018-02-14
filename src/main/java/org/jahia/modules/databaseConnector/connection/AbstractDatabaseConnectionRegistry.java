@@ -438,12 +438,30 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
         }
     }
 
-    public Object getConnectionService(String databseType, String connectionId) {
-        return getConnectionService(ConnectionService.class, databseType, connectionId) ;
+    public Object getConnectionService(String databaseType, String connectionId) {
+        return getConnectionService(ConnectionService.class, databaseType, connectionId) ;
     }
 
-    public Object getConnectionService(Class c, String databseType, String connectionId) {
-       return BundleUtils.getOsgiService(c, createFilter(databseType, connectionId)) ;
+    public Object getConnectionService(Class c, String databaseType, String connectionId) {
+       return BundleUtils.getOsgiService(c, createFilter(databaseType, connectionId)) ;
+    }
+
+    public List<Map<String, Object>> getConnectionsInfo(String databaseType) {
+        List<Map<String, Object>> connectionsInfoList = new LinkedList<>();
+        for (Map.Entry<String, T> connection : registry.entrySet()) {
+            AbstractConnection abstractConnection = connection.getValue();
+            ConnectionService cs = BundleUtils.getOsgiService(ConnectionService.class, createFilter(databaseType, connection.getValue().getId()));
+            if (cs != null) {
+                Map<String, Object> connectionInfo = new LinkedHashMap<>();
+                connectionInfo.put("id", abstractConnection.getId());
+                connectionInfo.put("displayName", abstractConnection.getDisplayName());
+                connectionInfo.put("databaseType", abstractConnection.getDatabaseType());
+                connectionInfo.put("host", abstractConnection.getHost());
+                connectionInfo.put("port", abstractConnection.getPort());
+                connectionsInfoList.add(connectionInfo);
+            }
+        }
+        return connectionsInfoList;
     }
 
     protected abstract String getConnectionNodeType();
