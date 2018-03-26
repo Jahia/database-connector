@@ -298,7 +298,9 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
         if (settings.hasNode(DATABASE_CONNECTOR_PATH)) {
             return settings.getNode(DATABASE_CONNECTOR_PATH);
         } else {
-            return settings.addNode(DATABASE_CONNECTOR_PATH, DATABASE_CONNECTOR_NODE_TYPE);
+            JCRNodeWrapper dbConnectorNode = settings.addNode(DATABASE_CONNECTOR_PATH, DATABASE_CONNECTOR_NODE_TYPE);
+            dbConnectorNode.setAclInheritanceBreak(true);
+            return dbConnectorNode;
         }
     }
 
