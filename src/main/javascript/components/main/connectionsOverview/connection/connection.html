@@ -6,7 +6,7 @@
        </md-button>
        <md-menu-content>
            <md-menu-item>
-               <md-button ng-click="cc.updateConnection(!cc.connection.isConnected)"><span message-key="{{!cc.connection.isConnected ? 'dc_databaseConnector.label.connect' : 'dc_databaseConnector.label.disconnect'}}"></span></md-button>
+               <md-button ng-click="cc.updateConnection(!cc.connection.isConnected)"><span>{{cc.getI18nMessage(!cc.connection.isConnected ? 'dc_databaseConnector.label.connect' : 'dc_databaseConnector.label.disconnect')}}</span></md-button>
            </md-menu-item>
            <md-menu-item>
                <md-button ng-click="cc.editConnection($event)"><span message-key="dc_databaseConnector.label.edit"></span></md-button>

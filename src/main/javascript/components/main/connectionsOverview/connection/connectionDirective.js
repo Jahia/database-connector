@@ -39,6 +39,7 @@
         cc.updateExportValue = updateExportValue;
         cc.goToStatus = goToStatus;
         cc.serverStatusAvailable = serverStatusAvailable;
+        cc.getI18nMessage= i18n.message;
 
         cc.$onInit = function() {
             cc.imageUrl = contextualData.context + '/modules/' + $DCSS.connectorsMetaData[cc.connection.databaseType].moduleName + '/images/' + cc.connection.databaseType.toLowerCase() + '/logo_60.png';
