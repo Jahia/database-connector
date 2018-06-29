@@ -4,7 +4,7 @@
   "description": "Database Connector",
   "dependencies": {},
   "devDependencies": {
-    "bower": "^1.7.10",
+    "bower": "~1.7.10",
     "grunt": "^0.4.5",
     "grunt-bower-concat": "^0.6.0",
     "grunt-cli": "^0.1.13",
