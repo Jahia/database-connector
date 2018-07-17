@@ -42,7 +42,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class RegistryListener extends DefaultEventListener implements InitializingBean, BundleListener, BundleContextAware, ExternalEventListener {
+public class RegistryListener extends DefaultEventListener implements InitializingBean, SynchronousBundleListener, BundleContextAware, ExternalEventListener {
     private static final Logger logger = LoggerFactory.getLogger(RegistryListener.class);
 
     private SettingsBean settingsBean;

@@ -73,7 +73,7 @@ import java.util.concurrent.Semaphore;
  * @author Frédéric Pierre
  * @version 1.0
  */
-public class DatabaseConnectorManager implements InitializingBean, BundleListener, BundleContextAware {
+public class DatabaseConnectorManager implements InitializingBean, SynchronousBundleListener, BundleContextAware {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectorManager.class);
 
     public static final String DATABASE_CONNECTOR_ROOT_PATH = "/settings/";
