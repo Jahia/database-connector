@@ -103,6 +103,7 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
     private static String DCMIX_DIRECTIVES_DEFINITION = "dcmix:directivesDefinition";
     private static String DCMIX_SERVICES_DEFINITION = "dcmix:servicesDefinition";
     private final static ConcurrentMap<String, Semaphore> processings = new ConcurrentHashMap<>();
+
     public static DatabaseConnectorManager getInstance() {
         if (instance == null) {
             synchronized (DatabaseConnectorManager.class) {
@@ -147,8 +148,6 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
                     logger.error("Parse exception: " + e.getMessage());
                 } catch (IOException e) {
                     logger.error("IO exception: " + e.getMessage());
-                } finally {
-                    JcrSessionFilter.endRequest();
                 }
             }
         } else {
