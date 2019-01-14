@@ -28,20 +28,22 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.jahia.api.Constants;
-import org.jahia.bin.filters.jcr.JcrSessionFilter;
 import org.jahia.data.templates.JahiaTemplatesPackage;
 import org.jahia.modules.databaseConnector.bundle.RBExecutor;
 import org.jahia.modules.databaseConnector.connector.ConnectorMetaData;
-import org.jahia.modules.databaseConnector.services.DatabaseConnectionRegistry;
-import org.jahia.modules.databaseConnector.util.Utils;
 import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
 import org.jahia.modules.databaseConnector.dsl.DSLHandler;
+import org.jahia.modules.databaseConnector.services.DatabaseConnectionRegistry;
+import org.jahia.modules.databaseConnector.util.Utils;
 import org.jahia.osgi.BundleResource;
 import org.jahia.services.content.*;
 import org.jahia.services.content.nodetypes.ExtendedNodeType;
 import org.jahia.services.content.nodetypes.NodeTypeRegistry;
 import org.jahia.services.content.nodetypes.ParseException;
-import org.jahia.services.render.*;
+import org.jahia.services.render.RenderContext;
+import org.jahia.services.render.RenderException;
+import org.jahia.services.render.RenderService;
+import org.jahia.services.render.Resource;
 import org.jahia.services.templates.JahiaTemplateManagerService;
 import org.jahia.services.usermanager.JahiaUserManagerService;
 import org.jahia.settings.SettingsBean;
@@ -461,10 +463,27 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
                                     logger.debug("\tRetrieving definition wzd resource for: " + type.getName() + "(" + url + ")");
                                     URL resource = bundle.getResource(type.getName().replace(":", "_") + "/html/" + StringUtils.substringAfter(type.getName(), ":") + ".wzd");
                                     if (resource != null) {
+                                        Semaphore semaphore = processings.get(resource.toExternalForm());
+                                        if (semaphore == null) {
+                                            semaphore = new Semaphore(1);
+                                            Semaphore semaphoreOld = processings.putIfAbsent(resource.toExternalForm(), semaphore);
+                                            if (semaphoreOld != null) {
+                                                semaphore = semaphoreOld;
+                                            }
+                                        }
+                                        try {
+                                            semaphore.acquire();
                                             logger.info("\tPreparing to execute DSL handler to register " + definitionType);
                                             foundDefinitions = true;
                                             dslExecutor.execute(resource, dslHandlerMap.get(definitionType), packageById, type);
                                             parsedDefinitionsCount++;
+                                        } catch (InterruptedException e) {
+                                            logger.debug(e.getMessage(), e);
+                                            Thread.currentThread().interrupt();
+                                            throw new IOException(e);
+                                        } finally {
+                                            semaphore.release();
+                                        }
                                     } else {
                                         logger.warn("\tCould not locate resource for definition: " + type.getName());
                                     }
