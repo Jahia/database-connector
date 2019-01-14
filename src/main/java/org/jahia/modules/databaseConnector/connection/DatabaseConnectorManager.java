@@ -29,6 +29,7 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
 import org.jahia.api.Constants;
 import org.jahia.data.templates.JahiaTemplatesPackage;
+import org.jahia.data.templates.ModuleState;
 import org.jahia.modules.databaseConnector.bundle.RBExecutor;
 import org.jahia.modules.databaseConnector.connector.ConnectorMetaData;
 import org.jahia.modules.databaseConnector.dsl.DSLExecutor;
@@ -448,7 +449,7 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
             JahiaTemplatesPackage packageById = org.jahia.osgi.BundleUtils.getModule(bundle);
             boolean foundDefinitions = false;
             int parsedDefinitionsCount = 0;
-            if (packageById != null) {
+            if (packageById != null && packageById.getState().getState().equals(ModuleState.State.STARTED)) {
                 List<String> definitionsFiles = new LinkedList<>(packageById.getDefinitionsFiles());
                 if (!definitionsFiles.isEmpty()) {
                     for (String definitionsFile : definitionsFiles) {
