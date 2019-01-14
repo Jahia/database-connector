@@ -145,7 +145,7 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
             if ((bundleEvent.getType() == BundleEvent.RESOLVED && installedBundles.contains(bundleId)) || (bundleEventBundle.getState() == Bundle.RESOLVED && bundleEvent.getType() == BundleEvent.INSTALLED) || (bundleEventBundle.getState() == BundleEvent.RESOLVED && bundleEvent.getType() == BundleEvent.STARTED)) {
                 installedBundles.remove(bundleId);
                 try {
-                    logger.debug("Preparing to Parse definitions");
+                    logger.debug("Preparing to parse [" + bundleEvent.getBundle().getSymbolicName() + "] directive definitions");
                     parseDefinitionWizards(bundleEvent.getBundle());
                 } catch (ParseException e) {
                     logger.error("Parse exception: " + e.getMessage());
@@ -449,7 +449,7 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
             JahiaTemplatesPackage packageById = org.jahia.osgi.BundleUtils.getModule(bundle);
             boolean foundDefinitions = false;
             int parsedDefinitionsCount = 0;
-            if (packageById != null && packageById.getState().getState().equals(ModuleState.State.STARTED)) {
+            if (packageById != null && (packageById.getState().getState().equals(ModuleState.State.STARTING) || packageById.getState().getState().equals(ModuleState.State.STARTED))) {
                 List<String> definitionsFiles = new LinkedList<>(packageById.getDefinitionsFiles());
                 if (!definitionsFiles.isEmpty()) {
                     for (String definitionsFile : definitionsFiles) {
@@ -460,6 +460,7 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
                             if (!type.isMixin()) {
                                 String definitionType = resolveDslHandlerType(Arrays.asList(type.getDeclaredSupertypeNames()));
                                 if (definitionType != null) {
+                                    logger.info("\tFound DSL handler for module " +bundle.getSymbolicName() + " in state "+ packageById.getState().toString());
                                     String url = type.getName().replace(":", "_") + "/html/" + StringUtils.substringAfter(type.getName(), ":") + ".wzd";
                                     logger.debug("\tRetrieving definition wzd resource for: " + type.getName() + "(" + url + ")");
                                     URL resource = bundle.getResource(type.getName().replace(":", "_") + "/html/" + StringUtils.substringAfter(type.getName(), ":") + ".wzd");
