@@ -23,6 +23,7 @@
  */
 package org.jahia.modules.databaseConnector.connection;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.jahia.modules.databaseConnector.connector.ConnectorMetaData;
 import org.jahia.modules.databaseConnector.services.ConnectionService;
 import org.jahia.modules.databaseConnector.services.DatabaseConnectionRegistry;
@@ -411,12 +412,12 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
     }
 
     private String[] getInterfacesNames(Object obj) {
-        Class[] interfaces = obj.getClass().getInterfaces();
-        String[] interfacesNames = new String[interfaces.length];
-        for (int i = 0; i < interfaces.length; i++) {
-            interfacesNames[i] = interfaces[i].getName();
+        List<Class<?>> interfaces = ClassUtils.getAllInterfaces(obj.getClass());
+        List<String> interfacesNames = new ArrayList<>();
+        for (Class<?> interfaceClass : interfaces) {
+            interfacesNames.add(interfaceClass.getName());
         }
-        return interfacesNames;
+        return interfacesNames.toArray(new String[0]);
     }
 
     private Hashtable<String, String> createProperties(String databaseType, String databaseId, String connectionPath) {
