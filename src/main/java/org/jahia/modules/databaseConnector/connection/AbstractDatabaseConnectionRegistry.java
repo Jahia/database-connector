@@ -63,7 +63,6 @@ public abstract class AbstractDatabaseConnectionRegistry<T extends AbstractConne
     public final static String DATABASE_ID_KEY = "databaseId";
     public final static String DATABASE_TYPE_KEY = "databaseType";
     public final static String DATABASE_CONNECTION_PATH_PROPERTY = "connectionPath";
-    protected static final Pattern ALPHA_NUMERIC_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
 
     protected Map<String, T> registry;
 

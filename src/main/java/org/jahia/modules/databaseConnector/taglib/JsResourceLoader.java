@@ -62,21 +62,21 @@ public class JsResourceLoader extends AbstractJahiaTag {
      * @return file path (String/NULL)
      */
     private String getResourcePath(RenderContext renderContext) {
-        DatabaseConnectorManager dcm = (DatabaseConnectorManager)  ServicesRegistry.getInstance().getJahiaTemplateManagerService().getTemplatePackage("Jahia Database Connector").getContext().getBean("databaseConnectorManager");
+        DatabaseConnectorManager dcm = DatabaseConnectorManager.getInstance();
         try {
             return dcm.getAngularConfigFilePath(renderContext);
         } catch (Exception e) {
-            logger.error("Failed to get file path fo generated js resource: " + e.getMessage());
+            logger.error("Failed to get file path for generated js resource: " + e.getMessage());
             return null;
         }
     }
 
     private Long getResourceTimestamp(RenderContext renderContext) {
-        DatabaseConnectorManager dcm = (DatabaseConnectorManager)  ServicesRegistry.getInstance().getJahiaTemplateManagerService().getTemplatePackage("Jahia Database Connector").getContext().getBean("databaseConnectorManager");
+        DatabaseConnectorManager dcm = DatabaseConnectorManager.getInstance();
         try {
             return dcm.getAngularConfigFileTimestamp(renderContext);
         } catch (Exception e) {
-            logger.error("Failed to get file path fo generated js resource: " + e.getMessage());
+            logger.error("Failed to get file path for generated js resource: " + e.getMessage());
             return null;
         }
     }

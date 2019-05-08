@@ -24,6 +24,7 @@
 package org.jahia.modules.databaseConnector.connection;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.eclipse.gemini.blueprint.context.BundleContextAware;
@@ -637,9 +638,11 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
             public String doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 List<JahiaTemplatesPackage> dependencies = getDependentModules();
                 File jsFile = new File(filePath);
+                FileWriter fw = null;
+                BufferedWriter bw = null;
                 try {
-                    FileWriter fw = new FileWriter(jsFile.getAbsoluteFile(), true);
-                    BufferedWriter bw = new BufferedWriter(fw);
+                    fw = new FileWriter(jsFile.getAbsoluteFile(), true);
+                    bw = new BufferedWriter(fw);
 
                     for (JahiaTemplatesPackage pack : dependencies) {
                         try {
@@ -660,9 +663,11 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
                             logger.error("Failed to render view: " + e.getMessage() + "\n" + e);
                         }
                     }
-                    bw.close();
                 } catch (IOException e) {
                     logger.error("Failed to write to buffer: " + e.getMessage() + "\n" + e);
+                } finally {
+                    IOUtils.closeQuietly(bw);
+                    IOUtils.closeQuietly(fw);
                 }
                 return null;
             }
@@ -674,7 +679,6 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
      *
      * @param renderContext               The render context on which to get the current site
      * @param extraResourceBundlePackages
-     * @return The path to the generated file
      * @throws RepositoryException
      */
     private void addJSToAngularConfigFileByViewName(final RenderContext renderContext, final String query, final String viewName, final String filePath, final Set<String> extraResourceBundlePackages) throws RepositoryException, IOException {
@@ -683,9 +687,11 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
             public String doInJCR(JCRSessionWrapper session) throws RepositoryException {
                 List<JahiaTemplatesPackage> dependencies = getDependentModules();
                 File jsFile = new File(filePath);
+                FileWriter fw = null;
+                BufferedWriter bw = null;
                 try {
-                    FileWriter fw = new FileWriter(jsFile.getAbsoluteFile(), true);
-                    BufferedWriter bw = new BufferedWriter(fw);
+                    fw = new FileWriter(jsFile.getAbsoluteFile(), true);
+                    bw = new BufferedWriter(fw);
 
                     for (JahiaTemplatesPackage pack : dependencies) {
                         try {
@@ -704,9 +710,11 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
                             logger.error("Failed to render view: " + e.getMessage() + "\n" + e);
                         }
                     }
-                    bw.close();
                 } catch (IOException e) {
                     logger.error("Failed to write to buffer: " + e.getMessage() + "\n" + e);
+                } finally {
+                    IOUtils.closeQuietly(bw);
+                    IOUtils.closeQuietly(fw);
                 }
                 return null;
             }
@@ -766,6 +774,8 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
                 new File(getFileSystemPath("/generated-resources")).mkdirs();
 
                 File jsFile = new File(getFileSystemPath("/generated-resources/" + fileName));
+                FileWriter fw = null;
+                BufferedWriter bw = null;
                 try {
                     if (!jsFile.exists()) {
                         jsFile.createNewFile();
@@ -773,12 +783,14 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
                         FileUtils.forceDelete(jsFile);
                         jsFile.createNewFile();
                     }
-                    FileWriter fw = new FileWriter(jsFile.getAbsoluteFile());
-                    BufferedWriter bw = new BufferedWriter(fw);
+                    fw = new FileWriter(jsFile.getAbsoluteFile());
+                    bw = new BufferedWriter(fw);
                     bw.write("");
-                    bw.close();
                 } catch (IOException e) {
                     logger.error(e.getMessage(), e);
+                } finally {
+                    IOUtils.closeQuietly(bw);
+                    IOUtils.closeQuietly(fw);
                 }
                 return jsFile.getPath();
             }
@@ -799,9 +811,11 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
 
     private void addConnectorAvailability(String filePath) {
         File jsFile = new File(filePath);
+        FileWriter fw = null;
+        BufferedWriter bw = null;
         try {
-            FileWriter fw = new FileWriter(jsFile.getAbsoluteFile(), true);
-            BufferedWriter bw = new BufferedWriter(fw);
+            fw = new FileWriter(jsFile.getAbsoluteFile(), true);
+            bw = new BufferedWriter(fw);
             bw.newLine();
             bw.write("(function(){\n");
             bw.write("angular.module('databaseConnector').config(function(contextualData) {\n");
@@ -811,10 +825,11 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
             }
             bw.write("});\n");
             bw.write("})();");
-
-            bw.close();
         } catch (IOException e) {
             logger.error("Failed to write to buffer: " + e.getMessage() + "\n" + e);
+        } finally {
+            IOUtils.closeQuietly(bw);
+            IOUtils.closeQuietly(fw);
         }
     }
 }
