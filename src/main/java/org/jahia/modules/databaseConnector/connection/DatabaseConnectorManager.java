@@ -111,14 +111,16 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
     public static DatabaseConnectorManager getInstance() {
         if (instance == null) {
             synchronized (DatabaseConnectorManager.class) {
-                instance = new DatabaseConnectorManager();
-                instance.userManagerService = JahiaUserManagerService.getInstance();
+                if (instance == null) {
+                    instance = new DatabaseConnectorManager();
+                    instance.userManagerService = JahiaUserManagerService.getInstance();
 
-                if (instance.jcrTemplate == null) {
-                    instance.jcrTemplate = JCRTemplate.getInstance();
+                    if (instance.jcrTemplate == null) {
+                        instance.jcrTemplate = JCRTemplate.getInstance();
+                    }
+
+                    instance.rbExecutor = new RBExecutor(instance.jcrTemplate);
                 }
-
-                instance.rbExecutor = new RBExecutor(instance.jcrTemplate);
             }
         }
         return instance;
