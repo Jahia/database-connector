@@ -1,18 +1,6 @@
 (function(){
     var DCConnectionManagerService = function($http, contextualData, $q, toaster, i18n, $DCSS, dcDataFactory, dcConnectionStatusService) {
         var self = this;
-        this.registeredStatusHandlers = {};
-
-        //Hook to add a connector's callback to the list of status handlers
-        this.registerStatusHandler = (type, fn) => {
-            this.registeredStatusHandlers[type] = fn;
-        };
-
-        //Hook to remove a connector's callback from the list of status handlers
-        this.unregisterStatusHandler = (type) => {
-            delete this.registeredStatusHandlers[type];
-        };
-
         this.updateConnection = function(connection, connect) {
             return $q(function(resolve, reject){
                 var url = contextualData.apiUrl + $DCSS.connectorsMetaData[connection.databaseType].entryPoint + (connect ? '/connect/' : '/disconnect/') + connection.id;
@@ -80,10 +68,6 @@
                         }
                         else if (data.connection.databaseType == "ELASTICSEARCH") {
                             data.connection.dbVersion = JSON.parse(response.data.success).aboutConnection.dbVersion;
-                        }
-                        //Allow external connector modules to set variables as seen fit on connection object (such as version, uptime etc)
-                        if (data.connection.databaseType in self.registeredStatusHandlers && typeof self.registeredStatusHandlers[data.connection.databaseType] === 'function' ) {
-                            self.registeredStatusHandlers[data.connection.databaseType](data.connection, response.data);
                         }
                     } else {
                         data.connection.canRetrieveStatus = false;
