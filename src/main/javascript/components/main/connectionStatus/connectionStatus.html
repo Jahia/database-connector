@@ -1,14 +1,13 @@
 <md-content>
     <md-toolbar layout-padding>
-        <div class="md-toolbar-tools">
-            <h2 message-key="dc_databaseConnector.label.statistics.connectionStatus"></h2>
-            <span flex></span>
+        <div class="md-toolbar-tools dc-toolbar">
+            <h2 flex message-key="dc_databaseConnector.label.statistics.connectionStatus"></h2>
             <md-button class="md-icon-button" ng-click="csc.goToConnections()">
                 <md-icon class="md-secondary"><i class="material-icons">home</i></md-icon>
                 <md-tooltip class="noToolTipAnimation"
                             md-direction="top"
-                            md-delay="500">
-                    <span message-key="dc_databaseConnector.label.goBack"></span>
+                            md-delay="500"
+                            message-key="dc_databaseConnector.label.goBack">
                 </md-tooltip>
             </md-button>
         </div>

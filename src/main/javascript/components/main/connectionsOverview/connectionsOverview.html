@@ -2,7 +2,7 @@
         toaster-options="{'time-out': 6000, 'close-button':true, 'animation-class': 'toast-top-right', 'prevent-duplicates': true}"></toaster-container>
 <dc-spinner spinner-mode="indeterminiate" show="coc.spinnerOn"></dc-spinner>
 <md-toolbar layout-padding>
-    <div class="md-toolbar-tools">
+    <div class="md-toolbar-tools dc-toolbar">
         <h2 message-key="dc_databaseConnector.label.connections"></h2>
         <span flex></span>
         <md-button class="md-icon-button" type="file" ngf-select="coc.importConnections($file)" ng-disabled="!coc.connectorsAvailable()">

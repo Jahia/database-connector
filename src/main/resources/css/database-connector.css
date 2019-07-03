@@ -311,3 +311,7 @@ form legend {
     bottom:20px;
     left:20px;
 }
+
+.dc-toolbar {
+    padding-right: 28px !important;
+}
