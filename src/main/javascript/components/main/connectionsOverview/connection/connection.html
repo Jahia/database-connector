@@ -30,7 +30,7 @@
        <div class="db-info"><span message-key="dc_databaseConnector.label.host"></span>: <span>{{cc.connection.host}}</span></div>
        <div class="db-info"><span message-key="dc_databaseConnector.label.port"></span>: <span>{{cc.connection.port}}</span></div>
        <div ng-if="cc.serverStatusAvailable()">
-           <div class="db-info"><span message-key="dc_databaseConnector.label.uptime"></span>: <span><i>{{cc.connection.uptime | momentFormatter : 'second' : 'fancy'}}</i></span></div>
+           <div class="db-info" ng-if="cc.connection.uptime!=null"><span message-key="dc_databaseConnector.label.uptime"></span>: <span><i>{{cc.connection.uptime | momentFormatter : 'second' : 'fancy'}}</i></span></div>
            <div class="db-info" ng-if="cc.connection.dbVersion!=null"><span message-key="dc_databaseConnector.label.version"></span>: <span>{{cc.connection.dbVersion}}</span></div>
        </div>
        <div ng-if="!cc.serverStatusAvailable()">
