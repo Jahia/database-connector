@@ -1,24 +1,12 @@
 (function() {
     window.jahia.i18n.loadNamespaces('database-connector');
 
-    var level = 'server';
-    var parentTarget = 'administration-server';
-
-    var cPath = '/administration/database-connector';
-    var routeId = 'database-connector';
-    window.jahia.uiExtender.registry.add('adminRoute', `${level}-${cPath.toLowerCase()}`, {
-        id: routeId,
-        targets: [`${parentTarget}-configuration:99`],
-        path: cPath,
-        route: routeId,
+    window.jahia.uiExtender.registry.add('adminRoute', 'database-connector', {
+        targets: ['administration-server-configuration:99'],
         // requiredPermission: 'admin',
-        defaultPath: cPath,
         icon: null,
         label: 'database-connector:label',
-        childrenTarget: null,
         isSelectable: true,
-        level: level
+        iframeUrl: window.contextJsParameters.contextPath + '/cms/adminframe/default/en/settings.database-connector.html?redirect=false'
     });
-
-    console.log('%c Database Connector is activated', 'color: #3c8cba');
 })();
