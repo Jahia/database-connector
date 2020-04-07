@@ -8,7 +8,7 @@
  * JAHIA'S ENTERPRISE DISTRIBUTIONS LICENSING - IMPORTANT INFORMATION
  * ==========================================================================================
  *
- *     Copyright (C) 2002-2019 Jahia Solutions Group. All rights reserved.
+ *     Copyright (C) 2002-2020 Jahia Solutions Group. All rights reserved.
  *
  *     This file is part of a Jahia's Enterprise Distribution.
  *
@@ -496,7 +496,7 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
                             }
                         }
                     }
-                } 
+                }
             } else {
                 logger.debug("\tNo Jahia Template Package found for bundle [" + bundle.getSymbolicName() + "]");
             }

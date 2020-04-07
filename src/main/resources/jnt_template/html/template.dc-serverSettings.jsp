@@ -35,7 +35,7 @@
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <p class="text-center jahia-admin-copyright"><fmt:message key="jahia.copyright" />&nbsp;<fmt:message key="jahia.company" /></p>
+            <p class="text-center jahia-admin-copyright" style="text-align: center; font-size: 10px"><fmt:message key="jahia.copyright" />&nbsp;<fmt:message key="jahia.company" /></p>
         </div>
     </div>
 </div>
