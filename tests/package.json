@@ -1,7 +1,7 @@
 {
-  "name": "database-connector",
+  "name": "cypress",
   "version": "1.0.0",
-  "description": "Database Connector",
+  "description": "cypress",
   "dependencies": {
     "jahia-cli": "0.0.33",
     "typescript": "^3.9.3",
@@ -10,24 +10,10 @@
   "devDependencies": {
     "@bahmutov/add-typescript-to-cypress": "^2.1.2",
     "@cypress/webpack-preprocessor": "^5.4.1",
-    "bower": "~1.7.10",
     "cypress": "^4.6.0",
-    "grunt": "^0.4.5",
-    "grunt-bower-concat": "^0.6.0",
-    "grunt-cli": "^0.1.13",
-    "grunt-contrib-concat": "^0.5.1",
-    "grunt-contrib-copy": "^0.8.2",
-    "grunt-contrib-jshint": "^0.12.0",
-    "grunt-contrib-less": "^1.2.0",
-    "grunt-contrib-uglify": "^0.11.1",
-    "grunt-contrib-watch": "^0.6.1",
-    "jsdoc": "^3.5.5",
-    "minami": "^1.1.1",
     "webpack": "^4.43.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "generate-docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose",
     "e2e:local": "cypress run --config integrationFolder=./cypress/e2e,video=false",
     "e2e:debug": "cypress open --config integrationFolder=./cypress/e2e"
   },

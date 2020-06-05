@@ -29,7 +29,7 @@ class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
     }
 
     verifyValidConnectionMessage() {
-        return super.getIframeElement("database-connector", this.elements.notification).should('contain', 'Connection verification was not successful!');
+        return super.getIframeElement("database-connector", this.elements.notification).should('contain', 'Connection verification was successful!');
     }
 
 

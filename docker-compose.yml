@@ -1,0 +1,59 @@
+version: '3.6'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
+    environment:
+      - discovery.type=single-node
+      - cluster.name=jahia-cluster
+    container_name: elasticsearch
+    ports:
+      - 9200:9200
+    networks:
+      stack:
+        ipv4_address: 172.16.1.30
+  jahia:
+    image: jahia/jahia-private:snapshot
+    container_name: jahia
+    environment:
+      - jahia_cfg_karaf_remoteShellHost=0.0.0.0
+    ports:
+      - 8080:8080
+      - 8101:8101
+    networks:
+      stack:
+        ipv4_address: 172.16.1.20
+    depends_on:
+      - elasticsearch
+  # Cypress container
+  cypress:
+    # the Docker image to use from https://github.com/cypress-io/cypress-docker-images
+    # image: "cypress/included:4.7.0"
+    build: tests
+    depends_on:
+      - jahia
+    environment:
+      # pass base url to test pointing at the web application
+      - CYPRESS_baseUrl=http://jahia:8080
+      - JAHIA_HOST=jahia
+      - JAHIA_PORT=8080
+      - NEXUS_USERNAME=****
+      - NEXUS_PASSWORD=****
+      - CYPRESS_screenshotsFolder=/results/${TAG}/screenshots
+      - CYPRESS_videosFolder=/results/${TAG}/videos
+    volumes: 
+      - type: bind
+        source: ./results
+        target: /results
+    # share the current folder as volume to avoid copying
+    # working_dir: /tmp
+    # volumes:
+    #   - ./:/tmp
+    networks:
+      - stack
+networks:
+  stack:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.1.0/24
