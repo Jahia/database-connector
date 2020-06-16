@@ -1,0 +1,7 @@
+connection {
+	type "ELASTICSEARCH"
+	host "badhost"
+	identifier "esImportConn1"
+	isConnected "true"
+	port "1234"
+}

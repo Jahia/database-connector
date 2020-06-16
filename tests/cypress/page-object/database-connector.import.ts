@@ -6,12 +6,16 @@ class DatabaseConnectorImport extends DatabaseConnectorBasePage {
     elements = {
         importBtn: "button[aria-label='Import']",
         importInput: "#importFileSelector",
-        notification: "md-toast"
+        performImport: "#performImport",
+        notification: "md-toast",
+        importResultsHeader: "message-key='dc_databaseConnector.label.modal.importResults'",
+        importedConnContainer: "md-list-item",
+        successStatusBar: ".successStatusBar"
     }
 
     importConnection(fileName: string) {
-        // this.getElementInIframe(this.elements.importBtn).click()
-        super.getIframeElement("database-connector", this.elements.importInput).attachFile("../resources/files/" + fileName, { force: true })
+        super.getElementInIframe(this.elements.importInput).attachFile(fileName, { force: true })
+        super.getElementInIframe(this.elements.performImport).click({force: true})
         return this
     }
 
@@ -23,6 +27,11 @@ class DatabaseConnectorImport extends DatabaseConnectorBasePage {
         return super.getIframeElement("database-connector", this.elements.notification).should('contain', 'All connections imported successfully!')
     }
 
+    verifyNumberOfImportedConnections(numberOfConnections: number) {
+        expect(super.getElementInIframe(this.elements.importResultsHeader).should('contain', 'Import Results'))
+        expect(super.getElementInIframe(this.elements.importedConnContainer).should('have.length', numberOfConnections))
+        expect(super.getElementInIframe(this.elements.successStatusBar).should('have.length', numberOfConnections))
+    }
 
 }
 export const databaseConnectorImport = new DatabaseConnectorImport()

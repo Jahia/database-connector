@@ -1,0 +1,31 @@
+connection {
+	type "ELASTICSEARCH7"
+	host "localhost"
+	identifier "esImportConn1"
+	isConnected "true"
+	port "9200"
+}
+
+connection {
+	type "ELASTICSEARCH7"
+	host "localhost"
+	identifier "esImportConn2"
+	isConnected "true"
+	port "9200"
+}
+
+connection {
+	type "ELASTICSEARCH7"
+	host "localhost"
+	identifier "esImportConn3"
+	isConnected "true"
+	port "9200"
+}
+
+connection {
+	type "ELASTICSEARCH7"
+	host "localhost"
+	identifier "esImportConn4"
+	isConnected "true"
+	port "9200"
+}
