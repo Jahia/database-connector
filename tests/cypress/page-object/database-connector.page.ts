@@ -32,7 +32,10 @@ class DatabaseConnectorPage extends DatabaseConnectorBasePage {
    */
   cleanUp() {
     this.getElementInIframe("md-card").each(card => {
-      //open context menu and click on delete
+        //API approach
+        // cy.request('DELETE', 'modules/dbconn/elasticsearch7/remove/esImportConn1')
+        //UI approach
+        //open context menu and click on delete
         card.find("button").click()
         this.contextMenu("delete")
 
@@ -49,12 +52,7 @@ class DatabaseConnectorPage extends DatabaseConnectorBasePage {
   contextMenu(action: string) {
     switch (action) {
       case 'delete':
-        this.getElementInIframe("md-menu-content")
-            .find("[message-key='dc_databaseConnector.label.delete']")
-            .click({timeout: 1000})
-
-        this.getElementInIframe("[message-key='dc_databaseConnector.label.delete']")
-            .should("not.be.visible")
+        this.getElementInIframe("[ng-click*='DeleteConnectionDialog']")
         this.deleteDialog(true)
         break
       case 'disconnect':
@@ -77,7 +75,7 @@ class DatabaseConnectorPage extends DatabaseConnectorBasePage {
 
   deleteDialog(confirmed: boolean) {
     if (confirmed) {
-      this.getElementInIframe(".md-dialog-content").find("[message-key='dc_databaseConnector.label.delete']").click({timeout: 2000})
+      this.getIframeElement("database-connector",".custom-confirm-dialog [message-key='dc_databaseConnector.label.delete']").click({force: true})
     } else {
       this.getElementInIframe(".md-dialog-content").find("[message-key='dc_databaseConnector.label.cancel']").click({timeout: 2000})
     }
