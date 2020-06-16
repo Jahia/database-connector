@@ -31,17 +31,22 @@ class DatabaseConnectorPage extends DatabaseConnectorBasePage {
    * delete all connections
    */
   cleanUp() {
-    this.getElementInIframe("md-card").each(card => {
-      //open context menu and click on delete
+    this.getElementInIframe("md-card").then((card) => {
+      if (card) {
+        //API approach
+        // cy.request('DELETE', 'modules/dbconn/elasticsearch7/remove/esImportConn1')
+        //UI approach
+        //open context menu and click on delete
         card.find("button").click()
         this.contextMenu("delete")
 
-        //check delete was successful
+        // //check delete was successful
         super.getIframeElement("database-connector", "md-toast").should('contain', 'Successfully deleted connection!')
+      }
     })
   }
 
-//---------------------------
+  //---------------------------
   /**
    * context menu of an existing connection
    * @param action - one of the options in the menu
@@ -49,37 +54,33 @@ class DatabaseConnectorPage extends DatabaseConnectorBasePage {
   contextMenu(action: string) {
     switch (action) {
       case 'delete':
-        this.getElementInIframe("md-menu-content")
-            .find("[message-key='dc_databaseConnector.label.delete']")
-            .click({timeout: 1000})
-
-        this.getElementInIframe("[message-key='dc_databaseConnector.label.delete']")
-            .should("not.be.visible")
+        this.getElementInIframe("[ng-click='cc.openDeleteConnectionDialog($event)']")
+          .click()
         this.deleteDialog(true)
         break
       case 'disconnect':
         //
-            break
+        break
       case 'edit':
         //
-            break
+        break
       case 'export':
         //
-            break
+        break
       case 'connection statistics':
         //
-            break
+        break
       default:
         console.error("the action: " + action + " does not exist in the context menu")
-            break
+        break
     }
   }
 
   deleteDialog(confirmed: boolean) {
     if (confirmed) {
-      this.getElementInIframe(".md-dialog-content").find("[message-key='dc_databaseConnector.label.delete']").click({timeout: 2000})
+      this.getIframeElement("database-connector",".custom-confirm-dialog [message-key='dc_databaseConnector.label.delete']").click()
     } else {
-      this.getElementInIframe(".md-dialog-content").find("[message-key='dc_databaseConnector.label.cancel']").click({timeout: 2000})
+      this.getElementInIframe(".md-dialog-content").find("[message-key='dc_databaseConnector.label.cancel']").click({ timeout: 2000 })
     }
   }
 

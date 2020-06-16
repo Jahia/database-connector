@@ -14,18 +14,18 @@ describe('import elastic search connections', () => {
             .verifyValidConnectionMessage()
     })
 
-    it('should fail to import connection', function () {
-        databaseConnector.goTo()
-        databaseConnectorImport.importConnection("badImportConn.txt")
-            .verifyInvalidConnectionMessage()
-    })
+    // it('should fail to import connection', function () {
+    //     databaseConnector.goTo()
+    //     databaseConnectorImport.importConnection("badImportConn.txt")
+    //         .verifyInvalidConnectionMessage()
+    // })
 
-    it('imports multiple connections successfully', function () {
-        databaseConnector.goTo()
-        databaseConnectorImport.importConnection("esMultipleConn.txt")
-            .verifyValidConnectionMessage()
+    // it('imports multiple connections successfully', function () {
+    //     databaseConnector.goTo()
+    //     databaseConnectorImport.importConnection("esMultipleConn.txt")
+    //         .verifyValidConnectionMessage()
 
-        databaseConnectorImport.verifyNumberOfImportedConnections(4)
-    })
+    //     databaseConnectorImport.verifyNumberOfImportedConnections(4)
+    // })
 
 })
