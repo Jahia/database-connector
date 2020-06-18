@@ -1,0 +1,21 @@
+version: '3.6'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
+    environment:
+      - discovery.type=single-node
+      - cluster.name=jahia-cluster
+    container_name: elasticsearch
+    ports:
+      - 9200:9200
+    extra_hosts:
+      - jahia:127.0.0.1
+  jahia:
+    image: jahia/jahia-private:snapshot
+    container_name: jahia
+    ports:
+      - 8080:8080
+    extra_hosts:
+      - jahia:127.0.0.1
+    depends_on:
+      - elasticsearch

@@ -1,0 +1,246 @@
+version: 2.1
+orbs:
+  docker: circleci/docker@0.5.20
+  # slack: circleci/slack@3.4.2
+  # cypress: cypress-io/cypress@1
+
+# Parameters are available to all elements of config.yml, these are accessible using `pipeline.parameters.PARAMETER`
+parameters:
+  testframework_directory:
+    type: string
+    default: 'tests/'
+
+references:
+  workdir: &workdir
+    working_directory: ~/source
+
+  persist-workspace: &persist-workspace
+    persist_to_workspace:
+      root: ~/source
+      paths:
+        - .
+
+  attach-workspace: &attach-workspace
+    attach_workspace:
+      at: .
+
+# Commands contains reusable actions used by jobs
+commands:
+  # This commands prepare the environment to run the integration tests
+  # This involved building containers or fetching previously built containers and starting docker-compose with those
+  warmup_on_machine:
+    description: 'In a machine environment, build and commit docker images'
+    parameters:
+      # Should we be building the container, even though the manifest didn't change?
+      # Note: By default, if the manifest changes, containers are rebuilt
+      force_build:
+        type: boolean
+        default: false
+      # Manifest file to use for the build
+      manifest:
+        type: string
+        default: warmup-manifest-build.yml
+    steps:
+      - run:
+          name: Printing job parameters and default host values
+          command: |
+            echo "build: << parameters.force_build >>"
+            echo "manifest: << parameters.manifest >>"
+            node -v
+            npm -v
+      - run:
+          name: Update packages list and install jq, build-essential, libssl-dev
+          command: |
+            sudo apt-get update
+            sudo apt-get install jq build-essential libssl-dev
+      - run:
+          # Instructions found here: https://discuss.circleci.com/t/nvm-does-not-change-node-version-on-machine/28973/14
+          name: Prepare NVM
+          command: |
+            echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+            echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run:
+          name: Install latest NVM
+          command: |
+            nvm install v12
+            nvm alias default v12
+      - run: |
+          node -v
+          npm -v
+      - run:
+          name: Install jahia-cli & yarn
+          command: npm install -g jahia-cli yarn jest
+      - run:
+          name: Fetch docker image names, force_build = << parameters.force_build >>
+          command: |
+            cd << pipeline.parameters.testframework_directory >>
+            if [ "<< parameters.force_build >>" == "true" ]; then
+              echo "Force building new containers"
+              jahia-cli docker:getimgname -b --manifest=./<< parameters.manifest >> --output=./docker-images.json
+            else
+              echo "Using existing containers (if they actually exists on docker hub, otherwise build)"
+              jahia-cli docker:getimgname --manifest=./<< parameters.manifest >> --output=./docker-images.json
+            fi
+      - run:
+          name: Preparing environment variables
+          command: |
+            cd << pipeline.parameters.testframework_directory >>
+            echo "export ELASTICSEARCH_IMAGE=`cat docker-images.json| jq -r '.[] | select(.name == "Elasticsearch") | .destination'`" >> $BASH_ENV
+            echo "export ELASTICSEARCH_ACTION=`cat docker-images.json| jq -r '.[] | select(.name == "Elasticsearch") | .action'`" >> $BASH_ENV
+            echo "export ELASTICSEARCH_COMMIT=`cat docker-images.json| jq -r '.[] | select(.name == "Elasticsearch") | .commit'`" >> $BASH_ENV
+            echo "export JAHIA_IMAGE=`cat docker-images.json| jq -r '.[] | select(.name == "Jahia") | .destination'`" >> $BASH_ENV
+            echo "export JAHIA_ACTION=`cat docker-images.json| jq -r '.[] | select(.name == "Jahia") | .action'`" >> $BASH_ENV
+            echo "export JAHIA_COMMIT=`cat docker-images.json| jq -r '.[] | select(.name == "Jahia") | .commit'`" >> $BASH_ENV
+      - run:
+          name: Verifying environment variables
+          command: |
+            echo "ELASTICSEARCH_IMAGE=${ELASTICSEARCH_IMAGE}"
+            echo "ELASTICSEARCH_ACTION=${ELASTICSEARCH_ACTION}"
+            echo "ELASTICSEARCH_COMMIT=${ELASTICSEARCH_COMMIT}"
+            echo "JAHIA_IMAGE=${JAHIA_IMAGE}"
+            echo "JAHIA_ACTION=${JAHIA_ACTION}"
+            echo "JAHIA_COMMIT=${JAHIA_COMMIT}"
+      - run:
+          name: Docker login
+          command: |
+            echo "$DOCKER_REGISTRY_USERNAME"
+            echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USERNAME" --password-stdin
+      - run:
+          name: Spin-up docker images (docker-compose up)
+          command: |
+            cd << pipeline.parameters.testframework_directory >>
+            docker-compose up -d
+      - run:
+          name: Wait for Jahia to be alive
+          command: jahia-cli alive
+      - run:
+          name: Configure Jahia (Conditional), check index, then wait for 30s before moving to the next step
+          command: |
+            cd << pipeline.parameters.testframework_directory >>
+            if [ "$JAHIA_ACTION" = "build" ]; then
+              sed -i -e "s/NEXUS_USERNAME/${NEXUS_USERNAME}/g" ./<< parameters.manifest >>
+              sed -i -e "s/NEXUS_PASSWORD/${NEXUS_PASSWORD}/g" ./<< parameters.manifest >>
+              jahia-cli manifest:run --manifest=./<< parameters.manifest >>
+            fi
+
+jobs:
+  # Checkout and Initializes the testing framework
+  initialize:
+    <<: *workdir
+    docker:
+      - image: circleci/node:latest
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v2-npm-{{ checksum "<< pipeline.parameters.testframework_directory >>yarn.lock" }}
+      - run:
+          name: Install dependencies
+          command: |
+            cd << pipeline.parameters.testframework_directory >>
+            yarn
+      - save_cache:
+          key: v2-npm-{{ checksum "<< pipeline.parameters.testframework_directory >>yarn.lock" }}
+          paths:
+            - << pipeline.parameters.testframework_directory >>node_modules
+      - *persist-workspace
+
+  # The initialize clone and yarn install
+  build:
+    <<: *workdir
+    docker: # run the steps with Docker
+      - image: circleci/openjdk:8-jdk-stretch
+    steps:
+      - *attach-workspace
+      - restore_cache:
+          keys:
+            - v3-dependencies-{{ checksum "pom.xml" }}
+      - run: mvn -s .circleci/.circleci.settings.xml clean install
+      # Built module is stored in: /home/circleci/source/repo/repo/api/target/augmented-search-1.0.1-SNAPSHOT.jar
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v3-dependencies-{{ checksum "pom.xml" }}
+      - run:
+          name: Prepare artifacts
+          command: |
+            mkdir /tmp/artifacts/
+            cp /home/circleci/source/api/target/*.jar /tmp/artifacts/
+            mkdir /home/circleci/source/build-dependencies/
+            cp -r ~/.m2/repository/org/jahia/modules/database-connector /home/circleci/source/build-dependencies/
+            cp -r ~/.m2/repository/org/jahia/modules/elasticsearch-connector-7 /home/circleci/source/build-dependencies/
+      - store_artifacts:
+          path: /tmp/artifacts/
+      - *persist-workspace
+
+  # Running the warmup stage
+  integration_tests:
+    <<: *workdir
+    machine:
+      image: ubuntu-1604:201903-01
+    # Available types: medium, large, xlarge, 2xlarge https://circleci.com/docs/2.0/configuration-reference/#machine-executor-linux
+    resource_class: xlarge
+    parameters:
+      # Should we be building the container, even though the manifest didn't change?
+      # Note: By default, if the manifest changes, containers are rebuilt
+      force_build:
+        type: boolean
+        default: false
+      # Manifest file to use for the build
+      manifest:
+        type: string
+        default: warmup-manifest-build.yml
+      # Milestone used in Testrail
+      testrail_milestone:
+        type: string
+        default: Default
+      # Javascript file containing a list of the tests to be executed
+      test_filter:
+        type: string
+        default: ./src/filters/all.js
+    steps:
+      - *attach-workspace
+      - warmup_on_machine:
+          force_build: << parameters.force_build >>
+          manifest: << parameters.manifest >>
+      - run:
+          name: Yarn
+          command: |
+            cd << pipeline.parameters.testframework_directory >>
+            yarn
+      - run:
+          name: Wait for search to be working
+          command: jahia-cli search:check
+      - run:
+          name: Install JUnit coverage reporter
+          command: |
+            cd << pipeline.parameters.testframework_directory >>
+            yarn add --dev jest-junit
+      - run:
+          name: Run tests
+          command: |
+            cd << pipeline.parameters.testframework_directory >>
+            mkdir -p ./results/$TAG/screenshots ./results/$TAG/videos
+            yarn e2e
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: 'reports/junit/js-test-results.xml'
+      - store_test_results:
+          path: ./results
+
+workflows:
+  version: 2
+  on-code-change:
+    jobs:
+      - initialize
+      - build:
+          context: QA_ENVIRONMENT
+          requires:
+            - initialize
+      - integration_tests:
+          name: 'Int. Tests - Jahia Latest - Built modules'
+          requires:
+            - build
+            - initialize
+          context: QA_ENVIRONMENT
+          force_build: true
+          manifest: warmup-manifest-build.yml
