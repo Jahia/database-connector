@@ -19,5 +19,4 @@ services:
       - jahia:127.0.0.1
     depends_on:
       - elasticsearch
-
-      ##
+      

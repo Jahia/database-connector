@@ -69,7 +69,7 @@ commands:
           npm -v
       - run:
           name: Install jahia-cli & yarn
-          command: npm install -g jahia-cli yarn jest
+          command: npm install -g jahia-cli
       - run:
           name: Fetch docker image names, force_build = << parameters.force_build >>
           command: |
@@ -81,25 +81,6 @@ commands:
               echo "Using existing containers (if they actually exists on docker hub, otherwise build)"
               jahia-cli docker:getimgname --manifest=./<< parameters.manifest >> --output=./docker-images.json
             fi
-      - run:
-          name: Preparing environment variables
-          command: |
-            cd << pipeline.parameters.testframework_directory >>
-            echo "export ELASTICSEARCH_IMAGE=`cat docker-images.json| jq -r '.[] | select(.name == "Elasticsearch") | .destination'`" >> $BASH_ENV
-            echo "export ELASTICSEARCH_ACTION=`cat docker-images.json| jq -r '.[] | select(.name == "Elasticsearch") | .action'`" >> $BASH_ENV
-            echo "export ELASTICSEARCH_COMMIT=`cat docker-images.json| jq -r '.[] | select(.name == "Elasticsearch") | .commit'`" >> $BASH_ENV
-            echo "export JAHIA_IMAGE=`cat docker-images.json| jq -r '.[] | select(.name == "Jahia") | .destination'`" >> $BASH_ENV
-            echo "export JAHIA_ACTION=`cat docker-images.json| jq -r '.[] | select(.name == "Jahia") | .action'`" >> $BASH_ENV
-            echo "export JAHIA_COMMIT=`cat docker-images.json| jq -r '.[] | select(.name == "Jahia") | .commit'`" >> $BASH_ENV
-      - run:
-          name: Verifying environment variables
-          command: |
-            echo "ELASTICSEARCH_IMAGE=${ELASTICSEARCH_IMAGE}"
-            echo "ELASTICSEARCH_ACTION=${ELASTICSEARCH_ACTION}"
-            echo "ELASTICSEARCH_COMMIT=${ELASTICSEARCH_COMMIT}"
-            echo "JAHIA_IMAGE=${JAHIA_IMAGE}"
-            echo "JAHIA_ACTION=${JAHIA_ACTION}"
-            echo "JAHIA_COMMIT=${JAHIA_COMMIT}"
       - run:
           name: Docker login
           command: |
