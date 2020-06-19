@@ -8,6 +8,9 @@ parameters:
   slack_channel:
     type: string
     default: '#cci-database-connector'
+  testframework_directory:
+    type: string
+    default: 'tests/'
 
 references:
   workdir: &workdir
