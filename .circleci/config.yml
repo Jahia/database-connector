@@ -44,7 +44,7 @@ jobs:
             - v1-dependencies-{{ checksum "pom.xml" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-      - run: mvn -s .circleci/.circleci.settings.xml clean install
+      # - run: mvn -s .circleci/.circleci.settings.xml clean install
       # Built module is stored in: /home/circleci/source/target/database-connector-SNAPSHOT.jar
       - save_cache:
           paths:
@@ -79,6 +79,45 @@ jobs:
           include_visit_job_action: true
           mentions: "channel"
 
+  integration_tests:
+    <<: *workdir
+    machine:
+      image: ubuntu-1604:201903-01
+    # Available types: medium, large, xlarge, 2xlarge https://circleci.com/docs/2.0/configuration-reference/#machine-executor-linux
+    resource_class: xlarge
+    parameters:
+      # Should we be building the container, even though the manifest didn't change?
+      # Note: By default, if the manifest changes, containers are rebuilt
+      force_build:
+        type: boolean
+        default: false
+      # Manifest file to use for the build
+      manifest:
+        type: string
+        default: warmup-manifest-build.yml
+      # Milestone used in Testrail
+      # testrail_milestone:
+      #   type: string
+      #   default: Default
+    steps:
+      - *attach-workspace
+      - warmup_on_machine:
+          force_build: << parameters.force_build >>
+          manifest: << parameters.manifest >>
+      - run:
+          name: Yarn
+          command: |
+            cd << pipeline.parameters.testframework_directory >>
+            yarn
+      - run:
+          name: Run tests
+          command: |
+            cd << pipeline.parameters.testframework_directory >>
+            mkdir -p ./results/$TAG/screenshots ./results/$TAG/videos
+            yarn e2e
+      - store_test_results:
+          path: ./results
+
 workflows:
   version: 2
   on-code-change:
@@ -96,3 +135,11 @@ workflows:
             branches:
               only:
                 - master
+      - integration_tests:
+          name: 'Int. Tests - Jahia Latest - Built modules'
+          requires:
+            - build
+            - initialize
+          context: QA_ENVIRONMENT
+          force_build: true
+          manifest: warmup-manifest-build.yml
