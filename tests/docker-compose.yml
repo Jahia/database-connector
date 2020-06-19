@@ -19,4 +19,28 @@ services:
       - jahia:127.0.0.1
     depends_on:
       - elasticsearch
-      
+  # Cypress container
+  cypress:
+    # the Docker image to use from https://github.com/cypress-io/cypress-docker-images
+    # image: "cypress/included:4.7.0"
+    build: tests
+    depends_on:
+      - jahia
+    environment:
+      # pass base url to test pointing at the web application
+      - CYPRESS_baseUrl=http://jahia:8080
+      - NEXUS_USERNAME=${NEXUS_USERNAME}
+      - NEXUS_PASSWORD=${NEXUS_PASSWORD}
+      - MANIFEST=${MANIFEST}
+      - CYPRESS_screenshotsFolder=/results/${TAG}/screenshots
+      - CYPRESS_videosFolder=/results/${TAG}/videos
+    volumes: 
+      - type: bind
+        source: ./results
+        target: /results
+    # share the current folder as volume to avoid copying
+    # working_dir: /tmp
+    # volumes:
+    #   - ./:/tmp
+    networks:
+      - stack
