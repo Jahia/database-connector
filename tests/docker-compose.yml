@@ -23,7 +23,7 @@ services:
   cypress:
     # the Docker image to use from https://github.com/cypress-io/cypress-docker-images
     # image: "cypress/included:4.7.0"
-    build: tests
+    build: .
     depends_on:
       - jahia
     environment:
@@ -42,5 +42,3 @@ services:
     # working_dir: /tmp
     # volumes:
     #   - ./:/tmp
-    networks:
-      - stack
