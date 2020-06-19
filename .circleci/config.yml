@@ -8,7 +8,7 @@ parameters:
   slack_channel:
     type: string
     default: '#cci-database-connector'
-  testframework_directory:
+    testframework_directory:
     type: string
     default: 'tests/'
 
@@ -81,6 +81,83 @@ jobs:
           include_project_field: true
           include_visit_job_action: true
           mentions: "channel"
+
+# This involved building containers or fetching previously built containers and starting docker-compose with those
+  warmup_on_machine:
+    description: 'In a machine environment, build and commit docker images'
+    parameters:
+      # Should we be building the container, even though the manifest didn't change?
+      # Note: By default, if the manifest changes, containers are rebuilt
+      force_build:
+        type: boolean
+        default: false
+      # Manifest file to use for the build
+      manifest:
+        type: string
+        default: warmup-manifest-build.yml
+    steps:
+      - run:
+          name: Printing job parameters and default host values
+          command: |
+            echo "build: << parameters.force_build >>"
+            echo "manifest: << parameters.manifest >>"
+            node -v
+            npm -v
+      - run:
+          name: Update packages list and install jq, build-essential, libssl-dev
+          command: |
+            sudo apt-get update
+            sudo apt-get install jq build-essential libssl-dev
+      - run:
+          # Instructions found here: https://discuss.circleci.com/t/nvm-does-not-change-node-version-on-machine/28973/14
+          name: Prepare NVM
+          command: |
+            echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+            echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run:
+          name: Install latest NVM
+          command: |
+            nvm install v12
+            nvm alias default v12
+      - run: |
+          node -v
+          npm -v
+      - run:
+          name: Install jahia-cli & yarn
+          command: npm install -g jahia-cli
+      - run:
+          name: Fetch docker image names, force_build = << parameters.force_build >>
+          command: |
+            cd << pipeline.parameters.testframework_directory >>
+            if [ "<< parameters.force_build >>" == "true" ]; then
+              echo "Force building new containers"
+              jahia-cli docker:getimgname -b --manifest=./<< parameters.manifest >> --output=./docker-images.json
+            else
+              echo "Using existing containers (if they actually exists on docker hub, otherwise build)"
+              jahia-cli docker:getimgname --manifest=./<< parameters.manifest >> --output=./docker-images.json
+            fi
+      - run:
+          name: Docker login
+          command: |
+            echo "$DOCKER_REGISTRY_USERNAME"
+            echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USERNAME" --password-stdin
+      - run:
+          name: Spin-up docker images (docker-compose up)
+          command: |
+            cd << pipeline.parameters.testframework_directory >>
+            docker-compose up -d
+      - run:
+          name: Wait for Jahia to be alive
+          command: jahia-cli alive
+      - run:
+          name: Configure Jahia (Conditional), check index, then wait for 30s before moving to the next step
+          command: |
+            cd << pipeline.parameters.testframework_directory >>
+            if [ "$JAHIA_ACTION" = "build" ]; then
+              sed -i -e "s/NEXUS_USERNAME/${NEXUS_USERNAME}/g" ./<< parameters.manifest >>
+              sed -i -e "s/NEXUS_PASSWORD/${NEXUS_PASSWORD}/g" ./<< parameters.manifest >>
+              jahia-cli manifest:run --manifest=./<< parameters.manifest >>
+            fi
 
   integration_tests:
     <<: *workdir
