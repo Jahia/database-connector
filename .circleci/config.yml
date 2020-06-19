@@ -101,8 +101,8 @@ workflows:
       #       - initialize
       - publish:
           context: QA_ENVIRONMENT
-          requires:
-            - build
+          # requires:
+          #   - build
           filters:
             branches:
               only:
