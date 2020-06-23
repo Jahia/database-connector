@@ -90,7 +90,7 @@ jobs:
     docker: # run the steps with Docker
       - image: circleci/openjdk:8-jdk-stretch
     steps:
-      - *attach-workspace
+      # - *attach-workspace
       - restore_cache:
           keys:
             - v1-dependencies-2-{{ checksum "pom.xml" }}
