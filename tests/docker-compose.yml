@@ -21,9 +21,8 @@ services:
       - elasticsearch
   # Cypress container
   cypress:
-    # the Docker image to use from https://github.com/cypress-io/cypress-docker-images
-    # image: "cypress/included:4.7.0"
     build: .
+    container_name: e2e-tests
     depends_on:
       - jahia
     environment:
