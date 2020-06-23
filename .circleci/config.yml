@@ -85,24 +85,24 @@ jobs:
       # - *persist-workspace
 
   # publish to nexus only after merging to master
-  publish:
-    <<: *workdir
-    docker: # run the steps with Docker
-      - image: circleci/openjdk:8-jdk-stretch
-    steps:
-      # - *attach-workspace
-      # - restore_cache:
-      #     keys:
-      #       - v1-dependencies-2-{{ checksum "pom.xml" }}
-      #       # fallback to using the latest cache if no exact match is found
-      #       - v1-dependencies-
-      - run: mvn -s .circleci/.circleci.settings.xml clean install deploy
-      - slack/status:
-          channel: << pipeline.parameters.slack_channel >>
-          fail_only: true
-          include_project_field: true
-          include_visit_job_action: true
-          mentions: "channel"
+  # publish:
+  #   <<: *workdir
+  #   docker: # run the steps with Docker
+  #     - image: circleci/openjdk:8-jdk-stretch
+  #   steps:
+  #     # - *attach-workspace
+  #     # - restore_cache:
+  #     #     keys:
+  #     #       - v1-dependencies-2-{{ checksum "pom.xml" }}
+  #     #       # fallback to using the latest cache if no exact match is found
+  #     #       - v1-dependencies-
+  #     - run: mvn -s .circleci/.circleci.settings.xml clean install deploy
+  #     - slack/status:
+  #         channel: << pipeline.parameters.slack_channel >>
+  #         fail_only: true
+  #         include_project_field: true
+  #         include_visit_job_action: true
+  #         mentions: "channel"
 
 workflows:
   version: 2
@@ -113,14 +113,14 @@ workflows:
       #     context: QA_ENVIRONMENT
       #     requires:
       #       - initialize
-      - publish:
-          context: QA_ENVIRONMENT
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - master
+      # - publish:
+      #     context: QA_ENVIRONMENT
+      #     requires:
+      #       - build
+      #     filters:
+      #       branches:
+      #         only:
+      #           - master
       - test:
           context: QA_ENVIRONMENT
           requires:
