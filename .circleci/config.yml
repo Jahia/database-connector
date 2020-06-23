@@ -39,11 +39,11 @@ jobs:
       - image: circleci/openjdk:8-jdk-stretch
     steps:
       # - *attach-workspace
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+      # - restore_cache:
+      #     keys:
+      #       - v1-dependencies-{{ checksum "pom.xml" }}
+      #       # fallback to using the latest cache if no exact match is found
+      #       - v1-dependencies-
       - run: mvn -s .circleci/.circleci.settings.xml clean install
       # Built module is stored in: /home/circleci/source/target/database-connector-SNAPSHOT.jar
       - save_cache:
@@ -65,11 +65,11 @@ jobs:
       docker_layer_caching: true    # default - false
     steps:
       # - *attach-workspace
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+      # - restore_cache:
+      #     keys:
+      #       - v1-dependencies-{{ checksum "pom.xml" }}
+      #       # fallback to using the latest cache if no exact match is found
+      #       - v1-dependencies-
       - run:
           name: Docker login
           command: |
@@ -91,11 +91,11 @@ jobs:
       - image: circleci/openjdk:8-jdk-stretch
     steps:
       # - *attach-workspace
-      - restore_cache:
-          keys:
-            - v1-dependencies-2-{{ checksum "pom.xml" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+      # - restore_cache:
+      #     keys:
+      #       - v1-dependencies-2-{{ checksum "pom.xml" }}
+      #       # fallback to using the latest cache if no exact match is found
+      #       - v1-dependencies-
       - run: mvn -s .circleci/.circleci.settings.xml clean install deploy
       - slack/status:
           channel: << pipeline.parameters.slack_channel >>
