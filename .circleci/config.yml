@@ -109,10 +109,10 @@ workflows:
   on-code-change:
     jobs:
       - initialize
-      - build:
-          context: QA_ENVIRONMENT
-          requires:
-            - initialize
+      # - build:
+      #     context: QA_ENVIRONMENT
+      #     requires:
+      #       - initialize
       - publish:
           context: QA_ENVIRONMENT
           requires:
@@ -125,4 +125,4 @@ workflows:
           context: QA_ENVIRONMENT
           requires:
             - initialize
-            - build
+            # - build
