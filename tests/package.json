@@ -1,5 +1,5 @@
 {
-  "name": "cypress",
+  "name": "database-connector-cypress",
   "version": "1.0.0",
   "description": "cypress",
   "dependencies": {
