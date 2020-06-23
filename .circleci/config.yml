@@ -97,12 +97,12 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
       - run: mvn -s .circleci/.circleci.settings.xml clean install deploy
-      # - slack/status:
-      #     channel: << pipeline.parameters.slack_channel >>
-      #     fail_only: true
-      #     include_project_field: true
-      #     include_visit_job_action: true
-      #     mentions: "channel"
+      - slack/status:
+          channel: << pipeline.parameters.slack_channel >>
+          fail_only: true
+          include_project_field: true
+          include_visit_job_action: true
+          mentions: "channel"
 
 workflows:
   version: 2

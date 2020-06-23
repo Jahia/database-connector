@@ -7,7 +7,7 @@ if [[ $MANIFEST == "" ]]; then
   echo " == No Warmup manifest provided, using: ${MANIFEST}"
 fi
 
-echo " == Waiting for Jahia to startup"
+echo " == Waiting for Jahia to startup http://${JAHIA_HOST}:${JAHIA_PORT}"
 jahia-cli alive --jahiaAdminUrl=http://${JAHIA_HOST}:${JAHIA_PORT}
 
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
