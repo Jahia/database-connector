@@ -28,6 +28,8 @@ services:
       - jahia
     environment:
       # pass base url to test pointing at the web application
+      - JAHIA_HOST=jahia
+      - JAHIA_PORT=8080
       - CYPRESS_baseUrl=http://jahia:8080
       - NEXUS_USERNAME=${NEXUS_USERNAME}
       - NEXUS_PASSWORD=${NEXUS_PASSWORD}
