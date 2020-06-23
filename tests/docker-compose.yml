@@ -39,7 +39,3 @@ services:
       - type: bind
         source: ./results
         target: /results
-    # share the current folder as volume to avoid copying
-    # working_dir: /tmp
-    # volumes:
-    #   - ./:/tmp
