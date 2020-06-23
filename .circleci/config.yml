@@ -79,7 +79,8 @@ jobs:
           name: Execute tests
           command : |
             cd tests
-            docker-compose up
+            mkdir -p ./results/$TAG/screenshots ./results/$TAG/videos
+            docker-compose up --abort-on-container-exit
       - store_artifacts:
           path: ./results
       - *persist-workspace
