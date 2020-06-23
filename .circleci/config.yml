@@ -80,7 +80,7 @@ jobs:
           command : |
             cd tests
             docker-compose up
-      - store_test_results:
+      - store_artifacts:
           path: ./results
       - *persist-workspace
 
