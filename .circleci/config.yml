@@ -81,7 +81,7 @@ jobs:
             cd tests
             docker-compose up --abort-on-container-exit
       - store_artifacts:
-          path: ./results
+          path: ./tests/results
       - *persist-workspace
 
   # publish to nexus only after merging to master
