@@ -12,7 +12,7 @@ class DatabaseConnectorPage extends DatabaseConnectorBasePage {
   }
 
   goTo() {
-    cy.goTo('/jahia/administration/database-connector')
+    cy.goTo('/cms/adminframe/default/en/settings.database-connector.html')
   }
 
   clickOnCreateNewConnection() {
