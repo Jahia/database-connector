@@ -7,14 +7,16 @@ services:
       - cluster.name=jahia-cluster
     container_name: elasticsearch
     ports:
-      - 9200:9200
+      - "9200:9200"
     extra_hosts:
       - jahia:127.0.0.1
   jahia:
     image: jahia/jahia-private:snapshot
     container_name: jahia
+    environment:
+      - jahia_cfg_karaf_remoteShellHost=0.0.0.0
     ports:
-      - 8080:8080
+      - "8080:8080"
     extra_hosts:
       - jahia:127.0.0.1
     depends_on:
