@@ -13,15 +13,15 @@ references:
   workdir: &workdir
     working_directory: ~/source
 
-  # persist-workspace: &persist-workspace
-  #   persist_to_workspace:
-  #     root: ~/source
-  #     paths:
-  #       - .
+  persist-workspace: &persist-workspace
+    persist_to_workspace:
+      root: ~/source
+      paths:
+        - .
 
-  # attach-workspace: &attach-workspace
-  #   attach_workspace:
-  #     at: .
+  attach-workspace: &attach-workspace
+    attach_workspace:
+      at: .
 
 jobs:
   # The initialize clone and mvn install
@@ -31,19 +31,19 @@ jobs:
       - image: circleci/openjdk:8-jdk-stretch
     steps:
       - checkout
-      # - *persist-workspace
+      - *persist-workspace
 
   build:
     <<: *workdir
     docker: # run the steps with Docker
       - image: circleci/openjdk:8-jdk-stretch
     steps:
-      # - *attach-workspace
-      # - restore_cache:
-      #     keys:
-      #       - v1-dependencies-{{ checksum "pom.xml" }}
-      #       # fallback to using the latest cache if no exact match is found
-      #       - v1-dependencies-
+      - *attach-workspace
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
       - run: mvn -s .circleci/.circleci.settings.xml clean install
       # Built module is stored in: /home/circleci/source/target/database-connector-SNAPSHOT.jar
       - save_cache:
@@ -57,20 +57,19 @@ jobs:
             cp /home/circleci/source/target/*.jar /tmp/artifacts/
       - store_artifacts:
           path: /tmp/artifacts/
-      # - *persist-workspace
+      - *persist-workspace
 
   test:
     <<: *workdir
     machine:
       docker_layer_caching: true    # default - false
     steps:
-      # - *attach-workspace
-      # - restore_cache:
-      #     keys:
-      #       - v1-dependencies-{{ checksum "pom.xml" }}
-      #       # fallback to using the latest cache if no exact match is found
-      #       - v1-dependencies-
-      - checkout
+      - *attach-workspace
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
       - run:
           name: Docker login
           command: |
@@ -83,47 +82,47 @@ jobs:
             docker-compose up --abort-on-container-exit
       - store_artifacts:
           path: ./results
-      # - *persist-workspace
+      - *persist-workspace
 
   # publish to nexus only after merging to master
-  # publish:
-  #   <<: *workdir
-  #   docker: # run the steps with Docker
-  #     - image: circleci/openjdk:8-jdk-stretch
-  #   steps:
-  #     # - *attach-workspace
-  #     # - restore_cache:
-  #     #     keys:
-  #     #       - v1-dependencies-2-{{ checksum "pom.xml" }}
-  #     #       # fallback to using the latest cache if no exact match is found
-  #     #       - v1-dependencies-
-  #     - run: mvn -s .circleci/.circleci.settings.xml clean install deploy
-  #     - slack/status:
-  #         channel: << pipeline.parameters.slack_channel >>
-  #         fail_only: true
-  #         include_project_field: true
-  #         include_visit_job_action: true
-  #         mentions: "channel"
+  publish:
+    <<: *workdir
+    docker: # run the steps with Docker
+      - image: circleci/openjdk:8-jdk-stretch
+    steps:
+      - *attach-workspace
+      - restore_cache:
+          keys:
+            - v1-dependencies-2-{{ checksum "pom.xml" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: mvn -s .circleci/.circleci.settings.xml clean install deploy
+      - slack/status:
+          channel: << pipeline.parameters.slack_channel >>
+          fail_only: true
+          include_project_field: true
+          include_visit_job_action: true
+          mentions: "channel"
 
 workflows:
   version: 2
   on-code-change:
     jobs:
       - initialize
-      # - build:
-      #     context: QA_ENVIRONMENT
-      #     requires:
-      #       - initialize
-      # - publish:
-      #     context: QA_ENVIRONMENT
-      #     requires:
-      #       - build
-      #     filters:
-      #       branches:
-      #         only:
-      #           - master
+      - build:
+          context: QA_ENVIRONMENT
+          requires:
+            - initialize
+      - publish:
+          context: QA_ENVIRONMENT
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
       - test:
           context: QA_ENVIRONMENT
           requires:
             - initialize
-            # - build
+            - build
