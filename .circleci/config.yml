@@ -82,6 +82,8 @@ jobs:
             cd tests
             docker-compose up --abort-on-container-exit
             docker logs e2e-tests | grep -w "All specs passed!"
+          environment:
+            PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
       - store_artifacts:
           path: ./tests/results
       - *persist-workspace
