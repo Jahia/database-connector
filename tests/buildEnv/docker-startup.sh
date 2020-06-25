@@ -21,5 +21,5 @@ echo "Jahia was updated"
 sleep 5
 
 echo "Run cypress tests"
-yarn cypress run --headless --browser chrome
+yarn cypress run
 echo "Tests Done"

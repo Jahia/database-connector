@@ -19,7 +19,7 @@ class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
         // this.checkbox(this.elements.enableConnection, true)
         super.getElementInIframe(this.elements.host).type(host)
         super.getElementInIframe(this.elements.port).clear().type(port)
-        super.getElementInIframe(this.elements.id).type(id)
+        super.getElementInIframe(this.elements.id).type(id).should('contain', id)
         super.getElementInIframe(this.elements.createButton).click()
         return this
     }
