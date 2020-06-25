@@ -21,8 +21,7 @@ echo "/tmp/buildEnv/${MANIFEST}"
 jahia-cli manifest:run --manifest=/tmp/buildEnv/${MANIFEST} --jahiaAdminUrl=http://${JAHIA_HOST}:${JAHIA_PORT}
 END_BUILD=$(($SECONDS - $INT_TIME))
 echo " == Jahia was updated in ${END_BUILD} seconds"
-echo "sleep 30 seconds"
-sleep 30
+sleep 5
 
 echo "Run cypress tests"
 yarn cypress run
