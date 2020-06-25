@@ -37,6 +37,7 @@ services:
       - MANIFEST=${MANIFEST}
       - CYPRESS_screenshotsFolder=/results/screenshots
       - CYPRESS_videosFolder=/results/videos
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
     volumes: 
       - type: bind
         source: ./results
