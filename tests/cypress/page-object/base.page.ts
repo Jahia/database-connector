@@ -14,7 +14,7 @@ export class BasePage {
      * returns the body of the iframe
      * @param iframeSrc - src attribute of the iframe
      */
-    getIframeBody(iframeSrc: string, timeout = 30000) {
+    getIframeBody(iframeSrc: string, timeout = 60000) {
         // get the iframe > document > body
         // and retry until the body element is not empty
         return cy
@@ -33,7 +33,7 @@ export class BasePage {
      * @param iframeSrc - src attribute of the iframe
      * @param elementSelector - the element's locator
      */
-    getIframeElement(iframeSrc: string, elementSelector: string, timeout = 30000) {
+    getIframeElement(iframeSrc: string, elementSelector: string, timeout = 60000) {
         return cy
             .get(`iframe[src*="${iframeSrc}"]`, { timeout: timeout })
             .should($iframe => {
