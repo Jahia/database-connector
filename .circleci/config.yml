@@ -41,15 +41,15 @@ jobs:
       - *attach-workspace
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}
+            - v4-dependencies-{{ checksum "pom.xml" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - v4-dependencies-
       - run: mvn -s .circleci/.circleci.settings.xml clean install
       # Built module is stored in: /home/circleci/source/target/database-connector-SNAPSHOT.jar
       - save_cache:
           paths:
             - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}
+          key: v4-dependencies-{{ checksum "pom.xml" }}
       - run:
           name: Prepare artifacts
           command: |
@@ -67,9 +67,9 @@ jobs:
       - *attach-workspace
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}
+            - v4-dependencies-{{ checksum "pom.xml" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - v4-dependencies-
       - run:
           name: Docker login
           command: |
@@ -93,9 +93,9 @@ jobs:
       - *attach-workspace
       - restore_cache:
           keys:
-            - v1-dependencies-2-{{ checksum "pom.xml" }}
+            - v4-dependencies-2-{{ checksum "pom.xml" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - v4-dependencies-
       - run: mvn -s .circleci/.circleci.settings.xml clean install deploy
       - slack/status:
           channel: << pipeline.parameters.slack_channel >>
