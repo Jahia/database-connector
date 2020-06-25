@@ -20,7 +20,7 @@ class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
         super.getElementInIframe(this.elements.host).type(host)
         super.getElementInIframe(this.elements.port).clear().type(port)
         super.getElementInIframe(this.elements.id).type(id)
-        cy.wait(1000)
+        cy.wait(100)
         super.getElementInIframe(this.elements.createButton).click()
         return this
     }
