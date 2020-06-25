@@ -78,6 +78,7 @@ jobs:
       - run:
           name: Execute tests
           command : |
+            set -e
             cd tests
             docker-compose up --abort-on-container-exit
       - store_artifacts:
