@@ -20,6 +20,8 @@ class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
         super.getElementInIframe(this.elements.host).type(host)
         super.getElementInIframe(this.elements.port).clear().type(port)
         super.getElementInIframe(this.elements.id).type(id)
+        // necessary for run on circleci. Fancier and more complicated workaround can be done
+        // but this is so small i'm leaving it as is
         cy.wait(100)
         super.getElementInIframe(this.elements.createButton).click()
         return this

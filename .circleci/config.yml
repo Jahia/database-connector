@@ -41,15 +41,15 @@ jobs:
       - *attach-workspace
       - restore_cache:
           keys:
-            - v4-dependencies-{{ checksum "pom.xml" }}
+            - v1-dependencies-{{ checksum "pom.xml" }}
             # fallback to using the latest cache if no exact match is found
-            - v4-dependencies-
+            - v1-dependencies-
       - run: mvn -s .circleci/.circleci.settings.xml clean install
       # Built module is stored in: /home/circleci/source/target/database-connector-SNAPSHOT.jar
       - save_cache:
           paths:
             - ~/.m2
-          key: v4-dependencies-{{ checksum "pom.xml" }}
+          key: v1-dependencies-{{ checksum "pom.xml" }}
       - run:
           name: Prepare artifacts
           command: |
@@ -62,14 +62,14 @@ jobs:
   test:
     <<: *workdir
     machine:
-      docker_layer_caching: false    # default - false
+      docker_layer_caching: true    # default - false
     steps:
       - *attach-workspace
       - restore_cache:
           keys:
-            - v4-dependencies-{{ checksum "pom.xml" }}
+            - v1-dependencies-{{ checksum "pom.xml" }}
             # fallback to using the latest cache if no exact match is found
-            - v4-dependencies-
+            - v1-dependencies-
       - run:
           name: Docker login
           command: |
@@ -84,6 +84,7 @@ jobs:
             docker logs e2e-tests | grep -w "All specs passed!"
           environment:
             PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+            MANIFEST: "warmup-manifest-snapshot.yml"
       - store_artifacts:
           path: ./tests/results
       - *persist-workspace
@@ -97,9 +98,9 @@ jobs:
       - *attach-workspace
       - restore_cache:
           keys:
-            - v4-dependencies-2-{{ checksum "pom.xml" }}
+            - v1-dependencies-2-{{ checksum "pom.xml" }}
             # fallback to using the latest cache if no exact match is found
-            - v4-dependencies-
+            - v1-dependencies-
       - run: mvn -s .circleci/.circleci.settings.xml clean install deploy
       - slack/status:
           channel: << pipeline.parameters.slack_channel >>
@@ -125,8 +126,16 @@ workflows:
             branches:
               only:
                 - master
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 1 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - initialize
+      - build
       - test:
           context: QA_ENVIRONMENT
-          requires:
-            - initialize
-            - build

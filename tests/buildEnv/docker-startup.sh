@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 MANIFEST=$1
-export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 if [[ $MANIFEST == "" ]]; then
   MANIFEST="warmup-manifest-snapshot.yml"
   echo " == No Warmup manifest provided, using: ${MANIFEST}"
