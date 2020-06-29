@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
+    image: "docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION}"
     environment:
       - discovery.type=single-node
       - cluster.name=jahia-cluster
@@ -11,7 +11,7 @@ services:
     extra_hosts:
       - jahia:127.0.0.1
   jahia:
-    image: jahia/jahia-private:snapshot
+    image: "jahia/${JAHIA_VERSION}"
     container_name: jahia
     environment:
       - jahia_cfg_karaf_remoteShellHost=0.0.0.0
