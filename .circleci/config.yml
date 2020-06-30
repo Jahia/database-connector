@@ -59,6 +59,23 @@ jobs:
           path: /tmp/artifacts/
       - *persist-workspace
 
+  lint:
+    <<: *workdir
+    machine:
+      docker_layer_caching: true    # default - false
+    steps:
+      - *attach-workspace
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: Docker login
+          command: |
+            cd tests
+            yarn lint
+
   test:
     <<: *workdir
     machine:
@@ -118,6 +135,9 @@ workflows:
           context: QA_ENVIRONMENT
           requires:
             - initialize
+      - lint:
+          requires:
+            - build
       - publish:
           context: QA_ENVIRONMENT
           requires:
