@@ -1,11 +1,10 @@
 export class BasePage {
-
     /**
      * finds and element inside an iframe
      * getIframeBody will get overwritten by inheriting classes
-     * @param locator 
+     * @param locator
      */
-    getElementInIframe(locator: string) {
+    getElementInIframe(locator: string): Cypress.Chainable {
         return this.getIframeBody('').find(locator)
     }
 
@@ -14,16 +13,19 @@ export class BasePage {
      * returns the body of the iframe
      * @param iframeSrc - src attribute of the iframe
      */
-    getIframeBody(iframeSrc: string, timeout = 60000) {
+    getIframeBody(iframeSrc: string, timeout = 60000): Cypress.Chainable {
         // get the iframe > document > body
         // and retry until the body element is not empty
-        return cy
-            .get(`iframe[src*="${iframeSrc}"]`, { timeout: timeout })
-            .its('0.contentDocument.body').should('not.be.empty')
-            // wraps "body" DOM element to allow
-            // chaining more Cypress commands, like ".find(...)"
-            // https://on.cypress.io/wrap
-            .then(cy.wrap)
+        return (
+            cy
+                .get(`iframe[src*="${iframeSrc}"]`, { timeout: timeout })
+                .its('0.contentDocument.body')
+                .should('not.be.empty')
+                // wraps "body" DOM element to allow
+                // chaining more Cypress commands, like ".find(...)"
+                // https://on.cypress.io/wrap
+                .then(cy.wrap)
+        )
     }
 
     /**
@@ -33,15 +35,14 @@ export class BasePage {
      * @param iframeSrc - src attribute of the iframe
      * @param elementSelector - the element's locator
      */
-    getIframeElement(iframeSrc: string, elementSelector: string, timeout = 60000) {
+    getIframeElement(iframeSrc: string, elementSelector: string, timeout = 60000): Cypress.Chainable {
         return cy
             .get(`iframe[src*="${iframeSrc}"]`, { timeout: timeout })
-            .should($iframe => {
+            .should(($iframe) => {
                 expect($iframe.contents().find(elementSelector)).to.exist
             })
-            .then($iframe => {
+            .then(($iframe) => {
                 return cy.wrap($iframe.contents().find(elementSelector))
             })
     }
-
 }

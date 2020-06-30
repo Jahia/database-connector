@@ -1,7 +1,6 @@
-import { DatabaseConnectorBasePage } from "./database-connector.base.page"
+import { DatabaseConnectorBasePage } from './database-connector.base.page'
 
 class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
-
     elements = {
         elasticsearch: "[src*='elasticsearch']",
         enableConnection: "[ng-model*='isConnected']",
@@ -11,7 +10,7 @@ class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
         createButton: "[ng-click*='createElasticSearchConnection']",
         testButton: "[ng-click*='testElasticSearchConnection()']",
         backButton: "[ng-click*='cancel()']",
-        notification: "md-toast"
+        notification: 'md-toast',
     }
 
     createNewElasticSearchConnection(host: string, port: string, id: string) {
@@ -29,13 +28,15 @@ class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
     }
 
     verifyInvalidConnectionMessage() {
-        return super.getIframeElement("database-connector", this.elements.notification).should('contain', 'Connection is invalid!');
+        return super
+            .getIframeElement('database-connector', this.elements.notification)
+            .should('contain', 'Connection is invalid!')
     }
 
     verifyValidConnectionMessage() {
-        return super.getIframeElement("database-connector", this.elements.notification).should('contain', 'Connection verification was successful!');
+        return super
+            .getIframeElement('database-connector', this.elements.notification)
+            .should('contain', 'Connection verification was successful!')
     }
-
-
 }
 export const databaseConnectorPopup = new DatabaseConnectorPopupPage()

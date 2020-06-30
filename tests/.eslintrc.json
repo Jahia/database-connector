@@ -5,6 +5,9 @@
         "cypress"
     ],
     "extends": [
-        "plugin:cypress/recommended"
+        "plugin:cypress/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "prettier/@typescript-eslint",
+        "plugin:prettier/recommended"
     ]
 }
