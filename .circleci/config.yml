@@ -59,7 +59,65 @@ jobs:
           path: /tmp/artifacts/
       - *persist-workspace
 
-    # publish to nexus only after merging to master
+  lint:
+    docker:
+      - image: circleci/node:14.3
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ .Branch }}-{{ checksum "tests/yarn.lock" }}
+            - yarn-packages-{{ .Branch }}
+            - yarn-packages-master
+            - yarn-packages-
+      - run:
+          name: Install Dependencies
+          command: |
+            cd tests
+            yarn install
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ .Branch }}-{{ checksum "tests/yarn.lock" }}
+          paths:
+            - tests/node_modules/
+      - run:
+          name: Check code formatting
+          command: |
+            cd tests
+            yarn lint
+
+  test:
+    <<: *workdir
+    machine:
+      docker_layer_caching: true    # default - false
+    steps:
+      - *attach-workspace
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: Docker login
+          command: |
+            echo "$DOCKER_REGISTRY_USERNAME"
+            echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USERNAME" --password-stdin
+      - run:
+          name: Execute tests
+          command : |
+            set -e
+            cd tests
+            docker-compose up --abort-on-container-exit
+            docker logs e2e-tests | grep -w "All specs passed!"
+          environment:
+            PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+            MANIFEST: "warmup-manifest-snapshot.yml"
+      - store_artifacts:
+          path: ./tests/results
+      - *persist-workspace
+
+  # publish to nexus only after merging to master
   publish:
     <<: *workdir
     docker: # run the steps with Docker
@@ -88,6 +146,9 @@ workflows:
           context: QA_ENVIRONMENT
           requires:
             - initialize
+      - lint:
+          requires:
+            - build
       - publish:
           context: QA_ENVIRONMENT
           requires:
@@ -96,4 +157,16 @@ workflows:
             branches:
               only:
                 - master
-
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 1 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - initialize
+      - build
+      - test:
+          context: QA_ENVIRONMENT

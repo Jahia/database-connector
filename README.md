@@ -13,3 +13,9 @@ This module is required to use elasticsearch-connector or elasticsearch-connecto
 
 You can set up a connection by going to Administration -> Configuration -> Database connector. Click on "plus" button and 
 fill out the form.
+
+#### Running End-to-End tests
+
+You can execute End-to-End tests locally by navigating to the tests folder and executing `docker-compose up -d`. This will start and set up Jahia, Elastic Search and cypress containers.
+The cypress container will exit once it's done executing the tests but the Jahia and Elastic Search containers will remain.
+At this point you can run the tests locally by executing `yarn e2e` or if you'd like to have the Cypress interface `yarn e2e:debug`
