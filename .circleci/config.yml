@@ -67,21 +67,25 @@ jobs:
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
-            - yarn-packages-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-{{ .Branch }}-{{ checksum "tests/yarn.lock" }}
             - yarn-packages-{{ .Branch }}
             - yarn-packages-master
             - yarn-packages-
       - run:
           name: Install Dependencies
-          command: yarn install
+          command: |
+            cd tests
+            yarn install
       - save_cache:
           name: Save Yarn Package Cache
-          key: yarn-packages-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: yarn-packages-{{ .Branch }}-{{ checksum "tests/yarn.lock" }}
           paths:
-            - node_modules/
+            - tests/node_modules/
       - run:
           name: Check code formatting
-          command: yarn lint
+          command: |
+            cd tests
+            yarn lint
 
   test:
     <<: *workdir
