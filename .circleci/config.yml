@@ -60,21 +60,28 @@ jobs:
       - *persist-workspace
 
   lint:
-    <<: *workdir
-    machine:
-      docker_layer_caching: true    # default - false
+    docker:
+      - image: circleci/node:10.14
     steps:
-      - *attach-workspace
+      - checkout
       - restore_cache:
+          name: Restore Yarn Package Cache
           keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - yarn-packages-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-{{ .Branch }}
+            - yarn-packages-master
+            - yarn-packages-
       - run:
-          name: Docker login
-          command: |
-            cd tests
-            yarn lint
+          name: Install Dependencies
+          command: yarn install
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules/
+      - run:
+          name: Check code formatting
+          command: yarn lint
 
   test:
     <<: *workdir
