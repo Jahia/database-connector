@@ -2,6 +2,6 @@
     "baseUrl": "http://localhost:8080",
     "chromeWebSecurity": false,
     "failOnStatusCode": false,
-    "defaultCommandTimeout": 60000,
+    "defaultCommandTimeout": 30000,
     "videoUploadOnPasses": false
 }
