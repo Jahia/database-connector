@@ -16,6 +16,8 @@ src/main/resources/javascript/angular
 src/main/resources/javascript/angular/components
 src/main/resources/css/lib/_dc.css
 src/main/resources/javascript/lib
+cypress/screenshots
+cypress/videos
 # OS generated files #
 ######################
 .DS_Store?

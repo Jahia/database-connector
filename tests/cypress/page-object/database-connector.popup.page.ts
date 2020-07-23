@@ -8,6 +8,7 @@ class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
         port: "input[name='port']",
         id: "input[name='id']",
         createButton: "[ng-click*='createElasticSearchConnection']",
+        updateButton: "[ng-click*='editElasticSearchConnection']",
         testButton: "[ng-click*='testElasticSearchConnection()']",
         backButton: "[ng-click*='cancel()']",
         notification: 'md-toast',
@@ -27,10 +28,33 @@ class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
         return this
     }
 
+    editElasticSearchConnection(host: string, port: string) {
+        super.getElementInIframe(this.elements.host).clear().type(host)
+        super.getElementInIframe(this.elements.port).clear().type(port)
+        cy.wait(100)
+        super.getElementInIframe(this.elements.updateButton).click()
+        return this
+    }
+
+    cancelEditConnection() {
+        super.getElementInIframe(this.elements.backButton).click()
+    }
+
+    verifyElementIsreadOnly() {
+        super.getElementInIframe(this.elements.id).should('have.attr','readOnly', 'readonly')
+        return this
+    }
+
     verifyInvalidConnectionMessage() {
         return super
             .getIframeElement('database-connector', this.elements.notification)
             .should('contain', 'Connection is invalid!')
+    }
+
+    verifyFailedConnectionMessage() {
+        return super
+            .getIframeElement('database-connector', this.elements.notification)
+            .should('contain', 'Connection verification failed!')
     }
 
     verifyValidConnectionMessage() {
