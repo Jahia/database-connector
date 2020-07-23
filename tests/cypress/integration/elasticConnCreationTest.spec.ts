@@ -1,6 +1,10 @@
 import { databaseConnector } from '../page-object/database-connector.page'
 
 describe('elastic search test', () => {
+    afterEach(() => {
+        databaseConnector.cleanUp()
+    })
+
     it('creates a new connection successfully', function () {
         databaseConnector.goTo()
         databaseConnector
