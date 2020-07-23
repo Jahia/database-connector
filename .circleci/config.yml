@@ -167,6 +167,11 @@ workflows:
                 - master
     jobs:
       - initialize
-      - build
+      - build:
+          context: QA_ENVIRONMENT
+          requires:
+            - initialize
       - test:
           context: QA_ENVIRONMENT
+          requires:
+            - build
