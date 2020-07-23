@@ -4,26 +4,40 @@
   "description": "cypress",
   "devDependencies": {
     "@bahmutov/add-typescript-to-cypress": "^2.1.2",
+    "@cypress/code-coverage": "^3.8.1",
     "@cypress/webpack-preprocessor": "^5.4.1",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@typescript-eslint/eslint-plugin": "^3.5.0",
     "@typescript-eslint/parser": "^3.5.0",
+    "babel-plugin-istanbul": "^6.0.0",
     "cypress": "^4.6.0",
     "eslint": "^7.3.1",
-    "eslint-plugin-cypress": "^2.11.1",
     "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-cypress": "^2.11.1",
     "eslint-plugin-prettier": "^3.1.4",
     "husky": "^4.2.5",
+    "istanbul-lib-coverage": "^3.0.0",
     "jahia-cli": "0.0.33",
     "lint-staged": "^10.2.11",
+    "nyc": "^15.1.0",
     "prettier": "^2.0.5",
+    "source-map-support": "^0.5.19",
+    "ts-node": "^8.10.2",
     "typescript": "^3.9.3",
     "webpack": "^4.43.0",
     "yarn": "^1.22.4"
   },
   "scripts": {
+    "instrument": "nyc instrument --compact=false cypress instrumented",
     "e2e": "cypress run",
+    "e2e:ci": "yarn instrument && yarn cypress run --config integrationFolder=instrumented/integration && yarn nyc report --reporter=html --report-dir=./results/coverage && yarn nyc report",
     "e2e:debug": "cypress open",
     "lint": "eslint . -c .eslintrc.json --ext .ts"
+  },
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": true,
+    "include": ["cypress/integration", "cypress/page-object"]
   },
   "husky": {
     "hooks": {
