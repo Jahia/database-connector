@@ -1,39 +1,39 @@
 import { databaseConnector } from '../page-object/database-connector.page'
 
 describe('elastic search test', () => {
+    let connId
 
-    var connId;
-
-    before(('Create connection'), function (){
-        connId = 'augm-search-conn'+ Date.now().toString();
+    before('Create connection', function () {
+        connId = 'augm-search-conn' + Date.now().toString()
         databaseConnector.goTo()
-        databaseConnector
-            .clickOnCreateNewConnection()
-            .createNewElasticSearchConnection('elasticsearch', '9200', connId )
+        databaseConnector.clickOnCreateNewConnection().createNewElasticSearchConnection('myHost', '9201', connId)
     })
 
-    after(('Delete connection'), function (){
+    after('Delete connection', function () {
+        databaseConnector.goTo()
+        databaseConnector.clickOnDeleteConnection(connId).confirmDeleteConnection()
+    })
+
+    it('edit a new connection with error', function () {
         databaseConnector.goTo()
         databaseConnector
-            .clickOnDeleteConnection(connId)
-            .confirmDeleteConnection()
+            .clickOnEditConnection(connId)
+            .editElasticSearchConnection('mynewhost', '9202')
+            .verifyFailedConnectionMessage()
+        databaseConnector.verifyConnectionExists('mynewhost', '9202', connId)
     })
 
     it('edit a new connection successfully', function () {
         databaseConnector.goTo()
         databaseConnector
             .clickOnEditConnection(connId)
-            .editElasticSearchConnection("myNewHost","9201")
-            .verifyFailedConnectionMessage()
-        databaseConnector.verifyConnectionExists('myNewHost', '9201', connId)
+            .editElasticSearchConnection('elasticsearch', '9200')
+            .verifyValidConnectionMessage()
+        databaseConnector.verifyConnectionExists('elasticsearch', '9200', connId)
     })
 
     it('check id cannot be edited', function () {
         databaseConnector.goTo()
-        databaseConnector
-            .clickOnEditConnection(connId)
-            .verifyElementIsreadOnly()
-            .cancelEditConnection()
+        databaseConnector.clickOnEditConnection(connId).verifyElementIsreadOnly().cancelEditConnection()
     })
-
 })
