@@ -53,7 +53,7 @@ export class BasePage {
      * @param type of content to find
      * @param text to find
      */
-    getByText(type:string, text:string){
-        return this.getIframeBody('').contains(type, text);
+    getByText(type: string, text: string) {
+        return cy.contains(type, text)
     }
 }

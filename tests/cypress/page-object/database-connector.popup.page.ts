@@ -15,52 +15,64 @@ class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
     }
 
     createNewElasticSearchConnection(host: string, port: string, id: string) {
-        super.getElementInIframe(this.elements.elasticsearch).click()
-        // this.checkbox(this.elements.enableConnection, true)
-        super.getElementInIframe(this.elements.host).type(host)
-        super.getElementInIframe(this.elements.port).clear().type(port)
-        super.getElementInIframe(this.elements.id).type(id)
+        cy.get(this.elements.elasticsearch).click()
+        this.fillElasticSearchConnection(host, port)
+        cy.get(this.elements.id).type(id)
         // necessary for run on circleci. Fancier and more complicated workaround can be done
         // but this is so small i'm leaving it as is
         // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(100)
-        super.getElementInIframe(this.elements.createButton).click()
+        cy.get(this.elements.createButton).click()
         return this
     }
 
-    editElasticSearchConnection(host: string, port: string) {
-        super.getElementInIframe(this.elements.host).clear().type(host)
-        super.getElementInIframe(this.elements.port).clear().type(port)
+    /**
+     * Updating the connection with a host, port or both
+     * @param host
+     * @param port
+     */
+    editElasticSearchConnection(host = '', port = '') {
+        this.fillElasticSearchConnection(host, port)
+        // necessary for run on circleci. Fancier and more complicated workaround can be done
+        // but this is so small i'm leaving it as is
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(100)
-        super.getElementInIframe(this.elements.updateButton).click()
+        cy.get(this.elements.updateButton).click()
         return this
+    }
+
+    fillElasticSearchConnection(host = '', port = '') {
+        if (host != '') {
+            cy.get(this.elements.host).clear()
+            // Only way it works consistently
+            // eslint-disable-next-line cypress/no-unnecessary-waiting
+            cy.wait(100)
+            cy.get(this.elements.host).type(host)
+        }
+        if (port != '') {
+            cy.get(this.elements.port).clear().type(port)
+        }
     }
 
     cancelEditConnection() {
-        super.getElementInIframe(this.elements.backButton).click()
+        cy.get(this.elements.backButton).click()
     }
 
     verifyElementIsreadOnly() {
-        super.getElementInIframe(this.elements.id).should('have.attr','readOnly', 'readonly')
+        cy.get(this.elements.id).should('have.attr', 'readOnly', 'readonly')
         return this
     }
 
     verifyInvalidConnectionMessage() {
-        return super
-            .getIframeElement('database-connector', this.elements.notification)
-            .should('contain', 'Connection is invalid!')
+        return cy.get(this.elements.notification).should('contain', 'Connection is invalid!')
     }
 
     verifyFailedConnectionMessage() {
-        return super
-            .getIframeElement('database-connector', this.elements.notification)
-            .should('contain', 'Connection verification failed!')
+        return cy.get(this.elements.notification).should('contain', 'Connection verification failed!')
     }
 
     verifyValidConnectionMessage() {
-        return super
-            .getIframeElement('database-connector', this.elements.notification)
-            .should('contain', 'Connection verification was successful!')
+        return cy.get(this.elements.notification).should('contain', 'Connection verification was successful!')
     }
 }
 export const databaseConnectorPopup = new DatabaseConnectorPopupPage()

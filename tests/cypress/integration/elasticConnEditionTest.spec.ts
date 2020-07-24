@@ -1,17 +1,16 @@
 import { databaseConnector } from '../page-object/database-connector.page'
 
 describe('elastic search test', () => {
-    let connId
+    let connId: string
 
-    before('Create connection', function () {
+    beforeEach('Create connection', function () {
         connId = 'augm-search-conn' + Date.now().toString()
         databaseConnector.goTo()
         databaseConnector.clickOnCreateNewConnection().createNewElasticSearchConnection('myHost', '9201', connId)
     })
 
-    after('Delete connection', function () {
-        databaseConnector.goTo()
-        databaseConnector.clickOnDeleteConnection(connId).confirmDeleteConnection()
+    afterEach('Delete connection', function () {
+        databaseConnector.cleanUp()
     })
 
     it('edit a new connection with error', function () {
