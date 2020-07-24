@@ -41,6 +41,18 @@ class DatabaseConnectorPage extends DatabaseConnectorBasePage {
         cy.get(this.elements.host).parent().should('contain', host)
         cy.get(this.elements.port).parent().should('contain', port)
     }
+
+    createConnection(host: string, port: string, id: string) {
+        cy.request('POST', 'modules/dbconn/elasticsearch7/add', {
+            port: port,
+            isConnected: true,
+            host: host,
+            id: id,
+            user: '',
+            password: '',
+        })
+    }
+
     /**
      * delete all connections
      */

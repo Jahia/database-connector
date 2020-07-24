@@ -5,8 +5,7 @@ describe('elastic search test', () => {
 
     beforeEach('Create connection', function () {
         connId = 'augm-search-conn' + Date.now().toString()
-        databaseConnector.goTo()
-        databaseConnector.clickOnCreateNewConnection().createNewElasticSearchConnection('myHost', '9201', connId)
+        databaseConnector.createConnection('myHost', '9201', connId)
     })
 
     afterEach('Delete connection', function () {
