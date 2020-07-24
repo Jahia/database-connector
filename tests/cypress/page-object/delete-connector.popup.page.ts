@@ -5,9 +5,8 @@ class DeleteConnectorPopupPage extends DatabaseConnectorBasePage {
         confirmDeleteButton: "[ng-click*='dcp.deleteConnection']",
     }
 
-    confirmDeleteConnection(){
+    confirmDeleteConnection() {
         super.getElementInIframe(this.elements.confirmDeleteButton).click()
     }
-
 }
 export const deleteConnectorPopup = new DeleteConnectorPopupPage()
