@@ -121,7 +121,7 @@ jobs:
           command : |
             set -e
             docker pull vladislavradan/testrail_cypress_reporter
-            docker run -v tests:/tmp/tests vladislavradan/testrail_cypress_reporter
+            docker run -v tests:/tmp/tests -e TESTRAIL_URL=$TESTRAIL_URL -e TESTRAIL_USERNAME=$TESTRAIL_USERNAME -e TESTRAIL_PASSWORD=$TESTRAIL_PASSWORD vladislavradan/testrail_cypress_reporter
           https://jahia.testrail.net:
             TESTRAIL_URL: $TESTRAIL_URL
             TESTRAIL_USERNAME: $TESTRAIL_USERNAME
