@@ -116,6 +116,12 @@ jobs:
       - store_artifacts:
           path: ./tests/results
       - *persist-workspace
+      - run:
+          name: Testrail reporter
+          command : |
+            set -e
+            docker pull vladislavradan/testrail_cypress_reporter
+            docker run -v tests:/tmp/tests vladislavradan/testrail_cypress_reporter
 
   # publish to nexus only after merging to master
   publish:
@@ -147,6 +153,10 @@ workflows:
           requires:
             - initialize
       - lint:
+          requires:
+            - build
+      - test:
+          context: QA_ENVIRONMENT
           requires:
             - build
       - publish:

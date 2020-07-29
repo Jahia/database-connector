@@ -27,7 +27,7 @@ describe('elastic search test', () => {
             .clickOnEditConnection(connId)
             .editElasticSearchConnection('elasticsearch', '9200')
             .verifyValidConnectionMessage()
-        databaseConnector.verifyConnectionExists('elasticsearch', '9200', connId)
+        databaseConnector.verifyConnectionExists('elasticsearch', '9300', connId)
     })
 
     it('check id cannot be edited', function () {
