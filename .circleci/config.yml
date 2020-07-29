@@ -90,7 +90,7 @@ jobs:
   test:
     <<: *workdir
     machine:
-      docker_layer_caching: true    # default - false
+      docker_layer_caching: false    # default - false
     steps:
       - *attach-workspace
       - restore_cache:
@@ -113,8 +113,6 @@ jobs:
           environment:
             PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
             MANIFEST: "warmup-manifest-snapshot.yml"
-      - store_artifacts:
-          path: ./tests/results
       - run:
           when: always
           name: Testrail reporter
@@ -126,6 +124,8 @@ jobs:
             TESTRAIL_URL: $TESTRAIL_URL
             TESTRAIL_USERNAME: $TESTRAIL_USERNAME
             TESTRAIL_PASSWORD: $TESTRAIL_PASSWORD
+      - store_artifacts:
+          path: ./tests/results
       - *persist-workspace
 
   # publish to nexus only after merging to master
