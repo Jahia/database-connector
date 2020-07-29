@@ -115,8 +115,8 @@ jobs:
             MANIFEST: "warmup-manifest-snapshot.yml"
       - store_artifacts:
           path: ./tests/results
-      - *persist-workspace
       - run:
+          when: always
           name: Testrail reporter
           command : |
             set -e
@@ -126,6 +126,7 @@ jobs:
             TESTRAIL_URL: $TESTRAIL_URL
             TESTRAIL_USERNAME: $TESTRAIL_USERNAME
             TESTRAIL_PASSWORD: $TESTRAIL_PASSWORD
+      - *persist-workspace
 
   # publish to nexus only after merging to master
   publish:
