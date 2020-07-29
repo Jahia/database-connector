@@ -22,3 +22,4 @@ sleep 5
 echo "Run cypress tests"
 yarn e2e:ci
 echo "Tests Done"
+sleep 300
