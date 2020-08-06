@@ -12,19 +12,25 @@
     "babel-plugin-istanbul": "^6.0.0",
     "cypress": "^4.6.0",
     "cypress-file-upload": "^4.0.7",
+    "diff": "^4.0.2",
     "eslint": "^7.3.1",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-cypress": "^2.11.1",
     "eslint-plugin-prettier": "^3.1.4",
+    "he": "^1.2.0",
     "husky": "^4.2.5",
     "istanbul-lib-coverage": "^3.0.0",
     "jahia-cli": "0.0.33",
     "lint-staged": "^10.2.11",
+    "ms": "^2.1.2",
     "nyc": "^15.1.0",
+    "path": "^0.12.7",
     "prettier": "^2.0.5",
     "source-map-support": "^0.5.19",
+    "supports-color": "^7.1.0",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.3",
+    "util": "^0.12.3",
     "webpack": "^4.43.0",
     "yarn": "^1.22.4"
   },
@@ -38,7 +44,10 @@
   "nyc": {
     "extends": "@istanbuljs/nyc-config-typescript",
     "all": true,
-    "include": ["cypress/integration", "cypress/page-object"]
+    "include": [
+      "cypress/integration",
+      "cypress/page-object"
+    ]
   },
   "husky": {
     "hooks": {
