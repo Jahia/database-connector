@@ -114,7 +114,13 @@ jobs:
             PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
             MANIFEST: "warmup-manifest-snapshot.yml"
       - store_artifacts:
-          path: /results
+          path: ./results
+      - run:
+          name: Publish results to testrail
+          when: always
+          command: |
+            set +e
+            npx jahia-testrail-reporter results $TESTRAIL_USERNAME $TESTRAIL_PASSWORD -n="Database Connector" -m="Jahia-Latest" -d="This test was executed on circleci, $CIRCLE_BUILD_URL"
       - *persist-workspace
 
   publish_results:
