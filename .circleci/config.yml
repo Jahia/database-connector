@@ -120,7 +120,8 @@ jobs:
           when: always
           command: |
             set +e
-            npx jahia-testrail-reporter results $TESTRAIL_USERNAME $TESTRAIL_PASSWORD -n="Database Connector" -m="Jahia-Latest" -d="This test was executed on circleci, $CIRCLE_BUILD_URL"
+            npm install -g jahia-testrail-reporter
+            jahia-testrail-reporter results $TESTRAIL_USERNAME $TESTRAIL_PASSWORD -n="Database Connector" -m="Jahia-Latest" -d="This test was executed on circleci, $CIRCLE_BUILD_URL"
       - *persist-workspace
 
   publish_results:
