@@ -114,8 +114,20 @@ jobs:
             PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
             MANIFEST: "warmup-manifest-snapshot.yml"
       - store_artifacts:
-          path: ./tests/results
+          path: /results
       - *persist-workspace
+
+  publish_results:
+    docker:
+      - image: circleci/node:14.3
+    steps:
+      - *attach-workspace
+      - run:
+          name: Publish results to testrail
+          command: |
+            set -o errexit
+            npx jahia-testrail-reporter results $TESTRAIL_USERNAME $TESTRAIL_PASSWORD -n="Database Connector" -m="Jahia-Latest" -d="This test was executed on circleci, $CIRCLE_BUILD_URL" 
+            set -o errexit
 
   # publish to nexus only after merging to master
   publish:
@@ -149,6 +161,14 @@ workflows:
       - lint:
           requires:
             - build
+      - test:
+          context: QA_ENVIRONMENT
+          requires:
+            - build
+      - publish_results:
+          context: QA_ENVIRONMENT
+          requires:
+            - test
       - publish:
           context: QA_ENVIRONMENT
           requires:
