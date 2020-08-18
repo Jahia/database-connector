@@ -115,7 +115,7 @@ jobs:
             PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
             MANIFEST: "warmup-manifest-snapshot.yml"
       - store_artifacts:
-          path: ./results
+          path: ./tests/results
       - run:
           name: Publish results to testrail
           when: always
@@ -126,20 +126,8 @@ jobs:
             nvm install v12
             nvm alias default v12
             npm install -g jahia-testrail-reporter
-            jahia-testrail-reporter results $TESTRAIL_USERNAME $TESTRAIL_PASSWORD -n="Database Connector" -m="Jahia-Latest" -d="This test was executed on circleci, $CIRCLE_BUILD_URL"
+            jahia-testrail-reporter /tests/results $TESTRAIL_USERNAME $TESTRAIL_PASSWORD -n="Database Connector" -m="Jahia-Latest" -d="This test was executed on circleci, $CIRCLE_BUILD_URL"
       - *persist-workspace
-
-  publish_results:
-    docker:
-      - image: circleci/node:14.3
-    steps:
-      - *attach-workspace
-      - run:
-          name: Publish results to testrail
-          command: |
-            set -o errexit
-            npx jahia-testrail-reporter results $TESTRAIL_USERNAME $TESTRAIL_PASSWORD -n="Database Connector" -m="Jahia-Latest" -d="This test was executed on circleci, $CIRCLE_BUILD_URL" 
-            set -o errexit
 
   # publish to nexus only after merging to master
   publish:
