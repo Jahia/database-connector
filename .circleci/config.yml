@@ -165,10 +165,6 @@ workflows:
           context: QA_ENVIRONMENT
           requires:
             - build
-      - publish_results:
-          context: QA_ENVIRONMENT
-          requires:
-            - test
       - publish:
           context: QA_ENVIRONMENT
           requires:
