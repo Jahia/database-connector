@@ -20,6 +20,5 @@ echo "Jahia was updated"
 sleep 5
 
 echo "Run cypress tests"
-cd tests
 yarn e2e:ci
 echo "Tests Done"
