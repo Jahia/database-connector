@@ -91,7 +91,7 @@ jobs:
   test:
     <<: *workdir
     machine:
-      docker_layer_caching: true    # default - false
+      docker_layer_caching: false    # default - false
     steps:
       - *attach-workspace
       - restore_cache:
