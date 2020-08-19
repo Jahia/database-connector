@@ -78,7 +78,7 @@ function JSONReporter(runner, options) {
             console.log("An error occured while writing JSON Object to File.");
             return console.log(err);
         }
-    
+        console.log(__dirname)
         console.log(fileName+".json" +" file has been saved.");
     });
   });
