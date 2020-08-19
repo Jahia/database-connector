@@ -35,9 +35,7 @@ services:
       - NEXUS_USERNAME=${NEXUS_USERNAME}
       - NEXUS_PASSWORD=${NEXUS_PASSWORD}
       - MANIFEST=${MANIFEST}
-      - CYPRESS_screenshotsFolder=/results/screenshots
-      - CYPRESS_videosFolder=/results/videos
     volumes: 
       - type: bind
         source: ./results
-        target: /results
+        target: /tmp/results

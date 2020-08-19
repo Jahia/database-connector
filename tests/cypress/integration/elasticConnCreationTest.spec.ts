@@ -1,6 +1,6 @@
 import { databaseConnector } from '../page-object/database-connector.page'
 
-describe('elastic search test', () => {
+describe('elastic search connection creation test', () => {
     afterEach(() => {
         databaseConnector.cleanUp()
     })
@@ -11,6 +11,6 @@ describe('elastic search test', () => {
             .clickOnCreateNewConnection()
             .createNewElasticSearchConnection('elasticsearch', '9200', 'augmented-search-conn')
             .verifyValidConnectionMessage()
-        databaseConnector.verifyConnectionExists('elasticsearch', '9201', 'augmented-search-conn')
+        databaseConnector.verifyConnectionExists('elasticsearch', '9200', 'augmented-search-conn')
     })
 })

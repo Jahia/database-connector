@@ -37,7 +37,7 @@
   "scripts": {
     "instrument": "nyc instrument --compact=false cypress instrumented",
     "e2e": "cypress run",
-    "e2e:ci": "yarn instrument && yarn cypress run --config integrationFolder=./instrumented/integration && yarn nyc report --reporter=html --report-dir=/results/coverage && yarn nyc report",
+    "e2e:ci": "yarn instrument && yarn cypress run --config integrationFolder=./instrumented/integration && yarn nyc report --reporter=html --report-dir=./results/coverage && yarn nyc report",
     "e2e:debug": "cypress open",
     "lint": "eslint . -c .eslintrc.json --ext .ts"
   },

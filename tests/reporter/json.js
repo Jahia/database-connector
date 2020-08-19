@@ -73,7 +73,7 @@ function JSONReporter(runner, options) {
       console.log("Failed to write to report")
       return
     };
-    fs.writeFile("/results/" + fileName+".json", JSON.stringify(obj, null, 2), 'utf8', function (err) {
+    fs.writeFile("./results/" + fileName+".json", JSON.stringify(obj, null, 2), 'utf8', function (err) {
         if (err) {
             console.log("An error occured while writing JSON Object to File.");
             return console.log(err);

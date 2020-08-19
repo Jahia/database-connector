@@ -4,5 +4,7 @@
     "failOnStatusCode": false,
     "defaultCommandTimeout": 30000,
     "videoUploadOnPasses": false,
-    "reporter": "reporter/json.js"
+    "reporter": "reporter/json.js",
+    "screenshotsFolder": "./results/screenshots",
+    "videosFolder": "/results/videos"
 }
