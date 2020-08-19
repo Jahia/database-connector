@@ -65,13 +65,20 @@ function JSONReporter(runner, options) {
     };
 
     runner.testResults = obj;
-    var fileName = tests[0].parent.parent.file.split("/").pop()
-    fs.writeFile("results/" + fileName+".json", JSON.stringify(obj, null, 2), 'utf8', function (err) {
+    if (tests.length !== 0){
+      var fileName = tests[0].parent.parent.file.split("/").pop()
+    } else if (failures.length !== 0){
+      var fileName = failures[0].parent.parent.file.split("/").pop()
+    } else {
+      console.log("Failed to write to report")
+      return
+    };
+    fs.writeFile("./results/" + fileName+".json", JSON.stringify(obj, null, 2), 'utf8', function (err) {
         if (err) {
             console.log("An error occured while writing JSON Object to File.");
             return console.log(err);
         }
-     
+    
         console.log(fileName+".json" +" file has been saved.");
     });
   });
