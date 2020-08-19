@@ -126,8 +126,6 @@ jobs:
             nvm install v12
             nvm alias default v12
             npm install -g jahia-testrail-reporter
-            ls ./tests
-            ls ./tests/results
             jahia-testrail-reporter ./tests/results $TESTRAIL_USERNAME $TESTRAIL_PASSWORD -n="Database Connector" -m="Jahia-Latest" -d="This test was executed on circleci, $CIRCLE_BUILD_URL"
       - *persist-workspace
 
