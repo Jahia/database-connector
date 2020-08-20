@@ -1,6 +1,6 @@
 import { databaseConnector } from '../page-object/database-connector.page'
 
-describe('elastic search connection edit test', () => {
+describe('elastic search connection edit', () => {
     let connId: string
 
     beforeEach('Create connection', function () {
