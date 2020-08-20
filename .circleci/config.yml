@@ -2,6 +2,7 @@ version: 2.1
 orbs:
   docker: circleci/docker@0.5.20
   slack: circleci/slack@3.4.2
+  node: circleci/node@4.0.0
 
 # Parameters are available to all elements of config.yml, these are accessible using `pipeline.parameters.PARAMETER`
 parameters:
@@ -115,6 +116,17 @@ jobs:
             MANIFEST: "warmup-manifest-snapshot.yml"
       - store_artifacts:
           path: ./tests/results
+      - run:
+          name: Publish results to testrail
+          when: always
+          command: |
+            set +e
+            export NVM_DIR="/opt/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install v12
+            nvm alias default v12
+            npm install -g jahia-testrail-reporter
+            jahia-testrail-reporter ./tests/results $TESTRAIL_USERNAME $TESTRAIL_PASSWORD -n="Database Connector" -m="Jahia-Latest" -d="This test was executed on circleci, $CIRCLE_BUILD_URL"
       - *persist-workspace
 
   # publish to nexus only after merging to master
