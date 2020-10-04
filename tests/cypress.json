@@ -6,5 +6,5 @@
     "videoUploadOnPasses": false,
     "reporter": "reporter/json.js",
     "screenshotsFolder": "./results/screenshots",
-    "videosFolder": "/results/videos"
+    "videosFolder": "./results/videos"
 }
