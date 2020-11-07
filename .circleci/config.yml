@@ -125,8 +125,8 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm install v12
             nvm alias default v12
-            npm install -g jahia-testrail-reporter
-            jahia-testrail-reporter ./tests/results $TESTRAIL_USERNAME $TESTRAIL_PASSWORD -n="Database Connector" -m="Jahia-Latest" -d="This test was executed on circleci, $CIRCLE_BUILD_URL"
+            npm install -g jahia-reporter
+            jahia-reporter testrail ./tests/results $TESTRAIL_USERNAME $TESTRAIL_PASSWORD -n="Database Connector" -m="Jahia-Latest" -d="This test was executed on circleci, $CIRCLE_BUILD_URL"
       - *persist-workspace
 
   # publish to nexus only after merging to master
