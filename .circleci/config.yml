@@ -32,6 +32,7 @@ jobs:
       - image: circleci/openjdk:8-jdk-stretch
     steps:
       - checkout
+      - run: npm install
       - *persist-workspace
 
   build:
