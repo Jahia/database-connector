@@ -29,9 +29,10 @@ jobs:
   initialize:
     <<: *workdir
     docker:
-      - image: circleci/openjdk:8-jdk-stretch
+      - image: cimg/node:14.15
     steps:
       - checkout
+      - run: npm install
       - *persist-workspace
 
   build:
