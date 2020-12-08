@@ -187,7 +187,7 @@ workflows:
             - build
       - test:
           context: QA_ENVIRONMENT
-          SKIP_TESTRAIL: "false"
+          SKIP_TESTRAIL: "true"
           requires:
             - build
       - publish:
