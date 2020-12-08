@@ -12,15 +12,9 @@ parameters:
   TESTRAIL_PROJECTNAME:
     type: string
     default: 'Database Connector'
-  TESTRAIL_MILESTONE:
-    type: string
-    default: 'Jahia-Latest'
   PRIMARY_RELEASE_BRANCH:
     type: string
     default: 'master'
-  SKIP_TESTRAIL:
-    type: string 
-    default: "" 
 
 references:
   workdir: &workdir
@@ -105,6 +99,13 @@ jobs:
     <<: *workdir
     machine:
       docker_layer_caching: true    # default - false
+    parameters:
+      TESTRAIL_MILESTONE:
+        type: string
+        default: 'Jahia-Latest'
+      SKIP_TESTRAIL:
+        type: string 
+        default: "" 
     steps:
       - *attach-workspace
       - restore_cache:
