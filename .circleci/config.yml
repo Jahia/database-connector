@@ -9,6 +9,12 @@ parameters:
   slack_channel:
     type: string
     default: '#cci-database-connector'
+  TESTRAIL_PROJECTNAME:
+    type: string
+    default: 'Database Connector'
+  PRIMARY_RELEASE_BRANCH:
+    type: string
+    default: 'master'
 
 references:
   workdir: &workdir
@@ -93,6 +99,13 @@ jobs:
     <<: *workdir
     machine:
       docker_layer_caching: true    # default - false
+    parameters:
+      TESTRAIL_MILESTONE:
+        type: string
+        default: 'Jahia-Latest'
+      SKIP_TESTRAIL:
+        type: string 
+        default: "" 
     steps:
       - *attach-workspace
       - restore_cache:
@@ -103,8 +116,8 @@ jobs:
       - run:
           name: Docker login
           command: |
-            echo "$DOCKER_REGISTRY_USERNAME"
-            echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USERNAME" --password-stdin
+            echo "$DOCKERHUB_LOGIN"
+            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_LOGIN" --password-stdin
       - run:
           name: Execute tests
           command : |
@@ -122,12 +135,22 @@ jobs:
           when: always
           command: |
             set +e
-            export NVM_DIR="/opt/circleci/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm install v12
-            nvm alias default v12
-            npm install -g jahia-reporter
-            jahia-reporter testrail ./tests/results $TESTRAIL_USERNAME $TESTRAIL_PASSWORD -n="Database Connector" -m="Jahia-Latest" -d="This test was executed on circleci, $CIRCLE_BUILD_URL"
+            if [ "<< parameters.SKIP_TESTRAIL >>" != "true" ] || [ "$CIRCLE_BRANCH" = "<< pipeline.parameters.PRIMARY_RELEASE_BRANCH >>" ]; then            
+              export NVM_DIR="/opt/circleci/.nvm"
+              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+              nvm install v12
+              nvm alias default v12
+              npm install -g jahia-reporter
+              echo "Sending testrail report"
+              jahia-reporter testrail \
+                --testrailUsername=$TESTRAIL_USERNAME \
+                --testrailPassword=$TESTRAIL_PASSWORD \
+                --sourcePath="./tests/results" \
+                --sourceType="json" \
+                --projectName="<< pipeline.parameters.TESTRAIL_PROJECTNAME >>" \
+                --milestone="<< parameters.TESTRAIL_MILESTONE >>" \
+                --defaultRunDescription="This test was executed on circleci, $CIRCLE_BUILD_URL"
+              fi
       - *persist-workspace
 
   # publish to nexus only after merging to master
@@ -162,6 +185,11 @@ workflows:
       - lint:
           requires:
             - build
+      - test:
+          context: QA_ENVIRONMENT
+          SKIP_TESTRAIL: "true"
+          requires:
+            - build
       - publish:
           context: QA_ENVIRONMENT
           requires:
@@ -169,7 +197,7 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - << pipeline.parameters.PRIMARY_RELEASE_BRANCH >>
   nightly:
     triggers:
       - schedule:
@@ -177,7 +205,7 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - << pipeline.parameters.PRIMARY_RELEASE_BRANCH >>
     jobs:
       - initialize
       - build:
@@ -186,5 +214,6 @@ workflows:
             - initialize
       - test:
           context: QA_ENVIRONMENT
+          SKIP_TESTRAIL: "false"
           requires:
             - build
