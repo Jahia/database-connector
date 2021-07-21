@@ -1,41 +1,32 @@
-version: '3.3'
+version: '3.6'
 services:
-  elasticsearch:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION}"
-    environment:
-      - discovery.type=single-node
-      - cluster.name=jahia-cluster
-    container_name: elasticsearch
-    ports:
-      - "9200:9200"
-    extra_hosts:
-      - jahia:127.0.0.1
-  jahia:
-    image: "jahia/${JAHIA_VERSION}"
-    container_name: jahia
-    environment:
-      - jahia_cfg_karaf_remoteShellHost=0.0.0.0
-    ports:
-      - "8080:8080"
-    extra_hosts:
-      - jahia:127.0.0.1
-    depends_on:
-      - elasticsearch
-  # Cypress container
-  cypress:
-    build: .
-    container_name: e2e-tests
-    depends_on:
-      - jahia
-    environment:
-      # pass base url to test pointing at the web application
-      - JAHIA_HOST=jahia
-      - JAHIA_PORT=8080
-      - CYPRESS_baseUrl=http://jahia:8080
-      - NEXUS_USERNAME=${NEXUS_USERNAME}
-      - NEXUS_PASSWORD=${NEXUS_PASSWORD}
-      - MANIFEST=${MANIFEST}
-    volumes: 
-      - type: bind
-        source: ./results
-        target: /tmp/results
+    jahia:
+        image: '${JAHIA_IMAGE}'
+        container_name: jahia
+        environment:
+            - SUPER_USER_PASSWORD=${SUPER_USER_PASSWORD}        
+            - MAX_RAM_PERCENTAGE=95
+        ports:
+            - '8080:8080'
+        extra_hosts:
+            - jahia:127.0.0.1
+        networks:
+            - stack
+    # Cypress container
+    cypress:
+        image: '${TESTS_IMAGE}'
+        # https://github.com/cypress-io/cypress/issues/350
+        ipc: host
+        container_name: cypress
+        depends_on:
+            - jahia
+        environment:
+            - MANIFEST=${MANIFEST}
+            - SUPER_USER_PASSWORD=${SUPER_USER_PASSWORD}
+            - JAHIA_URL=http://jahia:8080
+            - NEXUS_USERNAME=${NEXUS_USERNAME}
+            - NEXUS_PASSWORD=${NEXUS_PASSWORD}
+        networks:
+            - stack
+networks:
+    stack:
