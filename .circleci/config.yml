@@ -66,6 +66,9 @@ parameters:
   SSH_KEY_FINGERPRINT:
     type: string
     default: "4:ed:b7:f9:49:6b:06:89:85:ca:4a:b3:6e:fe:ec:2d"
+  ELASTICSEARCH_IMAGE:
+    type: string
+    default: "docker.elastic.co/elasticsearch/elasticsearch:7.13.2"
 
 workflows:
   # On code change is executed each time new code is pushed to a branch
@@ -212,6 +215,7 @@ workflows:
           requires:
             - jahia-modules-orb/initialize
           jahia_image: << pipeline.parameters.JAHIA_IMAGE >>
+          elasticsearch_image: << pipeline.parameters.ELASTICSEARCH_IMAGE >>
           tests_manifest: << pipeline.parameters.TESTS_MANIFEST >>
           module_id: << pipeline.parameters.MODULE_ID >>
           testrail_project: << pipeline.parameters.TESTRAIL_PROJECTNAME >>
@@ -242,11 +246,12 @@ workflows:
           matrix:
             parameters:
               jahia_image: ["jahia/jahia-ee:8", "jahia/jahia-ee-dev:8-SNAPSHOT"]
-              tests_manifest: ["provisioning-manifest-snapshot.yml"]
-              module_id: ["<< pipeline.parameters.MODULE_ID >>"]
-              testrail_project: ["<< pipeline.parameters.TESTRAIL_PROJECTNAME >>"]
-              testrail_milestone: ["<< matrix.jahia_image >>"]
-              should_skip_artifacts: [true]
-              should_skip_testrail: [false]
-              should_skip_notifications: [false]
-              should_skip_zencrepes: [false]
+          elasticsearch_image: << pipeline.parameters.ELASTICSEARCH_IMAGE >>
+          tests_manifest: "provisioning-manifest-snapshot.yml"
+          module_id: "<< pipeline.parameters.MODULE_ID >>"
+          testrail_project: "<< pipeline.parameters.TESTRAIL_PROJECTNAME >>"
+          testrail_milestone: "<< matrix.jahia_image >>"
+          should_skip_artifacts: true
+          should_skip_testrail: false
+          should_skip_notifications: false
+          should_skip_zencrepes: false

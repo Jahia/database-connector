@@ -12,6 +12,16 @@ services:
             - jahia:127.0.0.1
         networks:
             - stack
+    elasticsearch:
+        image: '${ELASTICSEARCH_IMAGE}'
+        environment:
+            - discovery.type=single-node
+            - TZ=${TIMEZONE}
+        container_name: elasticsearch
+        ports:
+            - 9200:9200
+        networks:
+            - stack            
     # Cypress container
     cypress:
         image: '${TESTS_IMAGE}'
