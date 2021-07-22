@@ -1,7 +1,0 @@
-connection {
-	type "ELASTICSEARCH7"
-	host "elasticsearch"
-	identifier "esImportConn1"
-	isConnected "true"
-	port "9200"
-}
