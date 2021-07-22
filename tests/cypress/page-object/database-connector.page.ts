@@ -43,7 +43,7 @@ class DatabaseConnectorPage extends DatabaseConnectorBasePage {
     }
 
     createConnection(host: string, port: string, id: string) {
-        cy.request('POST', 'modules/dbconn/elasticsearch7/add', {
+        cy.request('POST', 'modules/dbconn/elasticsearch/add', {
             port: port,
             isConnected: true,
             host: host,
@@ -60,7 +60,7 @@ class DatabaseConnectorPage extends DatabaseConnectorBasePage {
         cy.request('GET', 'modules/dbconn/allconnections').then((response) => {
             // response.body is automatically serialized into JSON
             response.body.connections.forEach((card) => {
-                cy.request('DELETE', 'modules/dbconn/elasticsearch7/remove/' + card.id)
+                cy.request('DELETE', 'modules/dbconn/elasticsearch/remove/' + card.id)
             })
         })
     }

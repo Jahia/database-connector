@@ -1,5 +1,5 @@
 connection {
-	type "ELASTICSEARCH7"
+	type "ELASTICSEARCH"
 	host "elasticsearch"
 	identifier "esImportConn1"
 	isConnected "true"
@@ -7,7 +7,7 @@ connection {
 }
 
 connection {
-	type "ELASTICSEARCH7"
+	type "ELASTICSEARCH"
 	host "elasticsearch"
 	identifier "esImportConn2"
 	isConnected "true"
@@ -15,7 +15,7 @@ connection {
 }
 
 connection {
-	type "ELASTICSEARCH7"
+	type "ELASTICSEARCH"
 	host "elasticsearch"
 	identifier "esImportConn3"
 	isConnected "true"
@@ -23,7 +23,7 @@ connection {
 }
 
 connection {
-	type "ELASTICSEARCH7"
+	type "ELASTICSEARCH"
 	host "elasticsearch"
 	identifier "esImportConn4"
 	isConnected "true"

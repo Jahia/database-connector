@@ -1,5 +1,5 @@
 connection {
-	type "ELASTICSEARCH7"
+	type "ELASTICSEARCH"
 	host "elasticsearch"
 	identifier "esImportConn1"
 	isConnected "true"
