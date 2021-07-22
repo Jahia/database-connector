@@ -65,7 +65,7 @@ parameters:
     default: false
   SSH_KEY_FINGERPRINT:
     type: string
-    default: "4:ed:b7:f9:49:6b:06:89:85:ca:4a:b3:6e:fe:ec:2d"
+    default: "04:ed:b7:f9:49:6b:06:89:85:ca:4a:b3:6e:fe:ec:2d"
   ELASTICSEARCH_IMAGE:
     type: string
     default: "docker.elastic.co/elasticsearch/elasticsearch:7.13.2"
