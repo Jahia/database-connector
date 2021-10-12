@@ -86,7 +86,7 @@ public class RegistryListener extends DefaultEventListener implements Initializi
                     nodeToPropertyValueMap.put(nodePath, null);
                 }
             } catch (RepositoryException e) {
-                e.printStackTrace();
+                logger.warn("Error handling event", e);
             }
         }
 
@@ -124,7 +124,7 @@ public class RegistryListener extends DefaultEventListener implements Initializi
                 }
             });
         } catch (RepositoryException e) {
-            e.printStackTrace();
+            logger.warn("Error handling event", e);
         }
     }
 

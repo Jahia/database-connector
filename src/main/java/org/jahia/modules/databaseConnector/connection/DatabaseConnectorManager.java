@@ -358,7 +358,7 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
             }
             FileUtils.writeStringToFile(file, sb.toString(), true);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Error exporting connections", e);
         }
         return file;
     }
