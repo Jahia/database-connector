@@ -34,13 +34,15 @@ module.exports = function(grunt) {
         },
         watch       : {
             files: ['Gruntfile.js', 'src/main/javascript/**/*.js', 'src/main/javascript/**/*.html'],
-            tasks: ['concat', 'copy', 'less']
+            tasks: ['concat', 'copy']
             // tasks: ['concat', 'copy', 'less', 'uglify']
         },
         bower_concat: {
             all: {
-                dest        : 'src/main/resources/javascript/lib/_dc.js',
-                cssDest     : 'src/main/resources/css/lib/_dc.css',
+                dest        : {
+                    js:'src/main/resources/javascript/lib/_dc.js',
+                    css:'src/main/resources/css/lib/_dc.css'
+                },
                 exclude     : [
                     'jquery',
                     'modernizr'
@@ -63,17 +65,7 @@ module.exports = function(grunt) {
                 files: {
                     'src/main/resources/javascript/lib/_dc.min.js': ['src/main/resources/javascript/lib/_dc.js'],
                     'src/main/resources/javascript/lib/_dc-main.min.js': ['src/main/resources/javascript/angular/components/dc-main.js','src/main/resources/javascript/angular/components/dc-core.js'],
-                    
-                }
-            }
-        },
-        less: {
-            development: {
-                options: {
-                    compress: true  //minifying the result
-                },
-                files: {
-                    "./src/main/resources/css/bootstrap.min.css":"./src/main/less/bootstrap.less"
+
                 }
             }
         }
@@ -84,8 +76,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-bower-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-less');
-    //grunt.registerTask('default', ['concat', 'bower_concat', 'copy', 'less', 'uglify']);
     /*DEV*/
-    grunt.registerTask('default', ['concat', 'bower_concat', 'copy', 'less']);
+    grunt.registerTask('default', ['concat', 'bower_concat', 'copy']);
 };
