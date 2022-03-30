@@ -16,6 +16,11 @@
     "jsdoc": "^3.6.10",
     "minami": "^1.2.3"
   },
+  "resolutions": {
+    "lodash": "4.17.21",
+    "bower": "1.8.14",
+    "underscore.string": "3.3.5"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate-docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose"
