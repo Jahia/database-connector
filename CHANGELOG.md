@@ -1,3 +1,25 @@
+# v1.0.1 (Fri Apr 01 2022)
+
+#### 🐛 Bug Fix
+
+- BACKLOG-16745: Update test dependencies [#48](https://github.com/Jahia/database-connector/pull/48) ([@tdraier](https://github.com/tdraier))
+- BACKLOG-16745: update dependencies [#46](https://github.com/Jahia/database-connector/pull/46) ([@tdraier](https://github.com/tdraier))
+- Updated orb to the latest version [#42](https://github.com/Jahia/database-connector/pull/42) ([@Fgerthoffert](https://github.com/Fgerthoffert))
+- Updated to the latest version of the orb [#40](https://github.com/Jahia/database-connector/pull/40) ([@Fgerthoffert](https://github.com/Fgerthoffert))
+
+#### ⚠️ Pushed to `master`
+
+- Updated the config to use the latest version of the orb ([@Fgerthoffert](https://github.com/Fgerthoffert))
+- [ci skip] Updated signature for Jahia Database Connector ([@jahia-ci](https://github.com/jahia-ci))
+
+#### Authors: 3
+
+- Francois G. ([@Fgerthoffert](https://github.com/Fgerthoffert))
+- Jahia Continuous Integration account ([@jahia-ci](https://github.com/jahia-ci))
+- Thomas Draier ([@tdraier](https://github.com/tdraier))
+
+---
+
 # v1.0.1 (Wed Nov 03 2021)
 
 #### 🐛 Bug Fix
