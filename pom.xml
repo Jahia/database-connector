@@ -54,6 +54,7 @@
         <javaxws-annotations.version>1.1.1</javaxws-annotations.version>
         <jersey.version>2.18</jersey.version>
         <jahia.plugin.version>6.2</jahia.plugin.version>
+        <jahia.nexus.staging.repository.id>40c27f27a86d2d</jahia.nexus.staging.repository.id>
     </properties>
     <dependencies>
         <dependency>
@@ -201,11 +202,11 @@
     <distributionManagement>
         <repository>
             <id>jahia-enterprise-releases</id>
-            <url>https://devtools.jahia.com/nexus/content/repositories/jahia-enterprise-releases</url>
+            <url>https://devtools.jahia.com/nexus/content/repositories/jahia-connector-enterprise-releases</url>
         </repository>
         <snapshotRepository>
             <id>jahia-enterprise-snapshots</id>
-            <url>https://devtools.jahia.com/nexus/content/repositories/jahia-enterprise-snapshots</url>
+            <url>https://devtools.jahia.com/nexus/content/repositories/jahia-connector-enterprise-snapshots</url>
         </snapshotRepository>
     </distributionManagement>
     <build>
@@ -274,7 +275,7 @@
                             <goal>bower</goal>
                         </goals>
                         <configuration>
-                            <arguments>update -F</arguments>
+                            <arguments>update -f -q</arguments>
                         </configuration>
                     </execution>
                     <execution>
@@ -284,7 +285,7 @@
                             <goal>bower</goal>
                         </goals>
                         <configuration>
-                            <arguments>install -F</arguments>
+                            <arguments>install -f -q</arguments>
                         </configuration>
                     </execution>
                     <execution>
