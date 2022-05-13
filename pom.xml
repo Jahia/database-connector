@@ -275,7 +275,7 @@
                             <goal>bower</goal>
                         </goals>
                         <configuration>
-                            <arguments>update -F</arguments>
+                            <arguments>update -f -q</arguments>
                         </configuration>
                     </execution>
                     <execution>
@@ -285,7 +285,7 @@
                             <goal>bower</goal>
                         </goals>
                         <configuration>
-                            <arguments>install -F</arguments>
+                            <arguments>install -f -q</arguments>
                         </configuration>
                     </execution>
                     <execution>
