@@ -14,6 +14,7 @@
     "grunt-contrib-uglify": "^5.1.0",
     "grunt-contrib-watch": "^1.1.0",
     "jsdoc": "^3.6.10",
+    "lint": "yarn lint:scss && yarn lint:js",
     "minami": "^1.2.3"
   },
   "resolutions": {
