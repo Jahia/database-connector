@@ -75,6 +75,10 @@ jobs:
         with:
           node-version: 'lts/*'
       - uses: actions/checkout@v2
+      - name: Prepare environment variable
+        shell: bash
+        run: |
+          mv tests/.env.example tests/.env
       - uses: jahia/jahia-modules-action/integration-tests@v2
         with:
           module_id: database-connector
