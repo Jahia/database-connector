@@ -16,7 +16,6 @@ services:
         image: '${ELASTICSEARCH_IMAGE}'
         environment:
             - discovery.type=single-node
-            - TZ=${TIMEZONE}
         container_name: elasticsearch
         ports:
             - 9200:9200
