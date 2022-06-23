@@ -12,7 +12,7 @@ echo " JAHIA_IMAGE: ${JAHIA_IMAGE}"
 echo " ELASTICSEARCH_IMAGE: ${ELASTICSEARCH_IMAGE}"
 
 docker-compose pull jahia
-docker-compose up -d --renew-anon-volumes --remove-orphans --force-recreate jahia
+docker-compose up -d --renew-anon-volumes --remove-orphans --force-recreate jahia elasticsearch
 
 if [[ $1 != "notests" ]]; then
     echo "$(date +'%d %B %Y - %k:%M') [TESTS] == Starting cypress tests =="
