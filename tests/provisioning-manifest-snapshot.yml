@@ -1,4 +1,6 @@
-- addMavenRepository: "https://NEXUS_USERNAME:NEXUS_PASSWORD@devtools.jahia.com/nexus/content/groups/enterprise@id=jahia-enterprise@snapshots"
+- addMavenRepository: 'https://devtools.jahia.com/nexus/content/groups/enterprise@id=jahia-enterprise@snapshots'
+  username: NEXUS_USERNAME
+  password: NEXUS_PASSWORD
 - installBundle:
   - 'mvn:org.jahia.modules/database-connector'
   autoStart: true
