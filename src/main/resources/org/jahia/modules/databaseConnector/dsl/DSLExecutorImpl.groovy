@@ -2,7 +2,6 @@ package org.jahia.modules.databaseConnector.dsl
 
 import org.jahia.data.templates.JahiaTemplatesPackage
 import org.jahia.services.content.nodetypes.ExtendedNodeType
-import org.osgi.service.component.annotations.Component
 
 class DSLExecutorImpl implements DSLExecutor {
 
