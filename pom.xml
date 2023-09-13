@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.jahia.modules</groupId>
         <artifactId>jahia-modules</artifactId>
-        <version>8.1.0.0</version>
+        <version>8.2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>database-connector</artifactId>
     <version>1.6.0-SNAPSHOT</version>
@@ -53,7 +53,6 @@
         <!--JAX-RS Properties -->
         <javaxws-annotations.version>1.1.1</javaxws-annotations.version>
         <jersey.version>2.18</jersey.version>
-        <jahia.plugin.version>6.2</jahia.plugin.version>
         <jahia.nexus.staging.repository.id>40c27f27a86d2d</jahia.nexus.staging.repository.id>
     </properties>
     <dependencies>
@@ -212,35 +211,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <_dsannotations>*</_dsannotations>
-                        <Jahia-Deploy-On-Site>all</Jahia-Deploy-On-Site>
-                        <Jahia-Module-Priority>2</Jahia-Module-Priority>
-                        <Import-Package>
-                            ${jahia.plugin.projectPackageImport},
-                            *
-                        </Import-Package>
-                        <Export-Package>
-                            org.jahia.modules.databaseConnector,
-                            org.bson,
-                            org.bson.conversions,
-                            org.jahia.modules.databaseConnector.services,
-                            org.jahia.modules.databaseConnector.connection,
-                            org.jahia.modules.databaseConnector.connector,
-                            org.jahia.modules.databaseConnector.util,
-                            org.jahia.modules.databaseConnector.taglib,
-                            org.jahia.modules.databaseConnector.api.filters
-                        </Export-Package>
-                        <JAX-RS-Alias>/dbconn</JAX-RS-Alias>
-                        <JAX-RS-Application>org.jahia.modules.databaseConnector.api.DCApiApplication</JAX-RS-Application>
-                    </instructions>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
                 <version>1.12.0</version>
@@ -253,7 +223,7 @@
                             <goal>install-node-and-yarn</goal>
                         </goals>
                         <configuration>
-                            <nodeVersion>v14.16.0</nodeVersion>
+                            <nodeVersion>v18.16.0</nodeVersion>
                             <yarnVersion>v1.22.18</yarnVersion>
                         </configuration>
                     </execution>
@@ -321,18 +291,36 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>5.1.2</version>
                 <extensions>true</extensions>
                 <dependencies>
                     <dependency>
                         <groupId>biz.aQute.bnd</groupId>
                         <artifactId>biz.aQute.bndlib</artifactId>
-                        <version>6.1.0</version>
+                        <version>6.4.0</version>
                     </dependency>
                 </dependencies>
                 <configuration>
                     <instructions>
-                        <_noimportjava>true</_noimportjava>
+                        <_dsannotations>*</_dsannotations>
+                        <Jahia-Deploy-On-Site>all</Jahia-Deploy-On-Site>
+                        <Jahia-Module-Priority>2</Jahia-Module-Priority>
+                        <Import-Package>
+                            ${jahia.plugin.projectPackageImport},
+                            *
+                        </Import-Package>
+                        <Export-Package>
+                            org.jahia.modules.databaseConnector,
+                            org.bson,
+                            org.bson.conversions,
+                            org.jahia.modules.databaseConnector.services,
+                            org.jahia.modules.databaseConnector.connection,
+                            org.jahia.modules.databaseConnector.connector,
+                            org.jahia.modules.databaseConnector.util,
+                            org.jahia.modules.databaseConnector.taglib,
+                            org.jahia.modules.databaseConnector.api.filters
+                        </Export-Package>
+                        <JAX-RS-Alias>/dbconn</JAX-RS-Alias>
+                        <JAX-RS-Application>org.jahia.modules.databaseConnector.api.DCApiApplication</JAX-RS-Application>
                     </instructions>
                 </configuration>
             </plugin>

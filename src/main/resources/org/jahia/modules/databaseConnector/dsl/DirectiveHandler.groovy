@@ -9,10 +9,6 @@ import org.jahia.services.content.JCRSessionWrapper
 import org.jahia.services.content.JCRTemplate
 import org.jahia.services.content.nodetypes.ExtendedNodeType
 import org.jahia.services.usermanager.JahiaUserManagerService
-import org.osgi.service.component.annotations.Component
-import org.osgi.service.component.annotations.Reference
-import org.osgi.service.component.annotations.ReferenceCardinality
-import org.osgi.service.component.annotations.ReferencePolicy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -21,7 +17,6 @@ import javax.jcr.RepositoryException
 /**
  * @author alexander karmanov on 2017-04-21.
  */
-@Component (service = DirectiveHandler.class)
 class DirectiveHandler implements DSLHandler {
     private static final Logger logger = LoggerFactory.getLogger(DirectiveHandler.class);
     def JCRTemplate jcrTemplate;
