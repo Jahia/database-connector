@@ -43,11 +43,7 @@ class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
 
     fillElasticSearchConnection(host = '', port = '') {
         if (host != '') {
-            cy.get(this.elements.host).clear()
-            // Only way it works consistently
-            // eslint-disable-next-line cypress/no-unnecessary-waiting
-            cy.wait(200)
-            cy.get(this.elements.host).type(host)
+            cy.get(this.elements.host).click().focused().clear().type(host)
         }
         if (port != '') {
             cy.get(this.elements.port).clear().type(port)
