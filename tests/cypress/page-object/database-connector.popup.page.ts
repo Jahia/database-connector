@@ -43,7 +43,7 @@ class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
 
     fillElasticSearchConnection(host = '', port = '') {
         if (host != '') {
-            cy.get(this.elements.host).clear().type(host)
+            cy.get(this.elements.host).click().focused().clear().type(host)
         }
         if (port != '') {
             cy.get(this.elements.port).clear().type(port)
