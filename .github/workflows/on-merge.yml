@@ -87,6 +87,7 @@ jobs:
           reporter: java-junit
           fail-on-error: 'false'
           output-to: 'step-summary'
+
   publish:
     name: Publish module
     needs: [integration-tests-standalone]
