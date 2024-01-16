@@ -4,6 +4,7 @@ describe('elastic search connection edit', () => {
     let connId: string
 
     beforeEach('Create connection', function () {
+        databaseConnector.cleanUp()
         connId = 'augm-search-conn' + Date.now().toString()
         databaseConnector.createConnection('myHost', '9201', connId)
     })
