@@ -33,20 +33,17 @@ class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
      */
     editElasticSearchConnection(host = '', port = '') {
         this.fillElasticSearchConnection(host, port)
-        // necessary for run on circleci. Fancier and more complicated workaround can be done
-        // but this is so small i'm leaving it as is
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(100)
         cy.get(this.elements.updateButton).click()
         return this
     }
 
     fillElasticSearchConnection(host = '', port = '') {
         if (host != '') {
-            cy.get(this.elements.host).click().focused().clear().type(host)
+            cy.get(this.elements.host).as('host').clear()
+            cy.get('@host').type(host, { delay: 0 })
         }
         if (port != '') {
-            cy.get(this.elements.port).clear().type(port)
+            cy.get(this.elements.port).clear().type(port, { delay: 0 })
         }
     }
 
@@ -71,4 +68,5 @@ class DatabaseConnectorPopupPage extends DatabaseConnectorBasePage {
         return cy.get(this.elements.notification).should('contain', 'Connection verification was successful!')
     }
 }
+
 export const databaseConnectorPopup = new DatabaseConnectorPopupPage()
