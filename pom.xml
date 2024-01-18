@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.jahia.modules</groupId>
         <artifactId>jahia-modules</artifactId>
-        <version>8.2.0.0-SNAPSHOT</version>
+        <version>8.1.1.0</version>
     </parent>
     <artifactId>database-connector</artifactId>
     <version>1.6.0-SNAPSHOT</version>
@@ -43,6 +43,7 @@
       <tag>HEAD</tag>
   </scm>
     <properties>
+        <jahia.plugin.version>6.9</jahia.plugin.version>
         <jahia-module-type>system</jahia-module-type>
         <jahia-depends/>
         <jahia-module-signature>MCwCFAMcrruBpEcwWGMnfozWaRsbNh7DAhQDykPsULDDjG0Zh3mXUUHEtoB3lg==</jahia-module-signature>
