@@ -52,11 +52,11 @@ jobs:
           incident_google_client_email: ${{ secrets.INCIDENT_GOOGLE_CLIENT_EMAIL }}
           incident_google_api_key_base64: ${{ secrets.INCIDENT_GOOGLE_PRIVATE_KEY_BASE64 }}
           zencrepes_secret: ${{ secrets.ZENCREPES_WEBHOOK_SECRET }}
-      - name: Test Report
+      - name: Nightly Tests Report
         uses: phoenix-actions/test-reporting@v12
         if: success() || failure()
         with:
-          name: Nightly Database Connector
+          name: Tests Report (Standalone - Jahia Dev Discovery 8)
           path: tests/artifacts/results/xml_reports/*.xml
           reporter: java-junit
           fail-on-error: 'false'
@@ -108,11 +108,12 @@ jobs:
           incident_google_client_email: ${{ secrets.INCIDENT_GOOGLE_CLIENT_EMAIL }}
           incident_google_api_key_base64: ${{ secrets.INCIDENT_GOOGLE_PRIVATE_KEY_BASE64 }}
           zencrepes_secret: ${{ secrets.ZENCREPES_WEBHOOK_SECRET }}
-      - name: Test Report
-        uses: dorny/test-reporter@v1
+      - name: Nightly Tests Report
+        uses: phoenix-actions/test-reporting@v12
         if: success() || failure()
         with:
-          name: Tests Report (Standalone)
+          name: Tests Report (Standalone - Jahia Discovery 8)
           path: tests/artifacts/results/xml_reports/*.xml
           reporter: java-junit
           fail-on-error: 'false'
+          output-to: 'step-summary'
