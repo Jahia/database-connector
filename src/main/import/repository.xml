@@ -37,7 +37,7 @@
                                                   j:defaultTemplate="false"
                                                   j:hiddenTemplate="false"
                                                   j:icon="/modules/database-connector/templates/files/admin/database_connector.png"
-                                                  j:requiredPermissions="#/permissions/admin/serverAdminDatabaseConnector"
+                                                  j:requiredPermissionNames="serverAdminDatabaseConnector"
                                                   j:titleKey="dc_databaseConnector"
                                                   jcr:mixinTypes="jmix:rbTitle"
                                                   jcr:primaryType="jnt:contentTemplate">
