@@ -3,7 +3,7 @@
 
     window.jahia.uiExtender.registry.add('adminRoute', 'database-connector', {
         targets: ['administration-server-configuration:99'],
-        // requiredPermission: 'admin',
+        requiredPermission: 'serverAdminDatabaseConnector',
         icon: null,
         label: 'database-connector:label',
         isSelectable: true,
