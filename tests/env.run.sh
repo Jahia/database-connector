@@ -54,11 +54,11 @@ curl -u root:${SUPER_USER_PASSWORD} -X POST ${JAHIA_URL}/modules/api/provisionin
 echo "$(date +'%d %B %Y - %k:%M') == elasticsearch-connector installed =="
 
 echo "$(date +'%d %B %Y - %k:%M') == Fetching the list of installed modules =="
-./node_modules/jahia-reporter/bin/run utils:modules \
-  --moduleId="${MODULE_ID}" \
-  --jahiaUrl="${JAHIA_URL}" \
-  --jahiaPassword="${SUPER_USER_PASSWORD}" \
-  --filepath="results/installed-jahia-modules.json"
+bash -c "unset npm_config_package; npx --yes @jahia/jahia-reporter@latest utils:modules \
+  --moduleId=\"${MODULE_ID}\" \
+  --jahiaUrl=\"${JAHIA_URL}\" \
+  --jahiaPassword=\"${SUPER_USER_PASSWORD}\" \
+  --filepath=\"results/installed-jahia-modules.json\" "  
 echo "$(date +'%d %B %Y - %k:%M') == Modules fetched =="
 INSTALLED_MODULE_VERSION=$(cat results/installed-jahia-modules.json | jq '.module.version')
 if [[ $INSTALLED_MODULE_VERSION == "UNKNOWN" ]]; then
