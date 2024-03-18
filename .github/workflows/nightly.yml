@@ -28,7 +28,7 @@ jobs:
           incident_service: database-connector-JahiaSN
           testrail_project: Database Connector
           tests_manifest: provisioning-manifest-snapshot.yml
-          jahia_image: jahia/jahia-discovery-dev:8-SNAPSHOT
+          jahia_image: jahia/jahia-ee-dev:8-SNAPSHOT
           should_use_build_artifacts: false
           should_skip_artifacts: true
           should_skip_notifications: false
@@ -84,7 +84,7 @@ jobs:
           incident_service: database-connector-JahiaRL
           testrail_project: Database Connector
           tests_manifest: provisioning-manifest-snapshot.yml
-          jahia_image: jahia/jahia-discovery:8
+          jahia_image: jahia/jahia-ee:8
           should_use_build_artifacts: false
           should_skip_artifacts: true
           should_skip_notifications: false
