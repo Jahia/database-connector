@@ -1,11 +1,11 @@
 # Trigger the workflow on milestone events
-on: 
+on:
   milestone:
     types: [closed]
   workflow_dispatch:
     inputs:
       milestoneId:
-        description: 'Milestone ID'     
+        description: 'Milestone ID'
         required: true
         default: '1'
 name: Milestone Closure
@@ -21,7 +21,7 @@ jobs:
         OUTPUT_FOLDER: temp_release_notes
         USE_MILESTONE_TITLE: "true"
     - name: Upload Release Notes
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: release-notes
         path: temp_release_notes/
