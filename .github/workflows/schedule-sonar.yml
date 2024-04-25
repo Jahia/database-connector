@@ -15,7 +15,7 @@ jobs:
     name: Sonar Analysis
     runs-on: ubuntu-latest
     env:
-      NEXUS_INTERNAL_URL: ${{ secrets.NEXUS_INTERNAL_URL }
+      NEXUS_INTERNAL_URL: ${{ secrets.NEXUS_INTERNAL_URL }}
     strategy:
       fail-fast: false
       matrix:
