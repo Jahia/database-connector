@@ -171,23 +171,25 @@ public class DatabaseConnectorManager implements InitializingBean, SynchronousBu
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        logger.info("Preparing to process bundles after properties set of database connector module.");
-        lastDeployDate = new Date();
-        lastBundleEvent = new Date();
-        for (Bundle currentBundle : this.bundle.getBundleContext().getBundles()) {
-            if (currentBundle.getSymbolicName().contains("connector")) {
-                logger.debug("Processing bundle: [" + currentBundle.getSymbolicName() + "]" + " - Current Bundle Status: [" + Utils.resolveBundleName(currentBundle.getState()) + "]");
+        if (settingsBean != null && settingsBean.isProcessingServer()) {
+            logger.info("Preparing to process bundles after properties set of database connector module.");
+            lastDeployDate = new Date();
+            lastBundleEvent = new Date();
+            for (Bundle currentBundle : this.bundle.getBundleContext().getBundles()) {
+                if (currentBundle.getSymbolicName().contains("connector")) {
+                    logger.debug("Processing bundle: [" + currentBundle.getSymbolicName() + "]" + " - Current Bundle Status: [" + Utils.resolveBundleName(currentBundle.getState()) + "]");
+                }
+                if (!(currentBundle.getSymbolicName().equals(this.bundle.getSymbolicName()))
+                        && org.jahia.osgi.BundleUtils.isJahiaModuleBundle(currentBundle)
+                        && (currentBundle.getState() == Bundle.INSTALLED
+                        || currentBundle.getState() == Bundle.RESOLVED
+                        || currentBundle.getState() == Bundle.ACTIVE)) {
+                    parseDefinitionWizards(currentBundle);
+                }
             }
-            if (!(currentBundle.getSymbolicName().equals(this.bundle.getSymbolicName()))
-                    && org.jahia.osgi.BundleUtils.isJahiaModuleBundle(currentBundle)
-                    && (currentBundle.getState() == Bundle.INSTALLED
-                    || currentBundle.getState() == Bundle.RESOLVED
-                    || currentBundle.getState() == Bundle.ACTIVE)) {
-                parseDefinitionWizards(currentBundle);
-            }
+            logger.debug("Preparing to Parse [" + this.bundle.getSymbolicName() + "] directive definitions");
+            parseDefinitionWizards(this.bundle);
         }
-        logger.debug("Preparing to Parse [" + this.bundle.getSymbolicName() + "] directive definitions");
-        parseDefinitionWizards(this.bundle);
     }
 
     public <T extends AbstractConnection> Map<String, T> getConnections(String databaseType) throws InstantiationException, IllegalAccessException {
