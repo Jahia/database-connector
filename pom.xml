@@ -46,7 +46,7 @@
         <jahia.plugin.version>6.9</jahia.plugin.version>
         <jahia-module-type>system</jahia-module-type>
         <jahia-depends>serverSettings</jahia-depends>
-        <jahia-module-signature>MCwCFBexMLDBsbHlZbtVJQPkp7Fx5aSfAhRGfC2mceRiL4gjHn99JQ14j6w97A==</jahia-module-signature>
+        <jahia-module-signature>MCwCFFpqOqQjUj9LYhgyV5a7Mg6NnlRnAhQCjvFcLcNB6eja12a+NZ2Qc+FjSA==</jahia-module-signature>
         <require-capability>osgi.extender;filter:="(osgi.extender=org.jahia.bundles.blueprint.extender.config)"</require-capability>
         <embed-dependency>*;groupId=org.hdrhistogram|io.netty|io.reactivex|org.latencyutils|org.glassfish.jersey|com.google.guava|org.apache.commons|com.fasterxml.jackson.core|com.fasterxml.jackson.jaxrs|com.fasterxml.jackson.module;scope=compile;
             type=!pom; inline=false
