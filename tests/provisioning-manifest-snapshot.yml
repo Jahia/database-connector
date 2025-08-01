@@ -3,5 +3,6 @@
   password: NEXUS_PASSWORD
 - installBundle:
   - 'mvn:org.jahia.modules/database-connector'
+  - 'mvn:org.jahia.modules/elasticsearch-connector/3.4.0'
   autoStart: true
   uninstallPreviousVersion: true
