@@ -1,4 +1,4 @@
-FROM cypress/base:18.16.1
+FROM cypress/base:22.17.1
 
 RUN apt update && apt install -y jq curl && apt-get clean && rm -rf /var/lib/apt/lists/*
 
