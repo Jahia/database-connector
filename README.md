@@ -1,9 +1,6 @@
-|  | Badges | 
-| --- | --- |
-| Module | ![ID](https://img.shields.io/badge/ID-database--connector-blue) [![Store](https://img.shields.io/badge/Jahia%20Store-Yes-brightgreen)](https://store.jahia.com/contents/modules-repository/org/jahia/modules/database-connector.html) |
-| CI / CD | [![CircleCI](https://circleci.com/gh/Jahia/database-connector/tree/master.svg?style=shield&circle-token=12ded3cf3a15eb80687f37e144422e3f7981bcdf)](https://app.circleci.com/pipelines/github/Jahia/database-connector) ![Unit Tests](https://img.shields.io/badge/Unit%20Tests-No-red) ![Integration Tests](https://img.shields.io/badge/Integration%20Tests-No-red) ![Build Snapshot](https://img.shields.io/badge/Build%20Snapshot-Yes-brightgreen) ![Build Release](https://img.shields.io/badge/Build%20Release-No-red) |
-| Artifacts | [![Snapshot](https://img.shields.io/badge/Snapshot-Nexus-blue)](https://devtools.jahia.com/nexus/content/repositories/jahia-enterprise-snapshots/org/jahia/modules/database-connector/) [![Release](https://img.shields.io/badge/Release-Nexus-blue)](https://devtools.jahia.com/nexus/content/repositories/jahia-enterprise-releases/org/jahia/modules/database-connector/) |
-| Slack | [![Discussion](https://img.shields.io/badge/Discussion-%23module--database--connector-blue)](https://jahia.slack.com/archives/C014B0RU328) [![Notifications](https://img.shields.io/badge/Notifications-%23cci--database--connector-blue)](https://jahia.slack.com/archives/C0143BLLSAZ)|
+<a href="https://www.jahia.com/">
+    <img src="https://www.jahia.com/modules/jahiacom-templates/images/jahia-3x.png" alt="Jahia logo" title="Jahia" align="right" height="60" />
+</a>
 
 # Database Connector
 
@@ -19,3 +16,6 @@ fill out the form.
 You can execute End-to-End tests locally by navigating to the tests folder and executing `docker-compose up -d`. This will start and set up Jahia, Elastic Search and cypress containers.
 The cypress container will exit once it's done executing the tests but the Jahia and Elastic Search containers will remain.
 At this point you can run the tests locally by executing `yarn e2e` or if you'd like to have the Cypress interface `yarn e2e:debug`
+## Open-Source
+
+This is an Open-Source module, you can find more details about Open-Source @ Jahia [in this repository](https://github.com/Jahia/open-source).
