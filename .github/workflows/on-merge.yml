@@ -62,6 +62,7 @@ jobs:
       module_id: database-connector
       jahia_image: ghcr.io/jahia/jahia-ee-dev:8-SNAPSHOT
       provisioning_manifest: provisioning-manifest-build.yml
+      incident_service: database-connector-JahiaSN
       should_use_build_artifacts: true
       artifact_prefix: database-connector-standalone-artifacts
       timeout_job: 45
